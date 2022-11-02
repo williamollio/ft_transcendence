@@ -16,3 +16,6 @@ Here are the tasks to do regarding the first work iteration :
 @mhahn and @wollio will work on their respective branches in order to set up the fundamentals of the project.
 
 
+Suggestions from @wollio:
+- using Typescript in strict mode initially -> this way we'll learn to code in typescript properly. And it's pretty difficult to switch on the fly as this would result in code rewriting.
+- using npm or yarn doesn't matter, but I am usually using npm
