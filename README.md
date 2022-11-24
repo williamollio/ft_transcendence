@@ -7,6 +7,7 @@
 Starting date : November 2nd
 
 Here are the tasks to do regarding the first work iteration :
+
 - Makefile
 - Dockerfiles
 - Docker-compose
@@ -19,4 +20,4 @@ Here are the tasks to do regarding the first work iteration :
 
 Date : November 21th
 
-
+![Feature Design](./ft_transcendence.drawio.svg)
