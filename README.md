@@ -20,4 +20,6 @@ Here are the tasks to do regarding the first work iteration :
 
 Date : November 21th
 
-![Feature Design](./ft_transcendence.drawio.svg)
+![Features Design : Authentification and Profil](./ft_transcendence.drawio.svg)
+
+@mhahn takes the left one and @wollio the right one.
