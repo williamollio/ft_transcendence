@@ -1,4 +1,4 @@
-# ft_transcendance
+# ft_transcendence
 
 [Subject PDF](https://github.com/williamollio/ft_transcendance/blob/william/ressources/ft_transcendance.pdf)
 
