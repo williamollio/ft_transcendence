@@ -15,4 +15,8 @@ Here are the tasks to do regarding the first work iteration :
 
 @mhahn and @wollio will work on their respective branches in order to set up the fundamentals of the project.
 
+## Second Meeting
+
+Date : November 21th
+
 
