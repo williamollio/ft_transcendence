@@ -1,6 +1,6 @@
 import { RoutePath } from "./router.interface";
 
-export interface Tab {
+export interface NavTab {
   label: string;
   path: RoutePath;
 }
@@ -10,11 +10,11 @@ export interface LocationStateTab {
 }
 
 export enum idTabs {
-  LOGIN = 0,
-  PROFILE = 1,
-  GAME = 2,
+  PROFILE = 0,
+  GAME = 1,
+  LOGIN = 2,
 }
 
-export interface TabWithId extends Tab {
+export interface TabWithId extends NavTab {
   id: number;
 }

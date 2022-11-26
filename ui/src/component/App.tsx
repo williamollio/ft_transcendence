@@ -2,14 +2,11 @@ import "./App.css";
 import { Routes, Route } from "react-router-dom";
 import ProfileView from "../views/ProfileView";
 import LoginView from "../views/LoginView";
+import GameView from "../views/GameView";
 import { makeStyles } from "tss-react/mui";
+import { RoutePath } from "../interfaces/router.interface";
 
-export enum RoutePath {
-  PROFILE = "/profile",
-  LOGIN = "/",
-}
-
-function App() {
+export default function App() {
   const { classes } = useStyles();
 
   return (
@@ -18,6 +15,7 @@ function App() {
         <Routes>
           <Route path={RoutePath.LOGIN} element={<LoginView />} />
           <Route path={RoutePath.PROFILE} element={<ProfileView />} />
+          <Route path={RoutePath.GAME} element={<GameView />} />
         </Routes>
       </div>
     </>
@@ -34,5 +32,3 @@ const useStyles = makeStyles()(() => ({
     backgroundColor: "#fff1e1",
   },
 }));
-
-export default App;
