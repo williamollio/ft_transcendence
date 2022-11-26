@@ -4,9 +4,8 @@
 
 ## Use
 
-Run for launch the posgres database in a container with `docker-compose up`
-Go to the nest folder, download the node modules via `npm install` and launch the app with `npm run`
-Go to the ui folder, download the node modules via `npm install` and launch the app with `npm run`
+For launching the app run `make up`
+For stopping the app run `make down`
 
 ## Commands
 
@@ -22,6 +21,7 @@ Go to the ui folder, download the node modules via `npm install` and launch the 
 
 Nest Server : http://localhost:8080
 Swagger : http://localhost:8080/api
+
 React App : http://localhost:3000/
 
 ## Good practise / Proposition
