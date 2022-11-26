@@ -2,12 +2,16 @@
 
 [Subject PDF](https://github.com/williamollio/ft_transcendance/blob/william/ressources/ft_transcendance.pdf)
 
-## Use
+## Launch the app
 
 For launching the app run `make up`
 For stopping the app run `make down`
 
-## Commands
+## Development experience
+
+To get rid of the code highlighting, just install the node_modules locally via `npm install`
+
+## Commands to know
 
 - npm start
 - rm -rf dist/
