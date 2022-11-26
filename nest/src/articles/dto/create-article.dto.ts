@@ -1,15 +1,15 @@
-import { ApiProperty} from "@nestjs/swagger";
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateArticleDto {
-    @ApiProperty()
-    title : string;
+  @ApiProperty()
+  title: string;
 
-    @ApiProperty({required: false})
-    description?: string;
+  @ApiProperty({ required: false })
+  description?: string;
 
-    @ApiProperty()
-    body : string
+  @ApiProperty()
+  body: string;
 
-    @ApiProperty()
-    published? : boolean = false;
+  @ApiProperty()
+  published?: boolean = false;
 }
