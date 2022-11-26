@@ -2,24 +2,28 @@
 
 [Subject PDF](https://github.com/williamollio/ft_transcendance/blob/william/ressources/ft_transcendance.pdf)
 
-## First Meeting
+## Use
 
-Starting date : November 2nd
+For launching the app run `make up`
+For stopping the app run `make down`
 
-Here are the tasks to do regarding the first work iteration :
+## Commands
 
-- Makefile
-- Dockerfiles
-- Docker-compose
-- set up the database (Prisma)
-- set up the BE + FE
+- npm start
+- rm -rf dist/
+- docker-compose up
+- npx prisma migrate dev --name "..." : save db / execute SQL / generate client
+- npx prisma db seed : seed the database
+- npx nest generate resource : generate REST resources
+- npx nest generate service/module prisma
 
-@mhahn and @wollio will work on their respective branches in order to set up the fundamentals of the project.
+## Links
 
-## Second Meeting
+Nest Server : http://localhost:8080
+Swagger : http://localhost:8080/api
 
-Date : November 21th
+React App : http://localhost:3000/
 
-![Features Design : Authentification and Profil](./ft_transcendence.drawio.svg)
+## Good practise / Proposition
 
-@mhahn takes the left one and @wollio the right one.
+Write DTO as TS class (ref. Nest doc)
