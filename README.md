@@ -6,8 +6,7 @@
 
 Run for launch the posgres database in a container with `docker-compose up`
 Go to the nest folder, download the node modules via `npm install` and launch the app with `npm run`
-
-### Nest folder
+Go to the ui folder, download the node modules via `npm install` and launch the app with `npm run`
 
 ## Commands
 
