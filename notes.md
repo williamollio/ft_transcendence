@@ -1,18 +1,21 @@
-# Commands
+## First Meeting
 
-- npm start
-- rm -rf dist/
-- docker-compose up
-- npx prisma migrate dev --name "..." : save db / execute SQL / generate client
-- npx prisma db seed : seed the database
-- npx nest generate resource : generate REST resources
-- npx nest generate service/module prisma
+Starting date : November 2nd
 
-# Links
+Here are the tasks to do regarding the first work iteration :
 
-Nest Server : http://localhost:3000
-Swagger : http://localhost:3000/api
+- Makefile
+- Dockerfiles
+- Docker-compose
+- set up the database (Prisma)
+- set up the BE + FE
 
-# Good practise / Proposition
+@mhahn and @wollio will work on their respective branches in order to set up the fundamentals of the project.
 
-Write DTO as TS class (ref. Nest doc) 
+## Second Meeting
+
+Date : November 21th
+
+![Features Design : Authentification and Profil](./ft_transcendence.drawio.svg)
+
+@mhahn takes the left one and @wollio the right one.

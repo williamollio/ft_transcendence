@@ -2,24 +2,29 @@
 
 [Subject PDF](https://github.com/williamollio/ft_transcendance/blob/william/ressources/ft_transcendance.pdf)
 
-## First Meeting
+## Use
 
-Starting date : November 2nd
+Run for launch the posgres database in a container with `docker-compose up`
+Go to the nest folder, download the node modules via `npm install` and launch the app with `npm run`
 
-Here are the tasks to do regarding the first work iteration :
+### Nest folder
 
-- Makefile
-- Dockerfiles
-- Docker-compose
-- set up the database (Prisma)
-- set up the BE + FE
+## Commands
 
-@mhahn and @wollio will work on their respective branches in order to set up the fundamentals of the project.
+- npm start
+- rm -rf dist/
+- docker-compose up
+- npx prisma migrate dev --name "..." : save db / execute SQL / generate client
+- npx prisma db seed : seed the database
+- npx nest generate resource : generate REST resources
+- npx nest generate service/module prisma
 
-## Second Meeting
+## Links
 
-Date : November 21th
+Nest Server : http://localhost:8080
+Swagger : http://localhost:8080/api
+React App : http://localhost:3000/
 
-![Features Design : Authentification and Profil](./ft_transcendence.drawio.svg)
+## Good practise / Proposition
 
-@mhahn takes the left one and @wollio the right one.
+Write DTO as TS class (ref. Nest doc)
