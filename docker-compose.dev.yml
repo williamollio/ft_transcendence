@@ -21,6 +21,7 @@ services:
       dockerfile: nest.Dockerfile
     container_name: nest
     volumes:
+      - postgres:/var/lib/postgresql/data
       - ./nest/:/app/nest
     ports:
       - "8080:8080"
