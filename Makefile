@@ -15,7 +15,7 @@ fclean :
 	docker system prune -a -f --volumes
 
 ps :
-	docker compose ps
+	docker compose -f docker-compose.dev.yml ps
 
 postgres :
 	docker compose -f docker-compose.dev.yml up postgres
