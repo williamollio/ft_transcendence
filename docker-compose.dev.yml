@@ -1,0 +1,55 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:13.5
+    container_name: postgres
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=password
+    restart: always
+    networks:
+      - ft_transcendance
+
+  nest:
+    build:
+      context: ./nest/
+      dockerfile: nest.Dockerfile
+    container_name: nest
+    volumes:
+      - postgres:/var/lib/postgresql/data
+      - ./nest/:/app/nest
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    restart: always
+    networks:
+      - ft_transcendance
+
+  ui:
+    build:
+      context: ./ui/
+      dockerfile: ui.Dockerfile
+    container_name: ui
+    volumes:
+      - ./ui/:/app/ui
+    ports:
+      - "3000:3000"
+    depends_on:
+      - nest
+    restart: always
+    networks:
+      - ft_transcendance
+
+networks:
+  ft_transcendance:
+    name: ft_transcendance
+    driver: bridge
+
+volumes:
+  postgres:

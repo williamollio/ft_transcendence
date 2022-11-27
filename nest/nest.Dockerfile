@@ -1,10 +1,14 @@
 FROM node:16-alpine
 
-WORKDIR /app
+WORKDIR /app/nest
+
+COPY package*.json ./
+
+COPY prisma ./prisma/
+
+RUN npm install
 
 COPY . .
-
-RUN npm ci
 
 RUN npm run build
 
@@ -12,4 +16,4 @@ RUN npx prisma generate
 
 EXPOSE 8080
 
-CMD [ "npm", "start" ]
+CMD ["npm", "run", "start:dev"]

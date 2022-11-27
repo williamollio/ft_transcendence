@@ -1,12 +1,12 @@
 
 up :
-	docker compose up
+	docker compose -f docker-compose.dev.yml up
 
 build :
-	docker compose build
+	docker compose -f docker-compose.dev.yml build
 
 down :
-	docker compose down
+	docker compose -f docker-compose.dev.yml down
 
 clean :
 	docker system prune -a -f
@@ -15,16 +15,7 @@ fclean :
 	docker system prune -a -f --volumes
 
 ps :
-	docker compose ps
-
-postgres :
-	docker compose up postgres
-
-nest :
-	docker compose up nest
-
-ui :
-	docker compose up ui
+	docker compose -f docker-compose.dev.yml ps
 
 info :
 	docker system df
