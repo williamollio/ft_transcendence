@@ -1,14 +1,36 @@
-import React from 'react';
-import './App.css';
+import "./App.css";
+import { Routes, Route } from "react-router-dom";
+import ProfileView from "../views/ProfileView";
+import LoginView from "../views/LoginView";
+import GameView from "../views/GameView";
+import { makeStyles } from "tss-react/mui";
+import { RoutePath } from "../interfaces/router.interface";
 
-function App() {
+// TO DO : set up theme for these colors #1d3c45, #d2601a, #fff1e1
+
+export default function App() {
+  const { classes } = useStyles();
+
   return (
-    <div className="App">
-        <p>
-          Edit
-        </p>
-    </div>
+    <>
+      <div className={classes.root}>
+        <Routes>
+          <Route path={RoutePath.LOGIN} element={<LoginView />} />
+          <Route path={RoutePath.PROFILE} element={<ProfileView />} />
+          <Route path={RoutePath.GAME} element={<GameView />} />
+        </Routes>
+      </div>
+    </>
   );
 }
 
-export default App;
+// https://github.com/garronej/tss-react
+
+const useStyles = makeStyles()(() => ({
+  root: {
+    display: "flex",
+    flexDirection: "column",
+    minHeight: "100vh",
+    backgroundColor: "#fff1e1",
+  },
+}));
