@@ -17,14 +17,5 @@ fclean :
 ps :
 	docker compose -f docker-compose.dev.yml ps
 
-postgres :
-	docker compose -f docker-compose.dev.yml up postgres
-
-nest :
-	docker compose -f docker-compose.dev.yml up nest
-
-ui :
-	docker compose -f docker-compose.dev.yml up ui
-
 info :
 	docker system df
