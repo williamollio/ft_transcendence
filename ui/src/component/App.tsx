@@ -6,6 +6,8 @@ import GameView from "../views/GameView";
 import { makeStyles } from "tss-react/mui";
 import { RoutePath } from "../interfaces/router.interface";
 
+// TO DO : set up theme for these colors #1d3c45, #d2601a, #fff1e1
+
 export default function App() {
   const { classes } = useStyles();
 

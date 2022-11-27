@@ -44,7 +44,7 @@ export default function NavBar(): React.ReactElement {
         value={selectedTabId}
         className={classes.menuBar}
         centered={true}
-        TabIndicatorProps={{ style: { backgroundColor: "#d2601a" } }}
+        TabIndicatorProps={{ style: { marginBottom: "5px", marginLeft : "-8px"} }}
       >
         {tabsWithId.map((tab) => {
           return (
