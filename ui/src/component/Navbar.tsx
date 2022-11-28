@@ -1,4 +1,4 @@
-import { Tab, Tabs, AppBar, Box } from "@mui/material";
+import { Tab, Tabs, AppBar } from "@mui/material";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { idTabs } from "../interfaces/tab.interface";
@@ -27,7 +27,9 @@ export default function NavBar(): React.ReactElement {
     return tabsWithId.filter((tab) => {
       if (tab.id === id) {
         return tab;
-      }
+      } else {
+		return null;
+	  }
     })[0];
   }
 
@@ -44,7 +46,9 @@ export default function NavBar(): React.ReactElement {
         value={selectedTabId}
         className={classes.menuBar}
         centered={true}
-        TabIndicatorProps={{ style: { marginBottom: "5px", marginLeft : "-8px"} }}
+        TabIndicatorProps={{
+          style: { marginBottom: "5px", marginLeft: "-8px" },
+        }}
       >
         {tabsWithId.map((tab) => {
           return (

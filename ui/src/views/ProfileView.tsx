@@ -1,10 +1,10 @@
 import React from "react";
-import { makeStyles } from "tss-react/mui";
+// import { makeStyles } from "tss-react/mui";
 import Navbar from "../component/Navbar";
-import { Box, Typography } from "@mui/material";
+import { Typography } from "@mui/material";
 
 export default function ProfileView(): React.ReactElement {
-  const { classes } = useStyles();
+  //const { classes } = useStyles();
   return (
     <>
       <Navbar />
@@ -13,10 +13,6 @@ export default function ProfileView(): React.ReactElement {
   );
 }
 
-const useStyles = makeStyles()(() => ({
-  menuBar: {
-    height: "4rem",
-    width: "100%",
-    backgroundColor: "#1d3c45",
-  },
-}));
+// const useStyles = makeStyles()(() => ({
+
+// }));
