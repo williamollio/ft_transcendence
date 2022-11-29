@@ -1,10 +1,21 @@
-import React from "react";
+import React, { useState } from "react";
 import { makeStyles } from "tss-react/mui";
 import Navbar from "../component/Navbar";
-import { Box, Typography } from "@mui/material";
+import { Box, TextField, Button, Typography, Input } from "@mui/material";
 
 export default function ProfileView(): React.ReactElement {
   const { classes } = useStyles();
+  const [name, setName] = useState<string>("");
+  const [picture, setPicture] = useState<any>();
+
+  function handleOnChangeName(name: string) {
+    setName(name);
+  }
+
+  function handleOnChangePicture(picture: any) {
+    setPicture(picture);
+  }
+
   return (
     <>
       <Navbar />
@@ -12,12 +23,50 @@ export default function ProfileView(): React.ReactElement {
         <Box className={classes.boxProfile}>
           <Box className={classes.wrapperProfile}>
             <Box className={classes.wrapperTile}>
-              <Typography variant="h4" color={"#d2601a"} fontWeight={"bold"} sx={{textDecoration : "underline"}}>
+              <Typography
+                variant="h4"
+                color={"#d2601a"}
+                fontWeight={"bold"}
+                sx={{ textDecoration: "underline" }}
+              >
                 Profile
               </Typography>
             </Box>
-            <Box className={classes.wrapperText}>
+            <Box className={classes.wrapperContent}>
               <Typography></Typography>
+              <Box className={classes.wrapperPicture}>
+                <Button
+                  variant="contained"
+                  component="label"
+                  className={classes.iconButton}
+                >
+                  Upload Picture
+                  <Input
+                    type="file"
+                    sx={{ display: "none" }}
+                    value={picture}
+                    onChange={(event) => {
+                      handleOnChangePicture(event.target.value);
+                    }}
+                  />
+                </Button>
+              </Box>
+              <Box className={classes.wrapperInputName}>
+                <TextField
+                  className={classes.inputName}
+                  value={name}
+                  name={"name"}
+                  variant="outlined"
+                  onChange={(event) => {
+                    handleOnChangeName(event.target.value);
+                  }}
+                  label="Choose an unique name"
+                ></TextField>
+              </Box>
+              <Box className={classes.buttons}>
+                <Button className={classes.iconButton} variant="outlined">Save</Button>
+                <Button className={classes.iconButton} variant="outlined">Cancel</Button>
+              </Box>
             </Box>
           </Box>
         </Box>
@@ -54,13 +103,41 @@ const useStyles = makeStyles()(() => ({
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-	marginTop : "10px"
+    marginTop: "10px",
   },
-  wrapperText: {
+  wrapperContent: {
     height: "80%",
     width: "100%",
     display: "flex",
     alignItems: "center",
+    justifyContent: "top",
+    gap: "1rem",
+    flexDirection: "column",
+  },
+  wrapperPicture: {
+    height: "20%",
+    width: "70%",
+    display: "flex",
     justifyContent: "center",
+  },
+  wrapperInputName: {
+    height: "20%",
+    width: "70%",
+  },
+  buttons: {
+    height: "20%",
+    width: "70%",
+    display: "flex",
+    justifyContent: "center",
+    gap: "1em",
+  },
+  iconButton: {
+    height: "50%",
+    width: "50%",
+  },
+  inputName: {
+    width: "100%",
+    height: "100%",
+    borderRadius: "100px",
   },
 }));
