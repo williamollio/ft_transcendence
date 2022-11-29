@@ -1,15 +1,19 @@
 import React, { useState } from "react";
 import { makeStyles } from "tss-react/mui";
 import Navbar from "../component/Navbar";
-import { Box, Typography } from "@mui/material";
-import { TextField } from "@mui/material";
+import { Box, TextField, Button, Typography, Input } from "@mui/material";
 
 export default function ProfileView(): React.ReactElement {
   const { classes } = useStyles();
   const [name, setName] = useState<string>("");
+  const [picture, setPicture] = useState<any>();
 
-  function handleOnChange(name: string) {
+  function handleOnChangeName(name: string) {
     setName(name);
+  }
+
+  function handleOnChangePicture(picture: any) {
+    setPicture(picture);
   }
 
   return (
@@ -30,7 +34,23 @@ export default function ProfileView(): React.ReactElement {
             </Box>
             <Box className={classes.wrapperContent}>
               <Typography></Typography>
-              <Box className={classes.wrapperInputName}></Box>
+              <Box className={classes.wrapperPicture}>
+                <Button
+                  variant="contained"
+                  component="label"
+                  className={classes.iconButton}
+                >
+                  Upload Picture
+                  <Input
+                    type="file"
+                    sx={{ display: "none" }}
+                    value={picture}
+                    onChange={(event) => {
+                      handleOnChangePicture(event.target.value);
+                    }}
+                  />
+                </Button>
+              </Box>
               <Box className={classes.wrapperInputName}>
                 <TextField
                   className={classes.inputName}
@@ -38,7 +58,7 @@ export default function ProfileView(): React.ReactElement {
                   name={"name"}
                   variant="outlined"
                   onChange={(event) => {
-                    handleOnChange(event.target.value);
+                    handleOnChangeName(event.target.value);
                   }}
                   label="Choose an unique name"
                 ></TextField>
@@ -90,9 +110,19 @@ const useStyles = makeStyles()(() => ({
     gap: "1rem",
     flexDirection: "column",
   },
+  wrapperPicture: {
+    height: "20%",
+    width: "70%",
+    display: "flex",
+    justifyContent: "center",
+  },
   wrapperInputName: {
     height: "20%",
     width: "70%",
+  },
+  iconButton: {
+    height: "50%",
+    width: "50%",
   },
   inputName: {
     width: "100%",
