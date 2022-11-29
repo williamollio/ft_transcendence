@@ -12,7 +12,12 @@ export default function ProfileView(): React.ReactElement {
         <Box className={classes.boxGame}>
           <Box className={classes.wrapperProfile}>
             <Box className={classes.wrapperTile}>
-              <Typography variant="h4" color={"#d2601a"} fontWeight={"bold"} sx={{textDecoration : "underline"}}>
+              <Typography
+                variant="h4"
+                color={"#d2601a"}
+                fontWeight={"bold"}
+                sx={{ textDecoration: "underline" }}
+              >
                 Game
               </Typography>
             </Box>
@@ -54,7 +59,7 @@ const useStyles = makeStyles()(() => ({
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-	marginTop : "10px"
+    marginTop: "10px",
   },
   wrapperText: {
     height: "80%",

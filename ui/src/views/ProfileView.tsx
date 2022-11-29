@@ -1,10 +1,17 @@
-import React from "react";
+import React, { useState } from "react";
 import { makeStyles } from "tss-react/mui";
 import Navbar from "../component/Navbar";
 import { Box, Typography } from "@mui/material";
+import { TextField } from "@mui/material";
 
 export default function ProfileView(): React.ReactElement {
   const { classes } = useStyles();
+  const [name, setName] = useState<string>("");
+
+  function handleOnChange(name: string) {
+    setName(name);
+  }
+
   return (
     <>
       <Navbar />
@@ -12,12 +19,30 @@ export default function ProfileView(): React.ReactElement {
         <Box className={classes.boxProfile}>
           <Box className={classes.wrapperProfile}>
             <Box className={classes.wrapperTile}>
-              <Typography variant="h4" color={"#d2601a"} fontWeight={"bold"} sx={{textDecoration : "underline"}}>
+              <Typography
+                variant="h4"
+                color={"#d2601a"}
+                fontWeight={"bold"}
+                sx={{ textDecoration: "underline" }}
+              >
                 Profile
               </Typography>
             </Box>
-            <Box className={classes.wrapperText}>
+            <Box className={classes.wrapperContent}>
               <Typography></Typography>
+              <Box className={classes.wrapperInputName}></Box>
+              <Box className={classes.wrapperInputName}>
+                <TextField
+                  className={classes.inputName}
+                  value={name}
+                  name={"name"}
+                  variant="outlined"
+                  onChange={(event) => {
+                    handleOnChange(event.target.value);
+                  }}
+                  label="Choose an unique name"
+                ></TextField>
+              </Box>
             </Box>
           </Box>
         </Box>
@@ -54,13 +79,24 @@ const useStyles = makeStyles()(() => ({
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-	marginTop : "10px"
+    marginTop: "10px",
   },
-  wrapperText: {
+  wrapperContent: {
     height: "80%",
     width: "100%",
     display: "flex",
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "top",
+    gap: "1rem",
+    flexDirection: "column",
+  },
+  wrapperInputName: {
+    height: "20%",
+    width: "70%",
+  },
+  inputName: {
+    width: "100%",
+    height: "100%",
+    borderRadius: "100px",
   },
 }));
