@@ -63,6 +63,10 @@ export default function ProfileView(): React.ReactElement {
                   label="Choose an unique name"
                 ></TextField>
               </Box>
+              <Box className={classes.buttons}>
+                <Button className={classes.iconButton} variant="outlined">Save</Button>
+                <Button className={classes.iconButton} variant="outlined">Cancel</Button>
+              </Box>
             </Box>
           </Box>
         </Box>
@@ -119,6 +123,13 @@ const useStyles = makeStyles()(() => ({
   wrapperInputName: {
     height: "20%",
     width: "70%",
+  },
+  buttons: {
+    height: "20%",
+    width: "70%",
+    display: "flex",
+    justifyContent: "center",
+    gap: "1em",
   },
   iconButton: {
     height: "50%",
