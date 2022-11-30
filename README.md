@@ -1,6 +1,7 @@
 # ft_transcendence
 
 [Subject PDF](https://github.com/williamollio/ft_transcendance/blob/william/ressources/ft_transcendance.pdf)
+[Notes](https://github.com/williamollio/ft_transcendance/blob/master/notes.md)
 
 ## Launch the app
 
