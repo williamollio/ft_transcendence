@@ -7,6 +7,7 @@
 For launching the app run `make up`
 For stopping the app run `make down`
 
+For executing seeding the db please run : `docker exec -it nest npx prisma db seed`
 ## Development experience
 
 To get rid of the code highlighting, just install the node_modules locally via `npm install`
