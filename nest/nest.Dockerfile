@@ -2,7 +2,7 @@ FROM node:16-alpine
 
 WORKDIR /app/nest
 
-COPY package*.json ./
+COPY package.json ./
 
 COPY prisma ./prisma/
 
