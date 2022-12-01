@@ -2,9 +2,11 @@ FROM node:16-alpine
 
 WORKDIR /app/ui
 
-COPY . .
+COPY package*.json ./
 
-RUN npm ci
+RUN npm install
+
+COPY . .
 
 RUN npm run build
 
