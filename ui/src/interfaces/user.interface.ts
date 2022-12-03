@@ -1,8 +1,8 @@
 export interface User {
-    id : number
-    name : string
+  id: number;
+  name: string;
 }
 
 export interface UserCreation {
-    name : string
+  name: string;
 }
