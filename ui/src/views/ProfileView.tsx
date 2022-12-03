@@ -3,21 +3,21 @@ import { makeStyles } from "tss-react/mui";
 import Navbar from "../component/Navbar";
 import { Box, TextField, Button, Typography, Input } from "@mui/material";
 import usersService from "../service/users.service";
-import {UserCreation} from "../interfaces/user.interface";
-import {useNavigate} from "react-router-dom";
-import {RoutePath} from "../interfaces/router.interface";
-import {idTabs} from "../interfaces/tab.interface";
+import { UserCreation } from "../interfaces/user.interface";
+import { useNavigate } from "react-router-dom";
+import { RoutePath } from "../interfaces/router.interface";
+import { idTabs } from "../interfaces/tab.interface";
 
-const isEditMode = false // TO DO
+const isEditMode = false; // TO DO
 
 export default function ProfileView(): React.ReactElement {
   const { classes } = useStyles();
   const [name, setName] = useState<string>("");
   const [picture, setPicture] = useState<any>();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   function navigateToGamePage() {
-    navigate(RoutePath.GAME, {state: {activeTabId: idTabs.GAME}})
+    navigate(RoutePath.GAME, { state: { activeTabId: idTabs.GAME } });
   }
 
   async function handleOnSave() {
@@ -25,14 +25,14 @@ export default function ProfileView(): React.ReactElement {
     if (isEditMode) {
       // usersService.patchUser() // TO DO
     } else {
-      const userCreation: UserCreation = {name: name};
-      response = await usersService.postUser(userCreation)
+      const userCreation: UserCreation = { name: name };
+      response = await usersService.postUser(userCreation);
     }
-    const isSuccess = !response?.error
+    const isSuccess = !response?.error;
     if (isSuccess) {
-      navigateToGamePage()
+      navigateToGamePage();
     } else {
-      console.error("an error has occurred") // TO DO
+      console.error("an error has occurred"); // TO DO
     }
   }
 
@@ -92,8 +92,18 @@ export default function ProfileView(): React.ReactElement {
                 ></TextField>
               </Box>
               <Box className={classes.buttons}>
-                <Button className={classes.iconButton} variant="outlined" onClick={() => handleOnSave()}>Save</Button>
-                {isEditMode && <Button className={classes.iconButton} variant="outlined">Cancel</Button>}
+                <Button
+                  className={classes.iconButton}
+                  variant="outlined"
+                  onClick={() => handleOnSave()}
+                >
+                  Save
+                </Button>
+                {isEditMode && (
+                  <Button className={classes.iconButton} variant="outlined">
+                    Cancel
+                  </Button>
+                )}
               </Box>
             </Box>
           </Box>
