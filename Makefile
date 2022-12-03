@@ -13,6 +13,8 @@ clean :
 
 fclean :
 	docker system prune -a -f --volumes
+	rm -Rf nest/node_modules
+	rm -Rf ui/node_modules
 
 ps :
 	docker compose -f docker-compose.dev.yml ps
