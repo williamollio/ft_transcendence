@@ -2,11 +2,39 @@ import React, { useState } from "react";
 import { makeStyles } from "tss-react/mui";
 import Navbar from "../component/Navbar";
 import { Box, TextField, Button, Typography, Input } from "@mui/material";
+import usersService from "../service/users.service";
+import {UserCreation} from "../interfaces/user.interface";
+import {useNavigate} from "react-router-dom";
+import {RoutePath} from "../interfaces/router.interface";
+import {idTabs} from "../interfaces/tab.interface";
+
+const isEditMode = false // TO DO
 
 export default function ProfileView(): React.ReactElement {
   const { classes } = useStyles();
   const [name, setName] = useState<string>("");
   const [picture, setPicture] = useState<any>();
+  const navigate = useNavigate()
+
+  function navigateToGamePage() {
+    navigate(RoutePath.GAME, {state: {activeTabId: idTabs.GAME}})
+  }
+
+  async function handleOnSave() {
+    let response;
+    if (isEditMode) {
+      // usersService.patchUser() // TO DO
+    } else {
+      const userCreation: UserCreation = {name: name};
+      response = await usersService.postUser(userCreation)
+    }
+    const isSuccess = !response?.error
+    if (isSuccess) {
+      navigateToGamePage()
+    } else {
+      console.error("an error has occurred") // TO DO
+    }
+  }
 
   function handleOnChangeName(name: string) {
     setName(name);
@@ -64,8 +92,8 @@ export default function ProfileView(): React.ReactElement {
                 ></TextField>
               </Box>
               <Box className={classes.buttons}>
-                <Button className={classes.iconButton} variant="outlined">Save</Button>
-                <Button className={classes.iconButton} variant="outlined">Cancel</Button>
+                <Button className={classes.iconButton} variant="outlined" onClick={() => handleOnSave()}>Save</Button>
+                {isEditMode && <Button className={classes.iconButton} variant="outlined">Cancel</Button>}
               </Box>
             </Box>
           </Box>
