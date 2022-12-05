@@ -1,5 +1,7 @@
 FROM node:16-alpine
 
+RUN npm update -g npm
+
 WORKDIR /app/nest
 
 COPY package.json ./
@@ -9,8 +11,6 @@ COPY prisma ./prisma/
 RUN npm install --legacy-peer-deps
 
 COPY . .
-
-RUN npm run build
 
 RUN npx prisma generate
 
