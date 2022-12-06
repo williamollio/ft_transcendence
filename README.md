@@ -1,24 +1,24 @@
-# ft_transcendence
+# ft_transcendance
 
 [Subject PDF](https://github.com/williamollio/ft_transcendance/blob/william/ressources/ft_transcendance.pdf)
 
 [Notes](https://github.com/williamollio/ft_transcendance/blob/master/notes.md)
 
-## Launch the app
+## Work on ft_transcendance
 
-For launching the app run `make up`
-For stopping the app run `make down`
+`make up` for building the image and for spinning up the containers.
+For stopping the app run `make down`.
 
-For executing seeding the db please run : `docker exec -it nest npx prisma db seed`
-## Development experience
+### ui
 
-To get rid of the code highlighting, just install the node_modules locally via `npm install`
+Adding new dependencies won't update the folder `app/cache/node_modules` in the container so for this reason always launch the app with `make up`. Furthermore, if you do `git pull` or `git checkout` run `make down` and then `make up` again.
+
+### nest
+
+For seeding the db run : `docker exec -it nest npx prisma db seed`
 
 ## Commands to know
 
-- npm start
-- rm -rf dist/
-- docker-compose up
 - npx prisma migrate dev --name "..." : save db / execute SQL / generate client
 - npx prisma db seed : seed the database
 - npx nest generate resource : generate REST resources
