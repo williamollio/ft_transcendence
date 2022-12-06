@@ -1,6 +1,6 @@
 
 up :
-	docker compose -f docker-compose.dev.yml up
+	docker compose -f docker-compose.dev.yml up --build
 
 build :
 	docker compose -f docker-compose.dev.yml build
@@ -10,6 +10,7 @@ down :
 
 clean :
 	docker system prune -a -f
+	docker network prune -f
 	rm -Rf nest/node_modules
 	rm -Rf ui/node_modules
 
