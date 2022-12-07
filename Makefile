@@ -8,11 +8,11 @@ build :
 down :
 	docker compose -f docker-compose.dev.yml down
 
-clean nest:
+nestclean:
 	rm -Rf nest/node_modules
 	docker image rm ft_transcendance_nest
 
-clean ui:
+uiclean:
 	rm -Rf ui/node_modules
 	docker image rm ft_transcendance_ui
 

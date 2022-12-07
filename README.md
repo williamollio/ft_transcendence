@@ -11,7 +11,7 @@ For stopping the app run `make down`.
 
 ### ui
 
-Adding new dependencies won't update the folder `app/cache/node_modules` in the container so for this reason always launch the app with `make up`. Furthermore, if you do `git pull` or `git checkout` run `make down` and then `make up` again.
+Adding new dependencies won't update the folder `app/cache/node_modules` in the container so for this reason always launch the app with `make up`. Furthermore, if you do `git pull` or `git checkout` run `make down` then `make uiclean` and `make up` again.
 
 ### nest
 
