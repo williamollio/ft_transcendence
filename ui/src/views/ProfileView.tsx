@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { ChangeEvent, useState } from "react";
 import { makeStyles } from "tss-react/mui";
 import Navbar from "../component/Navbar";
 import { Box, TextField, Button, Typography, Input } from "@mui/material";
@@ -10,10 +10,15 @@ import { idTabs } from "../interfaces/tab.interface";
 
 const isEditMode = false; // TO DO
 
+interface HandlePictureChangeInterface {
+  target: HTMLInputElement | HTMLTextAreaElement;
+}
+
 export default function ProfileView(): React.ReactElement {
   const { classes } = useStyles();
   const [name, setName] = useState<string>("");
   const [picture, setPicture] = useState<any>();
+  const [targetPicture, setTargetPicture] = useState<any>();
   const navigate = useNavigate();
 
   function navigateToGamePage() {
@@ -22,6 +27,10 @@ export default function ProfileView(): React.ReactElement {
 
   async function handleOnSave() {
     let response;
+    if (picture) {
+      const formData = new FormData();
+      formData.append("picture", picture, picture.name);
+    }
     if (isEditMode) {
       // usersService.patchUser() // TO DO
     } else {
@@ -40,8 +49,11 @@ export default function ProfileView(): React.ReactElement {
     setName(name);
   }
 
-  function handleOnChangePicture(picture: any) {
-    setPicture(picture);
+  function handleOnChangePicture(event: HandlePictureChangeInterface) {
+    setTargetPicture(event.target);
+    if (targetPicture && targetPicture !== 0) {
+      setPicture(targetPicture[0]);
+    }
   }
 
   return (
@@ -74,7 +86,7 @@ export default function ProfileView(): React.ReactElement {
                     sx={{ display: "none" }}
                     value={picture}
                     onChange={(event) => {
-                      handleOnChangePicture(event.target.value);
+                      handleOnChangePicture(event);
                     }}
                   />
                 </Button>
