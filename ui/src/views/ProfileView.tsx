@@ -1,7 +1,14 @@
 import React, { ChangeEvent, useState } from "react";
 import { makeStyles } from "tss-react/mui";
 import Navbar from "../component/Navbar";
-import { Box, TextField, Button, Typography, Input } from "@mui/material";
+import {
+  Box,
+  TextField,
+  Button,
+  Typography,
+  Input,
+  Avatar,
+} from "@mui/material";
 import usersService from "../service/users.service";
 import { UserCreation } from "../interfaces/user.interface";
 import { useNavigate } from "react-router-dom";
@@ -14,6 +21,7 @@ export default function ProfileView(): React.ReactElement {
   const { classes } = useStyles();
   const [name, setName] = useState<string>("");
   const [picture, setPicture] = useState<any>();
+  const [avatar, setAvatar] = useState<any>();
   const navigate = useNavigate();
 
   function navigateToGamePage() {
@@ -61,6 +69,7 @@ export default function ProfileView(): React.ReactElement {
   function handleOnChangePicture(e: ChangeEvent<HTMLInputElement>) {
     if (e.target.files) {
       setPicture(e.target.files[0]);
+      setAvatar(URL.createObjectURL(e.target.files[0]));
     }
   }
 
@@ -81,10 +90,17 @@ export default function ProfileView(): React.ReactElement {
               </Typography>
             </Box>
             <Box className={classes.wrapperContent}>
-              <Box className={classes.wrapperPicture}>
-                {/* <img src={picture} /> */}
+              <Box className={classes.wrapperPicture30}>
+                <Avatar
+                  id="profile-picture"
+                  src={avatar}
+                  style={{
+                    width: "100px",
+                    height: "100px",
+                  }}
+                />
               </Box>
-              <Box className={classes.wrapperPicture}>
+              <Box className={classes.wrapperPicture20}>
                 <Button
                   variant="contained"
                   component="label"
@@ -171,15 +187,21 @@ const useStyles = makeStyles()(() => ({
     gap: "1rem",
     flexDirection: "column",
   },
-  wrapperPicture: {
-    height: "20%",
+  wrapperPicture20: {
+    height: "15%",
+    width: "60%",
+    display: "flex",
+    justifyContent: "center",
+  },
+  wrapperPicture30: {
+    height: "30%",
     width: "70%",
     display: "flex",
     justifyContent: "center",
   },
   wrapperInputName: {
     height: "20%",
-    width: "70%",
+    width: "60%",
   },
   buttons: {
     height: "20%",
