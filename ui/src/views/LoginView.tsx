@@ -10,8 +10,14 @@ export default function LoginView(): React.ReactElement {
   const navigate = useNavigate();
 
   const handleLogin = () => {
-    // send request to BE
+    /*
+     * const response = somehow_call_the_backend();
+     * if (response.2fa) {
+     *   navigate(RoutePath.LOGIN_2FA);
+     * } else {
+     */
     navigate(RoutePath.PROFILE);
+    // }
   };
   return (
     <Box className={classes.containerLogin}>
