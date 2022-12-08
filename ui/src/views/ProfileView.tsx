@@ -10,38 +10,47 @@ import { idTabs } from "../interfaces/tab.interface";
 
 const isEditMode = false; // TO DO
 
-interface HandlePictureChangeInterface {
-  target: HTMLInputElement | HTMLTextAreaElement;
-}
-
 export default function ProfileView(): React.ReactElement {
   const { classes } = useStyles();
   const [name, setName] = useState<string>("");
   const [picture, setPicture] = useState<any>();
-  const [targetPicture, setTargetPicture] = useState<any>();
   const navigate = useNavigate();
 
   function navigateToGamePage() {
     navigate(RoutePath.GAME, { state: { activeTabId: idTabs.GAME } });
   }
 
-  async function handleOnSave() {
+  async function handleOnSavePicture() {
     let response;
-    if (picture) {
-      const formData = new FormData();
-      formData.append("picture", picture, picture.name);
+    const formData = new FormData();
+    formData.append("file", picture, picture.name);
+    response = await usersService.postUserImage(formData);
+    const isSuccess = !response?.error;
+    if (!isSuccess) {
+      console.error("an error has occurred on picture sending"); // TO DO : show error on UI
     }
-    if (isEditMode) {
-      // usersService.patchUser() // TO DO
-    } else {
-      const userCreation: UserCreation = { name: name };
-      response = await usersService.postUser(userCreation);
-    }
+  }
+  async function handleOnSaveName() {
+    let response;
+    const userCreation: UserCreation = { name: name };
+    response = await usersService.postUser(userCreation);
     const isSuccess = !response?.error;
     if (isSuccess) {
       navigateToGamePage();
     } else {
-      console.error("an error has occurred"); // TO DO
+      console.error("an error has occurred on name sending"); // TO DO : show error on UI
+    }
+  }
+
+  async function handleOnSave() {
+    if (isEditMode) {
+      // usersService.patchUser() // TO DO
+    }
+    if (picture) {
+      handleOnSavePicture();
+    }
+    if (name !== "") {
+      handleOnSaveName();
     }
   }
 
@@ -49,10 +58,9 @@ export default function ProfileView(): React.ReactElement {
     setName(name);
   }
 
-  function handleOnChangePicture(event: HandlePictureChangeInterface) {
-    setTargetPicture(event.target);
-    if (targetPicture && targetPicture !== 0) {
-      setPicture(targetPicture[0]);
+  function handleOnChangePicture(e: ChangeEvent<HTMLInputElement>) {
+    if (e.target.files) {
+      setPicture(e.target.files[0]);
     }
   }
 
@@ -73,7 +81,9 @@ export default function ProfileView(): React.ReactElement {
               </Typography>
             </Box>
             <Box className={classes.wrapperContent}>
-              <Typography></Typography>
+              <Box className={classes.wrapperPicture}>
+                {/* <img src={picture} /> */}
+              </Box>
               <Box className={classes.wrapperPicture}>
                 <Button
                   variant="contained"
@@ -84,10 +94,7 @@ export default function ProfileView(): React.ReactElement {
                   <Input
                     type="file"
                     sx={{ display: "none" }}
-                    value={picture}
-                    onChange={(event) => {
-                      handleOnChangePicture(event);
-                    }}
+                    onChange={handleOnChangePicture}
                   />
                 </Button>
               </Box>
