@@ -14,7 +14,7 @@ import {
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import {ApiCreatedResponse, ApiNotImplementedResponse, ApiOkResponse, ApiTags} from '@nestjs/swagger';
 import { UserEntity } from './entities/user.entity';
 import { User } from '@prisma/client';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -66,6 +66,15 @@ export class UsersController {
         HttpStatus.BAD_REQUEST,
       );
     }
+  }
+
+  @Post(':id')
+  @ApiNotImplementedResponse()
+  public async secondFactor(@Param('pin') pin: string) {
+    // TODO: Implement including the actual OAuth
+
+    console.log(pin);
+    return ApiNotImplementedResponse();
   }
 
   @Patch(':id')
