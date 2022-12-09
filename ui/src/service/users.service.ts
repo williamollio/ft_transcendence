@@ -14,7 +14,15 @@ class UsersService {
 
   async getUser(id: string): Promise<Response<User>> {
     return resolve<User>(
-      axiosInstance.get(`PATH/${id}`).then((res: AxiosResponse) => res.data)
+      axiosInstance.get(`${PATH}/${id}`).then((res: AxiosResponse) => res.data)
+    );
+  }
+
+  async postUserImage(file: any): Promise<Response<void>> {
+    return resolve<void>(
+      axiosInstance
+        .post(`${PATH}/upload`, file)
+        .then((res: AxiosResponse) => res.data)
     );
   }
 
@@ -27,14 +35,16 @@ class UsersService {
   async patchUser(id: number, user: UserCreation): Promise<Response<void>> {
     return resolve<void>(
       axiosInstance
-        .patch(`PATH/${id}`, user)
+        .patch(`${PATH}/${id}`, user)
         .then((res: AxiosResponse) => res.data)
     );
   }
 
   async deleteUser(id: number): Promise<Response<void>> {
     return resolve<void>(
-      axiosInstance.delete(`PATH/${id}`).then((res: AxiosResponse) => res.data)
+      axiosInstance
+        .delete(`${PATH}/${id}`)
+        .then((res: AxiosResponse) => res.data)
     );
   }
 

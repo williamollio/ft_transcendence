@@ -1,7 +1,14 @@
 import React, { ChangeEvent, useState } from "react";
 import { makeStyles } from "tss-react/mui";
 import Navbar from "../component/Navbar";
-import { Box, TextField, Button, Typography, Input } from "@mui/material";
+import {
+  Box,
+  TextField,
+  Button,
+  Typography,
+  Input,
+  Avatar,
+} from "@mui/material";
 import usersService from "../service/users.service";
 import { UserCreation } from "../interfaces/user.interface";
 import { useNavigate } from "react-router-dom";
@@ -10,38 +17,48 @@ import { idTabs } from "../interfaces/tab.interface";
 
 const isEditMode = false; // TO DO
 
-interface HandlePictureChangeInterface {
-  target: HTMLInputElement | HTMLTextAreaElement;
-}
-
 export default function ProfileView(): React.ReactElement {
   const { classes } = useStyles();
   const [name, setName] = useState<string>("");
   const [picture, setPicture] = useState<any>();
-  const [targetPicture, setTargetPicture] = useState<any>();
+  const [avatar, setAvatar] = useState<any>();
   const navigate = useNavigate();
 
   function navigateToGamePage() {
     navigate(RoutePath.GAME, { state: { activeTabId: idTabs.GAME } });
   }
 
-  async function handleOnSave() {
+  async function handleOnSavePicture() {
     let response;
-    if (picture) {
-      const formData = new FormData();
-      formData.append("picture", picture, picture.name);
+    const formData = new FormData();
+    formData.append("file", picture, picture.name);
+    response = await usersService.postUserImage(formData);
+    const isSuccess = !response?.error;
+    if (!isSuccess) {
+      console.error("an error has occurred on picture sending"); // TO DO : show error on UI
     }
-    if (isEditMode) {
-      // usersService.patchUser() // TO DO
-    } else {
-      const userCreation: UserCreation = { name: name };
-      response = await usersService.postUser(userCreation);
-    }
+  }
+  async function handleOnSaveName() {
+    let response;
+    const userCreation: UserCreation = { name: name };
+    response = await usersService.postUser(userCreation);
     const isSuccess = !response?.error;
     if (isSuccess) {
       navigateToGamePage();
     } else {
-      console.error("an error has occurred"); // TO DO
+      console.error("an error has occurred on name sending"); // TO DO : show error on UI
+    }
+  }
+
+  async function handleOnSave() {
+    if (isEditMode) {
+      // usersService.patchUser() // TO DO
+    }
+    if (picture) {
+      handleOnSavePicture();
+    }
+    if (name !== "") {
+      handleOnSaveName();
     }
   }
 
@@ -49,10 +66,10 @@ export default function ProfileView(): React.ReactElement {
     setName(name);
   }
 
-  function handleOnChangePicture(event: HandlePictureChangeInterface) {
-    setTargetPicture(event.target);
-    if (targetPicture && targetPicture !== 0) {
-      setPicture(targetPicture[0]);
+  function handleOnChangePicture(e: ChangeEvent<HTMLInputElement>) {
+    if (e.target.files) {
+      setPicture(e.target.files[0]);
+      setAvatar(URL.createObjectURL(e.target.files[0]));
     }
   }
 
@@ -73,8 +90,17 @@ export default function ProfileView(): React.ReactElement {
               </Typography>
             </Box>
             <Box className={classes.wrapperContent}>
-              <Typography></Typography>
-              <Box className={classes.wrapperPicture}>
+              <Box className={classes.wrapperPicture30}>
+                <Avatar
+                  id="profile-picture"
+                  src={avatar}
+                  style={{
+                    width: "100px",
+                    height: "100px",
+                  }}
+                />
+              </Box>
+              <Box className={classes.wrapperPicture20}>
                 <Button
                   variant="contained"
                   component="label"
@@ -84,10 +110,7 @@ export default function ProfileView(): React.ReactElement {
                   <Input
                     type="file"
                     sx={{ display: "none" }}
-                    value={picture}
-                    onChange={(event) => {
-                      handleOnChangePicture(event);
-                    }}
+                    onChange={handleOnChangePicture}
                   />
                 </Button>
               </Box>
@@ -164,15 +187,21 @@ const useStyles = makeStyles()(() => ({
     gap: "1rem",
     flexDirection: "column",
   },
-  wrapperPicture: {
-    height: "20%",
+  wrapperPicture20: {
+    height: "15%",
+    width: "60%",
+    display: "flex",
+    justifyContent: "center",
+  },
+  wrapperPicture30: {
+    height: "30%",
     width: "70%",
     display: "flex",
     justifyContent: "center",
   },
   wrapperInputName: {
     height: "20%",
-    width: "70%",
+    width: "60%",
   },
   buttons: {
     height: "20%",
