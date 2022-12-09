@@ -37,6 +37,12 @@ class UsersService {
       axiosInstance.delete(`PATH/${id}`).then((res: AxiosResponse) => res.data)
     );
   }
+
+  async secondAuthUser(id: number, pin: string): Promise<Response<void>> {
+    return resolve<void>(
+      axiosInstance.post(`PATH/${id}`, pin).then((res: AxiosResponse) => res.data)
+    );
+  }
 }
 
 export default new UsersService();
