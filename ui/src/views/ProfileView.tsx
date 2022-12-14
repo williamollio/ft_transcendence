@@ -14,6 +14,10 @@ import { UserCreation } from "../interfaces/user.interface";
 import { useNavigate } from "react-router-dom";
 import { RoutePath } from "../interfaces/router.interface";
 import { idTabs } from "../interfaces/tab.interface";
+import { AxiosError } from "axios";
+import { TranscendanceContext } from "../context/transcendance-context";
+import { ToastType } from "../context/toast";
+import { TranscendanceStateActionType } from "../context/transcendance-reducer";
 
 const isEditMode = false; // TO DO
 
@@ -23,6 +27,7 @@ export default function ProfileView(): React.ReactElement {
   const [picture, setPicture] = useState<any>();
   const [avatar, setAvatar] = useState<any>();
   const navigate = useNavigate();
+  const { dispatchTranscendanceState } = React.useContext(TranscendanceContext);
 
   function navigateToGamePage() {
     navigate(RoutePath.GAME, { state: { activeTabId: idTabs.GAME } });
@@ -46,8 +51,21 @@ export default function ProfileView(): React.ReactElement {
     if (isSuccess) {
       navigateToGamePage();
     } else {
-      console.error("an error has occurred on name sending"); // TO DO : show error on UI
+      showErrorToast(response.error);
     }
+  }
+
+  function showErrorToast(error?: AxiosError) {
+    const message = error?.response?.data as string;
+
+    dispatchTranscendanceState({
+      type: TranscendanceStateActionType.TOGGLE_TOAST,
+      toast: {
+        type: ToastType.ERROR,
+        title: "Error",
+        message: message,
+      },
+    });
   }
 
   async function handleOnSave() {
