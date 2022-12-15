@@ -176,7 +176,6 @@ export default function ProfileView(): React.ReactElement {
                       {...params}
                       variant="standard"
                       label="Add friends"
-                      placeholder="Favorites"
                     />
                   )}
                 />
