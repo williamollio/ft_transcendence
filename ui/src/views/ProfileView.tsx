@@ -56,7 +56,7 @@ export default function ProfileView(): React.ReactElement {
   }
 
   function showErrorToast(error?: AxiosError) {
-    const message = error?.response?.data as string;
+    const message = (error?.response?.data as any).message as string;
 
     dispatchTranscendanceState({
       type: TranscendanceStateActionType.TOGGLE_TOAST,
