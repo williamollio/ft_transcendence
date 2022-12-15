@@ -1,6 +1,6 @@
 import { ToastType } from "./toast";
 
-export interface transcendanceState {
+export interface TranscendanceState {
   toast?: {
     type?: ToastType;
     title?: string;
@@ -8,7 +8,7 @@ export interface transcendanceState {
   };
 }
 
-export const initialTranscendanceState: transcendanceState = {
+export const initialTranscendanceState: TranscendanceState = {
   toast: undefined,
 };
 
@@ -26,9 +26,9 @@ export enum TranscendanceStateActionType {
 }
 
 export const transcendanceReducer = (
-  state: transcendanceState,
+  state: TranscendanceState,
   action: TranscendanceStateAction
-): transcendanceState => {
+): TranscendanceState => {
   switch (action.type) {
     case TranscendanceStateActionType.TOGGLE_TOAST:
       return {

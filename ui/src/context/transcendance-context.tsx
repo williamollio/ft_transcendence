@@ -1,20 +1,14 @@
-import {
-  createContext,
-  Dispatch,
-  FC,
-  ReactElement,
-  useReducer,
-} from "react";
+import { createContext, Dispatch, FC, ReactElement, useReducer } from "react";
 
 import {
   transcendanceReducer,
   initialTranscendanceState,
-  transcendanceState,
+  TranscendanceState,
   TranscendanceStateAction,
 } from "./transcendance-reducer";
 
 export const TranscendanceContext = createContext<{
-  transcendanceState: transcendanceState;
+  transcendanceState: TranscendanceState;
   dispatchTranscendanceState: Dispatch<TranscendanceStateAction>;
 }>({
   transcendanceState: initialTranscendanceState,

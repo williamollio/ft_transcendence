@@ -32,7 +32,7 @@ export default function Toast(props: Props): React.ReactElement {
         onClose();
       }, TOAST_TIMEOUT);
     }
-  }, []);
+  });
 
   const toastBoxClasses = classNames({
     [classes.toastBox]: true,
@@ -43,12 +43,12 @@ export default function Toast(props: Props): React.ReactElement {
 
   return (
     <div className={classes.root}>
-      <div className={toastBoxClasses}>
+      {/* <div className={toastBoxClasses}>
         <div>
           <h3 className={classes.text}>{title}</h3>
           <p className={classes.text}>{message}</p>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }
@@ -58,6 +58,7 @@ const useStyles = makeStyles()(() => ({
     position: "fixed",
     right: "0.85rem",
     zIndex: "9999999",
+	background : "red"
   },
 
   toastBox: {
@@ -70,15 +71,15 @@ const useStyles = makeStyles()(() => ({
   },
 
   successBackground: {
-    backgroundColor: "transparentize($color-success, 0.2)",
+    backgroundColor: "transparentize(green, 0.2)",
   },
 
   warningBackground: {
-    backgroundColor: "transparentize($color-graph-corn-yellow, 0.2)",
+    backgroundColor: "transparentize(yellow, 0.2)",
   },
 
   errorBackground: {
-    backgroundColor: "transparentize($color-nerd-purple-dark, 0.2)",
+    backgroundColor: "transparentize(purple, 0.2)",
   },
   text: {
     color: "white",
