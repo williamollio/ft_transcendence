@@ -43,12 +43,12 @@ export default function Toast(props: Props): React.ReactElement {
 
   return (
     <div className={classes.root}>
-      {/* <div className={toastBoxClasses}>
+      <div className={toastBoxClasses}>
         <div>
           <h3 className={classes.text}>{title}</h3>
           <p className={classes.text}>{message}</p>
         </div>
-      </div> */}
+      </div>
     </div>
   );
 }
@@ -58,7 +58,7 @@ const useStyles = makeStyles()(() => ({
     position: "fixed",
     right: "0.85rem",
     zIndex: "9999999",
-	background : "red"
+	background : "grey"
   },
 
   toastBox: {

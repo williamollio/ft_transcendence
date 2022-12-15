@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 import App from "./component/App";
 import { BrowserRouter } from "react-router-dom";
+import { TranscendanceProvider } from "./context/transcendance-context";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -10,7 +11,9 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <BrowserRouter>
-      <App />
+      <TranscendanceProvider>
+        <App />
+      </TranscendanceProvider>
     </BrowserRouter>
   </React.StrictMode>
 );
