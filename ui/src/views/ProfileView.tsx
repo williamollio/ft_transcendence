@@ -8,9 +8,10 @@ import {
   Typography,
   Input,
   Avatar,
+  Autocomplete,
 } from "@mui/material";
 import usersService from "../service/users.service";
-import { UserCreation } from "../interfaces/user.interface";
+import { UserCreation, User } from "../interfaces/user.interface";
 import { useNavigate } from "react-router-dom";
 import { RoutePath } from "../interfaces/router.interface";
 import { idTabs } from "../interfaces/tab.interface";
@@ -18,16 +19,36 @@ import { AxiosError } from "axios";
 import { TranscendanceContext } from "../context/transcendance-context";
 import { ToastType } from "../context/toast";
 import { TranscendanceStateActionType } from "../context/transcendance-reducer";
+import { Response } from "../service/common/resolve";
+import { LabelValue } from "../interfaces/common.interface";
 
 const isEditMode = false; // TO DO
 
 export default function ProfileView(): React.ReactElement {
   const { classes } = useStyles();
+  const navigate = useNavigate();
+  const { dispatchTranscendanceState } = React.useContext(TranscendanceContext);
   const [name, setName] = useState<string>("");
   const [picture, setPicture] = useState<any>();
   const [avatar, setAvatar] = useState<any>();
-  const navigate = useNavigate();
-  const { dispatchTranscendanceState } = React.useContext(TranscendanceContext);
+  const [users, setUsers] = useState<LabelValue[]>([]);
+
+  React.useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  async function fetchUsers() {
+    const usersResponse: Response<User[]> = await usersService.getUsers();
+    const usersAsLabelValue: LabelValue[] = usersResponse.data.map(
+      (user: User) => {
+        return {
+          label: `${user.name}`,
+          value: user.id,
+        };
+      }
+    );
+    setUsers(usersAsLabelValue);
+  }
 
   function navigateToGamePage() {
     navigate(RoutePath.GAME, { state: { activeTabId: idTabs.GAME } });
@@ -40,7 +61,7 @@ export default function ProfileView(): React.ReactElement {
     response = await usersService.postUserImage(formData);
     const isSuccess = !response?.error;
     if (!isSuccess) {
-      console.error("an error has occurred on picture sending"); // TO DO : show error on UI
+      showErrorToast(response.error);
     }
   }
   async function handleOnSaveName() {
@@ -144,6 +165,22 @@ export default function ProfileView(): React.ReactElement {
                   label="Choose an unique name"
                 ></TextField>
               </Box>
+              <Box className={classes.wrapperMultiselect}>
+                <Autocomplete
+                  multiple
+                  id="tags-standard"
+                  options={users}
+                  getOptionLabel={(option) => option.label}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      variant="standard"
+                      label="Add friends"
+                      placeholder="Favorites"
+                    />
+                  )}
+                />
+              </Box>
               <Box className={classes.buttons}>
                 <Button
                   className={classes.iconButton}
@@ -180,8 +217,8 @@ const useStyles = makeStyles()(() => ({
     background: "#fff1e1",
     borderRadius: "50px",
     boxShadow: "46px 46px 92px #b3a99e, -46px -46px 92px #ffffff",
-    height: "25rem",
-    width: "40rem",
+    height: "35rem",
+    width: "45rem",
     marginBottom: "10rem",
   },
   wrapperProfile: {
@@ -219,7 +256,11 @@ const useStyles = makeStyles()(() => ({
   },
   wrapperInputName: {
     height: "20%",
-    width: "60%",
+    width: "50%",
+  },
+  wrapperMultiselect: {
+    height: "20%",
+    width: "70%",
   },
   buttons: {
     height: "20%",
