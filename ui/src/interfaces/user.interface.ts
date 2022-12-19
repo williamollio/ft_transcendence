@@ -1,8 +1,9 @@
 export interface User {
-  id: number;
+  id?: number;
   name: string;
 }
 
 export interface UserCreation {
   name: string;
+  friends?: User[];
 }

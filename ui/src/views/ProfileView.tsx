@@ -32,6 +32,7 @@ export default function ProfileView(): React.ReactElement {
   const [picture, setPicture] = useState<any>();
   const [avatar, setAvatar] = useState<any>();
   const [users, setUsers] = useState<LabelValue[]>([]);
+  const [friends, setFriends] = useState<LabelValue[] | undefined>(undefined);
 
   React.useEffect(() => {
     fetchUsers();
@@ -64,9 +65,20 @@ export default function ProfileView(): React.ReactElement {
       showErrorToast(response.error);
     }
   }
-  async function handleOnSaveName() {
+  async function handleOnSaveUserCreation() {
     let response;
-    const userCreation: UserCreation = { name: name };
+
+    const friendsList: User[] | undefined = friends?.map((friend) => {
+      return {
+        name: friend.label,
+      };
+    });
+
+    const userCreation: UserCreation = {
+      name: name,
+      friends: friendsList,
+    };
+
     response = await usersService.postUser(userCreation);
     const isSuccess = !response?.error;
     if (isSuccess) {
@@ -97,7 +109,7 @@ export default function ProfileView(): React.ReactElement {
       handleOnSavePicture();
     }
     if (name !== "") {
-      handleOnSaveName();
+      handleOnSaveUserCreation();
     }
   }
 
@@ -167,6 +179,13 @@ export default function ProfileView(): React.ReactElement {
               </Box>
               <Box className={classes.wrapperMultiselect}>
                 <Autocomplete
+                  value={friends}
+                  onChange={(
+                    event: any,
+                    newValue: LabelValue[] | undefined
+                  ) => {
+                    setFriends(newValue);
+                  }}
                   multiple
                   id="tags-standard"
                   options={users}
