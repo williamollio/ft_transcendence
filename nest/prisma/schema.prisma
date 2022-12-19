@@ -11,8 +11,10 @@ datasource db {
 }
 
 model User {
-    id        Int      @id @default(autoincrement()) // primary key
-    name      String   @unique
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    id              Int      @id @default(autoincrement())
+    name            String   @unique
+    friends         User[]   @relation("friends")
+    friendsRelation User[]   @relation("friends") // stores the many-to-many relation
+    createdAt       DateTime @default(now())
+    updatedAt       DateTime @updatedAt
 }
