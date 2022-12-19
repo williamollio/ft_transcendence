@@ -12,7 +12,7 @@ datasource db {
 
 model User {
     id              Int      @id @default(autoincrement())
-    name            String   @unique
+    name            String
     friends         User[]   @relation("friends")
     friendsRelation User[]   @relation("friends") // stores the many-to-many relation
     createdAt       DateTime @default(now())
