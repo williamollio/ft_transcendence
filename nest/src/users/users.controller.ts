@@ -13,6 +13,7 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
+import { FriendDto } from './dto/friend-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import {
   ApiBody,
@@ -81,6 +82,21 @@ export class UsersController {
     @Body() updateUserDto: UpdateUserDto,
   ) {
     return this.usersService.update(+id, updateUserDto);
+  }
+
+  @Patch('addFriend/:id')
+  @ApiOkResponse({ type: UserEntity })
+  public async addFriend(@Param('id') id: string, @Body() friend: FriendDto) {
+    return this.usersService.addFriend(+id, friend);
+  }
+
+  @Patch('/removeFriend/:id')
+  @ApiOkResponse({ type: UserEntity })
+  public async removeFriend(
+    @Param('id') id: string,
+    @Body() friend: FriendDto,
+  ) {
+    return this.usersService.removeFriend(+id, friend);
   }
 
   @Delete(':id')
