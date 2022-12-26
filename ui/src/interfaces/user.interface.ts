@@ -1,9 +1,12 @@
 export interface User {
-  id?: number;
+  id: number;
   name: string;
 }
 
+export interface Friends {
+  id: number;
+}
 export interface UserCreation {
   name: string;
-  friends?: User[];
+  friends: Friends[] | undefined;
 }

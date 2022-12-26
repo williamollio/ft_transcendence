@@ -11,7 +11,7 @@ import {
   Autocomplete,
 } from "@mui/material";
 import usersService from "../service/users.service";
-import { UserCreation, User } from "../interfaces/user.interface";
+import { UserCreation, User, Friends } from "../interfaces/user.interface";
 import { useNavigate } from "react-router-dom";
 import { RoutePath } from "../interfaces/router.interface";
 import { idTabs } from "../interfaces/tab.interface";
@@ -66,11 +66,11 @@ export default function ProfileView(): React.ReactElement {
     }
   }
   async function handleOnSaveUserCreation() {
-    let response;
+    let responseUser;
 
-    const friendsList: User[] | undefined = friends?.map((friend) => {
+    const friendsList: Friends[] | undefined = friends?.map((friend) => {
       return {
-        name: friend.label,
+        id: friend.value,
       };
     });
 
@@ -79,12 +79,13 @@ export default function ProfileView(): React.ReactElement {
       friends: friendsList,
     };
 
-    response = await usersService.postUser(userCreation);
-    const isSuccess = !response?.error;
-    if (isSuccess) {
+    responseUser = await usersService.postUser(userCreation);
+
+    const isSuccessUser = !responseUser?.error;
+    if (isSuccessUser) {
       navigateToGamePage();
     } else {
-      showErrorToast(response.error);
+      showErrorToast(responseUser.error);
     }
   }
 
