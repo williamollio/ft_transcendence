@@ -3,5 +3,10 @@
     "save": "Save",
     "login": "Login",
     "cancel": "Cancel"
-  }
+  },
+  "game": "Game",
+  "updloadPicture": "Upload Picture",
+  "profile": "Profile",
+  "chooseName": "Choose an unique name",
+  "addFriends": "Add Friends"
 }

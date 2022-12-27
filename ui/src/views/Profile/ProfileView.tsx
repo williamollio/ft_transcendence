@@ -21,10 +21,13 @@ import { ToastType } from "../../context/toast";
 import { TranscendanceStateActionType } from "../../context/transcendance-reducer";
 import { Response } from "../../service/common/resolve";
 import { LabelValue } from "../../interfaces/common.interface";
+import { translationKeys } from "./constants";
+import { useTranslation } from "react-i18next";
 
 const isEditMode = false; // TO DO
 
 export default function ProfileView(): React.ReactElement {
+  const { t } = useTranslation();
   const { classes } = useStyles();
   const navigate = useNavigate();
   const { dispatchTranscendanceState } = React.useContext(TranscendanceContext);
@@ -166,7 +169,7 @@ export default function ProfileView(): React.ReactElement {
                 fontWeight={"bold"}
                 sx={{ textDecoration: "underline" }}
               >
-                Profile
+                {t(translationKeys.profile)}
               </Typography>
             </Box>
             <Box
@@ -210,7 +213,7 @@ export default function ProfileView(): React.ReactElement {
                   component="label"
                   className={classes.iconButton}
                 >
-                  Upload Picture
+                  {t(translationKeys.updloadPicture)}
                   <Input
                     type="file"
                     sx={{ display: "none" }}
@@ -227,7 +230,7 @@ export default function ProfileView(): React.ReactElement {
                   onChange={(event) => {
                     handleOnChangeName(event.target.value);
                   }}
-                  label="Choose an unique name"
+                  label={t(translationKeys.chooseName)}
                 ></TextField>
               </Box>
               <Box sx={{ height: "20%", width: "70%" }}>
@@ -247,7 +250,7 @@ export default function ProfileView(): React.ReactElement {
                     <TextField
                       {...params}
                       variant="standard"
-                      label="Add friends"
+                      label={t(translationKeys.addFriends)}
                     />
                   )}
                 />
@@ -266,11 +269,11 @@ export default function ProfileView(): React.ReactElement {
                   variant="outlined"
                   onClick={() => handleOnSave()}
                 >
-                  Save
+                  {t(translationKeys.buttons.save)}
                 </Button>
                 {isEditMode && (
                   <Button className={classes.iconButton} variant="outlined">
-                    Cancel
+                    {t(translationKeys.buttons.cancel)}
                   </Button>
                 )}
               </Box>

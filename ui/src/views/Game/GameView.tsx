@@ -1,8 +1,11 @@
 import React from "react";
 import Navbar from "../../component/Navbar";
 import { Box, Typography } from "@mui/material";
+import { translationKeys } from "./constants";
+import { useTranslation } from "react-i18next";
 
 export default function ProfileView(): React.ReactElement {
+  const { t } = useTranslation();
   return (
     <>
       <Navbar />
@@ -44,7 +47,7 @@ export default function ProfileView(): React.ReactElement {
                 fontWeight={"bold"}
                 sx={{ textDecoration: "underline" }}
               >
-                Game
+                {t(translationKeys.game)}
               </Typography>
             </Box>
             <Box
