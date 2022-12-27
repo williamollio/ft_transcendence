@@ -1,6 +1,6 @@
 import React, { ChangeEvent, useState } from "react";
 import { makeStyles } from "tss-react/mui";
-import Navbar from "../component/Navbar";
+import Navbar from "../../component/Navbar";
 import {
   Box,
   TextField,
@@ -10,17 +10,17 @@ import {
   Avatar,
   Autocomplete,
 } from "@mui/material";
-import usersService from "../service/users.service";
-import { UserCreation, User, Friends } from "../interfaces/user.interface";
+import usersService from "../../service/users.service";
+import { UserCreation, User, Friends } from "../../interfaces/user.interface";
 import { useNavigate } from "react-router-dom";
-import { RoutePath } from "../interfaces/router.interface";
-import { idTabs } from "../interfaces/tab.interface";
+import { RoutePath } from "../../interfaces/router.interface";
+import { idTabs } from "../../interfaces/tab.interface";
 import { AxiosError } from "axios";
-import { TranscendanceContext } from "../context/transcendance-context";
-import { ToastType } from "../context/toast";
-import { TranscendanceStateActionType } from "../context/transcendance-reducer";
-import { Response } from "../service/common/resolve";
-import { LabelValue } from "../interfaces/common.interface";
+import { TranscendanceContext } from "../../context/transcendance-context";
+import { ToastType } from "../../context/toast";
+import { TranscendanceStateActionType } from "../../context/transcendance-reducer";
+import { Response } from "../../service/common/resolve";
+import { LabelValue } from "../../interfaces/common.interface";
 
 const isEditMode = false; // TO DO
 
@@ -128,10 +128,38 @@ export default function ProfileView(): React.ReactElement {
   return (
     <>
       <Navbar />
-      <Box className={classes.containerProfile}>
-        <Box className={classes.boxProfile}>
-          <Box className={classes.wrapperProfile}>
-            <Box className={classes.wrapperTile}>
+      <Box
+        sx={{
+          marginTop: "4rem",
+          border: "1px",
+          width: "100%",
+          height: "calc(100vh - 4rem)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Box
+          sx={{
+            background: "#fff1e1",
+            borderRadius: "50px",
+            boxShadow: "46px 46px 92px #b3a99e, -46px -46px 92px #ffffff",
+            height: "35rem",
+            width: "45rem",
+            marginBottom: "10rem",
+          }}
+        >
+          <Box sx={{ height: "100%", width: "100%" }}>
+            <Box
+              sx={{
+                height: "20%",
+                width: "100%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                marginTop: "10px",
+              }}
+            >
               <Typography
                 variant="h4"
                 color={"#d2601a"}
@@ -141,8 +169,25 @@ export default function ProfileView(): React.ReactElement {
                 Profile
               </Typography>
             </Box>
-            <Box className={classes.wrapperContent}>
-              <Box className={classes.wrapperPicture30}>
+            <Box
+              sx={{
+                height: "80%",
+                width: "100%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "top",
+                gap: "1rem",
+                flexDirection: "column",
+              }}
+            >
+              <Box
+                sx={{
+                  height: "30%",
+                  width: "70%",
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+              >
                 <Avatar
                   id="profile-picture"
                   src={avatar}
@@ -152,7 +197,14 @@ export default function ProfileView(): React.ReactElement {
                   }}
                 />
               </Box>
-              <Box className={classes.wrapperPicture20}>
+              <Box
+                sx={{
+                  height: "15%",
+                  width: "60%",
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+              >
                 <Button
                   variant="contained"
                   component="label"
@@ -166,9 +218,9 @@ export default function ProfileView(): React.ReactElement {
                   />
                 </Button>
               </Box>
-              <Box className={classes.wrapperInputName}>
+              <Box sx={{ height: "20%", width: "50%" }}>
                 <TextField
-                  className={classes.inputName}
+                  sx={{ width: "100%", height: "100%", borderRadius: "100px" }}
                   value={name}
                   name={"name"}
                   variant="outlined"
@@ -178,7 +230,7 @@ export default function ProfileView(): React.ReactElement {
                   label="Choose an unique name"
                 ></TextField>
               </Box>
-              <Box className={classes.wrapperMultiselect}>
+              <Box sx={{ height: "20%", width: "70%" }}>
                 <Autocomplete
                   value={friends}
                   onChange={(
@@ -200,7 +252,15 @@ export default function ProfileView(): React.ReactElement {
                   )}
                 />
               </Box>
-              <Box className={classes.buttons}>
+              <Box
+                sx={{
+                  height: "20%",
+                  width: "70%",
+                  display: "flex",
+                  justifyContent: "center",
+                  gap: "1em",
+                }}
+              >
                 <Button
                   className={classes.iconButton}
                   variant="outlined"
@@ -222,79 +282,11 @@ export default function ProfileView(): React.ReactElement {
   );
 }
 
+// https://github.com/garronej/tss-react
 const useStyles = makeStyles()(() => ({
-  containerProfile: {
-    marginTop: "4rem",
-    border: "1px",
-    width: "100%",
-    height: "calc(100vh - 4rem)",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  boxProfile: {
-    background: "#fff1e1",
-    borderRadius: "50px",
-    boxShadow: "46px 46px 92px #b3a99e, -46px -46px 92px #ffffff",
-    height: "35rem",
-    width: "45rem",
-    marginBottom: "10rem",
-  },
-  wrapperProfile: {
-    height: "100%",
-    width: "100%",
-  },
-  wrapperTile: {
-    height: "20%",
-    width: "100%",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: "10px",
-  },
-  wrapperContent: {
-    height: "80%",
-    width: "100%",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "top",
-    gap: "1rem",
-    flexDirection: "column",
-  },
-  wrapperPicture20: {
-    height: "15%",
-    width: "60%",
-    display: "flex",
-    justifyContent: "center",
-  },
-  wrapperPicture30: {
-    height: "30%",
-    width: "70%",
-    display: "flex",
-    justifyContent: "center",
-  },
-  wrapperInputName: {
-    height: "20%",
-    width: "50%",
-  },
-  wrapperMultiselect: {
-    height: "20%",
-    width: "70%",
-  },
-  buttons: {
-    height: "20%",
-    width: "70%",
-    display: "flex",
-    justifyContent: "center",
-    gap: "1em",
-  },
   iconButton: {
     height: "50%",
     width: "50%",
   },
-  inputName: {
-    width: "100%",
-    height: "100%",
-    borderRadius: "100px",
-  },
+  inputName: {},
 }));

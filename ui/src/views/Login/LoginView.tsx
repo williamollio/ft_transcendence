@@ -2,9 +2,12 @@ import React from "react";
 import Button from "@mui/material/Button";
 import { Box } from "@mui/system";
 import { useNavigate } from "react-router-dom";
-import { RoutePath } from "../interfaces/router.interface";
+import { RoutePath } from "../../interfaces/router.interface";
+import { useTranslation } from "react-i18next";
+import { translationKeys } from "./constants";
 
 export default function LoginView(): React.ReactElement {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const handleLogin = () => {
@@ -27,7 +30,7 @@ export default function LoginView(): React.ReactElement {
         variant="contained"
         onClick={() => handleLogin()}
       >
-        Login
+        {t(translationKeys.buttons.login)}
       </Button>
     </Box>
   );
