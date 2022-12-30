@@ -19,7 +19,6 @@ import {
   ApiConsumes,
   ApiCreatedResponse,
   ApiOkResponse,
-  ApiNotImplementedResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import { UserEntity } from './entities/user.entity';
@@ -73,24 +72,6 @@ export class UsersController {
         HttpStatus.BAD_REQUEST,
       );
     }
-  }
-
-  @Post(':id')
-  @ApiOkResponse()
-  public async firstAuthStep(@Param('auth') _: number) {
-    // TODO: Implement OAuth system
-
-    console.log('Attempted to authenticate.');
-    return true;
-  }
-
-  @Post(':id')
-  @ApiNotImplementedResponse()
-  public async secondFactor(@Param('pin') pin: string) {
-    // TODO: Implement including the actual OAuth
-
-    console.log(pin);
-    return ApiNotImplementedResponse();
   }
 
   @Patch(':id')

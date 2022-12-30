@@ -47,18 +47,6 @@ class UsersService {
         .then((res: AxiosResponse) => res.data)
     );
   }
-
-  async firstAuthUser(id: number): Promise<Response<boolean>> {
-    return resolve<boolean>(
-      axiosInstance.post(`PATH/${id}`, 1).then((res: AxiosResponse) => res.data)
-    );
-  }
-
-  async secondAuthUser(id: number, pin: string): Promise<Response<void>> {
-    return resolve<void>(
-      axiosInstance.post(`PATH/${id}`, pin).then((res: AxiosResponse) => res.data)
-    );
-  }
 }
 
 export default new UsersService();
