@@ -2,13 +2,13 @@ import React, {ReactElement} from "react";
 import {useNavigate} from "react-router-dom";
 import {RoutePath} from "../interfaces/router.interface";
 import {Box, Button, Grid, TextField} from "@material-ui/core";
-import UsersService from "../service/users.service";
+import AuthService from "../service/auth.service";
 
 export default function Login2FAView(): ReactElement {
     const navigate = useNavigate();
 
     async function handleSubmit() {
-        let response = await UsersService.secondAuthUser(0x007, "123456");
+        let response = await AuthService.getAuthURI(); // <- Will be changed later on.
         if (!response?.error) {
             navigate(RoutePath.PROFILE);
         } else {
