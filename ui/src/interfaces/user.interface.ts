@@ -8,5 +8,5 @@ export interface Friends {
 }
 export interface UserCreation {
   name: string;
-  friends: Friends[] | undefined;
+  friends?: Friends[];
 }
