@@ -132,6 +132,7 @@ export default function ProfileView(): React.ReactElement {
     <>
       <Navbar />
       <Box
+        id="background"
         sx={{
           marginTop: "4rem",
           border: "1px",
@@ -143,6 +144,7 @@ export default function ProfileView(): React.ReactElement {
         }}
       >
         <Box
+          id="card"
           sx={{
             background: "#fff1e1",
             borderRadius: "50px",
@@ -152,7 +154,7 @@ export default function ProfileView(): React.ReactElement {
             marginBottom: "10rem",
           }}
         >
-          <Box sx={{ height: "100%", width: "100%" }}>
+          <Box id="card-wrapper" sx={{ height: "100%", width: "100%" }}>
             <Box
               sx={{
                 height: "20%",
@@ -223,7 +225,8 @@ export default function ProfileView(): React.ReactElement {
               </Box>
               <Box sx={{ height: "20%", width: "50%" }}>
                 <TextField
-                  sx={{ width: "100%", height: "100%", borderRadius: "100px" }}
+                  sx={{ height: "100%", borderRadius: "100px" }}
+                  fullWidth
                   value={name}
                   name={"name"}
                   variant="outlined"
@@ -243,19 +246,20 @@ export default function ProfileView(): React.ReactElement {
                     setFriends(newValue);
                   }}
                   multiple
-                  id="tags-standard"
+                  id="multiselect-list-of-friends"
                   options={users}
                   getOptionLabel={(option) => option.label}
                   renderInput={(params) => (
                     <TextField
                       {...params}
-                      variant="standard"
+                      variant="outlined"
                       label={t(translationKeys.addFriends)}
                     />
                   )}
                 />
               </Box>
               <Box
+                id="wrapper-save-cancel-buttons"
                 sx={{
                   height: "20%",
                   width: "70%",
@@ -265,6 +269,7 @@ export default function ProfileView(): React.ReactElement {
                 }}
               >
                 <Button
+                  id="save-button"
                   className={classes.iconButton}
                   variant="outlined"
                   onClick={() => handleOnSave()}
@@ -272,7 +277,11 @@ export default function ProfileView(): React.ReactElement {
                   {t(translationKeys.buttons.save)}
                 </Button>
                 {isEditMode && (
-                  <Button className={classes.iconButton} variant="outlined">
+                  <Button
+                    id="cancel-button"
+                    className={classes.iconButton}
+                    variant="outlined"
+                  >
                     {t(translationKeys.buttons.cancel)}
                   </Button>
                 )}
