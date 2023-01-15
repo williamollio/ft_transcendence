@@ -15,7 +15,7 @@ Adding new dependencies won't update the folder `app/cache/node_modules` in the 
 
 ### nest
 
-For seeding the db run : `docker exec -it nest npx prisma db seed`
+For seeding the database run : `docker exec -it nest npx prisma db seed`
 
 ## Commands to know
 
