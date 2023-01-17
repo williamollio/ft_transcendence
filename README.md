@@ -6,8 +6,9 @@
 
 ## Work on ft_transcendance
 
-`make up` for building the image and for spinning up the containers.
-For stopping the app run `make down`.
+- `make up` for building the image and for spinning up the containers.
+- For stopping the app run `make down`.
+- <strong>Development experience needs to be improved</strong> : Always run `make uiclean` before relaunching the app run
 
 ### ui
 
@@ -15,7 +16,7 @@ Adding new dependencies won't update the folder `app/cache/node_modules` in the 
 
 ### nest
 
-For seeding the db run : `docker exec -it nest npx prisma db seed`
+For seeding the database run : `docker exec -it nest npx prisma db seed`
 
 ## Commands to know
 
