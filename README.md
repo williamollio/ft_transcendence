@@ -8,6 +8,7 @@
 
 `make up` for building the image and for spinning up the containers.
 For stopping the app run `make down`.
+<strong>Development experience needs to be improved</strong> : Always run `make uiclean` before relaunching the app run
 
 ### ui
 
