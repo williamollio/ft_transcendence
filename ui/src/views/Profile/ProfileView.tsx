@@ -58,11 +58,11 @@ export default function ProfileView(): React.ReactElement {
     navigate(RoutePath.GAME, { state: { activeTabId: idTabs.GAME } });
   }
 
-  async function handleOnSavePicture() {
+  async function handleOnSavePicture(name: string) {
     let response;
     const formData = new FormData();
     formData.append("file", picture, picture.name);
-    response = await usersService.postUserImage(formData);
+    response = await usersService.postUserImage(formData, name);
     const isSuccess = !response?.error;
     if (!isSuccess) {
       showErrorToast(response.error);
@@ -109,11 +109,12 @@ export default function ProfileView(): React.ReactElement {
     if (isEditMode) {
       // usersService.patchUser() // TO DO
     }
-    if (picture) {
-      handleOnSavePicture();
-    }
+
     if (name !== "") {
       handleOnSaveUserCreation();
+      if (picture) {
+        handleOnSavePicture(name);
+      }
     }
   }
 

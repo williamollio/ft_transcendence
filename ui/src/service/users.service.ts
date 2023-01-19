@@ -18,10 +18,10 @@ class UsersService {
     );
   }
 
-  async postUserImage(file: any): Promise<Response<void>> {
+  async postUserImage(file: any, name : string): Promise<Response<void>> {
     return resolve<void>(
       axiosInstance
-        .post(`${PATH}/upload`, file)
+        .post(`${PATH}/upload/${name}`, file)
         .then((res: AxiosResponse) => res.data)
     );
   }
