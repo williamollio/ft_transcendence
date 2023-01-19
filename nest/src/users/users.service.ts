@@ -8,6 +8,15 @@ import { User } from '@prisma/client';
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
+  public async setFilename(filename: string, userName: string) {
+    await this.prisma.user.update({
+      where: { name: userName },
+      data: {
+        filename: filename,
+      },
+    });
+  }
+
   public async create(createUserDto: CreateUserDto): Promise<User> {
     try {
       const User = await this.prisma.user.create({
@@ -25,14 +34,14 @@ export class UsersService {
   }
 
   private async updateFriendsList(
-    UserId: number,
+    userId: number,
     userDto: CreateUserDto | UpdateUserDto,
   ) {
     const sizeFriendsArray = userDto.friends?.length ?? 0;
 
     for (let i = 0; i < sizeFriendsArray; i++) {
       await this.prisma.user.update({
-        where: { id: UserId },
+        where: { id: userId },
         data: {
           friends: { connect: [{ id: userDto.friends?.[i].id }] },
         },
