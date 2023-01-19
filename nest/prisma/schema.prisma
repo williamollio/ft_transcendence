@@ -17,4 +17,5 @@ model User {
     friendsRelation User[]   @relation("friends") // stores the many-to-many relation
     createdAt       DateTime @default(now())
     updatedAt       DateTime @updatedAt
+    filename        String?
 }
