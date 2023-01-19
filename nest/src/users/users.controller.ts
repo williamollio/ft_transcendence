@@ -10,6 +10,7 @@ import {
   HttpStatus,
   UseInterceptors,
   UploadedFile,
+  Query,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -111,8 +112,18 @@ export class UsersController {
     },
   })
   @UseInterceptors(FileInterceptor('file', storage))
-  uploadFile(@UploadedFile() file: any): Observable<unknown> {
-    console.log(file);
+  uploadFile(
+    @UploadedFile() file: any,
+    @Query() name: string,
+  ): Observable<unknown> {
+    console.log('name ' + name);
+    this.usersService.setFilename(file.filename, name);
     return of({ imagePath: file.filename });
   }
+
+  //   @Get()
+  //   getFile(): StreamableFile {
+  //     const file = createReadStream(join(process.cwd(), 'package.json'));
+  //     return new StreamableFile(file);
+  //   }
 }
