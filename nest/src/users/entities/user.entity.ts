@@ -9,8 +9,14 @@ export class UserEntity implements User {
   name: string;
 
   @ApiProperty()
+  friends: User[];
+
+  @ApiProperty()
   createdAt: Date;
 
   @ApiProperty()
   updatedAt: Date;
+
+  @ApiProperty()
+  filename: string | null;
 }

@@ -10,6 +10,7 @@ async function main() {
     update: {},
     create: {
       name: '@wollio',
+      friends: { create: [{ name: '@mhahn' }] },
     },
   });
 
@@ -21,7 +22,15 @@ async function main() {
     },
   });
 
-  console.log({ user1, user2 });
+  const user3 = await prisma.user.upsert({
+    where: { id: 3 },
+    update: {},
+    create: {
+      name: '@thomass',
+    },
+  });
+
+  console.log({ user1, user2, user3 });
 }
 
 // execute the main function
