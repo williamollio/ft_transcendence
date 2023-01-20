@@ -18,5 +18,5 @@ export class UserEntity implements User {
   updatedAt: Date;
 
   @ApiProperty()
-  filename?: string | null;
+  filename: string | null;
 }
