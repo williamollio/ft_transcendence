@@ -8,6 +8,13 @@ import { User } from '@prisma/client';
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
+  public async getFilename(name: string) {
+    const User = await this.prisma.user.findUnique({
+      where: { name: name },
+    });
+    return User?.filename;
+  }
+
   public async setFilename(filename: string, userName: string) {
     await this.prisma.user.update({
       where: { name: userName },

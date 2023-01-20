@@ -10,7 +10,7 @@ import {
   HttpStatus,
   UseInterceptors,
   UploadedFile,
-  Query,
+  Res,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -20,15 +20,18 @@ import {
   ApiConsumes,
   ApiCreatedResponse,
   ApiOkResponse,
+  ApiResponse,
   ApiTags,
+  ApiQuery,
 } from '@nestjs/swagger';
 import { UserEntity } from './entities/user.entity';
 import { User } from '@prisma/client';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { v4 as uuidv4 } from 'uuid';
-import { Observable, of } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 import path = require('path');
+import { Response } from 'express';
 
 export const storage = {
   storage: diskStorage({
@@ -121,9 +124,28 @@ export class UsersController {
     return of({ imagePath: file.filename });
   }
 
-  //   @Get()
-  //   getFile(): StreamableFile {
-  //     const file = createReadStream(join(process.cwd(), 'package.json'));
-  //     return new StreamableFile(file);
-  //   }
+  @Get('upload/:username')
+  @ApiQuery({
+    name: 'name',
+    description: 'name of the user',
+    required: true,
+    type: 'string',
+  })
+  @ApiResponse({ status: HttpStatus.OK, description: 'File has been sent' })
+  async getFile(@Param('username') username: string, @Res() res: Response) {
+    try {
+      const filename = await this.usersService.getFilename(username);
+      if (!filename) {
+        throwError;
+      }
+      const filePath = path.resolve(`./uploads/profileimages/${filename}`);
+      res.sendFile(filePath);
+    } catch (error) {
+      console.error(error);
+      throw new HttpException(
+        'Error when trying to send the file',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
 }
