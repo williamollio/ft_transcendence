@@ -98,7 +98,7 @@ export class UsersController {
     return this.usersService.remove(+id);
   }
 
-  @Post('upload')
+  @Post('upload/:name')
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
@@ -113,8 +113,8 @@ export class UsersController {
   })
   @UseInterceptors(FileInterceptor('file', storage))
   uploadFile(
+    @Param('name') name: string,
     @UploadedFile() file: any,
-    @Query() name: string,
   ): Observable<unknown> {
     console.log('name ' + name);
     this.usersService.setFilename(file.filename, name);
