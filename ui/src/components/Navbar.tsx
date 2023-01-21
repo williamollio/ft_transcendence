@@ -28,8 +28,8 @@ export default function NavBar(): React.ReactElement {
       if (tab.id === id) {
         return tab;
       } else {
-		return null;
-	  }
+        return null;
+      }
     })[0];
   }
 
@@ -44,6 +44,8 @@ export default function NavBar(): React.ReactElement {
     <AppBar>
       <Tabs
         value={selectedTabId}
+        indicatorColor="secondary"
+        textColor="secondary"
         className={classes.menuBar}
         centered={true}
         TabIndicatorProps={{

@@ -1,6 +1,6 @@
 import React, { ChangeEvent, useState } from "react";
 import { makeStyles } from "tss-react/mui";
-import Navbar from "../../component/Navbar";
+import Navbar from "../../components/Navbar";
 import {
   Box,
   TextField,
@@ -10,7 +10,7 @@ import {
   Avatar,
   Autocomplete,
 } from "@mui/material";
-import usersService from "../../service/users.service";
+import usersService from "../../services/users.service";
 import { UserCreation, User, Friends } from "../../interfaces/user.interface";
 import { useNavigate } from "react-router-dom";
 import { RoutePath } from "../../interfaces/router.interface";
@@ -19,10 +19,17 @@ import { AxiosError } from "axios";
 import { TranscendanceContext } from "../../context/transcendance-context";
 import { ToastType } from "../../context/toast";
 import { TranscendanceStateActionType } from "../../context/transcendance-reducer";
-import { Response } from "../../service/common/resolve";
+import { Response } from "../../services/common/resolve";
 import { LabelValue } from "../../interfaces/common.interface";
 import { translationKeys } from "./constants";
 import { useTranslation } from "react-i18next";
+import {
+  Background,
+  CardContainer,
+  ProfileCard,
+  TitleWrapper,
+  ContentWrapper,
+} from "../../styles/MuiStyles";
 
 const isEditMode = false; // TO DO
 
@@ -132,68 +139,21 @@ export default function ProfileView(): React.ReactElement {
   return (
     <>
       <Navbar />
-      <Box
-        id="background"
-        sx={{
-          marginTop: "4rem",
-          border: "1px",
-          width: "100%",
-          height: "calc(100vh - 4rem)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <Box
-          id="card"
-          sx={{
-            background: "#fff1e1",
-            borderRadius: "50px",
-            boxShadow: "46px 46px 92px #b3a99e, -46px -46px 92px #ffffff",
-            height: "35rem",
-            width: "45rem",
-            marginBottom: "10rem",
-          }}
-        >
-          <Box id="card-wrapper" sx={{ height: "100%", width: "100%" }}>
-            <Box
-              sx={{
-                height: "20%",
-                width: "100%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                marginTop: "10px",
-              }}
-            >
+      <Background>
+        <ProfileCard>
+          <CardContainer>
+            <TitleWrapper>
               <Typography
                 variant="h4"
-                color={"#d2601a"}
+                color={"secondary"}
                 fontWeight={"bold"}
                 sx={{ textDecoration: "underline" }}
               >
                 {t(translationKeys.profile)}
               </Typography>
-            </Box>
-            <Box
-              sx={{
-                height: "80%",
-                width: "100%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "top",
-                gap: "1rem",
-                flexDirection: "column",
-              }}
-            >
-              <Box
-                sx={{
-                  height: "30%",
-                  width: "70%",
-                  display: "flex",
-                  justifyContent: "center",
-                }}
-              >
+            </TitleWrapper>
+            <ContentWrapper>
+              <Box className={classes.avatarWrapper}>
                 <Avatar
                   id="profile-picture"
                   src={avatar}
@@ -203,14 +163,7 @@ export default function ProfileView(): React.ReactElement {
                   }}
                 />
               </Box>
-              <Box
-                sx={{
-                  height: "15%",
-                  width: "60%",
-                  display: "flex",
-                  justifyContent: "center",
-                }}
-              >
+              <Box className={classes.uploadButtonWrapper}>
                 <Button
                   variant="contained"
                   component="label"
@@ -247,7 +200,6 @@ export default function ProfileView(): React.ReactElement {
                     setFriends(newValue);
                   }}
                   multiple
-                  id="multiselect-list-of-friends"
                   options={users}
                   getOptionLabel={(option) => option.label}
                   renderInput={(params) => (
@@ -259,18 +211,8 @@ export default function ProfileView(): React.ReactElement {
                   )}
                 />
               </Box>
-              <Box
-                id="wrapper-save-cancel-buttons"
-                sx={{
-                  height: "20%",
-                  width: "70%",
-                  display: "flex",
-                  justifyContent: "center",
-                  gap: "1em",
-                }}
-              >
+              <Box className={classes.buttonsWrapper}>
                 <Button
-                  id="save-button"
                   className={classes.iconButton}
                   variant="outlined"
                   onClick={() => handleOnSave()}
@@ -278,19 +220,15 @@ export default function ProfileView(): React.ReactElement {
                   {t(translationKeys.buttons.save)}
                 </Button>
                 {isEditMode && (
-                  <Button
-                    id="cancel-button"
-                    className={classes.iconButton}
-                    variant="outlined"
-                  >
+                  <Button className={classes.iconButton} variant="outlined">
                     {t(translationKeys.buttons.cancel)}
                   </Button>
                 )}
               </Box>
-            </Box>
-          </Box>
-        </Box>
-      </Box>
+            </ContentWrapper>
+          </CardContainer>
+        </ProfileCard>
+      </Background>
     </>
   );
 }
@@ -301,5 +239,23 @@ const useStyles = makeStyles()(() => ({
     height: "50%",
     width: "50%",
   },
-  inputName: {},
+  avatarWrapper: {
+    height: "30%",
+    width: "70%",
+    display: "flex",
+    justifyContent: "center",
+  },
+  buttonsWrapper: {
+    height: "20%",
+    width: "70%",
+    display: "flex",
+    justifyContent: "center",
+    gap: "1em",
+  },
+  uploadButtonWrapper: {
+    height: "15%",
+    width: "60%",
+    display: "flex",
+    justifyContent: "center",
+  },
 }));
