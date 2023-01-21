@@ -18,20 +18,9 @@ Adding new dependencies won't update the folder `app/cache/node_modules` in the 
 
 For seeding the database run : `docker exec -it nest npx prisma db seed`
 
-## Commands to know
-
-- npx prisma migrate dev --name "..." : save db / execute SQL / generate client
-- npx prisma db seed : seed the database
-- npx nest generate resource : generate REST resources
-- npx nest generate service/module prisma
-
 ## Links
 
 Nest Server : http://localhost:8080
 Swagger : http://localhost:8080/api
 
 React App : http://localhost:3000/
-
-## Good practise / Proposition
-
-Write DTO as TS class (ref. Nest doc)

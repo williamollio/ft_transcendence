@@ -3,6 +3,10 @@ export interface User {
   name: string;
 }
 
+export interface Friends {
+  id: number;
+}
 export interface UserCreation {
   name: string;
+  friends?: Friends[];
 }
