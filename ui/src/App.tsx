@@ -8,7 +8,7 @@ import { TranscendanceContext } from "./context/transcendance-context";
 import { TranscendanceStateActionType } from "./context/transcendance-reducer";
 import Toast from "./context/toast";
 import { Box, ThemeProvider } from "@mui/material";
-import theme from "./theme";
+import theme from "./MuiTheme";
 import classes from "./styles.module.scss";
 
 export default function App() {

@@ -1,6 +1,6 @@
 import React, { ChangeEvent, useState } from "react";
 import { makeStyles } from "tss-react/mui";
-import Navbar from "../../component/Navbar";
+import Navbar from "../../components/Navbar";
 import {
   Box,
   TextField,
@@ -10,7 +10,7 @@ import {
   Avatar,
   Autocomplete,
 } from "@mui/material";
-import usersService from "../../service/users.service";
+import usersService from "../../services/users.service";
 import { UserCreation, User, Friends } from "../../interfaces/user.interface";
 import { useNavigate } from "react-router-dom";
 import { RoutePath } from "../../interfaces/router.interface";
@@ -19,7 +19,7 @@ import { AxiosError } from "axios";
 import { TranscendanceContext } from "../../context/transcendance-context";
 import { ToastType } from "../../context/toast";
 import { TranscendanceStateActionType } from "../../context/transcendance-reducer";
-import { Response } from "../../service/common/resolve";
+import { Response } from "../../services/common/resolve";
 import { LabelValue } from "../../interfaces/common.interface";
 import { translationKeys } from "./constants";
 import { useTranslation } from "react-i18next";
