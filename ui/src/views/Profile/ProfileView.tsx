@@ -23,6 +23,7 @@ import { Response } from "../../services/common/resolve";
 import { LabelValue } from "../../interfaces/common.interface";
 import { translationKeys } from "./constants";
 import { useTranslation } from "react-i18next";
+import { Background } from "../../styles/MuiStyles";
 
 const isEditMode = false; // TO DO
 
@@ -132,18 +133,7 @@ export default function ProfileView(): React.ReactElement {
   return (
     <>
       <Navbar />
-      <Box
-        id="background"
-        sx={{
-          marginTop: "4rem",
-          border: "1px",
-          width: "100%",
-          height: "calc(100vh - 4rem)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
+      <Background>
         <Box
           id="card"
           sx={{
@@ -290,7 +280,7 @@ export default function ProfileView(): React.ReactElement {
             </Box>
           </Box>
         </Box>
-      </Box>
+      </Background>
     </>
   );
 }

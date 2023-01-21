@@ -4,6 +4,7 @@ import { Box, Typography } from "@mui/material";
 import { translationKeys } from "./constants";
 import { useTranslation } from "react-i18next";
 import { makeStyles } from "tss-react/mui";
+import { Background } from "../../styles/MuiStyles";
 
 export default function ProfileView(): React.ReactElement {
   const { t } = useTranslation();
@@ -11,7 +12,7 @@ export default function ProfileView(): React.ReactElement {
   return (
     <>
       <Navbar />
-      <Box className={classes.wrapperCard}>
+      <Background>
         <Box
           sx={{
             background: "#fff1e1",
@@ -55,7 +56,7 @@ export default function ProfileView(): React.ReactElement {
             </Box>
           </Box>
         </Box>
-      </Box>
+      </Background>
     </>
   );
 }
