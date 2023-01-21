@@ -1,0 +1,11 @@
+@import "./assets/css/colors.scss";
+
+:export {
+  colorPrimary: $color-primary;
+  colorSecondary: $color-secondary;
+  colorAccent: $color-accent;
+}
+
+.App {
+  text-align: center;
+}

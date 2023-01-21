@@ -18,7 +18,7 @@ class UsersService {
     );
   }
 
-  async postUserImage(file: any, name : string): Promise<Response<void>> {
+  async postUserImage(file: any, name: string): Promise<Response<void>> {
     return resolve<void>(
       axiosInstance
         .post(`${PATH}/upload/${name}`, file)
@@ -48,5 +48,5 @@ class UsersService {
     );
   }
 }
-
+// eslint-disable-next-line
 export default new UsersService();

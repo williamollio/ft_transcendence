@@ -1,7 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import "./index.css";
-import App from "./component/App";
+import App from "./App";
 import { BrowserRouter } from "react-router-dom";
 import { TranscendanceProvider } from "./context/transcendance-context";
 import { initReacti18n } from "./i18n/i18n";
