@@ -40,8 +40,6 @@ services:
       - ./ui/:/app/ui
     ports:
       - "3000:3000"
-    depends_on:
-      - nest
     restart: always
     networks:
       - ft_transcendance
