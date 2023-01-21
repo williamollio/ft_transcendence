@@ -9,6 +9,7 @@ import { TranscendanceStateActionType } from "./context/transcendance-reducer";
 import Toast from "./context/toast";
 import { Box, ThemeProvider } from "@mui/material";
 import theme from "./theme";
+import classes from "./styles.module.scss";
 
 export default function App() {
   function closeToast() {
@@ -32,12 +33,10 @@ export default function App() {
         />
       )}
       <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          minHeight: "100vh",
-          backgroundColor: "#fff1e1",
-        }}
+        display={"flex"}
+        flexDirection={"column"}
+        minHeight={"100vh"}
+        sx={{ backgroundColor: classes.colorSecondary }}
       >
         <ThemeProvider theme={theme}>
           <Routes>
