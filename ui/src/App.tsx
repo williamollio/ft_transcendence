@@ -10,8 +10,24 @@ import Toast from "./context/toast";
 import { Box, ThemeProvider } from "@mui/material";
 import theme from "./MuiTheme";
 import classes from "./styles.module.scss";
+import { useImageStore } from "./store/users-store";
 
 export default function App() {
+  const [image, setImage] = useImageStore((state) => [
+    state.image,
+    state.setImage,
+  ]);
+  const imageUrl = image ? URL.createObjectURL(image) : "";
+
+  // removes the object URL after the component unmounts to prevent memory leaks
+  React.useEffect(() => {
+    return () => {
+      if (imageUrl) {
+        URL.revokeObjectURL(imageUrl);
+      }
+    };
+  }, [imageUrl]);
+
   function closeToast() {
     dispatchTranscendanceState({
       type: TranscendanceStateActionType.TOGGLE_TOAST,
