@@ -1,4 +1,4 @@
-import create from "zustand";
+import { create } from "zustand";
 import { Dispatch, SetStateAction } from "react";
 
 // describes the shape of the state
