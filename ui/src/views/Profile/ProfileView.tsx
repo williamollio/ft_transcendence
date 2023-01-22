@@ -23,6 +23,7 @@ import { Response } from "../../services/common/resolve";
 import { LabelValue } from "../../interfaces/common.interface";
 import { translationKeys } from "./constants";
 import { useTranslation } from "react-i18next";
+import { useImageStore } from "../../store/users-store";
 import {
   Background,
   CardContainer,
@@ -41,6 +42,10 @@ export default function ProfileView(): React.ReactElement {
   const [name, setName] = useState<string>("");
   const [picture, setPicture] = useState<any>();
   const [avatar, setAvatar] = useState<any>();
+  const [image, setImage] = useImageStore((state) => [
+    state.image,
+    state.setImage,
+  ]);
   const [users, setUsers] = useState<LabelValue[]>([]);
   const [friends, setFriends] = useState<LabelValue[] | undefined>(undefined);
 
@@ -132,6 +137,7 @@ export default function ProfileView(): React.ReactElement {
   function handleOnChangePicture(e: ChangeEvent<HTMLInputElement>) {
     if (e.target.files) {
       setPicture(e.target.files[0]);
+      setImage(e.target.files[0]);
       setAvatar(URL.createObjectURL(e.target.files[0]));
     }
   }
@@ -155,7 +161,6 @@ export default function ProfileView(): React.ReactElement {
             <ContentWrapper>
               <Box className={classes.avatarWrapper}>
                 <Avatar
-                  id="profile-picture"
                   src={avatar}
                   style={{
                     width: "100px",
