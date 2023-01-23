@@ -2,7 +2,7 @@ import React, {ReactElement} from "react";
 import {useNavigate} from "react-router-dom";
 import {RoutePath} from "../interfaces/router.interface";
 import {Box, Button, Grid, TextField} from "@material-ui/core";
-import AuthService from "../service/auth.service";
+import AuthService from "../services/auth.service";
 
 export default function Login2FAView(): ReactElement {
     const navigate = useNavigate();
