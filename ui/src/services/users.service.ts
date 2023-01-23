@@ -26,6 +26,14 @@ class UsersService {
     );
   }
 
+  async getUserImage(username: string): Promise<Response<any>> {
+    return resolve<any>(
+      axiosInstance
+        .get(`${PATH}/upload/${username}`)
+        .then((res: AxiosResponse) => res.data)
+    );
+  }
+
   async postUser(user: UserCreation): Promise<Response<void>> {
     return resolve<void>(
       axiosInstance.post(PATH, user).then((res: AxiosResponse) => res.data)

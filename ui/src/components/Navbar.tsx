@@ -9,6 +9,7 @@ import classes from "../styles.module.scss";
 import { useImageStore } from "../store/users-store";
 import Avatar from "@material-ui/core/Avatar";
 import Box from "@mui/material/Box";
+import usersService from "../services/users.service";
 
 export default function NavBar(): React.ReactElement {
   const state = useLocation().state;
@@ -19,6 +20,17 @@ export default function NavBar(): React.ReactElement {
     state.image,
     state.setImage,
   ]);
+
+  React.useEffect(() => {
+    fetchProfilePicture();
+  });
+
+  async function fetchProfilePicture() {
+    if (image === null) {
+      const file: any = await usersService.getUserImage("transcendance");
+      setImage(file);
+    }
+  }
 
   const [selectedTabId, setSelectedTabId] = useState<number>(
     state?.activeTabId ?? idTabs.PROFILE
