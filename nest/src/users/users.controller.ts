@@ -22,7 +22,6 @@ import {
   ApiOkResponse,
   ApiResponse,
   ApiTags,
-  ApiQuery,
 } from '@nestjs/swagger';
 import { UserEntity } from './entities/user.entity';
 import { User } from '@prisma/client';
@@ -32,6 +31,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Observable, of, throwError } from 'rxjs';
 import path = require('path');
 import { Response } from 'express';
+import * as fs from 'fs';
 
 export const storage = {
   storage: diskStorage({
@@ -133,7 +133,9 @@ export class UsersController {
         throwError;
       }
       const filePath = path.resolve(`./uploads/profileimages/${filename}`);
-      res.sendFile(filePath);
+      const image = fs.readFileSync(filePath);
+      res.contentType('image/jpeg');
+      return res.send(image);
     } catch (error) {
       console.error(error);
       throw new HttpException(
