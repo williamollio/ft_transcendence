@@ -67,6 +67,13 @@ export class UsersService {
     });
   }
 
+  public async findByName(name: string) {
+    return this.prisma.user.findUnique({
+      where: { name },
+      include: { friends: false },
+    });
+  }
+
   public async update(id: number, updateUserDto: UpdateUserDto) {
     try {
       const User = await this.prisma.user.update({
