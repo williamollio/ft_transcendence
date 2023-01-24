@@ -125,12 +125,6 @@ export class UsersController {
   }
 
   @Get('upload/:username')
-  @ApiQuery({
-    name: 'name',
-    description: 'name of the user',
-    required: true,
-    type: 'string',
-  })
   @ApiResponse({ status: HttpStatus.OK, description: 'File has been sent' })
   async getFile(@Param('username') username: string, @Res() res: Response) {
     try {
