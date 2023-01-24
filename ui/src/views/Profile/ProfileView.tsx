@@ -41,7 +41,6 @@ export default function ProfileView(): React.ReactElement {
   const { dispatchTranscendanceState } = React.useContext(TranscendanceContext);
   const [name, setName] = useState<string>("");
   const [picture, setPicture] = useState<any>();
-  const [avatar, setAvatar] = useState<any>();
   const [image, setImage] = useImageStore((state) => [
     state.image,
     state.setImage,
@@ -138,7 +137,6 @@ export default function ProfileView(): React.ReactElement {
     if (e.target.files) {
       setPicture(e.target.files[0]);
       setImage(e.target.files[0]);
-      setAvatar(URL.createObjectURL(e.target.files[0]));
     }
   }
 
@@ -161,7 +159,7 @@ export default function ProfileView(): React.ReactElement {
             <ContentWrapper>
               <Box className={classes.avatarWrapper}>
                 <Avatar
-                  src={avatar}
+                  src={image ? URL.createObjectURL(image) : ""}
                   style={{
                     width: "100px",
                     height: "100px",
