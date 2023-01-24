@@ -8,7 +8,7 @@ import { Strategy } from 'passport-42';
 export class Intra42Strategy extends PassportStrategy(Strategy, 'intra42') {
   constructor(/* Params? */) {
     super({
-      clientID: null,
+      clientID: 7, // To be filled in...
       clientSecret: null,
       callbackURL: 'localhost:8080',
       scopes: [],
