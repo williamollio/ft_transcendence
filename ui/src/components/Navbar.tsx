@@ -7,9 +7,9 @@ import { makeStyles } from "tss-react/mui";
 import { useLocation } from "react-router-dom";
 import classes from "../styles.module.scss";
 import { useImageStore } from "../store/users-store";
-import Avatar from "@material-ui/core/Avatar";
 import Box from "@mui/material/Box";
 import { getBaseUrl } from "../utils/url-helper";
+import PictureMenu from "./PictureMenu";
 
 export default function NavBar(): React.ReactElement {
   const state = useLocation().state;
@@ -103,22 +103,7 @@ export default function NavBar(): React.ReactElement {
               );
             })}
           </Tabs>
-          <Box
-            id="container-picture"
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              width: "4%",
-            }}
-          >
-            <Avatar
-              style={{
-                width: "55px",
-                height: "55px",
-              }}
-              src={image ? URL.createObjectURL(image) : ""}
-            />
-          </Box>
+          <PictureMenu image={image} />
         </Box>
       </AppBar>
     </>
