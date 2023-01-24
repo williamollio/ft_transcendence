@@ -9,7 +9,7 @@ import classes from "../styles.module.scss";
 import { useImageStore } from "../store/users-store";
 import Avatar from "@material-ui/core/Avatar";
 import Box from "@mui/material/Box";
-import usersService from "../services/users.service";
+import { getBaseUrl } from "../utils/url-helper";
 
 export default function NavBar(): React.ReactElement {
   const state = useLocation().state;
@@ -25,10 +25,14 @@ export default function NavBar(): React.ReactElement {
     fetchProfilePicture();
   });
 
+  const name = "Mathias "; // set to current username
+  const URIGetImage = `${getBaseUrl()}users/upload/${name}`;
+
   async function fetchProfilePicture() {
     if (image === null) {
-      const file: any = await usersService.getUserImage("transcendance");
-      setImage(file);
+      const res = await fetch(URIGetImage);
+      const imageBlob = await res.blob(); // convert the response object to a blob
+      setImage(imageBlob);
     }
   }
 
