@@ -76,11 +76,12 @@ export default function NavBar(): React.ReactElement {
             justifyContent: "center",
           }}
         >
+          <Box sx={{ width: "5%"}}></Box>
           <Tabs
             value={selectedTabId}
             indicatorColor="secondary"
             textColor="secondary"
-            sx={{ width: "95%" }} // should be equal as the width of container-picture
+            sx={{ width: "90%"}}
             centered={true}
             TabIndicatorProps={{
               style: { marginBottom: "5px", marginLeft: "-8px" },

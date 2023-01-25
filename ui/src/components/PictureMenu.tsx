@@ -25,14 +25,7 @@ export default function PictureMenu(props: Props) {
   };
   return (
     <React.Fragment>
-      <Box
-        id="container-picture"
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          width: "5%",
-        }}
-      >
+      <Box id="container-picture" sx={{ width: "5%" }}>
         <Tooltip title="Account settings">
           <IconButton
             onClick={handleClick}
