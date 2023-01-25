@@ -31,10 +31,10 @@ import {
   TitleWrapper,
   ContentWrapper,
 } from "../../styles/MuiStyles";
-
-const isEditMode = false; // TO DO
+import { useLocation } from "react-router-dom";
 
 export default function ProfileView(): React.ReactElement {
+  const isEditMode = useLocation().state.isEditMode; // TODO : pass the correct everywhere when data available
   const { t } = useTranslation();
   const { classes } = useStyles();
   const navigate = useNavigate();

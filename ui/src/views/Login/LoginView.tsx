@@ -12,7 +12,6 @@ export default function LoginView(): React.ReactElement {
 
   const handleLogin = () => {
     // send request to BE
-    console.log("state sent");
     navigate(RoutePath.PROFILE, { state: { isEditMode: false } });
   };
   return (
