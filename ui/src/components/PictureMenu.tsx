@@ -30,7 +30,7 @@ export default function PictureMenu(props: Props) {
         sx={{
           display: "flex",
           alignItems: "center",
-          width: "4%",
+          width: "5%",
         }}
       >
         <Tooltip title="Account settings">
