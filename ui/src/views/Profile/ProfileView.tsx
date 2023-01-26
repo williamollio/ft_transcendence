@@ -45,6 +45,7 @@ export default function ProfileView(): React.ReactElement {
     formState: { errors },
     register,
     handleSubmit,
+    setValue,
     control,
   } = useForm({
     mode: "onChange",
@@ -52,7 +53,24 @@ export default function ProfileView(): React.ReactElement {
 
   React.useEffect(() => {
     fetchUsers();
+    fetchCurrentUser();
   }, []);
+
+  async function fetchCurrentUser() {
+    const id = "57";
+    const currentUser = (await usersService.getUser(id)).data;
+
+    for (const property in currentUser) {
+      if (property === "name") {
+        setValue(property, currentUser.name);
+      } else if (property === "friends") {
+        const friendsIds: number[] | undefined = currentUser.friends?.map(
+          (friend: Friends) => friend.id
+        );
+        setValue(property, friendsIds);
+      }
+    }
+  }
 
   async function fetchUsers() {
     const usersResponse: Response<User[]> = await usersService.getUsers();
@@ -71,7 +89,7 @@ export default function ProfileView(): React.ReactElement {
     navigate(RoutePath.GAME, { state: { activeTabId: idTabs.GAME } });
   }
 
-  async function handleOnSavePicture(name: string) {
+  async function handleOnSubmitPicture(name: string) {
     let response;
     const formData = new FormData();
     formData.append("file", picture, picture.name);
@@ -127,7 +145,7 @@ export default function ProfileView(): React.ReactElement {
     }
     handleOnSaveUserCreation(data);
     if (picture) {
-      handleOnSavePicture(data.name);
+      handleOnSubmitPicture(data.name);
     }
   }
 
