@@ -1,15 +1,7 @@
 import React, { ChangeEvent, useState } from "react";
 import { makeStyles } from "tss-react/mui";
 import Navbar from "../../components/Navbar";
-import {
-  Box,
-  TextField,
-  Button,
-  Typography,
-  Input,
-  Avatar,
-  Autocomplete,
-} from "@mui/material";
+import { Box, Button, Typography, Input, Avatar } from "@mui/material";
 import usersService from "../../services/users.service";
 import { UserCreation, User, Friends } from "../../interfaces/user.interface";
 import { useNavigate } from "react-router-dom";
@@ -31,22 +23,32 @@ import {
   TitleWrapper,
   ContentWrapper,
 } from "../../styles/MuiStyles";
-import { useLocation } from "react-router-dom";
+import { Controller, FieldValues, useForm } from "react-hook-form";
+import CustomAutocompleteMultiSelect from "../../components/shared/CustomAutocompleteMultiSelect/CustomAutocompleteMultiselect";
+import CustomTextField from "../../components/shared/CustomTextField/CustomTextField";
+
+const isEditMode = false;
 
 export default function ProfileView(): React.ReactElement {
-  const isEditMode = useLocation().state.isEditMode; // TODO : pass the correct everywhere when data available
   const { t } = useTranslation();
   const { classes } = useStyles();
   const navigate = useNavigate();
   const { dispatchTranscendanceState } = React.useContext(TranscendanceContext);
-  const [name, setName] = useState<string>("");
   const [picture, setPicture] = useState<any>();
   const [image, setImage] = useImageStore((state) => [
     state.image,
     state.setImage,
   ]);
   const [users, setUsers] = useState<LabelValue[]>([]);
-  const [friends, setFriends] = useState<LabelValue[] | undefined>(undefined);
+
+  const {
+    formState: { errors },
+    register,
+    handleSubmit,
+    control,
+  } = useForm({
+    mode: "onChange",
+  });
 
   React.useEffect(() => {
     fetchUsers();
@@ -79,17 +81,20 @@ export default function ProfileView(): React.ReactElement {
       showErrorToast(response.error);
     }
   }
-  async function handleOnSaveUserCreation() {
+
+  async function handleOnSaveUserCreation(data: FieldValues) {
     let responseUser;
 
-    const friendsList: Friends[] | undefined = friends?.map((friend) => {
-      return {
-        id: friend.value,
-      };
-    });
+    const friendsList: Friends[] | undefined = data.friends?.map(
+      (friend: LabelValue) => {
+        return {
+          id: friend,
+        };
+      }
+    );
 
     const userCreation: UserCreation = {
-      name: name,
+      name: data.name,
       friends: friendsList,
     };
 
@@ -116,21 +121,14 @@ export default function ProfileView(): React.ReactElement {
     });
   }
 
-  async function handleOnSave() {
+  async function onSubmit(data: FieldValues) {
     if (isEditMode) {
       // usersService.patchUser() // TO DO
     }
-
-    if (name !== "") {
-      handleOnSaveUserCreation();
-      if (picture) {
-        handleOnSavePicture(name);
-      }
+    handleOnSaveUserCreation(data);
+    if (picture) {
+      handleOnSavePicture(data.name);
     }
-  }
-
-  function handleOnChangeName(name: string) {
-    setName(name);
   }
 
   function handleOnChangePicture(e: ChangeEvent<HTMLInputElement>) {
@@ -181,44 +179,39 @@ export default function ProfileView(): React.ReactElement {
                 </Button>
               </Box>
               <Box sx={{ height: "20%", width: "50%" }}>
-                <TextField
-                  sx={{ height: "100%", borderRadius: "100px" }}
-                  fullWidth
-                  value={name}
-                  name={"name"}
-                  variant="outlined"
-                  onChange={(event) => {
-                    handleOnChangeName(event.target.value);
+                <CustomTextField
+                  label={"Choose a name"}
+                  isRequired
+                  name="name"
+                  rules={{
+                    required: true,
                   }}
-                  label={t(translationKeys.chooseName)}
-                ></TextField>
+                  error={errors.name}
+                  register={register}
+                />
               </Box>
               <Box sx={{ height: "20%", width: "70%" }}>
-                <Autocomplete
-                  value={friends}
-                  onChange={(
-                    event: any,
-                    newValue: LabelValue[] | undefined
-                  ) => {
-                    setFriends(newValue);
+                <Controller
+                  control={control}
+                  name="friends"
+                  defaultValue={[]}
+                  render={({ field: { onChange, value } }) => {
+                    return (
+                      <CustomAutocompleteMultiSelect
+                        label={t(translationKeys.addFriends)}
+                        options={users}
+                        onChange={onChange}
+                        selectedValues={value}
+                      />
+                    );
                   }}
-                  multiple
-                  options={users}
-                  getOptionLabel={(option) => option.label}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      variant="outlined"
-                      label={t(translationKeys.addFriends)}
-                    />
-                  )}
                 />
               </Box>
               <Box className={classes.buttonsWrapper}>
                 <Button
                   className={classes.iconButton}
                   variant="outlined"
-                  onClick={() => handleOnSave()}
+                  onClick={handleSubmit(onSubmit)}
                 >
                   {t(translationKeys.buttons.save)}
                 </Button>
