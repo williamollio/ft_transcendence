@@ -51,6 +51,7 @@ const CustomTextField: FC<Props> = forwardRef<HTMLInputElement, Props>(
           value={value}
           variant={"outlined"}
           helperText={error && getErrorMessage(error)}
+          InputLabelProps={{ shrink: true }}
         />
       </Box>
     );
