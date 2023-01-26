@@ -24,7 +24,7 @@ import {
   ContentWrapper,
 } from "../../styles/MuiStyles";
 import { Controller, FieldValues, useForm } from "react-hook-form";
-import CustomAutocompleteMultiSelect from "../../components/shared/CustomAutocompleteMultiSelect/CustomAutocompleteMultiselect";
+import CustomMultiSelect from "../../components/shared/CustomMultiSelect/CustomMultiselect";
 import CustomTextField from "../../components/shared/CustomTextField/CustomTextField";
 
 const isEditMode = false;
@@ -197,7 +197,7 @@ export default function ProfileView(): React.ReactElement {
                   defaultValue={[]}
                   render={({ field: { onChange, value } }) => {
                     return (
-                      <CustomAutocompleteMultiSelect
+                      <CustomMultiSelect
                         label={t(translationKeys.addFriends)}
                         options={users}
                         onChange={onChange}
