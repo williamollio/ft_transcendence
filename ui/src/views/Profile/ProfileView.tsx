@@ -41,7 +41,7 @@ export default function ProfileView(): React.ReactElement {
   ]);
   const [users, setUsers] = useState<LabelValue[]>([]);
 
-  const id = "61";
+  const id = "61"; // TODO : set to current username
   const {
     formState: { errors },
     register,

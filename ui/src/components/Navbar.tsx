@@ -25,13 +25,14 @@ export default function NavBar(): React.ReactElement {
     fetchProfilePicture();
   });
 
-  const id = "61 "; // set to current username
+  const id = "61 "; // TODO : set to current username
   const URIGetImage = `${getBaseUrl()}users/upload/${id}`;
 
   async function fetchProfilePicture() {
     if (image === null) {
       const res = await fetch(URIGetImage);
-      const imageBlob = await res.blob(); // convert the response object to a blob
+      // convert the response object to a blob
+      const imageBlob = await res.blob();
       setImage(imageBlob);
     }
   }
