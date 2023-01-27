@@ -41,6 +41,7 @@ export default function ProfileView(): React.ReactElement {
   ]);
   const [users, setUsers] = useState<LabelValue[]>([]);
 
+  const id = "61";
   const {
     formState: { errors },
     register,
@@ -57,7 +58,6 @@ export default function ProfileView(): React.ReactElement {
   }, []);
 
   async function fetchCurrentUser() {
-    const id = "61";
     const currentUser = (await usersService.getUser(id)).data;
 
     for (const property in currentUser) {
@@ -100,7 +100,7 @@ export default function ProfileView(): React.ReactElement {
     }
   }
 
-  async function handleOnSaveUserCreation(data: FieldValues) {
+  async function handleOnSaveUser(data: FieldValues) {
     let responseUser;
 
     const friendsList: Friends[] | undefined = data.friends?.map(
@@ -116,7 +116,11 @@ export default function ProfileView(): React.ReactElement {
       friends: friendsList,
     };
 
-    responseUser = await usersService.postUser(userCreation);
+    if (isEditMode) {
+      responseUser = await usersService.patchUser(id, userCreation);
+    } else {
+      responseUser = await usersService.postUser(userCreation);
+    }
 
     const isSuccessUser = !responseUser?.error;
     if (isSuccessUser) {
@@ -140,10 +144,7 @@ export default function ProfileView(): React.ReactElement {
   }
 
   async function onSubmit(data: FieldValues) {
-    if (isEditMode) {
-      // usersService.patchUser() // TO DO
-    }
-    handleOnSaveUserCreation(data);
+    handleOnSaveUser(data);
     if (picture) {
       handleOnSubmitPicture(data.name);
     }
