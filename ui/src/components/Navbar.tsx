@@ -25,8 +25,8 @@ export default function NavBar(): React.ReactElement {
     fetchProfilePicture();
   });
 
-  const name = "Valentin "; // set to current username
-  const URIGetImage = `${getBaseUrl()}users/upload/${name}`;
+  const id = "61 "; // set to current username
+  const URIGetImage = `${getBaseUrl()}users/upload/${id}`;
 
   async function fetchProfilePicture() {
     if (image === null) {
@@ -76,12 +76,12 @@ export default function NavBar(): React.ReactElement {
             justifyContent: "center",
           }}
         >
-          <Box sx={{ width: "5%"}}></Box>
+          <Box sx={{ width: "5%" }}></Box>
           <Tabs
             value={selectedTabId}
             indicatorColor="secondary"
             textColor="secondary"
-            sx={{ width: "90%"}}
+            sx={{ width: "90%" }}
             centered={true}
             TabIndicatorProps={{
               style: { marginBottom: "5px", marginLeft: "-8px" },

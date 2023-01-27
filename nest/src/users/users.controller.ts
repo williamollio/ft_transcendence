@@ -124,11 +124,11 @@ export class UsersController {
     return of({ imagePath: file.filename });
   }
 
-  @Get('upload/:username')
+  @Get('upload/:id')
   @ApiResponse({ status: HttpStatus.OK, description: 'File has been sent' })
-  async getFile(@Param('username') username: string, @Res() res: Response) {
+  async getFile(@Param('id') id: string, @Res() res: Response) {
     try {
-      const filename = await this.usersService.getFilename(username);
+      const filename = await this.usersService.getFilename(+id);
       if (!filename) {
         throwError;
       }
