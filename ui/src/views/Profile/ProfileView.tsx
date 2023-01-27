@@ -27,7 +27,7 @@ import { Controller, FieldValues, useForm } from "react-hook-form";
 import CustomMultiSelect from "../../components/shared/CustomMultiSelect/CustomMultiselect";
 import CustomTextField from "../../components/shared/CustomTextField/CustomTextField";
 
-const isEditMode = false;
+const isEditMode = true;
 
 export default function ProfileView(): React.ReactElement {
   const { t } = useTranslation();
@@ -57,7 +57,7 @@ export default function ProfileView(): React.ReactElement {
   }, []);
 
   async function fetchCurrentUser() {
-    const id = "57";
+    const id = "61";
     const currentUser = (await usersService.getUser(id)).data;
 
     for (const property in currentUser) {
@@ -196,34 +196,38 @@ export default function ProfileView(): React.ReactElement {
                   />
                 </Button>
               </Box>
-              <Box sx={{ height: "20%", width: "50%" }}>
-                <CustomTextField
-                  label={"Choose a name"}
-                  isRequired
-                  name="name"
-                  rules={{
-                    required: true,
-                  }}
-                  error={errors.name}
-                  register={register}
-                />
+              <Box className={classes.inputWrapper}>
+                <Box sx={{ width: "100%" }}>
+                  <CustomTextField
+                    label={"Choose a name"}
+                    isRequired
+                    name="name"
+                    rules={{
+                      required: true,
+                    }}
+                    error={errors.name}
+                    register={register}
+                  />
+                </Box>
               </Box>
-              <Box sx={{ height: "20%", width: "70%" }}>
-                <Controller
-                  control={control}
-                  name="friends"
-                  defaultValue={[]}
-                  render={({ field: { onChange, value } }) => {
-                    return (
-                      <CustomMultiSelect
-                        label={t(translationKeys.addFriends)}
-                        options={users}
-                        onChange={onChange}
-                        selectedValues={value}
-                      />
-                    );
-                  }}
-                />
+              <Box className={classes.multiInputWrapper}>
+                <Box sx={{ width: "100%" }}>
+                  <Controller
+                    control={control}
+                    name="friends"
+                    defaultValue={[]}
+                    render={({ field: { onChange, value } }) => {
+                      return (
+                        <CustomMultiSelect
+                          label={t(translationKeys.addFriends)}
+                          options={users}
+                          onChange={onChange}
+                          selectedValues={value}
+                        />
+                      );
+                    }}
+                  />
+                </Box>
               </Box>
               <Box className={classes.buttonsWrapper}>
                 <Button
@@ -254,22 +258,40 @@ const useStyles = makeStyles()(() => ({
     width: "50%",
   },
   avatarWrapper: {
-    height: "30%",
+    height: "20%",
     width: "70%",
     display: "flex",
     justifyContent: "center",
+    alignItems: "center",
   },
   buttonsWrapper: {
     height: "20%",
     width: "70%",
     display: "flex",
     justifyContent: "center",
+    alignItems: "center",
     gap: "1em",
   },
   uploadButtonWrapper: {
-    height: "15%",
+    height: "10%",
     width: "60%",
     display: "flex",
     justifyContent: "center",
+    alignItems: "center",
+  },
+  inputWrapper: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    height: "20%",
+    width: "60%",
+  },
+  multiInputWrapper: {
+    minHeight: "10%",
+    width: "70%",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: "4rem",
   },
 }));
