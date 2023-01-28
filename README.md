@@ -2,7 +2,7 @@
 
 [Subject PDF](https://github.com/williamollio/ft_transcendance/blob/master/ressources/ft_transcendance.pdf)
 
-## Work on ft_transcendance
+## Launch ft_transcendance
 
 - `make up` for building the images and for spinning up the containers.
 - For stopping them run `make down`.
