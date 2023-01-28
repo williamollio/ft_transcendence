@@ -4,8 +4,8 @@
 
 ## Work on ft_transcendance
 
-- `make up` for building the image and for spinning up the containers.
-- For stopping the app run `make down`.
+- `make up` for building the images and for spinning up the containers.
+- For stopping them run `make down`.
 
 ## UI
 
@@ -17,25 +17,24 @@
 
 #### Build and run the application
 
-1. Install dependencies by running `npm install` or `yarn install`
-2. Build the Docker image using `docker-compose build`
-3. Start the container using `docker-compose up`
+1. Go to the `ui` folder and install dependencies by running `npm install` or `yarn install`
+2. Go back at the root of the project and build the image by using `make uibuild`
+3. Run the container via `make uiup`
 4. The application will be available at http://localhost:3000
 
 #### Update dependencies
 
 1. Add new dependencies by running `npm install <package-name>` or `yarn add <package-name>`
-2. Rebuild the Docker image using `docker-compose build`
-3. Restart the container using `docker-compose up`
+2. Rebuild the Docker image using `make uibuild`
+3. Restart the container using `make uiup`
 
 ## Nest
 
 - To seed the database run : `docker exec -it nest npx prisma db seed`
-- To reset and to seed it run : `docker exec -it npx prisma migrate reset`
+- To reset and to seed it run : `docker exec -it nest npx prisma migrate reset`
 
 ## Links
 
-Nest Server : http://localhost:8080
-Swagger : http://localhost:8080/api
-
-React App : http://localhost:3000/
+**React App** : http://localhost:3000/
+**Nest Server** : http://localhost:8080
+**Swagger** : http://localhost:8080/api
