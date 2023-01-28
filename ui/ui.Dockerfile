@@ -6,7 +6,7 @@ WORKDIR /app/cache
 
 COPY package*.json ./
 
-RUN npm install --legacy-peer-deps
+RUN npm install
 
 WORKDIR /app/ui
 
