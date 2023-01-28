@@ -24,8 +24,8 @@ class AuthService {
      *
      *                                            - mhahnFr
      */
-    return `https://api.intra.42.fr/oauth/authorize?client_id=${
-      process.env.CLIENT_ID
+    return `https://api.intra.42.fr/oauth/authorize?response_type=code&client_id=${
+      process.env.REACT_APP_CLIENT_ID
     }&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fauth%2Fintra42%2Fcallback&state=${this.createAndSaveState()}`;
   }
 }
