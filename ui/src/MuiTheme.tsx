@@ -29,6 +29,7 @@ const theme = createTheme({
           fontSize: "14px",
           fontWeight: "400",
           borderRadius: "2px",
+          height: "auto",
         },
       },
     },

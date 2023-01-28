@@ -8,5 +8,8 @@
   "updloadPicture": "Upload Picture",
   "profile": "Profile",
   "chooseName": "Choose an unique name",
-  "addFriends": "Add Friends"
+  "addFriends": "Add Friends",
+  "errorMessages": {
+    "required": "This field is required"
+  }
 }
