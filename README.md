@@ -35,6 +35,6 @@
 
 ## Links
 
-**React App** : http://localhost:3000/
-**Nest Server** : http://localhost:8080
-**Swagger** : http://localhost:8080/api
+- **React App** : http://localhost:3000/
+- **Nest Server** : http://localhost:8080
+- **Swagger** : http://localhost:8080/api
