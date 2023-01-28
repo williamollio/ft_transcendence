@@ -1,5 +1,3 @@
-const PATH = "auth";
-
 class AuthService {
   stateKey = "UnguessableKeyWithAnImmenseLength";
 
