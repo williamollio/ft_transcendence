@@ -17,7 +17,9 @@ export default function LoginCallback(): React.ReactElement {
   const payload = getToken(window.location.search.split("?")[1]);
 
   if (payload.error || !payload.code || !stateMatch(payload.state)) {
-    alert("OAuth failed!" + (payload.error ? ("\nReason: " + payload.error) : ""));
+    alert(
+      "OAuth failed!" + (payload.error ? "\nReason: " + payload.error : "")
+    );
   } else {
     success = true;
     // TODO: Send code to BE, await JWT

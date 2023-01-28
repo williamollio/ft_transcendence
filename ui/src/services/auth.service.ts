@@ -17,6 +17,10 @@ class AuthService {
     return sessionStorage.getItem(this.stateKey) === state; // For now
   }
 
+  removeState(): void {
+    sessionStorage.removeItem(this.stateKey);
+  }
+
   createAuthURI(): string {
     /*
      * Callback URI needs to be changed in intra
