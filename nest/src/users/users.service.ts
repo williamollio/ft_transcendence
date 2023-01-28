@@ -8,9 +8,9 @@ import { User } from '@prisma/client';
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
-  public async getFilename(name: string) {
+  public async getFilename(id: number) {
     const User = await this.prisma.user.findUnique({
-      where: { name: name },
+      where: { id: id },
     });
     return User?.filename;
   }

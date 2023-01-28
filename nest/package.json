@@ -1,8 +1,7 @@
 {
-  "name": "project-name",
+  "name": "ft_transcendence_nest",
   "version": "0.0.1",
-  "description": "ft_transcendance",
-  "author": "French connection",
+  "author": "French Association",
   "private": true,
   "license": "UNLICENSED",
   "scripts": {

@@ -32,7 +32,7 @@ class UsersService {
     );
   }
 
-  async patchUser(id: number, user: UserCreation): Promise<Response<void>> {
+  async patchUser(id: string, user: UserCreation): Promise<Response<void>> {
     return resolve<void>(
       axiosInstance
         .patch(`${PATH}/${id}`, user)
@@ -40,7 +40,7 @@ class UsersService {
     );
   }
 
-  async deleteUser(id: number): Promise<Response<void>> {
+  async deleteUser(id: string): Promise<Response<void>> {
     return resolve<void>(
       axiosInstance
         .delete(`${PATH}/${id}`)

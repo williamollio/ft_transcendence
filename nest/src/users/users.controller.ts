@@ -22,7 +22,6 @@ import {
   ApiOkResponse,
   ApiResponse,
   ApiTags,
-  ApiQuery,
 } from '@nestjs/swagger';
 import { UserEntity } from './entities/user.entity';
 import { User } from '@prisma/client';
@@ -32,6 +31,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Observable, of, throwError } from 'rxjs';
 import path = require('path');
 import { Response } from 'express';
+import * as fs from 'fs';
 
 export const storage = {
   storage: diskStorage({
@@ -124,22 +124,18 @@ export class UsersController {
     return of({ imagePath: file.filename });
   }
 
-  @Get('upload/:username')
-  @ApiQuery({
-    name: 'name',
-    description: 'name of the user',
-    required: true,
-    type: 'string',
-  })
+  @Get('upload/:id')
   @ApiResponse({ status: HttpStatus.OK, description: 'File has been sent' })
-  async getFile(@Param('username') username: string, @Res() res: Response) {
+  async getFile(@Param('id') id: string, @Res() res: Response) {
     try {
-      const filename = await this.usersService.getFilename(username);
+      const filename = await this.usersService.getFilename(+id);
       if (!filename) {
         throwError;
       }
       const filePath = path.resolve(`./uploads/profileimages/${filename}`);
-      res.sendFile(filePath);
+      const image = fs.readFileSync(filePath);
+      res.contentType('image/jpeg');
+      return res.send(image);
     } catch (error) {
       console.error(error);
       throw new HttpException(
