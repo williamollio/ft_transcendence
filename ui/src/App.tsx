@@ -15,14 +15,13 @@ import classes from "./styles.module.scss";
 import { useImageStore } from "./store/users-store";
 
 export default function App() {
-
   const isAuthenticated = true;
-  const imageUrl = image ? URL.createObjectURL(image) : "";
-
   const [image, setImage] = useImageStore((state) => [
     state.image,
     state.setImage,
   ]);
+
+  const imageUrl = image ? URL.createObjectURL(image) : "";
 
   // removes the object URL after the component unmounts to prevent memory leaks
   React.useEffect(() => {
@@ -44,7 +43,6 @@ export default function App() {
       <Navigate to={RoutePath.LOGIN_2FA} replace />
     );
   };
-
 
   function closeToast() {
     dispatchTranscendanceState({
