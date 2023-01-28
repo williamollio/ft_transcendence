@@ -1,9 +1,9 @@
 import React from "react";
 import Navbar from "../../components/Navbar";
-import { Box, Typography } from "@mui/material";
+import { Typography } from "@mui/material";
 import { translationKeys } from "./constants";
 import { useTranslation } from "react-i18next";
-import { makeStyles } from "tss-react/mui";
+// import { makeStyles } from "tss-react/mui";
 import {
   Background,
   ProfileCard,
@@ -14,7 +14,7 @@ import {
 
 export default function ProfileView(): React.ReactElement {
   const { t } = useTranslation();
-  const { classes } = useStyles();
+//   const { classes } = useStyles();
   return (
     <>
       <Navbar />
@@ -41,15 +41,4 @@ export default function ProfileView(): React.ReactElement {
   );
 }
 
-const useStyles = makeStyles()(() => ({
-  wrapperCard: {
-    marginTop: "4rem",
-    border: "1px",
-    width: "100%",
-    height: "calc(100vh - 4rem)",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  inputName: {},
-}));
+// const useStyles = makeStyles()(() => ({}));

@@ -17,9 +17,9 @@ export const ProfileCard = styled(Box)({});
 ProfileCard.defaultProps = {
   borderRadius: "50px",
   boxShadow: "46px 46px 92px #b3a99e, -46px -46px 92px #ffffff",
-  height: "35rem",
-  width: "45rem",
-  marginBottom: "10rem",
+  height: "48rem",
+  width: "60rem",
+  marginBottom: "2rem",
   bgcolor: classes.colorSecondary,
 };
 
@@ -31,12 +31,11 @@ CardContainer.defaultProps = {
 
 export const TitleWrapper = styled(Box)({});
 TitleWrapper.defaultProps = {
-  height: "20%",
+  height: "10%",
   width: "100%",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  marginTop: "10px",
 };
 
 export const ContentWrapper = styled(Box)({});
@@ -45,7 +44,5 @@ ContentWrapper.defaultProps = {
   width: "100%",
   display: "flex",
   alignItems: "center",
-  justifyContent: "top",
-  gap: "1rem",
   flexDirection: "column",
 };
