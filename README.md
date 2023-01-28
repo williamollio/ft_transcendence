@@ -2,8 +2,6 @@
 
 [Subject PDF](https://github.com/williamollio/ft_transcendance/blob/william/ressources/ft_transcendance.pdf)
 
-[Notes](https://github.com/williamollio/ft_transcendance/blob/master/notes.md)
-
 ## Work on ft_transcendance
 
 - `make up` for building the image and for spinning up the containers.
