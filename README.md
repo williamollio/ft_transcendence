@@ -32,8 +32,8 @@
 
 ## Nest
 
-To seed the database run : `docker exec -it nest npx prisma db seed`
-To reset and to seed it run : `docker exec -it npx prisma migrate reset`
+- To seed the database run : `docker exec -it nest npx prisma db seed`
+- To reset and to seed it run : `docker exec -it npx prisma migrate reset`
 
 ## Links
 
