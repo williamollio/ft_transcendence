@@ -2,9 +2,9 @@ import React from "react";
 import Button from "@mui/material/Button";
 import { Box } from "@mui/system";
 import { useNavigate } from "react-router-dom";
-import { RoutePath } from "../../interfaces/router.interface";
 import { useTranslation } from "react-i18next";
 import { translationKeys } from "./constants";
+import {getBaseUrl} from "../../utils/url-helper";
 
 export default function LoginView(): React.ReactElement {
   const { t } = useTranslation();
@@ -12,8 +12,10 @@ export default function LoginView(): React.ReactElement {
 
   const handleLogin = () => {
     // send request to BE
-    navigate(RoutePath.PROFILE, { state: { isEditMode: false } });
-  };
+    // navigate(RoutePath.PROFILE, { state: { isEditMode: false } }); // from merge conf
+    window.open(`${getBaseUrl()}auth/intra42`, '_self');
+};
+
   return (
     <Box
       sx={{

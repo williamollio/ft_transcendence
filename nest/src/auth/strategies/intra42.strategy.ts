@@ -3,14 +3,15 @@ import { PassportStrategy } from '@nestjs/passport';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import { Strategy } from 'passport-42';
+import * as process from 'process';
 
 @Injectable()
 export class Intra42Strategy extends PassportStrategy(Strategy, 'intra42') {
-  constructor(/* Params? */) {
+  constructor() {
     super({
-      clientID: 7, // To be filled in...
-      clientSecret: null,
-      callbackURL: 'localhost:8080',
+      clientID: process.env.CLIENT_ID,
+      clientSecret: process.env.CLIENT_SECRET,
+      callbackURL: 'http://localhost:8080/auth/intra42/callback',
       scopes: [],
     });
   }

@@ -7,7 +7,13 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { Intra42Strategy } from './strategies/intra42.strategy';
 
 @Module({
-  imports: [JwtModule, UsersModule],
+  imports: [
+    JwtModule.register({
+      secret: 'blablabla',
+      signOptions: { expiresIn: '1d' },
+    }),
+    UsersModule,
+  ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy, Intra42Strategy],
 })
