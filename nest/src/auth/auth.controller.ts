@@ -6,7 +6,7 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { IntraGuard } from './guards/intra.guard';
 
@@ -14,12 +14,6 @@ import { IntraGuard } from './guards/intra.guard';
 @ApiTags('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
-
-  @Get()
-  @ApiOkResponse()
-  public async getURL(): Promise<string> {
-    return await this.authService.getAuthURL();
-  }
 
   @Get('intra42')
   @UseGuards(IntraGuard)

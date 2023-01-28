@@ -1,19 +1,7 @@
-import { resolve, Response } from "./common/resolve";
-import { axiosInstance } from "./common/axios-instance";
-import { AxiosResponse } from "axios";
-
 const PATH = "auth";
 
 class AuthService {
   stateKey = "UnguessableKeyWithAnImmenseLength";
-
-  async getAuthURI(): Promise<Response<String>> {
-    return resolve<String>(
-      axiosInstance
-        .get(`${PATH}/intra42`)
-        .then((res: AxiosResponse) => res.data)
-    );
-  }
 
   private generateState(): string {
     return "TODO";
