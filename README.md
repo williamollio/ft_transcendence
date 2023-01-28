@@ -1,6 +1,6 @@
 # ft_transcendance
 
-[Subject PDF](https://github.com/williamollio/ft_transcendance/blob/william/ressources/ft_transcendance.pdf)
+[Subject PDF](https://github.com/williamollio/ft_transcendance/blob/master/ressources/ft_transcendance.pdf)
 
 ## Work on ft_transcendance
 
