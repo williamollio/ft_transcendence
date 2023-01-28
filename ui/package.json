@@ -1,7 +1,8 @@
 {
-  "name": "ft_transcendance",
+  "name": "ft_transcendence_ui",
   "private": true,
-  "version": "0.0.0",
+  "version": "2.0.0",
+  "author": "French Association",
   "type": "module",
   "scripts": {
     "dev": "vite",
