@@ -7,6 +7,12 @@ uiup :
 uiclean:
 	docker image rm ft_transcendance_ui
 
+nestbuild :
+	docker compose -f docker-compose.dev.yml build nest
+
+nestup :
+	docker compose -f docker-compose.dev.yml up nest
+
 nestclean:
 	docker image rm ft_transcendance_nest
 
