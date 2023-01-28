@@ -142,6 +142,9 @@ export default function ProfileView(): React.ReactElement {
       },
     });
   }
+  function onCancel() {
+    navigate(-1);
+  }
 
   async function onSubmit(data: FieldValues) {
     handleOnSaveUser(data);
@@ -239,7 +242,11 @@ export default function ProfileView(): React.ReactElement {
                   {t(translationKeys.buttons.save)}
                 </Button>
                 {isEditMode && (
-                  <Button className={classes.iconButton} variant="outlined">
+                  <Button
+                    className={classes.iconButton}
+                    variant="outlined"
+                    onClick={onCancel}
+                  >
                     {t(translationKeys.buttons.cancel)}
                   </Button>
                 )}
