@@ -13,6 +13,7 @@ import { Box, ThemeProvider } from "@mui/material";
 import theme from "./MuiTheme";
 import classes from "./styles.module.scss";
 import { useImageStore } from "./store/users-store";
+import LoginCallback from "./views/Login/LoginCallback";
 
 export default function App() {
   const isAuthenticated = true;
@@ -80,6 +81,7 @@ export default function App() {
             <Route path={RoutePath.PROFILE} element={<ProfileView />} />
             <Route path={RoutePath.GAME} element={<GameView />} />
             <Route path={RoutePath.LOGIN_2FA} element={<Login2FAView />} />
+            <Route path={RoutePath.LOGIN_CALLBACK} element={<LoginCallback />} />
           </Routes>
         </ThemeProvider>
       </Box>

@@ -3,4 +3,5 @@ export enum RoutePath {
   LOGIN_2FA = "/login2fa",
   PROFILE = "/profile",
   GAME = "/game",
+  LOGIN_CALLBACK = "/login/callback"
 }
