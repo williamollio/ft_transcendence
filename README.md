@@ -22,7 +22,7 @@
 3. Run the container via `make uiup`
 4. The application will be available at http://localhost:3000
 
-The app ist compatible with the browsers Chrome and Firefox.
+The app is compatible with the browsers Chrome and Firefox.
 
 #### Update dependencies
 
