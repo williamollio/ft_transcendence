@@ -22,6 +22,8 @@
 3. Run the container via `make uiup`
 4. The application will be available at http://localhost:3000
 
+The app ist compatible with the browsers Chrome and Firefox.
+
 #### Update dependencies
 
 1. Add new dependencies by running `npm install <package-name>` or `yarn add <package-name>`
