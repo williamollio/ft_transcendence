@@ -22,7 +22,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 
     super({
       ignoreExpiration: false,
-      secretOrKey: 'fill me in', // To be filled in...
+      secretOrKey: 'blablabla', // To be filled in...
       jwtFromRequest: extractJwtFromCookie,
     });
   }
