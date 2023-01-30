@@ -9,7 +9,7 @@ export default function LoginView(): React.ReactElement {
   const { t } = useTranslation();
 
   const handleLogin = () => {
-    window.open(authService.createAuthURI(), "_self");
+    window.open(authService.getAuthURI(), "_self");
   };
   return (
     <Box

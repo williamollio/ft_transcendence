@@ -1,11 +1,4 @@
-import {
-  Controller,
-  Get,
-  HttpStatus,
-  Req,
-  Res,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { IntraGuard } from './guards/intra.guard';
@@ -30,7 +23,6 @@ export class AuthController {
       sameSite: true,
       secure: false,
     });
-
-    return response.status(HttpStatus.OK);
+    response.redirect('http://localhost:3000/profile');
   }
 }
