@@ -1,5 +1,5 @@
 import React, { ReactElement } from "react";
-import { Box, Button, Grid, TextField } from "@material-ui/core";
+import { Box, Button, Grid, TextField } from "@mui/material";
 
 export default function Login2FAView(): ReactElement {
   async function handleSubmit() {
