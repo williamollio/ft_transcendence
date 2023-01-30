@@ -2,6 +2,7 @@ import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { IntraGuard } from './guards/intra.guard';
+import * as process from 'process';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -23,6 +24,6 @@ export class AuthController {
       sameSite: true,
       secure: false,
     });
-    response.redirect('http://localhost:3000/profile');
+    response.redirect(`${process.env.PATH_TO_FRONTEND}/profile`);
   }
 }
