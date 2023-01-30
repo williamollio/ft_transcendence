@@ -1,1 +1,23 @@
-.idea/
+# OS
+.DS_Store
+
+# Environment file
+.env
+
+# IDE - VSCode
+.idea/*
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# ui
+# compiled output
+ui/dist
+ui/node_modules
+
+# Logs
+ui/logs
+ui/*.log
+ui/npm-debug.log*

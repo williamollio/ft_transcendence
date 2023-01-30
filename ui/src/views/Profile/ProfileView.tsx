@@ -292,11 +292,11 @@ const useStyles = makeStyles()(() => ({
     justifyContent: "center",
     alignItems: "center",
     height: "20%",
-    width: "60%",
+    width: "45%",
   },
   multiInputWrapper: {
     minHeight: "10%",
-    width: "70%",
+    width: "65%",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",

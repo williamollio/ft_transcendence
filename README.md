@@ -1,26 +1,42 @@
 # ft_transcendance
 
-[Subject PDF](https://github.com/williamollio/ft_transcendance/blob/william/ressources/ft_transcendance.pdf)
+[Subject PDF](https://github.com/williamollio/ft_transcendance/blob/master/ressources/ft_transcendance.pdf)
 
-[Notes](https://github.com/williamollio/ft_transcendance/blob/master/notes.md)
+## Launch ft_transcendance
 
-## Work on ft_transcendance
+- `make up` for building the images and for spinning up the containers.
+- For stopping them run `make down`.
 
-- `make up` for building the image and for spinning up the containers.
-- For stopping the app run `make down`.
-- <strong>Development experience needs to be improved</strong> : Always run `make uiclean` before relaunching the app run
+## UI
 
-### ui
+### Docker setup
 
-Adding new dependencies won't update the folder `app/cache/node_modules` in the container so for this reason always launch the app with `make up`. Furthermore, if you do `git pull` or `git checkout` run `make down` then `make uiclean` and `make up` again.
+#### Prerequisites
 
-### nest
+- Node.js and npm (or yarn) installed locally
 
-For seeding the database run : `docker exec -it nest npx prisma db seed`
+#### Build and run the application
+
+1. Go to the `ui` folder and install dependencies by running `npm install` or `yarn install`
+2. Go back at the root of the project and build the image by using `make uibuild`
+3. Run the container via `make uiup`
+4. The application will be available at http://localhost:3000
+
+The app is compatible with the browsers Chrome and Firefox.
+
+#### Update dependencies
+
+1. Add new dependencies by running `npm install <package-name>` or `yarn add <package-name>`
+2. Rebuild the Docker image using `make uibuild`
+3. Restart the container using `make uiup`
+
+## Nest
+
+- To seed the database run : `docker exec -it nest npx prisma db seed`
+- To reset and to seed it run : `docker exec -it nest npx prisma migrate reset`
 
 ## Links
 
-Nest Server : http://localhost:8080
-Swagger : http://localhost:8080/api
-
-React App : http://localhost:3000/
+- **React App** : http://localhost:3000/
+- **Nest Server** : http://localhost:8080
+- **Swagger** : http://localhost:8080/api
