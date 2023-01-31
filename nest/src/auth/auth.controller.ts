@@ -24,6 +24,6 @@ export class AuthController {
       sameSite: true,
       secure: false,
     });
-    response.redirect(`${process.env.PATH_TO_FRONTEND}/profile`);
+    response.redirect(`${process.env.PATH_TO_FRONTEND}profile`);
   }
 }
