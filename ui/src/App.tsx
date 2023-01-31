@@ -48,7 +48,7 @@ export default function App() {
     return isAuthenticated ? (
       <Navigate to={RoutePath.PROFILE} replace />
     ) : (
-      <Navigate to={RoutePath.LOGIN_2FA} replace />
+      <Navigate to={RoutePath.LOGIN} replace />
     );
   };
 
