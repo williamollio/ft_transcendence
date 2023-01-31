@@ -1,18 +1,15 @@
 import React from "react";
 import Button from "@mui/material/Button";
 import { Box } from "@mui/system";
-import { useNavigate } from "react-router-dom";
-import { RoutePath } from "../../interfaces/router.interface";
 import { useTranslation } from "react-i18next";
 import { translationKeys } from "./constants";
+import authService from "../../services/auth.service";
 
 export default function LoginView(): React.ReactElement {
   const { t } = useTranslation();
-  const navigate = useNavigate();
 
   const handleLogin = () => {
-    // send request to BE
-    navigate(RoutePath.PROFILE, { state: { isEditMode: false } });
+    window.open(authService.getAuthURI(), "_self");
   };
   return (
     <Box
