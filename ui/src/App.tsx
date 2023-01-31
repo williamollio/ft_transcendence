@@ -13,14 +13,22 @@ import { Box, ThemeProvider } from "@mui/material";
 import theme from "./MuiTheme";
 import classes from "./styles.module.scss";
 import { useImageStore } from "./store/users-store";
+import { initAuthToken } from "./utils/auth-helper";
+import { LOCAL_STORAGE_KEY } from "./utils/localstorage-helper";
 
 export default function App() {
-  const isAuthenticated = true;
+  const [isAuthenticated, setIsAuthenticated] = React.useState<boolean>(false);
   const [image, setImage] = useImageStore((state) => [
     state.image,
     state.setImage,
   ]);
 
+  React.useEffect(() => {
+    const token = initAuthToken();
+    if (token !== null) {
+      setIsAuthenticated(true);
+    }
+  }, []);
   const imageUrl = image ? URL.createObjectURL(image) : "";
 
   // removes the object URL after the component unmounts to prevent memory leaks
