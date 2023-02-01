@@ -30,7 +30,7 @@ export class UsersService {
       const User = await this.prisma.user.create({
         data: {
           name: createUserDto.name,
-          intraId: -1, // Needs to be adjusted
+          intraId: -1, // TODO : Needs to be adjusted
         },
       });
 
