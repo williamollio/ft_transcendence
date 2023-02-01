@@ -30,7 +30,7 @@ export class Intra42Strategy extends PassportStrategy(Strategy, 'intra42') {
       providerId: id,
       email: emails[0].value,
       name: `${name.givenName} ${name.familyName}`,
-      // picture: photos[0].value,
+      // picture: photos[0].value, TODO : fetch picture from 42 API
     };
 
     done(null, user);
