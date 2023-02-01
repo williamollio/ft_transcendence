@@ -5,8 +5,8 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
-import { JwtUserDto } from '../users/dto/jwt-user.dto';
-import { Intra42UserDto } from '../users/dto/intra42-user.dto';
+import { JwtUser } from '../users/interface/jwt-user.interface';
+import { Intra42User } from '../users/interface/intra42-user.interface';
 
 @Injectable()
 export class AuthService {
@@ -15,11 +15,11 @@ export class AuthService {
     private userService: UsersService,
   ) {}
 
-  generateJWT(payload: JwtUserDto) {
+  generateJWT(payload: JwtUser) {
     return this.jwtService.sign(payload);
   }
 
-  async signIn(user: Intra42UserDto) {
+  async signIn(user: Intra42User) {
     if (user == null) throw new BadRequestException('Unauthenticated');
 
     const foundUser = await this.userService.findByIntraId(user.providerId);
@@ -33,7 +33,7 @@ export class AuthService {
     });
   }
 
-  async registerUser(user: Intra42UserDto) {
+  async registerUser(user: Intra42User) {
     try {
       const newUser = await this.userService.createFromIntra(user);
       return this.generateJWT({

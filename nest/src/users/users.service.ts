@@ -3,7 +3,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { User } from '@prisma/client';
-import { Intra42UserDto } from './dto/intra42-user.dto';
+import { Intra42User } from './interface/intra42-user.interface';
 
 @Injectable()
 export class UsersService {
@@ -42,7 +42,7 @@ export class UsersService {
     }
   }
 
-  public async createFromIntra(dto: Intra42UserDto): Promise<User> {
+  public async createFromIntra(dto: Intra42User): Promise<User> {
     try {
       return await this.prisma.user.create({
         data: {
