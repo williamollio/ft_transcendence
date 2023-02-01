@@ -10,7 +10,8 @@ async function main() {
     update: {},
     create: {
       name: '@wollio',
-      friends: { create: [{ name: '@mhahn' }] },
+      intraId: 0x06,
+      friends: { create: [{ name: '@mhahn', intraId: 0x07 }] },
     },
   });
 
@@ -19,6 +20,7 @@ async function main() {
     update: {},
     create: {
       name: '@mhahn',
+      intraId: 0x07,
     },
   });
 
@@ -27,6 +29,7 @@ async function main() {
     update: {},
     create: {
       name: '@thomass',
+      intraId: 0x0,
     },
   });
 
