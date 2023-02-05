@@ -1,10 +1,17 @@
 import React, { ChangeEvent, useState } from "react";
 import { makeStyles } from "tss-react/mui";
 import Navbar from "../../components/Navbar";
-import { Box, Button, Typography, Input, Avatar } from "@mui/material";
+import {
+  Box,
+  Button,
+  Typography,
+  Input,
+  Avatar,
+  CircularProgress,
+} from "@mui/material";
 import usersService from "../../services/users.service";
 import { UserCreation, User, Friends } from "../../interfaces/user.interface";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { RoutePath } from "../../interfaces/router.interface";
 import { idTabs } from "../../interfaces/tab.interface";
 import { AxiosError } from "axios";
@@ -26,17 +33,13 @@ import {
 import { Controller, FieldValues, useForm } from "react-hook-form";
 import CustomMultiSelect from "../../components/shared/CustomMultiSelect/CustomMultiselect";
 import CustomTextField from "../../components/shared/CustomTextField/CustomTextField";
+import { Cookie, getTokenData, initAuthToken } from "../../utils/auth-helper";
 
-const isEditMode = true;
-interface Props {
-  isAuthenticated: boolean;
-}
-
-export default function ProfileView(props: Props): React.ReactElement {
-  const { isAuthenticated } = props;
+export default function ProfileView(): React.ReactElement {
   const { t } = useTranslation();
   const { classes } = useStyles();
   const navigate = useNavigate();
+  const location = useLocation();
   const { dispatchTranscendanceState } = React.useContext(TranscendanceContext);
   const [picture, setPicture] = useState<any>();
   const [image, setImage] = useImageStore((state) => [
@@ -44,8 +47,11 @@ export default function ProfileView(props: Props): React.ReactElement {
     state.setImage,
   ]);
   const [users, setUsers] = useState<LabelValue[]>([]);
+  const [userId, setUserId] = useState<string>("");
+  const [isEditMode, setIsEditMode] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [currentUser, setCurrentUser] = useState<User>();
 
-  const id = "8"; // TODO : set to current username
   const {
     formState: { errors },
     register,
@@ -57,16 +63,34 @@ export default function ProfileView(props: Props): React.ReactElement {
   });
 
   React.useEffect(() => {
-    if (!isAuthenticated) {
-      navigate(RoutePath.LOGIN);
+    const isEditMode = location.state.editMode;
+    let token;
+    if (isEditMode === false) {
+      setIsEditMode(isEditMode);
     }
-    fetchUsers();
-    fetchCurrentUser();
-  }, []);
+    if (isEditMode) {
+      token = localStorage.getItem(Cookie.TOKEN);
+    } else {
+      token = initAuthToken();
+    }
+    if (token === null) {
+      navigate(RoutePath.LOGIN);
+    } else {
+      setUserId(getTokenData(token).id.toString());
+      if (userId) {
+        Promise.all([fetchUsers(), fetchCurrentUser(userId)])
+          .then(() => {
+            setIsLoading(false);
+          })
+          .catch((error) => {
+            setIsLoading(false);
+            showErrorToast(error);
+          });
+      }
+    }
+  }, [userId]);
 
-  async function fetchCurrentUser() {
-    const currentUser = (await usersService.getUser(id)).data;
-
+  React.useEffect(() => {
     for (const property in currentUser) {
       if (property === "name") {
         setValue(property, currentUser.name);
@@ -77,6 +101,11 @@ export default function ProfileView(props: Props): React.ReactElement {
         setValue(property, friendsIds);
       }
     }
+  }, [currentUser, users]);
+
+  async function fetchCurrentUser(userId: string) {
+    const payload = await usersService.getUser(userId);
+    setCurrentUser(payload.data);
   }
 
   async function fetchUsers() {
@@ -123,17 +152,15 @@ export default function ProfileView(props: Props): React.ReactElement {
       friends: friendsList,
     };
 
-    if (isEditMode) {
-      responseUser = await usersService.patchUser(id, userCreation);
-    } else {
-      responseUser = await usersService.postUser(userCreation);
+    if (userId) {
+      responseUser = await usersService.patchUser(userId, userCreation);
     }
 
     const isSuccessUser = !responseUser?.error;
     if (isSuccessUser) {
       navigateToGamePage();
     } else {
-      showErrorToast(responseUser.error);
+      showErrorToast(responseUser?.error);
     }
   }
 
@@ -184,80 +211,86 @@ export default function ProfileView(props: Props): React.ReactElement {
               </Typography>
             </TitleWrapper>
             <ContentWrapper>
-              <Box className={classes.avatarWrapper}>
-                <Avatar
-                  src={image ? URL.createObjectURL(image) : ""}
-                  style={{
-                    width: "100px",
-                    height: "100px",
-                  }}
-                />
-              </Box>
-              <Box className={classes.uploadButtonWrapper}>
-                <Button
-                  variant="contained"
-                  component="label"
-                  className={classes.iconButton}
-                >
-                  {t(translationKeys.updloadPicture)}
-                  <Input
-                    type="file"
-                    sx={{ display: "none" }}
-                    onChange={handleOnChangePicture}
-                  />
-                </Button>
-              </Box>
-              <Box className={classes.inputWrapper}>
-                <Box sx={{ width: "100%" }}>
-                  <CustomTextField
-                    label={"Choose a name"}
-                    isRequired
-                    name="name"
-                    rules={{
-                      required: true,
-                    }}
-                    error={errors.name}
-                    register={register}
-                  />
-                </Box>
-              </Box>
-              <Box className={classes.multiInputWrapper}>
-                <Box sx={{ width: "100%" }}>
-                  <Controller
-                    control={control}
-                    name="friends"
-                    defaultValue={[]}
-                    render={({ field: { onChange, value } }) => {
-                      return (
-                        <CustomMultiSelect
-                          label={t(translationKeys.addFriends)}
-                          options={users}
-                          onChange={onChange}
-                          selectedValues={value}
-                        />
-                      );
-                    }}
-                  />
-                </Box>
-              </Box>
-              <Box className={classes.buttonsWrapper}>
-                <Button
-                  className={classes.iconButton}
-                  variant="outlined"
-                  onClick={handleSubmit(onSubmit)}
-                >
-                  {t(translationKeys.buttons.save)}
-                </Button>
-                {isEditMode && (
-                  <Button
-                    className={classes.iconButton}
-                    variant="outlined"
-                    onClick={onCancel}
-                  >
-                    {t(translationKeys.buttons.cancel)}
-                  </Button>
-                )}
-              </Box>
+              {isLoading ? (
+                <CircularProgress />
+              ) : (
+                <>
+                  <Box className={classes.avatarWrapper}>
+                    <Avatar
+                      src={image ? URL.createObjectURL(image) : ""}
+                      style={{
+                        width: "100px",
+                        height: "100px",
+                      }}
+                    />
+                  </Box>
+                  <Box className={classes.uploadButtonWrapper}>
+                    <Button
+                      variant="contained"
+                      component="label"
+                      className={classes.iconButton}
+                    >
+                      {t(translationKeys.updloadPicture)}
+                      <Input
+                        type="file"
+                        sx={{ display: "none" }}
+                        onChange={handleOnChangePicture}
+                      />
+                    </Button>
+                  </Box>
+                  <Box className={classes.inputWrapper}>
+                    <Box sx={{ width: "100%" }}>
+                      <CustomTextField
+                        label={"Choose a name"}
+                        isRequired
+                        name="name"
+                        rules={{
+                          required: true,
+                        }}
+                        error={errors.name}
+                        register={register}
+                      />
+                    </Box>
+                  </Box>
+                  <Box className={classes.multiInputWrapper}>
+                    <Box sx={{ width: "100%" }}>
+                      <Controller
+                        control={control}
+                        name="friends"
+                        defaultValue={[]}
+                        render={({ field: { onChange, value } }) => {
+                          return (
+                            <CustomMultiSelect
+                              label={t(translationKeys.addFriends)}
+                              options={users}
+                              onChange={onChange}
+                              selectedValues={value}
+                            />
+                          );
+                        }}
+                      />
+                    </Box>
+                  </Box>
+                  <Box className={classes.buttonsWrapper}>
+                    <Button
+                      className={classes.iconButton}
+                      variant="outlined"
+                      onClick={handleSubmit(onSubmit)}
+                    >
+                      {t(translationKeys.buttons.save)}
+                    </Button>
+                    {isEditMode && (
+                      <Button
+                        className={classes.iconButton}
+                        variant="outlined"
+                        onClick={onCancel}
+                      >
+                        {t(translationKeys.buttons.cancel)}
+                      </Button>
+                    )}
+                  </Box>
+                </>
+              )}
             </ContentWrapper>
           </CardContainer>
         </ProfileCard>
