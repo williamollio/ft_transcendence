@@ -22,12 +22,7 @@ export default function App() {
     state.setImage,
   ]);
 
-  React.useEffect(() => {
-    const token = localStorage.getItem(Cookie.TOKEN);
-    if (token !== null) {
-      setIsAuthenticated(true);
-    }
-  }, []);
+  React.useEffect(() => {}, [isAuthenticated]);
   const imageUrl = image ? URL.createObjectURL(image) : "";
 
   // removes the object URL after the component unmounts to prevent memory leaks
@@ -39,11 +34,17 @@ export default function App() {
     };
   }, [imageUrl]);
 
-  const AuthWrapper = ({
-    isAuthenticated,
-  }: {
-    isAuthenticated: boolean;
-  }): ReactElement => {
+  const getIsAuthenticated = () => {
+    const token = localStorage.getItem(Cookie.TOKEN);
+    if (token !== null) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
+  const AuthWrapper = (): ReactElement => {
+    const isAuthenticated = getIsAuthenticated();
     return isAuthenticated ? (
       <Navigate to={RoutePath.PROFILE} replace />
     ) : (
@@ -85,10 +86,7 @@ export default function App() {
       >
         <ThemeProvider theme={theme}>
           <Routes>
-            <Route
-              path="/"
-              element={<AuthWrapper isAuthenticated={isAuthenticated} />}
-            />
+            <Route path="/" element={<AuthWrapper />} />
             <Route path="/redirect" element={<RedirectWrapper />} />
             <Route path={RoutePath.LOGIN} element={<LoginView />} />
             <Route path={RoutePath.PROFILE} element={<ProfileView />} />
