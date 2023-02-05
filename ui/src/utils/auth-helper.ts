@@ -1,5 +1,5 @@
 import { LOCAL_STORAGE_KEY } from "./localstorage-helper";
-enum Cookie {
+export enum Cookie {
   TOKEN = "access_token",
 }
 
@@ -21,4 +21,13 @@ export function initAuthToken(): string | null {
   } else {
     return null;
   }
+}
+
+export function getTokenData(token: string): tokenData {
+  const tokenParts = token.split(".");
+  const tokenPayload = JSON.parse(atob(tokenParts[1]));
+  return {
+    name: tokenPayload.name,
+    id: tokenPayload.id,
+  };
 }
