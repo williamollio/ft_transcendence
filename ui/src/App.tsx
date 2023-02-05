@@ -21,8 +21,6 @@ export default function App() {
     state.image,
     state.setImage,
   ]);
-
-  React.useEffect(() => {}, [isAuthenticated]);
   const imageUrl = image ? URL.createObjectURL(image) : "";
 
   // removes the object URL after the component unmounts to prevent memory leaks
