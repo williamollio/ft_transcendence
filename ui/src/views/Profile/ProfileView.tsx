@@ -67,11 +67,7 @@ export default function ProfileView(): React.ReactElement {
     if (location.state && location.state.editMode === false) {
       setIsEditMode(false);
     }
-    if (isEditMode) {
-      token = localStorage.getItem(Cookie.TOKEN);
-    } else {
-      token = initAuthToken();
-    }
+    token = localStorage.getItem(Cookie.TOKEN);
     if (token === null) {
       navigate(RoutePath.LOGIN);
     } else {
