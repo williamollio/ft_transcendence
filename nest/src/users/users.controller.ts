@@ -101,7 +101,7 @@ export class UsersController {
     return this.usersService.remove(+id);
   }
 
-  @Post('upload/:name')
+  @Post('upload/:id')
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
@@ -115,12 +115,22 @@ export class UsersController {
     },
   })
   @UseInterceptors(FileInterceptor('file', storage))
-  uploadFile(
-    @Param('name') name: string,
+  async uploadFile(
+    @Param('id') id: string,
     @UploadedFile() file: any,
-  ): Observable<unknown> {
-    console.log('name ' + name);
-    this.usersService.setFilename(file.filename, name);
+  ): Promise<Observable<unknown>> {
+    const filename = this.usersService.getFilename(+id);
+    if (await filename) {
+      console.log('here');
+      const filePath = path.resolve(`./uploads/profileimages/${filename}`);
+      fs.unlink(filePath, (err) => {
+        if (err) {
+          console.error(err);
+          return err;
+        }
+      });
+    }
+    this.usersService.setFilename(file.filename, +id);
     return of({ imagePath: file.filename });
   }
 
