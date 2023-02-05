@@ -85,7 +85,10 @@ export default function App() {
               element={<AuthWrapper isAuthenticated={isAuthenticated} />}
             />
             <Route path={RoutePath.LOGIN} element={<LoginView />} />
-            <Route path={RoutePath.PROFILE} element={<ProfileView />} />
+            <Route
+              path={RoutePath.PROFILE}
+              element={<ProfileView isAuthenticated={isAuthenticated} />}
+            />
             <Route path={RoutePath.GAME} element={<GameView />} />
             <Route path={RoutePath.LOGIN_2FA} element={<Login2FAView />} />
           </Routes>

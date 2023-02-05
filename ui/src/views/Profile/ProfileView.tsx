@@ -28,8 +28,12 @@ import CustomMultiSelect from "../../components/shared/CustomMultiSelect/CustomM
 import CustomTextField from "../../components/shared/CustomTextField/CustomTextField";
 
 const isEditMode = true;
+interface Props {
+  isAuthenticated: boolean;
+}
 
-export default function ProfileView(): React.ReactElement {
+export default function ProfileView(props: Props): React.ReactElement {
+  const { isAuthenticated } = props;
   const { t } = useTranslation();
   const { classes } = useStyles();
   const navigate = useNavigate();
@@ -41,7 +45,7 @@ export default function ProfileView(): React.ReactElement {
   ]);
   const [users, setUsers] = useState<LabelValue[]>([]);
 
-  const id = "61"; // TODO : set to current username
+  const id = "8"; // TODO : set to current username
   const {
     formState: { errors },
     register,
@@ -53,6 +57,9 @@ export default function ProfileView(): React.ReactElement {
   });
 
   React.useEffect(() => {
+    if (!isAuthenticated) {
+      navigate(RoutePath.LOGIN);
+    }
     fetchUsers();
     fetchCurrentUser();
   }, []);
