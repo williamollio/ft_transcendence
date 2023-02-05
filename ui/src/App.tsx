@@ -13,8 +13,7 @@ import { Box, ThemeProvider } from "@mui/material";
 import theme from "./MuiTheme";
 import classes from "./styles.module.scss";
 import { useImageStore } from "./store/users-store";
-import { initAuthToken } from "./utils/auth-helper";
-import { LOCAL_STORAGE_KEY } from "./utils/localstorage-helper";
+import { Cookie } from "./utils/auth-helper";
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = React.useState<boolean>(false);
@@ -24,7 +23,7 @@ export default function App() {
   ]);
 
   React.useEffect(() => {
-    const token = initAuthToken();
+    const token = localStorage.getItem(Cookie.TOKEN);
     if (token !== null) {
       setIsAuthenticated(true);
     }
@@ -49,6 +48,12 @@ export default function App() {
       <Navigate to={RoutePath.PROFILE} replace />
     ) : (
       <Navigate to={RoutePath.LOGIN} replace />
+    );
+  };
+
+  const RedirectWrapper = () => {
+    return (
+      <Navigate to={RoutePath.PROFILE} state={{ editMode: false }}></Navigate>
     );
   };
 
@@ -84,11 +89,9 @@ export default function App() {
               path="/"
               element={<AuthWrapper isAuthenticated={isAuthenticated} />}
             />
+            <Route path="/redirect" element={<RedirectWrapper />} />
             <Route path={RoutePath.LOGIN} element={<LoginView />} />
-            <Route
-              path={RoutePath.PROFILE}
-              element={<ProfileView isAuthenticated={isAuthenticated} />}
-            />
+            <Route path={RoutePath.PROFILE} element={<ProfileView />} />
             <Route path={RoutePath.GAME} element={<GameView />} />
             <Route path={RoutePath.LOGIN_2FA} element={<Login2FAView />} />
           </Routes>
