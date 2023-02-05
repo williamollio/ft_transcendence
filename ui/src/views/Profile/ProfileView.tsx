@@ -120,11 +120,11 @@ export default function ProfileView(): React.ReactElement {
     navigate(RoutePath.GAME, { state: { activeTabId: idTabs.GAME } });
   }
 
-  async function handleOnSubmitPicture(name: string) {
+  async function handleOnSubmitPicture() {
     let response;
     const formData = new FormData();
     formData.append("file", picture, picture.name);
-    response = await usersService.postUserImage(formData, name);
+    response = await usersService.postUserImage(formData, userId);
     const isSuccess = !response?.error;
     if (!isSuccess) {
       showErrorToast(response.error);
@@ -178,7 +178,7 @@ export default function ProfileView(): React.ReactElement {
   async function onSubmit(data: FieldValues) {
     handleOnSaveUser(data);
     if (picture) {
-      handleOnSubmitPicture(data.name);
+      handleOnSubmitPicture();
     }
   }
 
