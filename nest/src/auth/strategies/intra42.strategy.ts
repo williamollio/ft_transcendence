@@ -4,6 +4,7 @@ import { PassportStrategy } from '@nestjs/passport';
 // @ts-ignore
 import { Strategy } from 'passport-42';
 import * as process from 'process';
+import { Intra42User } from '../../users/interface/intra42-user.interface';
 
 @Injectable()
 export class Intra42Strategy extends PassportStrategy(Strategy, 'intra42') {
@@ -22,14 +23,14 @@ export class Intra42Strategy extends PassportStrategy(Strategy, 'intra42') {
     profile: any,
     done: any,
   ): Promise<any> {
-    const { id, name, emails, photos } = profile;
+    const { id, name, emails /*, photos*/ } = profile;
 
-    const user = {
+    const user: Intra42User = {
       provider: 'intra42',
       providerId: id,
       email: emails[0].value,
       name: `${name.givenName} ${name.familyName}`,
-      picture: photos[0].value,
+      // picture: photos[0].value, TODO : fetch picture from 42 API
     };
 
     done(null, user);

@@ -3,6 +3,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { User } from '@prisma/client';
+import { Intra42User } from './interface/intra42-user.interface';
 
 @Injectable()
 export class UsersService {
@@ -29,6 +30,7 @@ export class UsersService {
       const User = await this.prisma.user.create({
         data: {
           name: createUserDto.name,
+          intraId: -1, // TODO : Needs to be adjusted
         },
       });
 
@@ -38,6 +40,26 @@ export class UsersService {
     } catch (error) {
       throw error;
     }
+  }
+
+  public async createFromIntra(dto: Intra42User): Promise<User> {
+    try {
+      return await this.prisma.user.create({
+        data: {
+          name: `${dto.providerId}`,
+          intraId: +dto.providerId,
+        },
+      });
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  public async findByIntraId(intraId: number) {
+    return this.prisma.user.findUnique({
+      where: { intraId: +intraId },
+      include: { friends: false },
+    });
   }
 
   private async updateFriendsList(

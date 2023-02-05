@@ -8,6 +8,9 @@ export class UserEntity implements User {
   @ApiProperty({ required: true })
   name: string;
 
+  @ApiProperty({ required: true })
+  intraId: number;
+
   @ApiProperty()
   friends: User[];
 
