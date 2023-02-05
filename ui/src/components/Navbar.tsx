@@ -10,11 +10,13 @@ import { useImageStore } from "../store/users-store";
 import Box from "@mui/material/Box";
 import { getBaseUrl } from "../utils/url-helper";
 import PictureMenu from "./PictureMenu";
+import { Cookie, getTokenData, initAuthToken } from "../utils/auth-helper";
 
 export default function NavBar(): React.ReactElement {
   const state = useLocation().state;
   const navigate = useNavigate();
   const { classes } = useStyles();
+  const [userId, setUserId] = useState<string>("");
 
   const [image, setImage] = useImageStore((state) => [
     state.image,
@@ -22,14 +24,21 @@ export default function NavBar(): React.ReactElement {
   ]);
 
   React.useEffect(() => {
-    fetchProfilePicture();
-  });
+    let token;
+    if (localStorage.getItem(Cookie.TOKEN)) {
+      token = localStorage.getItem(Cookie.TOKEN);
+    } else {
+      token = initAuthToken();
+    }
+    if (token !== null) {
+      setUserId(getTokenData(token).id.toString());
+    }
+    fetchProfilePicture(userId);
+  }, [userId]);
 
-  const id = "61 "; // TODO : set to current username
-  const URIGetImage = `${getBaseUrl()}users/upload/${id}`;
-
-  async function fetchProfilePicture() {
-    if (image === null) {
+  async function fetchProfilePicture(userId: string) {
+    if (image === null && userId !== "") {
+      const URIGetImage = `${getBaseUrl()}users/upload/${userId}`;
       const res = await fetch(URIGetImage);
       // convert the response object to a blob
       const imageBlob = await res.blob();
