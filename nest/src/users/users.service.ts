@@ -23,9 +23,9 @@ export class UsersService {
     return User?.filename;
   }
 
-  public async setFilename(filename: string, userName: string) {
+  public async setFilename(filename: string, id: number) {
     await this.prisma.user.update({
-      where: { name: userName },
+      where: { id: id },
       data: {
         filename: filename,
       },
