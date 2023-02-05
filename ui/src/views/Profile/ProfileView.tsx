@@ -63,10 +63,9 @@ export default function ProfileView(): React.ReactElement {
   });
 
   React.useEffect(() => {
-    const isEditMode = location.state.editMode;
     let token;
-    if (isEditMode === false) {
-      setIsEditMode(isEditMode);
+    if (location.state && location.state.editMode === false) {
+      setIsEditMode(false);
     }
     if (isEditMode) {
       token = localStorage.getItem(Cookie.TOKEN);
