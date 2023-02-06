@@ -1,8 +1,9 @@
 import React from "react";
 import Navbar from "../../components/Navbar";
-import { Typography } from "@mui/material";
+import { Typography, TextField, Paper } from "@mui/material";
 import { translationKeys } from "./constants";
 import { useTranslation } from "react-i18next";
+import Chat from "./Chat";
 // import { makeStyles } from "tss-react/mui";
 import {
   Background,
@@ -12,6 +13,7 @@ import {
   ContentWrapper,
 } from "../../styles/MuiStyles";
 
+
 export default function ProfileView(): React.ReactElement {
   const { t } = useTranslation();
 //   const { classes } = useStyles();
@@ -19,6 +21,7 @@ export default function ProfileView(): React.ReactElement {
     <>
       <Navbar />
       <Background>
+		<Chat />
         <ProfileCard>
           <CardContainer>
             <TitleWrapper>
