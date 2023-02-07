@@ -1,3 +1,4 @@
+import { AirlineSeatLegroomReduced, PanoramaSharp } from "@mui/icons-material";
 import { Autocomplete, Box, Button, createFilterOptions, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, ExtendList, FilterOptionsState, Grid, List, ListItem, ListItemText, ListTypeMap, MenuItem, Paper, Select, TextField } from "@mui/material";
 import { Fragment, KeyboardEventHandler, useEffect, useRef, useState } from "react";
 
@@ -26,12 +27,13 @@ const filter = createFilterOptions<chatRoom>();
 export default function Chat() {
 	const tmpMsgDto: messagesDto = {};
 
-	const [ room, setRoom ] = useState<string>("public");
 	const [ inputChat, setInputChat ] = useState<string>();
+	const [ room, setRoom ] = useState<string>("");
 	const [ messages, setMessages ] = useState<Array<messagesDto>>([{user: "", message: "", room: "",}]);
 	const [ selection, setSelection ] = useState<chatRoom | undefined>(arr[0]);
 	const [open, toggleOpen] = useState(false);
 	const [dialogValue, setDialogValue] = useState<chatRoom>({name: '', access: 'public', password: ''});
+	const [ pwDisable, setPwDisable ] = useState<boolean>(true);
 
 	const scrollRef = useRef<HTMLLIElement | null>(null);
 
@@ -39,17 +41,21 @@ export default function Chat() {
 		setInputChat(e.target.value);
 	};
 
-	let pwDisable: boolean = true; 
-
 	const handleSelect = (e: any, newValue: any, reason: any) => {
-		const isExisting = arr.some((option: chatRoom) => room === option.name);
-		if (!isExisting)
+		if (reason === 'selectOption' && room && room !== "")
 		{
-			setDialogValue({name: room, access: 'public', password: ''})
+			// console.log(reason);
+			// console.log(newValue);
+			// console.log(selection);
+			// console.log(room);
+			setDialogValue({name: room, access: 'public', password: ''});
 			toggleOpen(true);
 		}
-		else
-			setSelection(newValue);
+		else if (reason == 'createOption' && newValue && newValue !== "")
+		{
+			setDialogValue({name: newValue, access: 'public', password: ''});
+			toggleOpen(true);
+		}
 	};
 
 	const handleSubmit = (e: any) => {
@@ -83,20 +89,18 @@ export default function Chat() {
 	});
 
 	const handleAccessChange = (e: any) => {
-		let tmpCR: chatRoom = {name: dialogValue.name, access: e.target.value, password: dialogValue.password};
+		let tmpCR: chatRoom = {...dialogValue, access: e.target.value};
 		if (tmpCR.access !== 'password')
 		{
 			tmpCR.password = "";
-			pwDisable = true;
+			setPwDisable(true);
 		}
 		else
-			pwDisable = false;
+			setPwDisable(false);
 		setDialogValue(tmpCR);
 	};
 
 	const handleClose = (e: any) => {
-		setDialogValue({name: '', access: 'public', password: ''});
-		toggleOpen(false);
 	};
 
 	useEffect(() => {
@@ -127,27 +131,12 @@ export default function Chat() {
 							<Autocomplete
 								size='small'
 								freeSolo
-								value={selection}
 								onChange={handleSelect}
 								renderInput={(params: any) => (
-								<TextField {...params} label="Room"
-									onChange={e => {
+									<TextField {...params} label="Room" onChange={e => {
 										setRoom(e.target.value);
-									}}
-									onKeyDown={e => {
-										if (e.key === "Enter")
-										{
-											if (room && room !== "")
-											{
-												const isExisting = arr.some((option: chatRoom) => room === option.name);
-												if (!isExisting)
-												{
-
-												}	
-											}
-										}
-									}}/>
-								)}
+										console.log("test");
+									}}/>)}
 								options={arr}
 								filterOptions={(options: any, params) => {
 								const filtered = filter(options, params);
@@ -181,7 +170,6 @@ export default function Chat() {
 										</DialogContentText>
 										<TextField
 										autoFocus
-										margin="dense"
 										id="name"
 										value={dialogValue.name}
 										onChange={(event) =>
@@ -194,14 +182,13 @@ export default function Chat() {
 										type="text"
 										variant="standard"
 										/>
-										<Select margin="dense" label="access" type="string" variant="standard" value={dialogValue.access} onChange={handleAccessChange}>
+										<Select label="access" type="string" variant="standard" value={dialogValue.access} onChange={handleAccessChange}>
 											<MenuItem value="public">public</MenuItem>
 											<MenuItem value="private">private</MenuItem>
 											<MenuItem value= "password">password</MenuItem>
 										</Select>
 										<TextField
 										disabled={pwDisable}
-										margin="dense"
 										id="name"
 										value={dialogValue.password}
 										onChange={(event) =>
