@@ -1,6 +1,7 @@
-import { AirlineSeatLegroomReduced, PanoramaSharp } from "@mui/icons-material";
-import { Autocomplete, Box, Button, createFilterOptions, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, ExtendList, FilterOptionsState, Grid, List, ListItem, ListItemText, ListTypeMap, MenuItem, Paper, Select, TextField } from "@mui/material";
-import { Fragment, KeyboardEventHandler, useEffect, useRef, useState } from "react";
+import { Add, AirlineSeatLegroomReduced, PanoramaSharp } from "@mui/icons-material";
+import { Autocomplete, Box, Button, createFilterOptions, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, ExtendList, FilterOptionsState, Grid, List, ListItem, ListItemButton, ListItemIcon, ListItemText, ListTypeMap, MenuItem, Paper, Select, Tab, Tabs, TextField } from "@mui/material";
+import { Fragment, KeyboardEventHandler, ReactElement, SyntheticEvent, useEffect, useRef, useState } from "react";
+import AddIcon from '@mui/icons-material/Add';
 
 export class messagesDto {
 	user?: string;
@@ -15,25 +16,24 @@ export class messagesDto {
 }
 
 interface chatRoom {
-	name: string;
+	key: string;
 	access: "public" | "private" | "password";
 	password?: string;
+	messages: messagesDto[];
 }
 
-var arr: chatRoom[] = [{name: "public", access: "public"}];
-  
-const filter = createFilterOptions<chatRoom>();
+var tabs: chatRoom[] = [{key: "public", access: "public", messages: []}]; 
 
 export default function Chat() {
 	const tmpMsgDto: messagesDto = {};
 
+
 	const [ inputChat, setInputChat ] = useState<string>();
-	const [ room, setRoom ] = useState<string>("");
-	const [ messages, setMessages ] = useState<Array<messagesDto>>([{user: "", message: "", room: "",}]);
-	const [ selection, setSelection ] = useState<chatRoom | undefined>(arr[0]);
-	const [open, toggleOpen] = useState(false);
-	const [dialogValue, setDialogValue] = useState<chatRoom>({name: '', access: 'public', password: ''});
+	const [ messages, setMessages ] = useState<Array<messagesDto>>(tabs[0].messages);
+	const [ open, toggleOpen ] = useState(false);
+	const [ dialogValue, setDialogValue ] = useState<chatRoom>({key: '', access: 'public', password: '', messages: []});
 	const [ pwDisable, setPwDisable ] = useState<boolean>(true);
+	const [ currentRoom, setCurrentRoom ] = useState(tabs[0]);
 
 	const scrollRef = useRef<HTMLLIElement | null>(null);
 
@@ -41,29 +41,12 @@ export default function Chat() {
 		setInputChat(e.target.value);
 	};
 
-	const handleSelect = (e: any, newValue: any, reason: any) => {
-		if (reason === 'selectOption' && room && room !== "")
-		{
-			// console.log(reason);
-			// console.log(newValue);
-			// console.log(selection);
-			// console.log(room);
-			setDialogValue({name: room, access: 'public', password: ''});
-			toggleOpen(true);
-		}
-		else if (reason == 'createOption' && newValue && newValue !== "")
-		{
-			setDialogValue({name: newValue, access: 'public', password: ''});
-			toggleOpen(true);
-		}
-	};
-
 	const handleSubmit = (e: any) => {
 		if (e.key === "Enter")
 		{
-			tmpMsgDto.message = inputChat;
-			tmpMsgDto.user = "test";
-			messages.push(tmpMsgDto);
+			tmpMsgDto.message = inputChat;	// }
+			tmpMsgDto.user = "test";		// } all for testing
+			messages.push(tmpMsgDto);		// }
 			// send message
 			setInputChat("");
 		}
@@ -71,19 +54,19 @@ export default function Chat() {
 
 	const handleFormSubmit = (e: any) => {
 		e.preventDefault();
-		arr.push({name: dialogValue.name, access: dialogValue.access, password: dialogValue.password});
-		setDialogValue({name: '', access: 'public', password: ''});
+		setCurrentRoom(tabs[tabs.push({key: dialogValue.key, access: dialogValue.access, password: dialogValue.password, messages: dialogValue.messages}) - 1]);
+		setMessages(dialogValue.messages);
+		setDialogValue({key: "", access: "public", password: "", messages: []});
 		toggleOpen(false);
-		setSelection(arr.find(element => element.name === dialogValue.name))
 	};
 	
 	const listMessages = messages.map((messagesDto: messagesDto, index) => {
-		if (messagesDto.message !== "" && messagesDto.user !== "")
+		if (messagesDto && messagesDto.message !== "" && messagesDto.user !== "")
 		{
 			return (
-					<ListItem disablePadding sx={{pl: '5px'}} ref={scrollRef} key={index}>
-						<ListItemText primary={messagesDto.user + ": " + messagesDto.message}/>
-					</ListItem>
+				<ListItem disablePadding sx={{pl: '5px'}} ref={scrollRef} key={index}>
+					<ListItemText primary={messagesDto.user + ": " + messagesDto.message}/>
+				</ListItem>
 			);	
 		}	
 	});
@@ -101,18 +84,46 @@ export default function Chat() {
 	};
 
 	const handleClose = (e: any) => {
+		setDialogValue({key: "", access: "public", password: "", messages: []});
+		toggleOpen(false);
 	};
+
 
 	useEffect(() => {
 		if  (scrollRef.current)
 			scrollRef.current.scrollIntoView();
 	});
 
+	const handleRoomChange = (event: SyntheticEvent, newValue: chatRoom) => {
+		setCurrentRoom(newValue);
+	};
+
+	const newRoom = () => {
+		setDialogValue({key: "", access: "public", password: "", messages: []});
+		toggleOpen(true);
+	}
+
 	return (
 		<>
 			<Paper elevation={4}>
-				<Box>
+				<Box sx={{
+					width: '300px',
+					height: '300px',
+				}}>
 					<Grid>
+						<Grid item>
+							<Tabs 
+								value={currentRoom}
+								onChange={handleRoomChange}
+								variant="scrollable">
+								{tabs.map((tab) => 
+									<Tab value={tab} key={tab.key} label={tab.key} onClick={() => {
+										setMessages(tab.messages);
+									}}></Tab>
+								)}
+								<Tab icon={<AddIcon/>} onClick={newRoom}></Tab>
+							</Tabs>
+						</Grid>
 						<Grid item>
 							<List disablePadding
 								sx={{
@@ -128,66 +139,33 @@ export default function Chat() {
 							</List>
 						</Grid>
 						<Grid item>
-							<Autocomplete
-								size='small'
-								freeSolo
-								onChange={handleSelect}
-								renderInput={(params: any) => (
-									<TextField {...params} label="Room" onChange={e => {
-										setRoom(e.target.value);
-										console.log("test");
-									}}/>)}
-								options={arr}
-								filterOptions={(options: any, params) => {
-								const filtered = filter(options, params);
-
-								const inputValue = params.inputValue;
-
-								const isExisting = options.some((option: string) => inputValue === option);
-								if (inputValue !== '' && !isExisting) {
-									filtered.push({name: "Add '" + inputValue + "'", access: "public"});
-								}
-
-								return filtered;
-								}}
-								selectOnFocus
-								clearOnBlur
-								handleHomeEndKeys
-								getOptionLabel={(option) => {
-									if (typeof option !== 'string')
-										return option.name;
-									return option;
-								}}
-								renderOption={(props, option) => <li {...props}>{option.name}</li>}
-							/>
-							<>
-								<Dialog open={open} onClose={handleClose}>
-									<form onSubmit={handleFormSubmit}>
-									<DialogTitle>Create new channel</DialogTitle>
-									<DialogContent>
-										<DialogContentText>
+							<Dialog open={open} onClose={handleClose}>
+								<form onSubmit={handleFormSubmit}>
+								<DialogTitle>Create new channel</DialogTitle>
+								<DialogContent>
+									<DialogContentText>
 										Please enter channel name, accessability and password.
-										</DialogContentText>
-										<TextField
+									</DialogContentText>
+									<TextField
 										autoFocus
 										id="name"
-										value={dialogValue.name}
+										value={dialogValue.key}
 										onChange={(event) =>
 											setDialogValue({
 											...dialogValue,
-											name: event.target.value,
+											key: event.target.value,
 											})
 										}
 										label="name"
 										type="text"
 										variant="standard"
-										/>
-										<Select label="access" type="string" variant="standard" value={dialogValue.access} onChange={handleAccessChange}>
-											<MenuItem value="public">public</MenuItem>
-											<MenuItem value="private">private</MenuItem>
-											<MenuItem value= "password">password</MenuItem>
-										</Select>
-										<TextField
+									/>
+									<Select label="access" type="string" variant="standard" value={dialogValue.access} onChange={handleAccessChange}>
+										<MenuItem value="public">public</MenuItem>
+										<MenuItem value="private">private</MenuItem>
+										<MenuItem value= "password">password</MenuItem>
+									</Select>
+									<TextField
 										disabled={pwDisable}
 										id="name"
 										value={dialogValue.password}
@@ -200,18 +178,17 @@ export default function Chat() {
 										label="password"
 										type="string"
 										variant="standard"
-										/>
-									</DialogContent>
-									<DialogActions>
-										<Button onClick={handleClose}>Cancel</Button>
-										<Button type="submit">Add</Button>
-									</DialogActions>
-									</form>
-								</Dialog>
-							</>
+									/>
+								</DialogContent>
+								<DialogActions>
+									<Button onClick={handleClose}>Cancel</Button>
+									<Button type="submit">Add</Button>
+								</DialogActions>
+								</form>
+							</Dialog>
 						</Grid>
 						<Grid item>
-							<TextField  size='small' label='Chat'
+							<TextField  size='small' label='Chat' sx={{width: '300px',}}
 								value={inputChat}
 								onChange={handleChange}
 								onKeyDown={handleSubmit}
