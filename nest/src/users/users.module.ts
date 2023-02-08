@@ -5,7 +5,6 @@ import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { SocketToUserIdStorage } from './socketToUserIdStorage.service';
-// import { UsersGateway } from './users.gateway';
 import 'socket.io-msgpack-parser';
 
 @Module({
