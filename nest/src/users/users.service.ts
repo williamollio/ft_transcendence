@@ -73,16 +73,43 @@ export class UsersService {
     userId: string,
     userDto: CreateUserDto | UpdateUserDto,
   ) {
-    const sizeFriendsArray = userDto.friends?.length ?? 0;
+    const currentFriends = await this.prisma.user
+      .findUnique({ where: { id: userId } })
+      .friends();
 
-    for (let i = 0; i < sizeFriendsArray; i++) {
-      await this.prisma.user.update({
-        where: { id: userId },
-        data: {
-          friends: { connect: [{ id: userDto.friends?.[i].id }] },
-        },
-      });
+    const newFriends = userDto.friends;
+
+    const friendsToRemove = currentFriends?.filter(
+      (friend) => !newFriends?.find((f) => f.id === friend.id),
+    );
+
+    const friendsToRemoveArr: { id: number }[] = [];
+    if (friendsToRemove) {
+      for (const friendToRemove of friendsToRemove) {
+        friendsToRemoveArr.push({ id: friendToRemove.id });
+      }
     }
+
+    const friendsToAdd = newFriends?.filter(
+      (friend) => !currentFriends?.find((f) => f.id === friend.id),
+    );
+
+    const friendsToAddArr: { id: number }[] = [];
+    if (friendsToAdd) {
+      for (const friendToAdd of friendsToAdd) {
+        friendsToAddArr.push({ id: friendToAdd.id });
+      }
+    }
+
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        friends: {
+          disconnect: friendsToRemoveArr,
+          connect: friendsToAddArr,
+        },
+      },
+    });
   }
 
   public async findAll(res : Response) {
