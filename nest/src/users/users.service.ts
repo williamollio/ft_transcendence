@@ -112,4 +112,20 @@ export class UsersService {
   public async remove(id: number) {
     return this.prisma.user.delete({ where: { id } });
   }
+
+  // channels api
+  // async updateConnectionStatus(userId: string, connectionStatus: UserStatus) {
+  //   try {
+  //     if (userId) {
+  //       await this.prisma.user.update({
+  //         where: {
+  //           id: Number(userId),
+  //         },
+  //         data: {
+  //           status: connectionStatus,
+  //         },
+  //       });
+  //     }
+  //   } catch (error) {}
+  // }
 }

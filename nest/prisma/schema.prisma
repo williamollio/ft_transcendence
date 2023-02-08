@@ -11,12 +11,19 @@ datasource db {
 }
 
 model User {
-    id              Int      @id @default(autoincrement())
-    intraId         Int      @unique
-    name            String   @unique
-    friends         User[]   @relation("friends")
-    friendsRelation User[]   @relation("friends") // stores the many-to-many relation
-    createdAt       DateTime @default(now())
-    updatedAt       DateTime @updatedAt
+    id              Int         @id @default(autoincrement())
+    intraId         Int         @unique
+    name            String      @unique
+    friends         User[]      @relation("friends")
+    friendsRelation User[]      @relation("friends") // stores the many-to-many relation
+    createdAt       DateTime    @default(now())
+    updatedAt       DateTime    @updatedAt
     filename        String?
+    status          UserStatus  @default(OFFLINE)
+}
+
+enum UserStatus {
+    OFFLINE
+    ONLINE
+    PLAYING
 }
