@@ -5,11 +5,12 @@ import { JwtModule } from '@nestjs/jwt';
 import { UsersModule } from '../users/users.module';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { Intra42Strategy } from './strategies/intra42.strategy';
+import * as process from 'process';
 
 @Module({
   imports: [
     JwtModule.register({
-      secret: 'blablabla',
+      secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: '1d' },
     }),
     UsersModule,
