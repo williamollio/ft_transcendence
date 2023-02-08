@@ -2,6 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { UsersService } from '../../users/users.service';
+import * as process from 'process';
 
 export type JwtPayload = {
   sub: string;
@@ -22,7 +23,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 
     super({
       ignoreExpiration: false,
-      secretOrKey: 'blablabla', // TODO : To be filled in...
+      secretOrKey: process.env.JWT_SECRET,
       jwtFromRequest: extractJwtFromCookie,
     });
   }
