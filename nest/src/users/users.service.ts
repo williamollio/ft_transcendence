@@ -135,13 +135,6 @@ export class UsersService {
     });
   }
 
-  public async findByName(name: string) {
-    return this.prisma.user.findUnique({
-      where: { name },
-      include: { friends: false },
-    });
-  }
-
   public async updateRefreshToken(id: number, refreshToken: string) {
     try {
       return await this.prisma.user.update({

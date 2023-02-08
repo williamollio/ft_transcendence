@@ -34,10 +34,6 @@ export class AuthService {
     };
   }
 
-  generateJWT(payload: JwtUser) {
-    return this.jwtService.sign(payload);
-  }
-
   async signIn(user: Intra42User) {
     if (user == null) throw new BadRequestException('Unauthenticated');
 
@@ -57,19 +53,11 @@ export class AuthService {
     );
 
     return tokens;
-    // return this.generateJWT({
-    //   id: foundUser.id,
-    //   intraId: foundUser.intraId,
-    // });
   }
 
   async registerUser(user: Intra42User) {
     try {
       return await this.userService.createFromIntra(user);
-      // return this.generateJWT({
-      //   id: newUser.id,
-      //   intraId: newUser.intraId,
-      // });
     } catch (e) {
       console.error(e);
       throw new InternalServerErrorException();
