@@ -23,7 +23,7 @@ export class UsersService {
     return User?.filename;
   }
 
-  public async setFilename(filename: string, id: number) {
+  public async setFilename(filename: string, id: string) {
     await this.prisma.user.update({
       where: { id: id },
       data: {
@@ -83,7 +83,7 @@ export class UsersService {
       (friend) => !newFriends?.find((f) => f.id === friend.id),
     );
 
-    const friendsToRemoveArr: { id: number }[] = [];
+    const friendsToRemoveArr: { id: string }[] = [];
     if (friendsToRemove) {
       for (const friendToRemove of friendsToRemove) {
         friendsToRemoveArr.push({ id: friendToRemove.id });
@@ -94,7 +94,7 @@ export class UsersService {
       (friend) => !currentFriends?.find((f) => f.id === friend.id),
     );
 
-    const friendsToAddArr: { id: number }[] = [];
+    const friendsToAddArr: { id: string }[] = [];
     if (friendsToAdd) {
       for (const friendToAdd of friendsToAdd) {
         friendsToAddArr.push({ id: friendToAdd.id });
@@ -140,6 +140,28 @@ export class UsersService {
       where: { name },
       include: { friends: false },
     });
+  }
+
+  public async updateRefreshToken(id: number, refreshToken: string) {
+    try {
+      return await this.prisma.user.update({
+        where: { id },
+        data: { refreshToken },
+      });
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  public async updateRefreshToken(id: string, refreshToken: string) {
+    try {
+      return await this.prisma.user.update({
+        where: { id },
+        data: { refreshToken },
+      });
+    } catch (e) {
+      throw e;
+    }
   }
 
   public async update(id: string, updateUserDto: UpdateUserDto) {
