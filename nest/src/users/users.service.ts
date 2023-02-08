@@ -242,4 +242,20 @@ export class UsersService {
     }
   }
 
+
+  // channels api
+  // async updateConnectionStatus(userId: string, connectionStatus: UserStatus) {
+  //   try {
+  //     if (userId) {
+  //       await this.prisma.user.update({
+  //         where: {
+  //           id: Number(userId),
+  //         },
+  //         data: {
+  //           status: connectionStatus,
+  //         },
+  //       });
+  //     }
+  //   } catch (error) {}
+  // }
 }

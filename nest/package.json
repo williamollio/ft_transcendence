@@ -22,7 +22,10 @@
   },
   "dependencies": {
     "@nestjs/websockets": "^9.1.6",
+<<<<<<< HEAD
     "@nestjs/platform-socket.io": "^9.1.6",
+=======
+>>>>>>> cf41ce6 (updated the prisma schema, add the channel folder)
     "@nestjs/common": "^9.2.1",
     "@nestjs/core": "^9.2.1",
     "@nestjs/jwt": "^10.0.1",
@@ -46,9 +49,13 @@
     "@grpc/proto-loader": "^0.7.3",
     "socket.io": "^4.5.3",
     "socket.io-msgpack-parser": "^3.0.2",
+<<<<<<< HEAD
     "uuid": "^9.0.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.13.2"
+=======
+    "uuid": "^9.0.0"
+>>>>>>> cf41ce6 (updated the prisma schema, add the channel folder)
   },
   "devDependencies": {
     "@nestjs/cli": "^9.0.0",
