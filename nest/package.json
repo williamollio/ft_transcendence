@@ -49,13 +49,9 @@
     "@grpc/proto-loader": "^0.7.3",
     "socket.io": "^4.5.3",
     "socket.io-msgpack-parser": "^3.0.2",
-<<<<<<< HEAD
     "uuid": "^9.0.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.13.2"
-=======
-    "uuid": "^9.0.0"
->>>>>>> cf41ce6 (updated the prisma schema, add the channel folder)
   },
   "devDependencies": {
     "@nestjs/cli": "^9.0.0",
