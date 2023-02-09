@@ -51,7 +51,7 @@ export class ChannelService {
     });
   }
 
-  async getAllChannelsByUserId(userId: string) {
+  async getAllChannelsByUserId(userId: number) {
     const channels: {
       id: string;
       name: string;
@@ -70,26 +70,21 @@ export class ChannelService {
         type: true,
       },
     });
-    /** Check if the channnel is of type DIRECT MESSAGE and change the name
-     * according to the name of the current user
-     */
-    for (const channel of channels) {
-      if (channel.type === 'DIRECTMESSAGE') {
-        const channelUser:
-          | {
-              id: string;
-              avatarImg: string | null;
-              nickname: string;
-              eloScore: number;
-              status: UserStatus;
-              twoFactorAuthenticationSet: boolean;
-            }[]
-          | undefined = await this.getUsersOfAChannel(channel.id);
-        if (channelUser && channelUser[0].id === userId && channelUser[1])
-          channel.name = channelUser[1].nickname;
-        else if (channelUser) channel.name = channelUser[0].nickname;
-      }
-    }
+    // Check if the channnel is of type DIRECT MESSAGE and change the name
+     // according to the name of the current user
+    // for (const channel of channels) {
+    //   if (channel.type === 'DIRECTMESSAGE') {
+    //     const channelUser:
+    //       | {
+    //           id: Number;
+    //           status: UserStatus;
+    //         }[]
+    //       | undefined = await this.getUsersOfAChannel(channel.id);
+    //     if (channelUser && channelUser[0].id === userId && channelUser[1])
+    //       channel.name = channelUser[1].nickname;
+    //     else if (channelUser) channel.name = channelUser[0].nickname;
+    //   }
+    // }
     return channels;
   }
 
@@ -101,7 +96,7 @@ export class ChannelService {
     });
   }
 
-  getChannelByUserId(userId: string, channelId: string) {
+  getChannelByUserId(userId: number, channelId: string) {
     return this.prisma.channelUser.findUnique({
       where: {
         userId_channelId: {
@@ -115,7 +110,7 @@ export class ChannelService {
     });
   }
 
-  async getDirectMessageByUserId(userId: string, participantId: string) {
+  async getDirectMessageByUserId(userId: Number, participantId: Number) {
     const allDirectMessages = await this.prisma.channel.findMany({
       where: {
         type: 'DIRECTMESSAGE',
@@ -135,42 +130,42 @@ export class ChannelService {
     return null;
   }
 
-  async getChannelAuthors(channelId: string) {
-    try {
-      const authors: {
-        sender: {
-          id: string;
-          nickname: string;
-          avatarImg: string | null;
-        };
-      }[] = await this.prisma.message.findMany({
-        where: {
-          channelId: channelId,
-        },
-        select: {
-          sender: {
-            select: {
-              id: true,
-              nickname: true,
-              avatarImg: true,
-            },
-          },
-        },
-        distinct: ['senderId'],
-      });
-      const flattenAuthors: {
-        id: string;
-        nickname: string;
-        avatarImg: string | null;
-      }[] = [];
-      for (const author of authors) {
-        flattenAuthors.push(author.sender);
-      }
-      return flattenAuthors;
-    } catch (error) {
-      throw new ForbiddenException(error);
-    }
-  }
+  // async getChannelAuthors(channelId: string) {
+  //   try {
+  //     const authors: {
+  //       sender: {
+  //         id: string;
+  //         nickname: string;
+  //         avatarImg: string | null;
+  //       };
+  //     }[] = await this.prisma.message.findMany({
+  //       where: {
+  //         channelId: channelId,
+  //       },
+  //       select: {
+  //         sender: {
+  //           select: {
+  //             id: true,
+  //             nickname: true,
+  //             avatarImg: true,
+  //           },
+  //         },
+  //       },
+  //       distinct: ['senderId'],
+  //     });
+  //     const flattenAuthors: {
+  //       id: string;
+  //       nickname: string;
+  //       avatarImg: string | null;
+  //     }[] = [];
+  //     for (const author of authors) {
+  //       flattenAuthors.push(author.sender);
+  //     }
+  //     return flattenAuthors;
+  //   } catch (error) {
+  //     throw new ForbiddenException(error);
+  //   }
+  // }
 
   async getChannelType(channelId: string) {
     return await this.prisma.channel.findUnique({
@@ -199,12 +194,8 @@ export class ChannelService {
       await this.checkChannel(channelId);
       const users: {
         user: {
-          id: string;
-          avatarImg: string | null;
-          nickname: string;
-          eloScore: number;
+          id: Number;
           status: UserStatus;
-          twoFactorAuthenticationSet: boolean;
         };
       }[] = await this.prisma.channelUser.findMany({
         where: {
@@ -214,22 +205,14 @@ export class ChannelService {
           user: {
             select: {
               id: true,
-              avatarImg: true,
-              nickname: true,
-              eloScore: true,
               status: true,
-              twoFactorAuthenticationSet: true,
             },
           },
         },
       });
       const flattenUsers: {
-        id: string;
-        avatarImg: string | null;
-        nickname: string;
-        eloScore: number;
+        id: Number;
         status: UserStatus;
-        twoFactorAuthenticationSet: boolean;
       }[] = [];
       for (const user of users) {
         flattenUsers.push(user.user);
@@ -241,45 +224,45 @@ export class ChannelService {
     }
   }
 
-  async getRoleOfUserChannel(userId: string, channelId: string) {
-    try {
-      await this.checkChannel(channelId);
-      const myRole: { role: ChannelRole } | null =
-        await this.prisma.channelUser.findUnique({
-          where: {
-            userId_channelId: {
-              userId: userId,
-              channelId: channelId,
-            },
-          },
-          select: {
-            role: true,
-          },
-        });
-      return myRole;
-    } catch (error) {
-      return null;
-    }
-  }
+  // async getRoleOfUserChannel(userId: string, channelId: string) {
+  //   try {
+  //     await this.checkChannel(channelId);
+  //     const myRole: { role: ChannelRole } | null =
+  //       await this.prisma.channelUser.findUnique({
+  //         where: {
+  //           userId_channelId: {
+  //             userId: userId,
+  //             channelId: channelId,
+  //           },
+  //         },
+  //         select: {
+  //           role: true,
+  //         },
+  //       });
+  //     return myRole;
+  //   } catch (error) {
+  //     return null;
+  //   }
+  // }
 
-  async getRolesOfUsersChannel(channelId: string) {
-    try {
-      await this.checkChannel(channelId);
-      const roles: {
-        userId: string;
-        role: ChannelRole;
-      }[] = await this.prisma.channelUser.findMany({
-        where: {
-          channelId: channelId,
-        },
-        select: {
-          userId: true,
-          role: true,
-        },
-      });
-      return roles;
-    } catch (error) {}
-  }
+  // async getRolesOfUsersChannel(channelId: string) {
+  //   try {
+  //     await this.checkChannel(channelId);
+  //     const roles: {
+  //       userId: string;
+  //       role: ChannelRole;
+  //     }[] = await this.prisma.channelUser.findMany({
+  //       where: {
+  //         channelId: channelId,
+  //       },
+  //       select: {
+  //         userId: true,
+  //         role: true,
+  //       },
+  //     });
+  //     return roles;
+  //   } catch (error) {}
+  // }
 
   async getInvitesOfAChannel(channelId: string) {
     try {
@@ -304,70 +287,70 @@ export class ChannelService {
     }
   }
 
-  async getInvitableUsers(userId: string, channelId: string) {
-    try {
-      await this.checkChannel(channelId);
-      const invitedUsers: {
-        invites: {
-          id: string;
-        }[];
-      } | null = await this.prisma.channel.findUnique({
-        where: {
-          id: channelId,
-        },
-        select: {
-          invites: {
-            select: {
-              id: true,
-            },
-          },
-        },
-      });
-      const membersOfChannel: { users: { userId: string }[] } | null =
-        await this.prisma.channel.findUnique({
-          where: {
-            id: channelId,
-          },
-          select: {
-            users: {
-              select: {
-                userId: true,
-              },
-            },
-          },
-        });
-      const allUsers: {
-        id: string;
-        nickname: string;
-        avatarImg: string | null;
-      }[] = await this.prisma.user.findMany({
-        select: {
-          id: true,
-          nickname: true,
-          avatarImg: true,
-        },
-      });
-      const invitableUsers: {
-        id: string;
-        nickname: string;
-        avatarImg: string | null;
-      }[] = [];
-      for (const aUser of allUsers) {
-        if (
-          !(
-            invitedUsers?.invites.find((user) => user.id === aUser.id) ||
-            membersOfChannel?.users.find((user) => user.userId === aUser.id)
-          ) &&
-          userId !== aUser.id
-        ) {
-          invitableUsers.push(aUser);
-        }
-      }
-      return invitableUsers;
-    } catch (error) {
-      throw new ForbiddenException(error);
-    }
-  }
+  // async getInvitableUsers(userId: string, channelId: string) {
+  //   try {
+  //     await this.checkChannel(channelId);
+  //     const invitedUsers: {
+  //       invites: {
+  //         id: string;
+  //       }[];
+  //     } | null = await this.prisma.channel.findUnique({
+  //       where: {
+  //         id: channelId,
+  //       },
+  //       select: {
+  //         invites: {
+  //           select: {
+  //             id: true,
+  //           },
+  //         },
+  //       },
+  //     });
+  //     const membersOfChannel: { users: { userId: string }[] } | null =
+  //       await this.prisma.channel.findUnique({
+  //         where: {
+  //           id: channelId,
+  //         },
+  //         select: {
+  //           users: {
+  //             select: {
+  //               userId: true,
+  //             },
+  //           },
+  //         },
+  //       });
+  //     const allUsers: {
+  //       id: string;
+  //       nickname: string;
+  //       avatarImg: string | null;
+  //     }[] = await this.prisma.user.findMany({
+  //       select: {
+  //         id: true,
+  //         nickname: true,
+  //         avatarImg: true,
+  //       },
+  //     });
+  //     const invitableUsers: {
+  //       id: string;
+  //       nickname: string;
+  //       avatarImg: string | null;
+  //     }[] = [];
+  //     for (const aUser of allUsers) {
+  //       if (
+  //         !(
+  //           invitedUsers?.invites.find((user) => user.id === aUser.id) ||
+  //           membersOfChannel?.users.find((user) => user.userId === aUser.id)
+  //         ) &&
+  //         userId !== aUser.id
+  //       ) {
+  //         invitableUsers.push(aUser);
+  //       }
+  //     }
+  //     return invitableUsers;
+  //   } catch (error) {
+  //     throw new ForbiddenException(error);
+  //   }
+  // }
 
   async getMessagesFromChannel(
     channelId: string,
@@ -412,7 +395,7 @@ export class ChannelService {
       await this.prisma.channelUser.findUnique({
         where: {
           userId_channelId: {
-            userId: userId,
+            userId: Number(userId),
             channelId: channelId,
           },
         },
@@ -446,7 +429,7 @@ export class ChannelService {
           ...dto,
           users: {
             create: {
-              userId: userId,
+              userId: Number(userId),
               role: 'OWNER',
             },
           },
@@ -471,20 +454,20 @@ export class ChannelService {
 
   async createDirectMessageWS(
     dto: CreateChannelDto,
-    userId: string,
+    userId: Number,
     clientSocket: Socket,
   ) {
     try {
       /* Check if one of the user is blocked by the other */
       if (typeof dto.userId !== 'string') return null;
       const usersBlockedEachOther =
-        await this.blockService.checkUsersBlockRelation(userId, dto.userId);
+        await this.blockService.checkUsersBlockRelation(String(userId), dto.userId);
       if (usersBlockedEachOther) return 'Users blocked each other';
 
       /* Check if a DM between the 2 users already exists */
       const conversationAlreadyExist = await this.getDirectMessageByUserId(
         userId,
-        dto.userId,
+        Number(dto.userId),
       );
       if (conversationAlreadyExist) {
         conversationAlreadyExist.passwordHash = '';
@@ -498,11 +481,11 @@ export class ChannelService {
           users: {
             create: [
               {
-                userId: userId,
+                userId: Number(userId),
                 role: 'USER',
               },
               {
-                userId: dto.userId,
+                userId: Number(dto.userId),
                 role: 'USER',
               },
             ],
@@ -539,7 +522,7 @@ export class ChannelService {
       },
     });
     return isInvited?.invites.find((value) => {
-      return value.id === userId;
+      return value.id === Number(userId);
     })
       ? true
       : false;
@@ -554,7 +537,7 @@ export class ChannelService {
       const moderationAction = await this.prisma.channelAction.findUnique({
         where: {
           channelActionTargetId_channelActionOnChannelId_type: {
-            channelActionTargetId: userTargetId,
+            channelActionTargetId: Number(userTargetId),
             channelActionOnChannelId: channelId,
             type: channelActionType,
           },
@@ -580,7 +563,7 @@ export class ChannelService {
       await this.prisma.channelAction.deleteMany({
         where: {
           AND: [
-            { channelActionTargetId: targetUserId },
+            { channelActionTargetId: Number(targetUserId) },
             {
               channelActionOnChannelId: channelId,
             },
@@ -621,11 +604,11 @@ export class ChannelService {
       if (banExpirationDate - currentTime < 0) {
         await this.deleteChannelAction(
           channelId,
-          action.channelActionTargetId,
+          String(action.channelActionTargetId),
           actionType,
         );
       } else {
-        userUnderModerationList.push(action.channelActionTargetId);
+        userUnderModerationList.push(String(action.channelActionTargetId));
       }
     }
     return userUnderModerationList;
@@ -713,7 +696,7 @@ export class ChannelService {
         data: {
           users: {
             create: {
-              userId: userId,
+              userId: Number(userId),
               role: 'USER',
             },
           },
@@ -762,7 +745,7 @@ export class ChannelService {
           data: {
             messages: {
               create: {
-                senderId: userId,
+                senderId: Number(userId),
                 content: messageInfo.content,
               },
             },
@@ -805,297 +788,297 @@ export class ChannelService {
     }
   }
 
-  async editChannelByIdWS(
-    userId: string,
-    channelId: string,
-    dto: EditChannelDto,
-  ) {
-    try {
-      /* Check the password is provided in the DTO for protected chan) */
-      if (dto.name === '') {
-        return null;
-      }
-      /* Check that the user is owner or admin for update rights */
-      const userRole: { role: ChannelRole } | null =
-        await this.getRoleOfUserChannel(userId, channelId);
-      if (!userRole || userRole.role < ChannelRole.ADMIN) {
-        return 'noEligibleRights';
-      }
-      if (dto.type === ChannelType.PROTECTED) {
-        await this.handlePasswords(dto, channelId);
-      }
-      /* Then, update channel's information */
-      const editedChannel: Channel = await this.prisma.channel.update({
-        where: {
-          id: channelId,
-        },
-        data: {
-          ...dto,
-        },
-      });
-      editedChannel.passwordHash = '';
-      return editedChannel;
-    } catch (error) {
-      if (error.code === 'P2002') {
-        return 'alreadyUsed';
-      }
-      if (error == 'Error: passwordIncorrect') {
-        return 'passwordIncorrect';
-      }
-      if (typeof error === 'string') return error;
-      return 'errorEditChannel';
-    }
-  }
+  // async editChannelByIdWS(
+  //   userId: string,
+  //   channelId: string,
+  //   dto: EditChannelDto,
+  // ) {
+  //   try {
+  //     /* Check the password is provided in the DTO for protected chan) */
+  //     if (dto.name === '') {
+  //       return null;
+  //     }
+  //     /* Check that the user is owner or admin for update rights */
+  //     const userRole: { role: ChannelRole } | null =
+  //       await this.getRoleOfUserChannel(Number(userId), channelId);
+  //     if (!userRole || userRole.role < ChannelRole.ADMIN) {
+  //       return 'noEligibleRights';
+  //     }
+  //     if (dto.type === ChannelType.PROTECTED) {
+  //       await this.handlePasswords(dto, channelId);
+  //     }
+  //     /* Then, update channel's information */
+  //     const editedChannel: Channel = await this.prisma.channel.update({
+  //       where: {
+  //         id: channelId,
+  //       },
+  //       data: {
+  //         ...dto,
+  //       },
+  //     });
+  //     editedChannel.passwordHash = '';
+  //     return editedChannel;
+  //   } catch (error) {
+  //     if (error.code === 'P2002') {
+  //       return 'alreadyUsed';
+  //     }
+  //     if (error == 'Error: passwordIncorrect') {
+  //       return 'passwordIncorrect';
+  //     }
+  //     if (typeof error === 'string') return error;
+  //     return 'errorEditChannel';
+  //   }
+  // }
 
-  async leaveChannelWS(userId: string, dto: LeaveChannelDto) {
-    try {
-      // Remove user from channel users ('user leave room')
-      let leavingUser = await this.prisma.channelUser.delete({
-        where: {
-          userId_channelId: {
-            userId: userId,
-            channelId: dto.id,
-          },
-        },
-      });
-      /* Verify if user asking for channel deletion is alone in channel */
-      const channelUsers: { users: ChannelUser[] } | null =
-        await this.prisma.channel.findUnique({
-          where: {
-            id: dto.id,
-          },
-          select: {
-            users: true,
-          },
-        });
-      /* Verify if channel is of type direct message */
-      const channel = await this.getChannelById(dto.id);
-      if (
-        channel?.type === ChannelType.DIRECTMESSAGE &&
-        channelUsers &&
-        channelUsers.users.length > 0
-      ) {
-        leavingUser = await this.prisma.channelUser.delete({
-          where: {
-            userId_channelId: {
-              userId: channelUsers.users[0].userId,
-              channelId: dto.id,
-            },
-          },
-        });
-      }
-      /* Then, delete channel */
-      // If user is the last one or channel is of type direct message delete the channel
-      if (
-        channelUsers?.users.length === 0 ||
-        channel?.type === ChannelType.DIRECTMESSAGE
-      ) {
-        await this.prisma.channel.delete({
-          where: {
-            id: dto.id,
-          },
-        });
-      }
-      return leavingUser;
-    } catch (error) {
-      if (typeof error === 'string') return error;
-      return 'errorLeaveChannel';
-    }
-  }
+  // async leaveChannelWS(userId: string, dto: LeaveChannelDto) {
+  //   try {
+  //     // Remove user from channel users ('user leave room')
+  //     let leavingUser = await this.prisma.channelUser.delete({
+  //       where: {
+  //         userId_channelId: {
+  //           userId: userId,
+  //           channelId: dto.id,
+  //         },
+  //       },
+  //     });
+  //     /* Verify if user asking for channel deletion is alone in channel */
+  //     const channelUsers: { users: ChannelUser[] } | null =
+  //       await this.prisma.channel.findUnique({
+  //         where: {
+  //           id: dto.id,
+  //         },
+  //         select: {
+  //           users: true,
+  //         },
+  //       });
+  //     /* Verify if channel is of type direct message */
+  //     const channel = await this.getChannelById(dto.id);
+  //     if (
+  //       channel?.type === ChannelType.DIRECTMESSAGE &&
+  //       channelUsers &&
+  //       channelUsers.users.length > 0
+  //     ) {
+  //       leavingUser = await this.prisma.channelUser.delete({
+  //         where: {
+  //           userId_channelId: {
+  //             userId: channelUsers.users[0].userId,
+  //             channelId: dto.id,
+  //           },
+  //         },
+  //       });
+  //     }
+  //     /* Then, delete channel */
+  //     // If user is the last one or channel is of type direct message delete the channel
+  //     if (
+  //       channelUsers?.users.length === 0 ||
+  //       channel?.type === ChannelType.DIRECTMESSAGE
+  //     ) {
+  //       await this.prisma.channel.delete({
+  //         where: {
+  //           id: dto.id,
+  //         },
+  //       });
+  //     }
+  //     return leavingUser;
+  //   } catch (error) {
+  //     if (typeof error === 'string') return error;
+  //     return 'errorLeaveChannel';
+  //   }
+  // }
 
-  async inviteToChannelWS(userId: string, inviteDto: InviteChannelDto) {
-    if (inviteDto.type !== ChannelType.PRIVATE) return 'notPrivateChannel';
-    else if (!inviteDto.channelId || !inviteDto.invitedId)
-      return 'missingDtoData';
-    const userRole: { role: ChannelRole } | null =
-      await this.getRoleOfUserChannel(userId, inviteDto.channelId);
-    if (!userRole || userRole.role < ChannelRole.ADMIN) {
-      return 'noEligibleRights';
-    }
-    try {
-      const isInvited = await this.getIsInvitedInAChannel(
-        inviteDto.invitedId,
-        inviteDto.channelId,
-      );
-      if (isInvited) throw new Error('alreadyInvited');
-      const channelInvite: Channel = await this.prisma.channel.update({
-        where: {
-          id: inviteDto.channelId,
-        },
-        data: {
-          invites: {
-            connect: { id: inviteDto.invitedId },
-          },
-        },
-      });
-      return channelInvite;
-    } catch (error) {
-      if (typeof error === 'string' && error == 'Error: alreadyInvited') {
-        return 'alreadyInvited';
-      }
-      if (typeof error === 'string') return error;
-      return 'errorChannelInvite';
-    }
-  }
+  // async inviteToChannelWS(userId: string, inviteDto: InviteChannelDto) {
+  //   if (inviteDto.type !== ChannelType.PRIVATE) return 'notPrivateChannel';
+  //   else if (!inviteDto.channelId || !inviteDto.invitedId)
+  //     return 'missingDtoData';
+  //   const userRole: { role: ChannelRole } | null =
+  //     await this.getRoleOfUserChannel(userId, inviteDto.channelId);
+  //   if (!userRole || userRole.role < ChannelRole.ADMIN) {
+  //     return 'noEligibleRights';
+  //   }
+  //   try {
+  //     const isInvited = await this.getIsInvitedInAChannel(
+  //       inviteDto.invitedId,
+  //       inviteDto.channelId,
+  //     );
+  //     if (isInvited) throw new Error('alreadyInvited');
+  //     const channelInvite: Channel = await this.prisma.channel.update({
+  //       where: {
+  //         id: inviteDto.channelId,
+  //       },
+  //       data: {
+  //         invites: {
+  //           connect: { id: inviteDto.invitedId },
+  //         },
+  //       },
+  //     });
+  //     return channelInvite;
+  //   } catch (error) {
+  //     if (typeof error === 'string' && error == 'Error: alreadyInvited') {
+  //       return 'alreadyInvited';
+  //     }
+  //     if (typeof error === 'string') return error;
+  //     return 'errorChannelInvite';
+  //   }
+  // }
 
-  async checkIfCanEnforceModeration(
-    requesterId: string,
-    moderationInfo: ModerateChannelDto,
-  ): Promise<string | undefined> {
-    try {
-      //Check if channel is not a direct channel
-      const typeOfChannel: { type: ChannelType } | null =
-        await this.getChannelType(moderationInfo.channelActionOnChannelId);
-      if (typeOfChannel?.type === ChannelType.DIRECTMESSAGE) {
-        return 'cannotModerateInDirectMessage';
-      }
-      //Verify if current user is Admin or Owner
-      const userRole: { role: ChannelRole } | null =
-        await this.getRoleOfUserChannel(
-          requesterId,
-          moderationInfo.channelActionOnChannelId,
-        );
-      if (
-        userRole?.role !== ChannelRole.OWNER &&
-        userRole?.role !== ChannelRole.ADMIN
-      ) {
-        return 'noEligibleRights';
-      }
-      // Verify if Target User is not owner of the channel
-      const targetRole: { role: ChannelRole } | null =
-        await this.getRoleOfUserChannel(
-          moderationInfo.channelActionTargetId,
-          moderationInfo.channelActionOnChannelId,
-        );
-      if (targetRole?.role === ChannelRole.OWNER) {
-        return 'cannotModerateOwner';
-      }
-      return 'Ok';
-    } catch (error) {
-      if (typeof error === 'string') return error;
-      return 'errorcheckIfCanEnforceModeration';
-    }
-  }
+//   async checkIfCanEnforceModeration(
+//     requesterId: string,
+//     moderationInfo: ModerateChannelDto,
+//   ): Promise<string | undefined> {
+//     try {
+//       //Check if channel is not a direct channel
+//       const typeOfChannel: { type: ChannelType } | null =
+//         await this.getChannelType(moderationInfo.channelActionOnChannelId);
+//       if (typeOfChannel?.type === ChannelType.DIRECTMESSAGE) {
+//         return 'cannotModerateInDirectMessage';
+//       }
+//       //Verify if current user is Admin or Owner
+//       const userRole: { role: ChannelRole } | null =
+//         await this.getRoleOfUserChannel(
+//           requesterId,
+//           moderationInfo.channelActionOnChannelId,
+//         );
+//       if (
+//         userRole?.role !== ChannelRole.OWNER &&
+//         userRole?.role !== ChannelRole.ADMIN
+//       ) {
+//         return 'noEligibleRights';
+//       }
+//       // Verify if Target User is not owner of the channel
+//       const targetRole: { role: ChannelRole } | null =
+//         await this.getRoleOfUserChannel(
+//           moderationInfo.channelActionTargetId,
+//           moderationInfo.channelActionOnChannelId,
+//         );
+//       if (targetRole?.role === ChannelRole.OWNER) {
+//         return 'cannotModerateOwner';
+//       }
+//       return 'Ok';
+//     } catch (error) {
+//       if (typeof error === 'string') return error;
+//       return 'errorcheckIfCanEnforceModeration';
+//     }
+//   }
 
-  async banFromChannelWS(requesterId: string, banInfo: ModerateChannelDto) {
-    try {
-      const checksResults = await this.checkIfCanEnforceModeration(
-        requesterId,
-        banInfo,
-      );
-      if (checksResults !== 'Ok') {
-        return checksResults;
-      }
-      const isAlreadyBanned = await this.isUserUnderModeration(banInfo);
-      if (isAlreadyBanned) {
-        return 'isAlreadyBanned';
-      }
-      // Getting ban timings
-      const banDurationInMS = 30 * 1000;
-      const banExpirationDate = new Date(Date.now() + banDurationInMS);
-      // Actual ban added in DB
-      const bannedUser = await this.prisma.channelAction.create({
-        data: {
-          channelActionTargetId: banInfo.channelActionTargetId,
-          channelActionOnChannelId: banInfo.channelActionOnChannelId,
-          channelActionTime: banExpirationDate,
-          type: ChannelActionType.BAN,
-          channelActionRequesterId: requesterId,
-        },
-        select: {
-          channelActionTargetId: true,
-          channelActionOnChannelId: true,
-        },
-      });
-      return bannedUser;
-    } catch (error) {
-      if (typeof error === 'string') return error;
-      return 'errorBanFromChannel';
-    }
-  }
+//   async banFromChannelWS(requesterId: string, banInfo: ModerateChannelDto) {
+//     try {
+//       const checksResults = await this.checkIfCanEnforceModeration(
+//         requesterId,
+//         banInfo,
+//       );
+//       if (checksResults !== 'Ok') {
+//         return checksResults;
+//       }
+//       const isAlreadyBanned = await this.isUserUnderModeration(banInfo);
+//       if (isAlreadyBanned) {
+//         return 'isAlreadyBanned';
+//       }
+//       // Getting ban timings
+//       const banDurationInMS = 30 * 1000;
+//       const banExpirationDate = new Date(Date.now() + banDurationInMS);
+//       // Actual ban added in DB
+//       const bannedUser = await this.prisma.channelAction.create({
+//         data: {
+//           channelActionTargetId: banInfo.channelActionTargetId,
+//           channelActionOnChannelId: banInfo.channelActionOnChannelId,
+//           channelActionTime: banExpirationDate,
+//           type: ChannelActionType.BAN,
+//           channelActionRequesterId: requesterId,
+//         },
+//         select: {
+//           channelActionTargetId: true,
+//           channelActionOnChannelId: true,
+//         },
+//       });
+//       return bannedUser;
+//     } catch (error) {
+//       if (typeof error === 'string') return error;
+//       return 'errorBanFromChannel';
+//     }
+//   }
 
-  async muteFromChannelWS(requesterId: string, muteInfo: ModerateChannelDto) {
-    try {
-      const checksResults = await this.checkIfCanEnforceModeration(
-        requesterId,
-        muteInfo,
-      );
-      if (checksResults !== 'Ok') {
-        return checksResults;
-      }
-      // Target User exist in channel and is not already banned
-      const isAlreadyMuted = await this.isUserUnderModeration(muteInfo);
-      if (isAlreadyMuted) {
-        return 'isAlreadyMuted';
-      }
+//   async muteFromChannelWS(requesterId: string, muteInfo: ModerateChannelDto) {
+//     try {
+//       const checksResults = await this.checkIfCanEnforceModeration(
+//         requesterId,
+//         muteInfo,
+//       );
+//       if (checksResults !== 'Ok') {
+//         return checksResults;
+//       }
+//       // Target User exist in channel and is not already banned
+//       const isAlreadyMuted = await this.isUserUnderModeration(muteInfo);
+//       if (isAlreadyMuted) {
+//         return 'isAlreadyMuted';
+//       }
 
-      // Getting ban timings
-      const MuteDurationInMS = 30 * 1000;
-      const MuteExpirationDate = new Date(Date.now() + MuteDurationInMS);
-      // Actual Mute added in DB
-      const MutedUser = await this.prisma.channelAction.create({
-        data: {
-          channelActionTargetId: muteInfo.channelActionTargetId,
-          channelActionOnChannelId: muteInfo.channelActionOnChannelId,
-          channelActionTime: MuteExpirationDate,
-          type: ChannelActionType.MUTE,
-          channelActionRequesterId: requesterId,
-        },
-        select: {
-          channelActionTargetId: true,
-          channelActionOnChannelId: true,
-        },
-      });
-      return MutedUser;
-    } catch (error) {
-      if (typeof error === 'string') return error;
-      return 'errorMuteFromChannel';
-    }
-  }
+//       // Getting ban timings
+//       const MuteDurationInMS = 30 * 1000;
+//       const MuteExpirationDate = new Date(Date.now() + MuteDurationInMS);
+//       // Actual Mute added in DB
+//       const MutedUser = await this.prisma.channelAction.create({
+//         data: {
+//           channelActionTargetId: muteInfo.channelActionTargetId,
+//           channelActionOnChannelId: muteInfo.channelActionOnChannelId,
+//           channelActionTime: MuteExpirationDate,
+//           type: ChannelActionType.MUTE,
+//           channelActionRequesterId: requesterId,
+//         },
+//         select: {
+//           channelActionTargetId: true,
+//           channelActionOnChannelId: true,
+//         },
+//       });
+//       return MutedUser;
+//     } catch (error) {
+//       if (typeof error === 'string') return error;
+//       return 'errorMuteFromChannel';
+//     }
+//   }
 
-  async updateAdminRoleByChannelIdWS(
-    userId: string,
-    channelId: string,
-    dto: EditRoleChannelDto,
-  ) {
-    try {
-      /** First, check the current user asking promotion is the owner of the channel */
-      const userRole: { role: ChannelRole } | null =
-        await this.getRoleOfUserChannel(userId, channelId);
-      if (!userRole || userRole.role < ChannelRole.ADMIN) {
-        return 'noEligibleRights';
-      }
-      /** Then, check the targeted user exists + is user or admin of the channel */
-      const targetRole: { role: ChannelRole } | null =
-        await this.getRoleOfUserChannel(dto.promotedUserId, channelId);
-      if (!targetRole || targetRole.role === ChannelRole.OWNER) {
-        return 'PromotionNotAuthorized';
-      }
-      /** Toggle Admin role regarding the current role */
-      const newRole: ChannelRole =
-        targetRole.role === ChannelRole.USER
-          ? ChannelRole.ADMIN
-          : ChannelRole.USER;
-      /* Then, update the role of the user targeted to Admin in the channel */
-      const editedTarget: { role: ChannelRole } =
-        await this.prisma.channelUser.update({
-          where: {
-            userId_channelId: {
-              userId: dto.promotedUserId,
-              channelId: channelId,
-            },
-          },
-          data: {
-            role: newRole,
-          },
-          select: {
-            role: true,
-          },
-        });
-      return editedTarget.role;
-    } catch (error) {
-      if (typeof error === 'string') return error;
-      return 'errorUpdateAdminChannel';
-    }
-  }
+//   async updateAdminRoleByChannelIdWS(
+//     userId: string,
+//     channelId: string,
+//     dto: EditRoleChannelDto,
+//   ) {
+//     try {
+//       /** First, check the current user asking promotion is the owner of the channel */
+//       const userRole: { role: ChannelRole } | null =
+//         await this.getRoleOfUserChannel(userId, channelId);
+//       if (!userRole || userRole.role < ChannelRole.ADMIN) {
+//         return 'noEligibleRights';
+//       }
+//       /** Then, check the targeted user exists + is user or admin of the channel */
+//       const targetRole: { role: ChannelRole } | null =
+//         await this.getRoleOfUserChannel(dto.promotedUserId, channelId);
+//       if (!targetRole || targetRole.role === ChannelRole.OWNER) {
+//         return 'PromotionNotAuthorized';
+//       }
+//       /** Toggle Admin role regarding the current role */
+//       const newRole: ChannelRole =
+//         targetRole.role === ChannelRole.USER
+//           ? ChannelRole.ADMIN
+//           : ChannelRole.USER;
+//       /* Then, update the role of the user targeted to Admin in the channel */
+//       const editedTarget: { role: ChannelRole } =
+//         await this.prisma.channelUser.update({
+//           where: {
+//             userId_channelId: {
+//               userId: dto.promotedUserId,
+//               channelId: channelId,
+//             },
+//           },
+//           data: {
+//             role: newRole,
+//           },
+//           select: {
+//             role: true,
+//           },
+//         });
+//       return editedTarget.role;
+//     } catch (error) {
+//       if (typeof error === 'string') return error;
+//       return 'errorUpdateAdminChannel';
+//     }
+//   }
 }

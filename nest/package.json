@@ -43,7 +43,8 @@
     "@grpc/proto-loader": "^0.7.3",
     "socket.io": "^4.5.3",
     "socket.io-msgpack-parser": "^3.0.2",
-    "uuid": "^9.0.0"
+    "uuid": "^9.0.0",
+    "argon2": "^0.28.2"
   },
   "devDependencies": {
     "@nestjs/cli": "^9.0.0",
