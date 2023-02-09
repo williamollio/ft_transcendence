@@ -3,6 +3,7 @@ import {
   ForbiddenException,
   Injectable,
   InternalServerErrorException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
@@ -49,7 +50,7 @@ export class AuthService {
       intraId: foundUser.intraId,
     });
 
-    const _ = this.userService.updateRefreshToken(
+    await this.userService.updateRefreshToken(
       foundUser.id,
       await argon2.hash(tokens.refreshToken),
     );
@@ -78,5 +79,11 @@ export class AuthService {
     });
     await this.userService.updateRefreshToken(user.id, tokens.refreshToken);
     return tokens;
+  }
+
+  async logout(userId: number) {
+    const user = await this.userService.findOne(userId);
+    if (!user) throw new UnauthorizedException('Unauthorized');
+    await this.userService.updateRefreshToken(user.id, '');
   }
 }
