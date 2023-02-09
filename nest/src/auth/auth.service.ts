@@ -9,6 +9,7 @@ import { UsersService } from '../users/users.service';
 import { JwtUser } from '../users/interface/jwt-user.interface';
 import { Intra42User } from '../users/interface/intra42-user.interface';
 import * as process from 'process';
+import * as argon2 from 'argon2';
 
 @Injectable()
 export class AuthService {
@@ -50,7 +51,7 @@ export class AuthService {
 
     const _ = this.userService.updateRefreshToken(
       foundUser.id,
-      tokens.refreshToken, // FIXME: Hash the refresh token
+      await argon2.hash(tokens.refreshToken),
     );
 
     return tokens;
@@ -69,10 +70,7 @@ export class AuthService {
     const user = await this.userService.findOne(userId);
     if (!user || !user.refreshToken)
       throw new ForbiddenException('Access denied');
-    // TODO: hashed checking
-    console.log(user.refreshToken);
-    console.log(refreshToken);
-    if (user.refreshToken !== refreshToken)
+    if (!(await argon2.verify(user.refreshToken, refreshToken)))
       throw new ForbiddenException('Access denied');
     const tokens = await this.generateTokens({
       id: user.id,
