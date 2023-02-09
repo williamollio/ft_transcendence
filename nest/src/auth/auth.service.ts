@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
@@ -62,5 +63,22 @@ export class AuthService {
       console.error(e);
       throw new InternalServerErrorException();
     }
+  }
+
+  async refreshTokens(userId: number, refreshToken: string) {
+    const user = await this.userService.findOne(userId);
+    if (!user || !user.refreshToken)
+      throw new ForbiddenException('Access denied');
+    // TODO: hashed checking
+    console.log(user.refreshToken);
+    console.log(refreshToken);
+    if (user.refreshToken !== refreshToken)
+      throw new ForbiddenException('Access denied');
+    const tokens = await this.generateTokens({
+      id: user.id,
+      intraId: user.intraId,
+    });
+    await this.userService.updateRefreshToken(user.id, tokens.refreshToken);
+    return tokens;
   }
 }
