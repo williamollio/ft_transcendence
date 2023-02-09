@@ -12,6 +12,7 @@ import { IntraGuard } from './guards/intra.guard';
 import * as process from 'process';
 import { Intra42User } from '../users/interface/intra42-user.interface';
 import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
+import { JwtGuard } from './guards/jwt.guard';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -47,6 +48,15 @@ export class AuthController {
     this.setCookieTokens(tokens, response);
 
     response.redirect(`${process.env.PATH_TO_FRONTEND}profile`);
+  }
+
+  @Get('logout')
+  @UseGuards(JwtGuard)
+  async logout(@Req() req: any, @Res() res: any) {
+    await this.authService.logout(req.user.id);
+
+    this.setCookieTokens({ accessToken: '', refreshToken: '' }, res);
+    return HttpStatus.OK;
   }
 
   @Get('refresh')
