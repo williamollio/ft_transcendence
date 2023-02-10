@@ -1,12 +1,16 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   InternalServerErrorException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import { JwtUser } from '../users/interface/jwt-user.interface';
 import { Intra42User } from '../users/interface/intra42-user.interface';
+import * as process from 'process';
+import * as argon2 from 'argon2';
 
 @Injectable()
 export class AuthService {
@@ -15,34 +19,71 @@ export class AuthService {
     private userService: UsersService,
   ) {}
 
-  generateJWT(payload: JwtUser) {
-    return this.jwtService.sign(payload);
+  private async generateTokens(payload: JwtUser) {
+    const [accessToken, refreshToken] = await Promise.all([
+      this.jwtService.signAsync(payload, {
+        secret: process.env.JWT_SECRET,
+        expiresIn: '15m',
+      }),
+      this.jwtService.signAsync(payload, {
+        secret: process.env.JWT_REFRESH_SECRET,
+        expiresIn: '7d',
+      }),
+    ]);
+
+    return {
+      accessToken,
+      refreshToken,
+    };
   }
 
   async signIn(user: Intra42User) {
     if (user == null) throw new BadRequestException('Unauthenticated');
 
-    const foundUser = await this.userService.findByIntraId(user.providerId);
+    let foundUser = await this.userService.findByIntraId(user.providerId);
     if (foundUser == null) {
-      return this.registerUser(user);
+      foundUser = await this.registerUser(user);
     }
 
-    return this.generateJWT({
+    const tokens = await this.generateTokens({
       id: foundUser.id,
       intraId: foundUser.intraId,
     });
+
+    await this.userService.updateRefreshToken(
+      foundUser.id,
+      await argon2.hash(tokens.refreshToken),
+    );
+
+    return tokens;
   }
 
   async registerUser(user: Intra42User) {
     try {
-      const newUser = await this.userService.createFromIntra(user);
-      return this.generateJWT({
-        id: newUser.id,
-        intraId: newUser.intraId,
-      });
+      return await this.userService.createFromIntra(user);
     } catch (e) {
       console.error(e);
       throw new InternalServerErrorException();
     }
+  }
+
+  async refreshTokens(userId: number, refreshToken: string) {
+    const user = await this.userService.findOne(userId);
+    if (!user || !user.refreshToken)
+      throw new ForbiddenException('Access denied');
+    if (!(await argon2.verify(user.refreshToken, refreshToken)))
+      throw new ForbiddenException('Access denied');
+    const tokens = await this.generateTokens({
+      id: user.id,
+      intraId: user.intraId,
+    });
+    await this.userService.updateRefreshToken(user.id, tokens.refreshToken);
+    return tokens;
+  }
+
+  async logout(userId: number) {
+    const user = await this.userService.findOne(userId);
+    if (!user) throw new UnauthorizedException('Unauthorized');
+    await this.userService.updateRefreshToken(user.id, '');
   }
 }
