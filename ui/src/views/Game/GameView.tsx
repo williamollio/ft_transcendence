@@ -13,16 +13,15 @@ import {
   ContentWrapper,
 } from "../../styles/MuiStyles";
 
-
 export default function ProfileView(): React.ReactElement {
   const { t } = useTranslation();
-//   const { classes } = useStyles();
+  //   const { classes } = useStyles();
   return (
     <>
       <Navbar />
       <Background>
-		<Chat />
         <ProfileCard>
+          <Chat />
           <CardContainer>
             <TitleWrapper>
               <Typography
