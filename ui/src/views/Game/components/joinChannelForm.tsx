@@ -8,7 +8,7 @@ import {
   Button,
 } from "@mui/material";
 
-export const joinForm = ({dialogJoinValue: {key: string, password?: string}, setDialogJoinValue: any, handleClose: any}) => {
+export const joinForm = ({dialogJoinValue, setDialogJoinValue, handleClose}: {dialogJoinValue: any, setDialogJoinValue: any, handleClose: any}) => {
   return (
     <Grid container>
       <Grid item>

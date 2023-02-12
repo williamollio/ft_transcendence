@@ -9,12 +9,8 @@ import {
   DialogActions,
   Button,
 } from "@mui/material";
-import { chatRoom } from "../interfaces/chat.interfaces";
 
-export const createForm = (
-  dialogValue: chatRoom,
-  { setDialogValue = (chatRoom: chatRoom) => {} }
-) => {
+export const createForm = ({ dialogValue, setDialogValue, handleAccessChange, pwDisable, handleClose }: { dialogValue: any, setDialogValue: any, handleAccessChange: any, pwDisable: any, handleClose: any }) => {
   return (
     <Grid container>
       <Grid item>
