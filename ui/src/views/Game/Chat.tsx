@@ -27,27 +27,11 @@ import AddIcon from "@mui/icons-material/Add";
 import usersService from "../../services/users.service";
 import { User } from "../../interfaces/user.interface";
 import CloseIcon from "@mui/icons-material/Close";
+import { chatRoom, messagesDto } from "./interfaces/chat.interfaces";
+import { createForm } from "./components/createChannelForm";
+import { joinForm } from "./components/joinChannelForm";
 
 // import io from "socket.io-client";
-
-export class messagesDto {
-  user?: string;
-  message?: string;
-  room?: string;
-
-  constructor(user: string, message: string, room: string) {
-    this.user = user;
-    this.message = message;
-    this.room = room;
-  }
-}
-
-interface chatRoom {
-  key: string;
-  access: "public" | "private" | "password";
-  password?: string;
-  messages: messagesDto[];
-}
 
 var tabs: chatRoom[] = [{ key: "public", access: "public", messages: [] }];
 
@@ -59,12 +43,6 @@ export default function Chat() {
     tabs[0].messages
   );
   const [open, toggleOpen] = useState(false);
-  const [dialogValue, setDialogValue] = useState<chatRoom>({
-    key: "",
-    access: "public",
-    password: "",
-    messages: [],
-  });
   const [pwDisable, setPwDisable] = useState<boolean>(true);
   const [currentRoom, setCurrentRoom] = useState(tabs[0]);
   const [user, setUser] = useState<User>();
@@ -80,6 +58,12 @@ export default function Chat() {
     mouseY: number;
     room: chatRoom;
   } | null>(null);
+  const [dialogValue, setDialogValue] = useState<chatRoom>({
+    key: "",
+    access: "public",
+    password: "",
+    messages: [],
+  });
 
   const scrollRef = useRef<HTMLLIElement | null>(null);
 
@@ -87,17 +71,18 @@ export default function Chat() {
     setInputChat(e.target.value);
   };
 
-  const id = "1";
-  async function fetchCurrentUser() {
-    const currentUser = (await usersService.getUser(id)).data;
-    if (!currentUser) console.log("Failed to fetch current User!");
-    setUser(currentUser);
-  }
+  // const id = "1";
+  // async function fetchCurrentUser() {
+  //   const currentUser = (await usersService.getUser(id)).data;
+  //   if (!currentUser) console.log("Failed to fetch current User!");
+  //   setUser(currentUser);
+  // }
 
   useEffect(() => {
     let ignore = false;
 
-    if (!ignore) fetchCurrentUser();
+    if (!ignore) {
+    }
     return () => {
       ignore = true;
     };
@@ -121,13 +106,18 @@ export default function Chat() {
     }
   };
 
+  const receiveUserList = (dto: string) => {
+    currentRoom.users = new Map(Object.entries(JSON.parse(dto)));
+  };
+
   //   useEffect(() => {
-  //     socket.on("receiveMessage", (msg: messagesDto) => {
+  //     socket.on("receiveMessage", (msg: string) => {
   //       let tmp: chatRoom | undefined = tabs.find(
   //         (element) => element.key === msg.room
   //       );
   //       if (tmp) tmp.messages.push(msg);
   //     });
+  //      socket.on("receiveUserList", (msg: string) => receiveUserList(msg))
   //   }, [socket]);
 
   const handleFormSubmit = (e: any) => {
@@ -184,7 +174,12 @@ export default function Chat() {
 
   const handleClose = (e: any) => {
     if (formSelection === 1)
-      setDialogValue({ key: "", access: "public", password: "", messages: [] });
+      setDialogValue({
+        key: "",
+        access: "public",
+        password: "",
+        messages: [],
+      });
     else setDialogJoinValue({ key: "", password: "" });
     toggleOpen(false);
   };
@@ -199,7 +194,12 @@ export default function Chat() {
 
   const newRoom = () => {
     setCurrentRoom(currentRoom);
-    setDialogValue({ key: "", access: "public", password: "", messages: [] });
+    setDialogValue({
+      key: "",
+      access: "public",
+      password: "",
+      messages: [],
+    });
     toggleOpen(true);
   };
 
@@ -243,142 +243,6 @@ export default function Chat() {
 
   const handleFormSelection = (e: SyntheticEvent, newValue: number) => {
     setFormSelection(newValue);
-  };
-
-  const createForm = () => {
-    return (
-      <Grid container>
-        <Grid item>
-          <DialogTitle>Create new channel</DialogTitle>
-        </Grid>
-        <Grid item>
-          <DialogContent>
-            <Grid container spacing="20px">
-              <Grid item>
-                <DialogContentText>
-                  Please enter channel name, accessibility and password.
-                </DialogContentText>
-              </Grid>
-              <Grid item>
-                <TextField
-                  variant="outlined"
-                  size="small"
-                  autoFocus
-                  id="name"
-                  value={dialogValue.key}
-                  onChange={(event) =>
-                    setDialogValue({
-                      ...dialogValue,
-                      key: event.target.value,
-                    })
-                  }
-                  label="name"
-                  type="text"
-                />
-              </Grid>
-              <Grid item>
-                <Select
-                  size="small"
-                  label="access"
-                  type="string"
-                  variant="outlined"
-                  value={dialogValue.access}
-                  onChange={handleAccessChange}
-                >
-                  <MenuItem value="public">public</MenuItem>
-                  <MenuItem value="private">private</MenuItem>
-                  <MenuItem value="password">password</MenuItem>
-                </Select>
-              </Grid>
-              <Grid item>
-                <TextField
-                  size="small"
-                  disabled={pwDisable}
-                  id="name"
-                  value={dialogValue.password}
-                  onChange={(event) =>
-                    setDialogValue({
-                      ...dialogValue,
-                      password: event.target.value,
-                    })
-                  }
-                  label="password"
-                  type="string"
-                  variant="outlined"
-                />
-              </Grid>
-            </Grid>
-          </DialogContent>
-        </Grid>
-        <Grid item>
-          <DialogActions>
-            <Button onClick={handleClose}>Cancel</Button>
-            <Button type="submit">Add</Button>
-          </DialogActions>
-        </Grid>
-      </Grid>
-    );
-  };
-
-  const joinForm = () => {
-    return (
-      <Grid container>
-        <Grid item>
-          <DialogTitle>Join existing channel</DialogTitle>
-        </Grid>
-        <Grid item>
-          <DialogContent>
-            <Grid container spacing="20px">
-              <Grid item>
-                <DialogContentText>
-                  Please enter the name and password of the channel you want to
-                  Join.
-                </DialogContentText>
-              </Grid>
-              <Grid item>
-                <TextField
-                  variant="outlined"
-                  size="small"
-                  autoFocus
-                  id="name"
-                  value={dialogJoinValue.key}
-                  onChange={(event) =>
-                    setDialogJoinValue({
-                      ...dialogJoinValue,
-                      key: event.target.value,
-                    })
-                  }
-                  label="name"
-                  type="text"
-                />
-              </Grid>
-              <Grid item>
-                <TextField
-                  size="small"
-                  id="name"
-                  value={dialogJoinValue.password}
-                  onChange={(event) =>
-                    setDialogJoinValue({
-                      ...dialogJoinValue,
-                      password: event.target.value,
-                    })
-                  }
-                  label="password"
-                  type="string"
-                  variant="outlined"
-                />
-              </Grid>
-            </Grid>
-          </DialogContent>
-        </Grid>
-        <Grid item>
-          <DialogActions>
-            <Button onClick={handleClose}>Cancel</Button>
-            <Button type="submit">Join</Button>
-          </DialogActions>
-        </Grid>
-      </Grid>
-    );
   };
 
   return (
@@ -492,9 +356,9 @@ export default function Chat() {
                 <form onSubmit={handleFormSubmit}>
                   {(() => {
                     if (formSelection === 0) {
-                      return joinForm();
+                      return joinForm(dialogJoinValue, setDialogJoinValue);
                     } else {
-                      return createForm();
+                      return createForm(dialogValue, setDialogValue);
                     }
                   })()}
                 </form>
