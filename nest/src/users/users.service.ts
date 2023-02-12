@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from '../prisma/prisma.service';
-import { User } from '@prisma/client';
+import { User, UserStatus } from '@prisma/client';
 import { Intra42User } from './interface/intra42-user.interface';
 
 @Injectable()
@@ -111,5 +111,21 @@ export class UsersService {
 
   public async remove(id: number) {
     return this.prisma.user.delete({ where: { id } });
+  }
+
+  // channels api
+  async updateConnectionStatus(userId: string, connectionStatus: UserStatus) {
+    try {
+      if (userId) {
+        await this.prisma.user.update({
+          where: {
+            id: Number(userId),
+          },
+          data: {
+            status: connectionStatus,
+          },
+        });
+      }
+    } catch (error) {}
   }
 }

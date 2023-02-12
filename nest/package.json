@@ -25,9 +25,7 @@
     "@nestjs/core": "^9.2.1",
     "@nestjs/jwt": "^10.0.1",
     "@nestjs/passport": "^9.0.0",
-    "@nestjs/platform-express": "^9.2.1",
-    "@nestjs/swagger": "^6.1.4",
-    "@prisma/client": "^4.9.0",
+    "@nestjs/websockets": "^9.1.6",
     "@types/cookie-parser": "^1.4.3",
     "@types/passport-jwt": "^3.0.8",
     "cookie-parser": "^1.4.6",
@@ -38,7 +36,12 @@
     "rimraf": "^3.0.2",
     "rxjs": "^7.2.0",
     "swagger-ui-express": "^4.6.0",
-    "uuid": "^9.0.0"
+    "@grpc/grpc-js": "^1.7.3",
+    "@grpc/proto-loader": "^0.7.3",
+    "socket.io": "^4.5.3",
+    "socket.io-msgpack-parser": "^3.0.2",
+    "uuid": "^9.0.0",
+    "argon2": "^0.28.2"
   },
   "devDependencies": {
     "@nestjs/cli": "^9.0.0",

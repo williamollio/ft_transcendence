@@ -11,12 +11,126 @@ datasource db {
 }
 
 model User {
-    id              Int      @id @default(autoincrement())
-    intraId         Int      @unique
-    name            String   @unique
-    friends         User[]   @relation("friends")
-    friendsRelation User[]   @relation("friends") // stores the many-to-many relation
-    createdAt       DateTime @default(now())
-    updatedAt       DateTime @updatedAt
-    filename        String?
+    id                            Int         @id @default(autoincrement())
+    intraId                       Int         @unique
+    name                          String      @unique
+    friends                       User[]      @relation("friends")
+    friendsRelation               User[]      @relation("friends") // stores the many-to-many relation
+    createdAt                     DateTime    @default(now())
+    updatedAt                     DateTime    @updatedAt
+    filename                      String?
+    status                        UserStatus  @default(OFFLINE)
+    messagesSent                  Message[]         @relation("messageSender")
+    userOnChannels                ChannelUser[]     @relation("userOnChannel")
+    channelActionRequester        ChannelAction[]   @relation("channelActionRequester")
+    channelActionTarget           ChannelAction[]   @relation("channelActionTarget")
+    channelBlockedRequester       BlockedUser[]     @relation("channelBlockedRequester")
+    channelBlockedTarget          BlockedUser[]     @relation("channelBlockedTarget")
+    invites                       Channel[]         @relation("inviteOnChannel")
+}
+
+model Channel {
+  id           String      @id @default(cuid())
+  name         String      @unique @default(cuid())
+  type         ChannelType @default(PUBLIC)
+  passwordHash String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  messages               Message[]       @relation("channelMessage")
+  users                  ChannelUser[]   @relation("channelUsers")
+  channelActionOnChannel ChannelAction[] @relation("channelActionOnChannel")
+  invites                User[]          @relation("inviteOnChannel")
+
+  @@map("channels")
+}
+
+
+model Message {
+  id      String @id @default(cuid())
+  content String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  senderId  Int
+  sender    User    @relation("messageSender", fields: [senderId], references: [id], onDelete: Cascade)
+  channelId String
+  channel   Channel @relation("channelMessage", fields: [channelId], references: [id], onDelete: Cascade)
+
+  @@map("messages")
+}
+
+model ChannelUser {
+  userId    Int
+  user      User    @relation("userOnChannel", fields: [userId], references: [id], onDelete: Cascade)
+  channelId String
+  channel   Channel @relation("channelUsers", fields: [channelId], references: [id], onDelete: Cascade)
+
+  role      ChannelRole @default(USER)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  @@id([userId, channelId])
+  @@map("channel_users")
+}
+
+model ChannelAction {
+  channelActionTargetId    Int
+  channelActionTarget      User              @relation("channelActionTarget", fields: [channelActionTargetId], references: [id], onDelete: Cascade)
+  channelActionOnChannelId String
+  channelActionOnChannel   Channel           @relation("channelActionOnChannel", fields: [channelActionOnChannelId], references: [id], onDelete: Cascade)
+  channelActionTime        DateTime
+  type                     ChannelActionType
+
+  channelActionRequesterId Int
+  channelActionRequester   User   @relation("channelActionRequester", fields: [channelActionRequesterId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@id([channelActionTargetId, channelActionOnChannelId, channelActionRequesterId, type])
+  @@unique([channelActionTargetId, channelActionOnChannelId, type])
+  @@map("channel_actions")
+}
+
+model BlockedUser {
+  channelBlockedTargetId    Int
+  channelBlockedTarget      User   @relation("channelBlockedTarget", fields: [channelBlockedTargetId], references: [id], onDelete: Cascade)
+  channelBlockedRequesterId Int
+  channelBlockedRequester   User   @relation("channelBlockedRequester", fields: [channelBlockedRequesterId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@id([channelBlockedTargetId, channelBlockedRequesterId])
+  @@unique(fields: [channelBlockedRequesterId, channelBlockedTargetId], name: "blockedId")
+  @@map("blocked")
+}
+
+
+enum ChannelType {
+  PUBLIC
+  PRIVATE
+  PROTECTED
+  DIRECTMESSAGE
+}
+
+
+enum ChannelRole {
+  USER
+  ADMIN
+  OWNER
+}
+
+enum UserStatus {
+    OFFLINE
+    ONLINE
+    PLAYING
+}
+
+enum ChannelActionType {
+  BAN
+  MUTE
 }
