@@ -119,17 +119,15 @@ export class UsersController {
     @Param('id') id: string,
     @UploadedFile() file: any,
   ): Promise<Observable<unknown>> {
-    const filename = this.usersService.getFilename(+id);
-    if (await filename) {
-      console.log('here');
-      const filePath = path.resolve(`./uploads/profileimages/${filename}`);
-      fs.unlink(filePath, (err) => {
-        if (err) {
-          console.error(err);
-          return err;
-        }
-      });
-    }
+    const filename = await this.usersService.getFilename(+id);
+    const filePath = path.resolve(`./uploads/profileimages/${filename}`);
+    fs.unlink(filePath, (err) => {
+      if (err) {
+        console.error(err);
+        return err;
+      }
+    });
+
     this.usersService.setFilename(file.filename, +id);
     return of({ imagePath: file.filename });
   }
