@@ -5,11 +5,7 @@ import { ChannelUserEntity } from './channel-user.entity';
 import { ChannelActionEntity } from './channel-action.entity';
 import { BlockedUserEntity } from './blocked-user.entity';
 import { ChannelEntity } from './channel.entity';
-import {
-  BadRequestException,
-  ForbiddenException,
-  Injectable,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class UserEntity implements User {
