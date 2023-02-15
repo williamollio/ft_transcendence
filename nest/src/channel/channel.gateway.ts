@@ -70,7 +70,7 @@ export class ChannelGateway {
     if (dto.type === ChannelType.DIRECTMESSAGE) {
       channel = await this.channelService.createDirectMessageWS(
         dto,
-        Number(userId),
+        userId,
         clientSocket,
       );
       /** Get the second user's socketId and make it join the channel's room */
@@ -179,7 +179,7 @@ export class ChannelGateway {
       /** Get the second user's socketId to leave the channel's room */
       if (typeof userLeaving !== 'string') {
         const secondUserSocket = socketToUserId.getFromUserId(
-          String(userLeaving.userId),
+          userLeaving.userId,
         );
         if (secondUserSocket && typeof userLeaving !== 'string')
           this.server.in(secondUserSocket).socketsLeave(userLeaving.channelId);

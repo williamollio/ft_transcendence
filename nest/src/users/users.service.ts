@@ -58,7 +58,7 @@ export class UsersService {
     }
   }
 
-  public async findByIntraId(intraId: number) {
+  public async findByIntraId(intraId: String) {
     return this.prisma.user.findUnique({
       where: { intraId: +intraId },
       include: { friends: false },
@@ -97,7 +97,7 @@ export class UsersService {
     }
   }
 
-  public async findOne(id: number) {
+  public async findOne(id: String) {
     return this.prisma.user.findUnique({
       where: { id },
       include: { friends: true },
@@ -111,7 +111,7 @@ export class UsersService {
     });
   }
 
-  public async update(id: number, updateUserDto: UpdateUserDto) {
+  public async update(id: String, updateUserDto: UpdateUserDto) {
     try {
       const User = await this.prisma.user.update({
         where: { id },
@@ -124,7 +124,7 @@ export class UsersService {
     }
   }
 
-  public async remove(id: number, res : Response) {
+  public async remove(id: String, res : Response) {
     // return this.prisma.user.delete({ where: { id } });
     try {
       await this.prisma.user.delete({

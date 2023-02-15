@@ -2,7 +2,7 @@ import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 import { JwtUser } from '../users/interface/types';
 
 export const GetCurrentUserId = createParamDecorator(
-  (_: undefined, context: ExecutionContext): number => {
+  (_: undefined, context: ExecutionContext): string => {
     interface UserRequest extends Request {
       user: JwtUser;
     }

@@ -14,13 +14,13 @@ import {
 @Injectable()
 export class UserEntity implements User {
   @ApiProperty()
-  id: number;
+  id: string;
 
   @ApiProperty({ required: true })
   name: string;
 
   @ApiProperty({ required: true })
-  intraId: number;
+  intraId: string;
 
   @ApiProperty()
   friends: User[];

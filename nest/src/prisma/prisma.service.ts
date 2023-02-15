@@ -4,7 +4,7 @@ import { INestApplication, Injectable, OnModuleDestroy, OnModuleInit, } from '@n
 import { PrismaClient } from '@prisma/client';
 
 @Injectable()
-export class PrismaService extends PrismaClient, implements OnModuleInit, OnModuleDestroy{
+export class PrismaService extends PrismaClient {
   // necessary initialization tasks when the module is initialized
   // async onModuleInit() {
   //   await this.$connect();

@@ -1,5 +1,5 @@
 export interface Intra42User {
-  providerId: number;
+  providerId: string;
   email: string;
   name: string;
   provider: string;
