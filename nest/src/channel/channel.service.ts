@@ -97,7 +97,7 @@ export class ChannelService {
     });
   }
 
-  getChannelByUserId(userId: number, channelId: string) {
+  getChannelByUserId(userId: string, channelId: string) {
     return this.prisma.channelUser.findUnique({
       where: {
         userId_channelId: {
@@ -111,7 +111,7 @@ export class ChannelService {
     });
   }
 
-  async getDirectMessageByUserId(userId: Number, participantId: Number) {
+  async getDirectMessageByUserId(userId: string, participantId: string) {
     const allDirectMessages = await this.prisma.channel.findMany({
       where: {
         type: 'DIRECTMESSAGE',
@@ -196,9 +196,6 @@ export class ChannelService {
       const users: {
         user: {
           id: string;
-          avatarImg: string | null;
-          nickname: string;
-          eloScore: number;
           status: UserStatus;
         };
       }[] = await this.prisma.channelUser.findMany({
@@ -215,10 +212,7 @@ export class ChannelService {
         },
       });
       const flattenUsers: {
-        id: string;
-        avatarImg: string | null;
-        nickname: string;
-        eloScore: number;
+        id: Number;
         status: UserStatus;
       }[] = [];
       for (const user of users) {
@@ -402,7 +396,7 @@ export class ChannelService {
       await this.prisma.channelUser.findUnique({
         where: {
           userId_channelId: {
-            userId: Number(userId),
+            userId: userId,
             channelId: channelId,
           },
         },
@@ -436,7 +430,7 @@ export class ChannelService {
           ...dto,
           users: {
             create: {
-              userId: Number(userId),
+              userId: userId,
               role: 'OWNER',
             },
           },
@@ -461,20 +455,20 @@ export class ChannelService {
 
   async createDirectMessageWS(
     dto: CreateChannelDto,
-    userId: Number,
+    userId: string,
     clientSocket: Socket,
   ) {
     try {
       /* Check if one of the user is blocked by the other */
       if (typeof dto.userId !== 'string') return null;
       const usersBlockedEachOther =
-        await this.blockService.checkUsersBlockRelation(String(userId), dto.userId);
+        await this.blockService.checkUsersBlockRelation(userId, dto.userId);
       if (usersBlockedEachOther) return 'Users blocked each other';
 
       /* Check if a DM between the 2 users already exists */
       const conversationAlreadyExist = await this.getDirectMessageByUserId(
         userId,
-        Number(dto.userId),
+        dto.userId,
       );
       if (conversationAlreadyExist) {
         conversationAlreadyExist.passwordHash = '';
@@ -488,11 +482,11 @@ export class ChannelService {
           users: {
             create: [
               {
-                userId: Number(userId),
+                userId: userId,
                 role: 'USER',
               },
               {
-                userId: Number(dto.userId),
+                userId: dto.userId,
                 role: 'USER',
               },
             ],
@@ -529,7 +523,7 @@ export class ChannelService {
       },
     });
     return isInvited?.invites.find((value) => {
-      return value.id === Number(userId);
+      return value.id === userId;
     })
       ? true
       : false;
@@ -544,7 +538,7 @@ export class ChannelService {
       const moderationAction = await this.prisma.channelAction.findUnique({
         where: {
           channelActionTargetId_channelActionOnChannelId_type: {
-            channelActionTargetId: Number(userTargetId),
+            channelActionTargetId: userTargetId,
             channelActionOnChannelId: channelId,
             type: channelActionType,
           },
@@ -570,7 +564,7 @@ export class ChannelService {
       await this.prisma.channelAction.deleteMany({
         where: {
           AND: [
-            { channelActionTargetId: Number(targetUserId) },
+            { channelActionTargetId: targetUserId },
             {
               channelActionOnChannelId: channelId,
             },
@@ -703,7 +697,7 @@ export class ChannelService {
         data: {
           users: {
             create: {
-              userId: Number(userId),
+              userId: userId,
               role: 'USER',
             },
           },
@@ -752,7 +746,7 @@ export class ChannelService {
           data: {
             messages: {
               create: {
-                senderId: Number(userId),
+                senderId: userId,
                 content: messageInfo.content,
               },
             },
@@ -807,7 +801,7 @@ export class ChannelService {
       }
       /* Check that the user is owner or admin for update rights */
       const userRole: { role: ChannelRole } | null =
-        await this.getRoleOfUserChannel(Number(userId), channelId);
+        await this.getRoleOfUserChannel(userId, channelId);
       if (!userRole || userRole.role < ChannelRole.ADMIN) {
         return 'noEligibleRights';
       }
