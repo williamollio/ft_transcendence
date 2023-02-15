@@ -1,4 +1,4 @@
-import { Channel, ChannelType } from '@nestjs/client';
+import { Channel, ChannelType } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
 import { MessageEntity } from './message.entity';
 import { ChannelUserEntity } from './channel-user.entity';
@@ -6,7 +6,7 @@ import { ChannelActionEntity } from './channel-action.entity';
 import { UserEntity } from './user.entity';
 
 // @Injectable()
-export class ChannelEntity implements Channel {
+export class ChannelEntity {
     @ApiProperty()
     id: string;
 

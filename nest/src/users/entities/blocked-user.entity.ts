@@ -3,7 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { UserEntity } from './user.entity';
 
 // @Injectable()
-export class BlockedUserEntity implements BlockedUser {
+export class BlockedUserEntity {
     @ApiProperty()
     channelBlockedRequsterId: string;
 

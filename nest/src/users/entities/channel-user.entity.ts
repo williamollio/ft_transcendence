@@ -1,11 +1,10 @@
-import { ChannelUser } from '@prisma/client';
+import { ChannelUser, ChannelRole } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
 import { UserEntity } from './user.entity';
 import { ChannelEntity } from './channel.entity';
-import { ChannelRoleEntity } from './channel-role.entity';
 
 // @Injectable()
-export class ChannelUserEntity implements ChannelUser {
+export class ChannelUserEntity {
     @ApiProperty()
     userid: string;
 
@@ -19,7 +18,7 @@ export class ChannelUserEntity implements ChannelUser {
     channel: ChannelEntity;
 
     @ApiProperty()
-    role: ChannelRoleEntity;
+    role: ChannelRole;
 
     @ApiProperty()
     createdAt: Date;

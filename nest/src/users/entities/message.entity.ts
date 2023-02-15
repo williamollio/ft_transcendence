@@ -1,10 +1,9 @@
-import { Message } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
 import { UserEntity } from './user.entity';
 import { ChannelEntity } from './channel.entity';
 
 // @Injectable()
-export class MessageEntity implements Message {
+export class MessageEntity {
     @ApiProperty()
     id: string;
 

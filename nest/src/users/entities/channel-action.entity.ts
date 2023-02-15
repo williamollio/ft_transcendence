@@ -4,7 +4,7 @@ import { UserEntity } from './user.entity';
 import { ChannelEntity } from './channel.entity';
 
 // @Injectable()
-export class ChannelActionEntity implements ChannelAction {
+export class ChannelActionEntity {
     @ApiProperty()
     channelActionTargetId: string;
 
