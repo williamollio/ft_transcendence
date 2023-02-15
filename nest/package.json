@@ -22,10 +22,6 @@
   },
   "dependencies": {
     "@nestjs/websockets": "^9.1.6",
-<<<<<<< HEAD
-    "@nestjs/platform-socket.io": "^9.1.6",
-=======
->>>>>>> cf41ce6 (updated the prisma schema, add the channel folder)
     "@nestjs/common": "^9.2.1",
     "@nestjs/core": "^9.2.1",
     "@nestjs/jwt": "^10.0.1",
@@ -36,7 +32,6 @@
     "@prisma/client": "^4.10.0",
     "@types/cookie-parser": "^1.4.3",
     "@types/passport-jwt": "^3.0.8",
-    "argon2": "^0.30.3",
     "cookie-parser": "^1.4.6",
     "multer": "^1.4.5-lts.1",
     "passport-42": "^1.2.6",
@@ -50,8 +45,7 @@
     "socket.io": "^4.5.3",
     "socket.io-msgpack-parser": "^3.0.2",
     "uuid": "^9.0.0",
-    "class-transformer": "^0.5.1",
-    "class-validator": "^0.13.2"
+    "argon2": "^0.28.2"
   },
   "devDependencies": {
     "@nestjs/cli": "^9.0.0",

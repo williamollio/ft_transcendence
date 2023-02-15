@@ -136,140 +136,140 @@ export class ChannelGateway {
     }
   }
 
-  // @SubscribeMessage('editRoom')
-  // async editRoom(
-  //   @GetCurrentUserId() userId: string,
-  //   @MessageBody('channelId') channelId: string,
-  //   @MessageBody('editInfo') editChannelDto: EditChannelDto,
-  //   @ConnectedSocket() clientSocket: Socket,
-  // ) {
-  //   const roomEdited = await this.channelService.editChannelByIdWS(
-  //     userId,
-  //     channelId,
-  //     editChannelDto,
-  //   );
-  //   roomEdited === null || typeof roomEdited === 'string'
-  //     ? this.server.to(clientSocket.id).emit('editRoomFailed', roomEdited)
-  //     : this.server
-  //         .to([clientSocket.id, channelId])
-  //         .emit('roomEdited', channelId);
-  // }
+  @SubscribeMessage('editRoom')
+  async editRoom(
+    @GetCurrentUserId() userId: string,
+    @MessageBody('channelId') channelId: string,
+    @MessageBody('editInfo') editChannelDto: EditChannelDto,
+    @ConnectedSocket() clientSocket: Socket,
+  ) {
+    const roomEdited = await this.channelService.editChannelByIdWS(
+      userId,
+      channelId,
+      editChannelDto,
+    );
+    roomEdited === null || typeof roomEdited === 'string'
+      ? this.server.to(clientSocket.id).emit('editRoomFailed', roomEdited)
+      : this.server
+          .to([clientSocket.id, channelId])
+          .emit('roomEdited', channelId);
+  }
 
-  // //Delete channel
-  // @SubscribeMessage('leaveRoom')
-  // async deleteRoom(
-  //   @GetCurrentUserId() userId: string,
-  //   @MessageBody('leaveInfo') leaveChannelDto: LeaveChannelDto,
-  //   @ConnectedSocket() clientSocket: Socket,
-  // ) {
-  //   const userLeaving = await this.channelService.leaveChannelWS(
-  //     userId,
-  //     leaveChannelDto,
-  //   );
-  //   if (!userLeaving || typeof userLeaving === 'string') {
-  //     this.server.to(clientSocket.id).emit('leaveRoomFailed');
-  //   } else if (leaveChannelDto.type === ChannelType.DIRECTMESSAGE) {
-  //     this.server.to(leaveChannelDto.id).emit('roomLeft', {
-  //       userId: userId,
-  //       channelId: leaveChannelDto.id,
-  //       secondUserId: userLeaving.userId,
-  //     });
-  //     /** Get the first user's socketId to leave the channel's room */
-  //     await clientSocket.leave(leaveChannelDto.id);
-  //     /** Get the second user's socketId to leave the channel's room */
-  //     if (typeof userLeaving !== 'string') {
-  //       const secondUserSocket = socketToUserId.getFromUserId(
-  //         String(userLeaving.userId),
-  //       );
-  //       if (secondUserSocket && typeof userLeaving !== 'string')
-  //         this.server.in(secondUserSocket).socketsLeave(userLeaving.channelId);
-  //     }
-  //   } else {
-  //     this.server
-  //       .to(leaveChannelDto.id)
-  //       .emit('roomLeft', { userId: userId, channelId: leaveChannelDto.id });
-  //     await clientSocket.leave(leaveChannelDto.id);
-  //   }
-  // }
+  //Delete channel
+  @SubscribeMessage('leaveRoom')
+  async deleteRoom(
+    @GetCurrentUserId() userId: string,
+    @MessageBody('leaveInfo') leaveChannelDto: LeaveChannelDto,
+    @ConnectedSocket() clientSocket: Socket,
+  ) {
+    const userLeaving = await this.channelService.leaveChannelWS(
+      userId,
+      leaveChannelDto,
+    );
+    if (!userLeaving || typeof userLeaving === 'string') {
+      this.server.to(clientSocket.id).emit('leaveRoomFailed');
+    } else if (leaveChannelDto.type === ChannelType.DIRECTMESSAGE) {
+      this.server.to(leaveChannelDto.id).emit('roomLeft', {
+        userId: userId,
+        channelId: leaveChannelDto.id,
+        secondUserId: userLeaving.userId,
+      });
+      /** Get the first user's socketId to leave the channel's room */
+      await clientSocket.leave(leaveChannelDto.id);
+      /** Get the second user's socketId to leave the channel's room */
+      if (typeof userLeaving !== 'string') {
+        const secondUserSocket = socketToUserId.getFromUserId(
+          String(userLeaving.userId),
+        );
+        if (secondUserSocket && typeof userLeaving !== 'string')
+          this.server.in(secondUserSocket).socketsLeave(userLeaving.channelId);
+      }
+    } else {
+      this.server
+        .to(leaveChannelDto.id)
+        .emit('roomLeft', { userId: userId, channelId: leaveChannelDto.id });
+      await clientSocket.leave(leaveChannelDto.id);
+    }
+  }
 
   // Invite other users to a private channel
-  // @SubscribeMessage('inviteToChannel')
-  // async inviteToChannel(
-  //   @GetCurrentUserId() userId: string,
-  //   @MessageBody('inviteInfo') inviteChannelDto: InviteChannelDto,
-  //   @ConnectedSocket() clientSocket: Socket,
-  // ) {
-  //   const inviteToChannel = await this.channelService.inviteToChannelWS(
-  //     userId,
-  //     inviteChannelDto,
-  //   );
-  //   if (!inviteToChannel || typeof inviteToChannel === 'string') {
-  //     this.server.to(clientSocket.id).emit('inviteFailed', inviteToChannel);
-  //   } else {
-  //     this.server
-  //       .to([clientSocket.id, inviteChannelDto.channelId])
-  //       .emit('inviteSucceeded', inviteToChannel);
-  //   }
-  // }
+  @SubscribeMessage('inviteToChannel')
+  async inviteToChannel(
+    @GetCurrentUserId() userId: string,
+    @MessageBody('inviteInfo') inviteChannelDto: InviteChannelDto,
+    @ConnectedSocket() clientSocket: Socket,
+  ) {
+    const inviteToChannel = await this.channelService.inviteToChannelWS(
+      userId,
+      inviteChannelDto,
+    );
+    if (!inviteToChannel || typeof inviteToChannel === 'string') {
+      this.server.to(clientSocket.id).emit('inviteFailed', inviteToChannel);
+    } else {
+      this.server
+        .to([clientSocket.id, inviteChannelDto.channelId])
+        .emit('inviteSucceeded', inviteToChannel);
+    }
+  }
 
-//   @SubscribeMessage('banUser')
-//   async banUserFromChannel(
-//     @GetCurrentUserId() requesterId: string,
-//     @MessageBody('banInfo') banInfo: ModerateChannelDto,
-//     @ConnectedSocket() clientSocket: Socket,
-//   ) {
-//     const banResult = await this.channelService.banFromChannelWS(
-//       requesterId,
-//       banInfo,
-//     );
-//     if (!banResult || typeof banResult === 'string') {
-//       this.server.to(clientSocket.id).emit('banFailed', banResult);
-//     } else {
-//       this.server
-//         .to(banInfo.channelActionOnChannelId)
-//         .emit('banSucceeded', banResult);
-//     }
-//   }
+  @SubscribeMessage('banUser')
+  async banUserFromChannel(
+    @GetCurrentUserId() requesterId: string,
+    @MessageBody('banInfo') banInfo: ModerateChannelDto,
+    @ConnectedSocket() clientSocket: Socket,
+  ) {
+    const banResult = await this.channelService.banFromChannelWS(
+      requesterId,
+      banInfo,
+    );
+    if (!banResult || typeof banResult === 'string') {
+      this.server.to(clientSocket.id).emit('banFailed', banResult);
+    } else {
+      this.server
+        .to(banInfo.channelActionOnChannelId)
+        .emit('banSucceeded', banResult);
+    }
+  }
 
-//   @SubscribeMessage('muteUser')
-//   async muteUserFromChannel(
-//     @GetCurrentUserId() requesterId: string,
-//     @MessageBody('muteInfo') muteInfo: ModerateChannelDto,
-//     @ConnectedSocket() clientSocket: Socket,
-//   ) {
-//     const muteResult = await this.channelService.muteFromChannelWS(
-//       requesterId,
-//       muteInfo,
-//     );
-//     if (!muteResult || typeof muteResult === 'string') {
-//       this.server.to(clientSocket.id).emit('muteFailed', muteResult);
-//     } else {
-//       this.server
-//         .to(muteInfo.channelActionOnChannelId)
-//         .emit('muteSucceeded', muteResult);
-//     }
-//   }
+  @SubscribeMessage('muteUser')
+  async muteUserFromChannel(
+    @GetCurrentUserId() requesterId: string,
+    @MessageBody('muteInfo') muteInfo: ModerateChannelDto,
+    @ConnectedSocket() clientSocket: Socket,
+  ) {
+    const muteResult = await this.channelService.muteFromChannelWS(
+      requesterId,
+      muteInfo,
+    );
+    if (!muteResult || typeof muteResult === 'string') {
+      this.server.to(clientSocket.id).emit('muteFailed', muteResult);
+    } else {
+      this.server
+        .to(muteInfo.channelActionOnChannelId)
+        .emit('muteSucceeded', muteResult);
+    }
+  }
 
-//   @SubscribeMessage('updateRole')
-//   async editRole(
-//     @GetCurrentUserId() userId: string,
-//     @MessageBody('channelId') channelId: string,
-//     @MessageBody('targetInfo') editRoleDto: EditRoleChannelDto,
-//     @ConnectedSocket() clientSocket: Socket,
-//   ) {
-//     const roleUpdated = await this.channelService.updateAdminRoleByChannelIdWS(
-//       userId,
-//       channelId,
-//       editRoleDto,
-//     );
-//     roleUpdated === ChannelRole.ADMIN ||
-//     roleUpdated === ChannelRole.OWNER ||
-//     roleUpdated === ChannelRole.USER
-//       ? this.server.in(channelId).emit('roleUpdated', roleUpdated)
-//       : this.server.to(clientSocket.id).emit('updateRoleFailed', roleUpdated);
-//   }
-//   @SubscribeMessage('signalBlock')
-//   async signalBlock(@ConnectedSocket() clientSocket: Socket) {
-//     return this.server.to(clientSocket.id).emit('signalBlock');
-//   }
+  @SubscribeMessage('updateRole')
+  async editRole(
+    @GetCurrentUserId() userId: string,
+    @MessageBody('channelId') channelId: string,
+    @MessageBody('targetInfo') editRoleDto: EditRoleChannelDto,
+    @ConnectedSocket() clientSocket: Socket,
+  ) {
+    const roleUpdated = await this.channelService.updateAdminRoleByChannelIdWS(
+      userId,
+      channelId,
+      editRoleDto,
+    );
+    roleUpdated === ChannelRole.ADMIN ||
+    roleUpdated === ChannelRole.OWNER ||
+    roleUpdated === ChannelRole.USER
+      ? this.server.in(channelId).emit('roleUpdated', roleUpdated)
+      : this.server.to(clientSocket.id).emit('updateRoleFailed', roleUpdated);
+  }
+  @SubscribeMessage('signalBlock')
+  async signalBlock(@ConnectedSocket() clientSocket: Socket) {
+    return this.server.to(clientSocket.id).emit('signalBlock');
+  }
 }
