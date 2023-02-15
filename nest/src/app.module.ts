@@ -21,7 +21,8 @@ import { ChannelModule } from './channel/channel.module';
   , ChannelModule],
   controllers: [AppController],
   providers: [
-    UserGateway, AppService,
+    UserGateway,
+    AppService,
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,

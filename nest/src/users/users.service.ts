@@ -197,4 +197,49 @@ export class UsersService {
       }
     } catch (error) {}
   }
+
+  // change the status of the user to offline
+  async logout(res: Response, userId: string) {
+    try {
+      await this.prisma.user.update({
+        where: {
+          id: userId,
+        },
+        data: {
+          status: UserStatus.OFFLINE,
+        },
+      });
+      return res.status(200).clearCookie('jwtToken', { httpOnly: true }).send(); // maybe like this
+    } catch (error) {
+      return res.status(403).send();
+    }
+  }
+
+  // channel invites
+  async getChannelInvites(userId: String) {
+    try {
+      const invitesList = await this.prisma.user.findUnique({
+        where: {
+          id: userId,
+        },
+        select: {
+          invites: {
+            select: {
+              id: true,
+            },
+          },
+        },
+      });
+      if (invitesList) {
+        const invites: { id: string }[] = [];
+        for (const invitees of invitesList.invites) {
+          invites.push(invitees);
+        }
+        return invites;
+      }
+    } catch (error) {
+      throw new ForbiddenException(error);
+    }
+  }
+
 }

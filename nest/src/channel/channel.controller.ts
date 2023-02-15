@@ -12,10 +12,6 @@ import { GetCurrentUserId } from '../decorators/getCurrentUserId.decorator';
 import { ChannelService } from './channel.service';
 import { ModerateChannelDto } from './dto/moderateChannelUser.dto';
 
-// TODO: add channel entities
-
-// TODO: ADD GUARDS
-
 @Controller('channels')
 export class ChannelController {
   constructor(private channelService: ChannelService) {}
