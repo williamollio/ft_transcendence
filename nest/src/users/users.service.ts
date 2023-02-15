@@ -216,7 +216,7 @@ export class UsersService {
   }
 
   // channel invites
-  async getChannelInvites(userId: String) {
+  async getChannelInvites(userId: string) {
     try {
       const invitesList = await this.prisma.user.findUnique({
         where: {
