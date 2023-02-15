@@ -27,24 +27,11 @@ import { UserEntity } from './entities/user.entity';
 import { User } from '@prisma/client';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import { v4 as uuidv4 } from 'uuid';
 import { Observable, of, throwError } from 'rxjs';
 import path = require('path');
 import { Response } from 'express';
 import * as fs from 'fs';
-
-export const storage = {
-  storage: diskStorage({
-    destination: './uploads/profileimages',
-    filename: (req, file, cb) => {
-      const filename: string =
-        path.parse(file.originalname).name.replace(/\s/g, '') + uuidv4();
-      const extension: string = path.parse(file.originalname).ext;
-
-      cb(null, `${filename}${extension}`);
-    },
-  }),
-};
+import { editFileName, imageFileFilter } from './utils/upload-utils';
 
 @Controller('users')
 @ApiTags('users')
@@ -114,10 +101,19 @@ export class UsersController {
       },
     },
   })
-  @UseInterceptors(FileInterceptor('file', storage))
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './uploads/profileimages',
+        filename: editFileName,
+      }),
+      fileFilter: imageFileFilter,
+    }),
+  )
   async uploadFile(
     @Param('id') id: string,
-    @UploadedFile() file: any,
+    @UploadedFile()
+    file: any,
   ): Promise<Observable<unknown>> {
     const filename = await this.usersService.getFilename(id);
     const filePath = path.resolve(`./uploads/profileimages/${filename}`);
