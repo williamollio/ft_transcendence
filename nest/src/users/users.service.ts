@@ -127,7 +127,7 @@ export class UsersService {
   public async remove(id: number, res : Response) {
     // return this.prisma.user.delete({ where: { id } });
     try {
-      await this.prismaService.user.delete({
+      await this.prisma.user.delete({
         where: {
           id: userId,
         },
@@ -142,7 +142,7 @@ export class UsersService {
       if (userId) {
         await this.prisma.user.update({
           where: {
-            id: Number(userId),
+            id: userId,
           },
           data: {
             status: connectionStatus,
@@ -155,7 +155,7 @@ export class UsersService {
   // change the status of the user to offline
   async logout(res: Response, userId: string) {
     try {
-      await this.prismaService.user.update({
+      await this.prisma.user.update({
         where: {
           id: userId,
         },
@@ -172,7 +172,7 @@ export class UsersService {
   // channel invites
   async getChannelInvites(userId: String) {
     try {
-      const invitesList = await this.prismaService.user.findUnique({
+      const invitesList = await this.prisma.user.findUnique({
         where: {
           id: userId,
         },

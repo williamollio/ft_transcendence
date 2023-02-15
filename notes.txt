@@ -6,9 +6,9 @@
 
 
 model Friendship {
-  requesterId String
+  requesterId Int
   requester   User   @relation("requester", fields: [requesterId], references: [id], onDelete: Cascade)
-  addresseeId String
+  addresseeId Int
   addressee   User   @relation("addressee", fields: [addresseeId], references: [id], onDelete: Cascade)
 
   status    FriendshipStatus @default(REQUESTED)

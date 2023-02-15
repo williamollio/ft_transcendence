@@ -11,8 +11,8 @@ datasource db {
 }
 
 model User {
-    id                            Int         @id @default(autoincrement())
-    intraId                       Int         @unique
+    id                            String      @id @default(cuid())
+    intraId                       String      @unique()
     name                          String      @unique
     friends                       User[]      @relation("friends")
     friendsRelation               User[]      @relation("friends") // stores the many-to-many relation
@@ -54,7 +54,7 @@ model Message {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  senderId  Int
+  senderId  String
   sender    User    @relation("messageSender", fields: [senderId], references: [id], onDelete: Cascade)
   channelId String
   channel   Channel @relation("channelMessage", fields: [channelId], references: [id], onDelete: Cascade)
@@ -63,7 +63,7 @@ model Message {
 }
 
 model ChannelUser {
-  userId    Int
+  userId    String
   user      User    @relation("userOnChannel", fields: [userId], references: [id], onDelete: Cascade)
   channelId String
   channel   Channel @relation("channelUsers", fields: [channelId], references: [id], onDelete: Cascade)
@@ -77,14 +77,14 @@ model ChannelUser {
 }
 
 model ChannelAction {
-  channelActionTargetId    Int
+  channelActionTargetId    String
   channelActionTarget      User              @relation("channelActionTarget", fields: [channelActionTargetId], references: [id], onDelete: Cascade)
   channelActionOnChannelId String
   channelActionOnChannel   Channel           @relation("channelActionOnChannel", fields: [channelActionOnChannelId], references: [id], onDelete: Cascade)
   channelActionTime        DateTime
   type                     ChannelActionType
 
-  channelActionRequesterId Int
+  channelActionRequesterId String
   channelActionRequester   User   @relation("channelActionRequester", fields: [channelActionRequesterId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
@@ -96,9 +96,9 @@ model ChannelAction {
 }
 
 model BlockedUser {
-  channelBlockedTargetId    Int
+  channelBlockedTargetId    String
   channelBlockedTarget      User   @relation("channelBlockedTarget", fields: [channelBlockedTargetId], references: [id], onDelete: Cascade)
-  channelBlockedRequesterId Int
+  channelBlockedRequesterId String
   channelBlockedRequester   User   @relation("channelBlockedRequester", fields: [channelBlockedRequesterId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())

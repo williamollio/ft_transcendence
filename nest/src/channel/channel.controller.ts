@@ -14,6 +14,8 @@ import { GetCurrentUserId } from '../common/decorators/getCurrentUserId.decorato
 import { ChannelService } from './channel.service';
 import { ModerateChannelDto } from './dto/moderateChannelUser.dto';
 
+// TODO: add channel entities
+
 @UseGuards(JwtAuthGuard)
 @Controller('channels')
 export class ChannelController {
