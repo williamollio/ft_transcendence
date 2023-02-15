@@ -51,43 +51,43 @@ export class ChannelService {
     });
   }
 
-  async getAllChannelsByUserId(userId: string) {
-    const channels: {
-      id: string;
-      name: string;
-      type: ChannelType;
-    }[] = await this.prisma.channel.findMany({
-      where: {
-        users: {
-          some: {
-            userId: userId,
-          },
-        },
-      },
-      select: {
-        id: true,
-        name: true,
-        type: true,
-      },
-    });
-    // Check if the channnel is of type DIRECT MESSAGE and change the name
-     // according to the name of the current user
-    for (const channel of channels) {
-      if (channel.type === 'DIRECTMESSAGE') {
-        const channelUser:
-          | {
-              id: string;
-              name: string;
-              status: UserStatus;
-            }[]
-          | undefined = await this.getUsersOfAChannel(channel.id);
-        if (channelUser && channelUser[0].id === userId && channelUser[1])
-          channel.name = channelUser[1].name;
-        else if (channelUser) channel.name = channelUser[0].name;
-      }
-    }
-    return channels;
-  }
+  // async getAllChannelsByUserId(userId: string) {
+  //   const channels: {
+  //     id: string;
+  //     name: string;
+  //     type: ChannelType;
+  //   }[] = await this.prisma.channel.findMany({
+  //     where: {
+  //       users: {
+  //         some: {
+  //           userId: userId,
+  //         },
+  //       },
+  //     },
+  //     select: {
+  //       id: true,
+  //       name: true,
+  //       type: true,
+  //     },
+  //   });
+  //   // Check if the channnel is of type DIRECT MESSAGE and change the name
+  //    // according to the name of the current user
+  //   for (const channel of channels) {
+  //     if (channel.type === 'DIRECTMESSAGE') {
+  //       const channelUser:
+  //         | {
+  //             id: string;
+  //             name: string;
+  //             status: UserStatus;
+  //           }[]
+  //         | undefined = await this.getUsersOfAChannel(channel.id);
+  //       if (channelUser && channelUser[0].id === userId && channelUser[1])
+  //         channel.name = channelUser[1].name;
+  //       else if (channelUser) channel.name = channelUser[0].name;
+  //     }
+  //   }
+  //   return channels;
+  // }
 
   getChannelById(channelId: string) {
     return this.prisma.channel.findFirst({
