@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from '../prisma/prisma.service';
@@ -12,7 +16,7 @@ import { Response } from 'express';
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
-  public async getFilename(id: number) {
+  public async getFilename(id: string) {
     const User = await this.prisma.user.findUnique({
       where: { id: id },
     });
@@ -33,7 +37,7 @@ export class UsersService {
       const User = await this.prisma.user.create({
         data: {
           name: createUserDto.name,
-          intraId: -1, // TODO : Needs to be adjusted
+          intraId: String(-1), // TODO : Needs to be adjusted
         },
       });
 
@@ -50,7 +54,7 @@ export class UsersService {
       return await this.prisma.user.create({
         data: {
           name: `${dto.providerId}`,
-          intraId: +dto.providerId,
+          intraId: dto.providerId,
         },
       });
     } catch (e) {
@@ -58,15 +62,15 @@ export class UsersService {
     }
   }
 
-  public async findByIntraId(intraId: String) {
+  public async findByIntraId(intraId: string) {
     return this.prisma.user.findUnique({
-      where: { intraId: +intraId },
+      where: { intraId: intraId },
       include: { friends: false },
     });
   }
 
   private async updateFriendsList(
-    userId: number,
+    userId: string,
     userDto: CreateUserDto | UpdateUserDto,
   ) {
     const sizeFriendsArray = userDto.friends?.length ?? 0;
@@ -97,7 +101,7 @@ export class UsersService {
     }
   }
 
-  public async findOne(id: String) {
+  public async findOne(id: string) {
     return this.prisma.user.findUnique({
       where: { id },
       include: { friends: true },
@@ -111,7 +115,7 @@ export class UsersService {
     });
   }
 
-  public async update(id: String, updateUserDto: UpdateUserDto) {
+  public async update(id: string, updateUserDto: UpdateUserDto) {
     try {
       const User = await this.prisma.user.update({
         where: { id },
@@ -124,12 +128,12 @@ export class UsersService {
     }
   }
 
-  public async remove(id: String, res : Response) {
+  public async remove(id: string, res : Response) {
     // return this.prisma.user.delete({ where: { id } });
     try {
       await this.prisma.user.delete({
         where: {
-          id: userId,
+          id,
         },
       });
     } catch (error) {}
@@ -170,7 +174,7 @@ export class UsersService {
   }
 
   // channel invites
-  async getChannelInvites(userId: String) {
+  async getChannelInvites(userId: string) {
     try {
       const invitesList = await this.prisma.user.findUnique({
         where: {

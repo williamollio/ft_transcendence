@@ -53,15 +53,15 @@ import {
   
     @Get()
     @ApiOkResponse({ type: UserEntity, isArray: true })
-    public async findAll() {
-      return this.usersService.findAll();
+    public async findAll(@Res() res: Response) {
+      return this.usersService.findAll(res);
     }
   
     @Get(':id')
     @ApiOkResponse({ type: UserEntity })
     public async findOne(@Param('id') id: string) {
       // + operator casts to a number
-      return this.usersService.findOne(+id);
+      return this.usersService.findOne(id);
     }
   
     @Post()
@@ -85,7 +85,7 @@ import {
       @Body() updateUserDto: UpdateUserDto,
     ) {
       try {
-        return await this.usersService.update(+id, updateUserDto);
+        return await this.usersService.update(id, updateUserDto);
       } catch (error) {
         console.error(error);
         throw new HttpException(
@@ -97,8 +97,8 @@ import {
   
     @Delete(':id')
     @ApiOkResponse({ type: UserEntity })
-    public async remove(@Param('id') id: string) {
-      return this.usersService.remove(+id);
+    public async remove(@Param('id') id: string, @Res() res: Response) {
+      return this.usersService.remove(id, res);
     }
   
     @Post('upload/:name')
@@ -128,7 +128,7 @@ import {
     @ApiResponse({ status: HttpStatus.OK, description: 'File has been sent' })
     async getFile(@Param('id') id: string, @Res() res: Response) {
       try {
-        const filename = await this.usersService.getFilename(+id);
+        const filename = await this.usersService.getFilename(id);
         if (!filename) {
           throwError;
         }
