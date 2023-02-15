@@ -9,4 +9,6 @@ export class CreateUserDto {
 
   @ApiProperty()
   friends?: Friends[];
+
+  // maybe add also a picture here
 }

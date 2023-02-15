@@ -4,6 +4,9 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { User, UserStatus } from '@prisma/client';
 import { Intra42User } from './interface/intra42-user.interface';
+import { Response } from 'express';
+
+// have to update this file and user response to display error
 
 @Injectable()
 export class UsersService {
@@ -78,8 +81,20 @@ export class UsersService {
     }
   }
 
-  public async findAll() {
-    return this.prisma.user.findMany({ include: { friends: true } });
+  public async findAll(res : Response) {
+    // return this.prisma.user.findMany({ include: { friends: true } });
+    try {
+      const nicknames = await this.prisma.user.findMany({
+        select: {
+          id: true,
+          name: true,
+          status: true,
+        },
+      });
+      return res.status(200).send(nicknames);
+    } catch (error) {
+      return res.status(403).send();
+    }
   }
 
   public async findOne(id: number) {
@@ -109,8 +124,16 @@ export class UsersService {
     }
   }
 
-  public async remove(id: number) {
-    return this.prisma.user.delete({ where: { id } });
+  public async remove(id: number, res : Response) {
+    // return this.prisma.user.delete({ where: { id } });
+    try {
+      await this.prismaService.user.delete({
+        where: {
+          id: userId,
+        },
+      });
+    } catch (error) {}
+    return res.send(204);
   }
 
   // channels api
@@ -128,4 +151,49 @@ export class UsersService {
       }
     } catch (error) {}
   }
+
+  // change the status of the user to offline
+  async logout(res: Response, userId: string) {
+    try {
+      await this.prismaService.user.update({
+        where: {
+          id: userId,
+        },
+        data: {
+          status: UserStatus.OFFLINE,
+        },
+      });
+      return res.status(200).clearCookie('jwtToken', { httpOnly: true }).send(); // maybe like this
+    } catch (error) {
+      return res.status(403).send();
+    }
+  }
+
+  // channel invites
+  async getChannelInvites(userId: String) {
+    try {
+      const invitesList = await this.prismaService.user.findUnique({
+        where: {
+          id: userId,
+        },
+        select: {
+          invites: {
+            select: {
+              id: true,
+            },
+          },
+        },
+      });
+      if (invitesList) {
+        const invites: { id: string }[] = [];
+        for (const invitees of invitesList.invites) {
+          invites.push(invitees);
+        }
+        return invites;
+      }
+    } catch (error) {
+      throw new ForbiddenException(error);
+    }
+  }
+
 }

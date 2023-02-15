@@ -14,7 +14,7 @@ import { UsersService } from './users.service';
 import * as msgpack from 'socket.io-msgpack-parser';
 
 // add some cors sanitazation here
-@WebSocketGateway(8080, {
+@WebSocketGateway(8888, {
   parser: msgpack,
 })
 // add some guards here
