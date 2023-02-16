@@ -31,7 +31,11 @@ import { Observable, of } from 'rxjs';
 import path = require('path');
 import { Response } from 'express';
 import * as fs from 'fs';
-import { editFileName, imageFileFilter } from './utils/upload-utils';
+import {
+  editFileName,
+  imageFileFilter,
+  maxSizeLimit,
+} from './utils/upload-utils';
 
 @Controller('users')
 @ApiTags('users')
@@ -108,6 +112,7 @@ export class UsersController {
         filename: editFileName,
       }),
       fileFilter: imageFileFilter,
+      limits: maxSizeLimit,
     }),
   )
   async uploadFile(
