@@ -97,6 +97,7 @@ export class UsersController {
   @ApiBody({
     schema: {
       type: 'object',
+      description: 'Upload profile picture',
       properties: {
         file: {
           type: 'string',
