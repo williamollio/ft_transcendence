@@ -128,8 +128,7 @@ export default function ProfileView(): React.ReactElement {
     const isSuccess = !response?.error;
     if (!isSuccess) {
       showErrorToast(response.error);
-    } else {
-      setImage(picture);
+      setImage(null);
     }
   }
 
@@ -187,6 +186,7 @@ export default function ProfileView(): React.ReactElement {
   function handleOnChangePicture(e: ChangeEvent<HTMLInputElement>) {
     if (e.target.files) {
       setPicture(e.target.files[0]);
+      setImage(e.target.files[0]);
     }
   }
 
