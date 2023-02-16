@@ -2,6 +2,7 @@ import { HttpException, HttpStatus } from '@nestjs/common';
 import path = require('path');
 import { v4 as uuidv4 } from 'uuid';
 
+export const maxSizeLimit = { fileSize: 1024 * 1024 * 2 }; // 2 MB
 export const imageFileFilter = (
   req: any,
   file: { originalname: string },
