@@ -27,7 +27,7 @@ import { UserEntity } from './entities/user.entity';
 import { User } from '@prisma/client';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import { Observable, of, throwError } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import path = require('path');
 import { Response } from 'express';
 import * as fs from 'fs';
@@ -116,13 +116,15 @@ export class UsersController {
     file: any,
   ): Promise<Observable<unknown>> {
     const filename = await this.usersService.getFilename(+id);
-    const filePath = path.resolve(`./uploads/profileimages/${filename}`);
-    fs.unlink(filePath, (err) => {
-      if (err) {
-        console.error(err);
-        return err;
-      }
-    });
+    if (filename !== null) {
+      const filePath = path.resolve(`./uploads/profileimages/${filename}`);
+      fs.unlink(filePath, (err) => {
+        if (err) {
+          console.error(err);
+          return err;
+        }
+      });
+    }
 
     this.usersService.setFilename(file.filename, +id);
     return of({ imagePath: file.filename });
@@ -133,8 +135,8 @@ export class UsersController {
   async getFile(@Param('id') id: string, @Res() res: Response) {
     try {
       const filename = await this.usersService.getFilename(+id);
-      if (!filename) {
-        throwError;
+      if (filename === null) {
+        return res.send(null);
       }
       const filePath = path.resolve(`./uploads/profileimages/${filename}`);
       const image = fs.readFileSync(filePath);
