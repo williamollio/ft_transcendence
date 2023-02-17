@@ -29,6 +29,7 @@
     "@nestjs/passport": "^9.0.0",
     "@nestjs/platform-express": "^9.2.1",
     "@nestjs/swagger": "^6.1.4",
+    "@nestjs/throttler": "^4.0.0",
     "@prisma/client": "^4.10.0",
     "@types/cookie-parser": "^1.4.3",
     "@types/passport-jwt": "^3.0.8",
