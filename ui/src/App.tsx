@@ -84,9 +84,9 @@ export default function App() {
       >
         <ThemeProvider theme={theme}>
           <Routes>
-            <Route path="/" element={<AuthWrapper />} />
-            <Route path="/redirect" element={<RedirectWrapper />} />
+            <Route path="*" element={<AuthWrapper />} />
             <Route path={RoutePath.LOGIN} element={<LoginView />} />
+            <Route path={RoutePath.REDIRECT} element={<RedirectWrapper />} />
             <Route path={RoutePath.PROFILE} element={<ProfileView />} />
             <Route path={RoutePath.GAME} element={<GameView />} />
             <Route path={RoutePath.LOGIN_2FA} element={<Login2FAView />} />
