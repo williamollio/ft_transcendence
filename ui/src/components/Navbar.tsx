@@ -24,13 +24,9 @@ export default function NavBar(): React.ReactElement {
   ]);
 
   React.useEffect(() => {
-    let token;
-    if (localStorage.getItem(Cookie.TOKEN)) {
-      token = localStorage.getItem(Cookie.TOKEN);
-    } else {
-      token = initAuthToken();
-    }
-    if (token !== null) {
+    let token = localStorage.getItem(Cookie.TOKEN);
+
+    if (token) {
       setUserId(getTokenData(token).id.toString());
     }
     fetchProfilePicture(userId);
