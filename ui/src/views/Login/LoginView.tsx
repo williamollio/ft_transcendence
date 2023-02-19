@@ -4,13 +4,24 @@ import { Box } from "@mui/system";
 import { useTranslation } from "react-i18next";
 import { translationKeys } from "./constants";
 import authService from "../../services/auth.service";
+import { useNavigate } from "react-router-dom";
+import { RoutePath } from "../../interfaces/router.interface";
+import { Cookie } from "../../utils/auth-helper";
 
 export default function LoginView(): React.ReactElement {
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
+  React.useEffect(() => {
+    const token = localStorage.getItem(Cookie.TOKEN);
+    if (token !== null) {
+      navigate(RoutePath.PROFILE);
+    }
+  }, []);
   const handleLogin = () => {
     window.open(authService.getAuthURI(), "_self");
   };
+
   return (
     <Box
       sx={{
