@@ -51,7 +51,7 @@ export class UsersController {
   }
 
   @Get(':id')
-  @UseGuards(JwtGuard)
+  //   @UseGuards(JwtGuard)
   @ApiOkResponse({ type: UserEntity })
   public async findOne(@Param('id') id: string) {
     // + operator casts to a number
