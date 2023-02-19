@@ -3,7 +3,7 @@ import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import ProfileView from "./views/Profile/ProfileView";
 import LoginView from "./views/Login/LoginView";
-import Login2FAView from "./views/Login2FAView";
+import Login2FAView from "./views/Login/Login2FAView";
 import GameView from "./views/Game/GameView";
 import { RoutePath } from "./interfaces/router.interface";
 import { TranscendanceContext } from "./context/transcendance-context";
