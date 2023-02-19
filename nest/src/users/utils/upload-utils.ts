@@ -8,7 +8,10 @@ export const imageFileFilter = (
   file: { originalname: string },
   callback: (arg0: HttpException | null, arg1?: any) => void,
 ) => {
-  if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
+  const lastIndex = file.originalname.lastIndexOf('.');
+  const extension = file.originalname.slice(lastIndex + 1).toLowerCase();
+
+  if (!['jpg', 'jpeg', 'png', 'gif'].includes(extension)) {
     return callback(
       new HttpException(
         'Only images format jpg, jpeg, png or gif are allowed',
