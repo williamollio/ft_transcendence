@@ -10,6 +10,7 @@ import Settings from "@mui/icons-material/Settings";
 import Logout from "@mui/icons-material/Logout";
 import { useNavigate } from "react-router-dom";
 import { RoutePath } from "../interfaces/router.interface";
+import { Cookie } from "../utils/auth-helper";
 
 interface Props {
   image: Blob | File | null;
@@ -31,7 +32,7 @@ export default function PictureMenu(props: Props) {
   const handleClose = (type: AnchorEnum) => {
     switch (type) {
       case AnchorEnum.LOGOUT: {
-        // TODO : logout, delete token and bye bye
+        localStorage.removeItem(Cookie.TOKEN);
         break;
       }
       case AnchorEnum.SETTINGS: {
