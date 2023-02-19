@@ -11,7 +11,9 @@ import {
   UseInterceptors,
   UploadedFile,
   Res,
+  UseGuards,
 } from '@nestjs/common';
+import { JwtGuard } from 'src/auth/guards/jwt.guard';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -27,24 +29,15 @@ import { UserEntity } from './entities/user.entity';
 import { User } from '@prisma/client';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import { v4 as uuidv4 } from 'uuid';
-import { Observable, of, throwError } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import path = require('path');
 import { Response } from 'express';
 import * as fs from 'fs';
-
-export const storage = {
-  storage: diskStorage({
-    destination: './uploads/profileimages',
-    filename: (req, file, cb) => {
-      const filename: string =
-        path.parse(file.originalname).name.replace(/\s/g, '') + uuidv4();
-      const extension: string = path.parse(file.originalname).ext;
-
-      cb(null, `${filename}${extension}`);
-    },
-  }),
-};
+import {
+  editFileName,
+  imageFileFilter,
+  maxSizeLimit,
+} from './utils/upload-utils';
 
 @Controller('users')
 @ApiTags('users')
@@ -58,6 +51,7 @@ export class UsersController {
   }
 
   @Get(':id')
+  //   @UseGuards(JwtGuard)
   @ApiOkResponse({ type: UserEntity })
   public async findOne(@Param('id') id: string) {
     // + operator casts to a number
@@ -101,11 +95,12 @@ export class UsersController {
     return this.usersService.remove(+id);
   }
 
-  @Post('upload/:name')
+  @Post('upload/:id')
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
       type: 'object',
+      description: 'Upload profile picture',
       properties: {
         file: {
           type: 'string',
@@ -114,13 +109,33 @@ export class UsersController {
       },
     },
   })
-  @UseInterceptors(FileInterceptor('file', storage))
-  uploadFile(
-    @Param('name') name: string,
-    @UploadedFile() file: any,
-  ): Observable<unknown> {
-    console.log('name ' + name);
-    this.usersService.setFilename(file.filename, name);
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './uploads/profileimages',
+        filename: editFileName,
+      }),
+      fileFilter: imageFileFilter,
+      limits: maxSizeLimit,
+    }),
+  )
+  async uploadFile(
+    @Param('id') id: string,
+    @UploadedFile()
+    file: any,
+  ): Promise<Observable<unknown>> {
+    const filename = await this.usersService.getFilename(+id);
+    if (filename !== null) {
+      const filePath = path.resolve(`./uploads/profileimages/${filename}`);
+      fs.unlink(filePath, (err) => {
+        if (err) {
+          console.error(err);
+          return err;
+        }
+      });
+    }
+
+    this.usersService.setFilename(file.filename, +id);
     return of({ imagePath: file.filename });
   }
 
@@ -129,8 +144,8 @@ export class UsersController {
   async getFile(@Param('id') id: string, @Res() res: Response) {
     try {
       const filename = await this.usersService.getFilename(+id);
-      if (!filename) {
-        throwError;
+      if (filename === null) {
+        return res.send(null);
       }
       const filePath = path.resolve(`./uploads/profileimages/${filename}`);
       const image = fs.readFileSync(filePath);
