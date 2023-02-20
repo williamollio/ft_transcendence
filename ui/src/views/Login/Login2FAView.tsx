@@ -1,4 +1,4 @@
-import React, { ReactElement } from "react";
+import React, { ReactElement, useRef } from "react";
 import { makeStyles } from "tss-react/mui";
 import { Typography, Button, Grid, TextField } from "@mui/material";
 import { useTranslation } from "react-i18next";
@@ -11,17 +11,48 @@ import {
   ContentWrapper,
 } from "../../styles/MuiStyles";
 
-const CODE_LENGTH = new Array(6).fill(0);
+const CODE_LENGTH = 6; // number of input fields to render
 
 export default function Login2FAView(): ReactElement {
   const { t } = useTranslation();
   const { classes } = useStyles();
-  const [input, setInput] = React.useState<string[]>(["", "", "", ""]);
+  const [input, setInput] = React.useState<string[]>(
+    Array(CODE_LENGTH).fill("")
+  );
+
+  const [currentIndex, setCurrentIndex] = React.useState<number>(0);
+  const inputRefs = useRef<any>([]);
+  const [isFocused, setIsFocused] = React.useState<boolean>(false);
+
   const handleInputChange = (index: number, value: string) => {
+    setCurrentIndex(index);
     const newInputs = [...input];
     newInputs[index] = value.replace(/[^0-9]/g, "").substr(0, 1);
     setInput(newInputs);
   };
+
+  React.useEffect(() => {
+    const nextIndex = currentIndex + 1;
+
+    console.log("isFocused " + isFocused);
+    if (input.every((str) => str === "") && isFocused === false) {
+      inputRefs.current[0].focus();
+      setIsFocused(true);
+      return;
+    }
+    if (nextIndex < CODE_LENGTH && input[currentIndex] != "") {
+      inputRefs.current[nextIndex].focus();
+      inputRefs.current[nextIndex].select();
+      return;
+    } else if (nextIndex === CODE_LENGTH || input.every((str) => str != "")) {
+      document.getElementById("submit-button")?.focus();
+      return;
+    } else {
+      inputRefs.current[currentIndex].focus();
+      inputRefs.current[currentIndex].select();
+      return;
+    }
+  }, [input, isFocused]);
 
   async function handleSubmit() {
     console.log("send input array " + input);
@@ -34,12 +65,15 @@ export default function Login2FAView(): ReactElement {
       navigate(RoutePath.LOGIN);
     }*/
   }
+
   const OTPInputField = ({ index }: { index: number }) => {
     return (
       <TextField
+        name={`textfield-${index}`}
         type="text"
-        inputProps={{ maxLength: 1 }}
         onChange={(e) => handleInputChange(index, e.target.value)}
+        inputProps={{ maxLength: 1 }}
+        inputRef={(ref) => (inputRefs.current[index] = ref)}
         value={input[index]}
       ></TextField>
     );
@@ -60,12 +94,15 @@ export default function Login2FAView(): ReactElement {
             </Typography>
           </TitleWrapper>
           <ContentWrapper>
-            <Grid alignItems={"stretch"} className={classes.inputWrapper}>
-              {CODE_LENGTH.map((v: any, index: number) => {
-                return <OTPInputField index={index} key={index} />;
-              })}
+            <Grid className={classes.inputWrapper}>
+              {Array(CODE_LENGTH)
+                .fill(0)
+                .map((v: any, index: number) => {
+                  return <OTPInputField index={index} key={index} />;
+                })}
             </Grid>
             <Button
+              id="submit-button"
               onClick={() => handleSubmit()}
               sx={{ width: "100px", height: "50px" }}
               variant="contained"
@@ -80,45 +117,12 @@ export default function Login2FAView(): ReactElement {
 }
 
 const useStyles = makeStyles()(() => ({
-  iconButton: {
-    height: "50%",
-    width: "50%",
-  },
-  avatarWrapper: {
-    height: "20%",
-    width: "70%",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  buttonsWrapper: {
-    height: "20%",
-    width: "70%",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    gap: "1em",
-  },
-  uploadButtonWrapper: {
-    height: "10%",
-    width: "60%",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-  },
   inputWrapper: {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
+    gap: "5px",
     height: "20%",
     width: "45%",
-  },
-  multiInputWrapper: {
-    minHeight: "10%",
-    width: "65%",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: "4rem",
   },
 }));
