@@ -77,7 +77,10 @@ export class AuthService {
       id: user.id,
       intraId: user.intraId,
     });
-    await this.userService.updateRefreshToken(user.id, tokens.refreshToken);
+    await this.userService.updateRefreshToken(
+      user.id,
+      await argon2.hash(tokens.refreshToken),
+    );
     return tokens;
   }
 
