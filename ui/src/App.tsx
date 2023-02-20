@@ -13,10 +13,10 @@ import { Box, ThemeProvider } from "@mui/material";
 import theme from "./MuiTheme";
 import classes from "./styles.module.scss";
 import { useImageStore } from "./store/users-store";
-import { Cookie } from "./utils/auth-helper";
+import { PrivateRoute } from "./components/PrivateRoute";
+import { getIsAuthenticated, initAuthToken } from "./utils/auth-helper";
 
 export default function App() {
-  const [isAuthenticated, setIsAuthenticated] = React.useState<boolean>(false);
   const [image, setImage] = useImageStore((state) => [
     state.image,
     state.setImage,
@@ -32,15 +32,6 @@ export default function App() {
     };
   }, [imageUrl]);
 
-  const getIsAuthenticated = () => {
-    const token = localStorage.getItem(Cookie.TOKEN);
-    if (token !== null) {
-      return true;
-    } else {
-      return false;
-    }
-  };
-
   const AuthWrapper = (): ReactElement => {
     const isAuthenticated = getIsAuthenticated();
     return isAuthenticated ? (
@@ -51,6 +42,7 @@ export default function App() {
   };
 
   const RedirectWrapper = () => {
+    initAuthToken();
     return (
       <Navigate to={RoutePath.PROFILE} state={{ editMode: false }}></Navigate>
     );
@@ -84,11 +76,32 @@ export default function App() {
       >
         <ThemeProvider theme={theme}>
           <Routes>
-            <Route path="/" element={<AuthWrapper />} />
-            <Route path="/redirect" element={<RedirectWrapper />} />
+            <Route path="*" element={<AuthWrapper />} />
             <Route path={RoutePath.LOGIN} element={<LoginView />} />
-            <Route path={RoutePath.PROFILE} element={<ProfileView />} />
-            <Route path={RoutePath.GAME} element={<GameView />} />
+            <Route
+              path={RoutePath.REDIRECT}
+              element={
+                <PrivateRoute>
+                  <RedirectWrapper />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path={RoutePath.PROFILE}
+              element={
+                <PrivateRoute>
+                  <ProfileView />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path={RoutePath.GAME}
+              element={
+                <PrivateRoute>
+                  <GameView />
+                </PrivateRoute>
+              }
+            />
             <Route path={RoutePath.LOGIN_2FA} element={<Login2FAView />} />
           </Routes>
         </ThemeProvider>

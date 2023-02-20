@@ -31,3 +31,15 @@ export function getTokenData(token: string): tokenData {
     id: tokenPayload.id,
   };
 }
+
+export const getIsAuthenticated = () => {
+  const token = localStorage.getItem(Cookie.TOKEN);
+  if (token !== null) {
+    return true;
+  } else {
+    let token = initAuthToken();
+    if (token === null) {
+      return false;
+    }
+  }
+};
