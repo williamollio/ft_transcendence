@@ -34,7 +34,6 @@ export default function Login2FAView(): ReactElement {
   React.useEffect(() => {
     const nextIndex = currentIndex + 1;
 
-    console.log("isFocused " + isFocused);
     if (input.every((str) => str === "") && isFocused === false) {
       inputRefs.current[0].focus();
       setIsFocused(true);
