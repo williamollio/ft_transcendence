@@ -14,15 +14,16 @@ import { ChannelModule } from './channel/channel.module';
     PrismaModule,
     UsersModule,
     AuthModule,
+    ChannelModule,
     ThrottlerModule.forRoot({
       ttl: 60,
       limit: 10,
     }),
-  , ChannelModule],
+  ],
   controllers: [AppController],
   providers: [
-    UserGateway,
     AppService,
+    UserGateway,
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,

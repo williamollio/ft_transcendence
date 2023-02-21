@@ -47,7 +47,7 @@ export class AuthController {
 
     this.setCookieTokens(tokens, response);
 
-    response.redirect(`${process.env.PATH_TO_FRONTEND}profile`);
+    response.redirect(`${process.env.PATH_TO_FRONTEND}redirect`);
   }
 
   @Get('logout')
