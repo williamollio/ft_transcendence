@@ -4,7 +4,12 @@ import { getBaseUrl } from "../../utils/url-helper";
 
 export const axiosInstance = axios.create({
   baseURL: `${getBaseUrl()}`,
-  headers: {
-    Authorization: `Bearer ${localStorage.getItem(Cookie.TOKEN)}`,
-  },
+});
+
+axiosInstance.interceptors.request.use((config) => {
+  const token = localStorage.getItem(Cookie.TOKEN);
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
 });
