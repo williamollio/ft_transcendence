@@ -3,6 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { UsersService } from '../../users/users.service';
 import * as process from 'process';
+import { HandshakeRequest } from 'src/game/entities/game.entity';
 
 export type JwtPayload = {
   sub: string;
@@ -12,19 +13,18 @@ export type JwtPayload = {
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(private userService: UsersService) {
-    const extractJwtFromCookie = (req: any) => {
-      let token = null;
-
-      if (req && req.cookies) {
-        token = req.cookies['access_token'];
+    const extractJwtFromSocket = (handshake: HandshakeRequest) => {
+      const authHeader = handshake.headers.authorization;
+      if (authHeader && authHeader.split(' ')[0] === 'Bearer') {
+        return authHeader.split(' ')[1];
       }
-      return token || ExtractJwt.fromAuthHeaderAsBearerToken()(req);
+      return null;
     };
 
     super({
       ignoreExpiration: false,
       secretOrKey: process.env.JWT_SECRET,
-      jwtFromRequest: extractJwtFromCookie,
+      jwtFromRequest: extractJwtFromSocket,
     });
   }
 
