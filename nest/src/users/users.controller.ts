@@ -40,6 +40,7 @@ import {
 } from './utils/upload-utils';
 
 @Controller('users')
+@UseGuards(JwtGuard)
 @ApiTags('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -51,7 +52,6 @@ export class UsersController {
   }
 
   @Get(':id')
-  //   @UseGuards(JwtGuard)
   @ApiOkResponse({ type: UserEntity })
   public async findOne(@Param('id') id: string) {
     // + operator casts to a number
