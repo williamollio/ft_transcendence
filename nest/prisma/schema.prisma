@@ -28,6 +28,8 @@ model User {
     channelBlockedRequester       BlockedUser[]     @relation("channelBlockedRequester")
     channelBlockedTarget          BlockedUser[]     @relation("channelBlockedTarget")
     invites                       Channel[]         @relation("inviteOnChannel")
+
+    @@map("users")
 }
 
 model Channel {
