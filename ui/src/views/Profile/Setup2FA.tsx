@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useRef } from "react";
 import Navbar from "../../components/Navbar";
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Button, Grid, Typography } from "@mui/material";
 import { translationKeys } from "./constants";
 import { useTranslation } from "react-i18next";
 import { makeStyles } from "tss-react/mui";
@@ -14,6 +14,9 @@ import {
 import CustomTextField from "../../components/shared/CustomTextField/CustomTextField";
 import { useForm, FieldValues } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
+import { TextField } from "@mui/material";
+
+const CODE_LENGTH = 6; // number of input fields to render
 
 export default function Setup2FA(): React.ReactElement {
   const navigate = useNavigate();
@@ -25,15 +28,72 @@ export default function Setup2FA(): React.ReactElement {
   } = useForm({
     mode: "onChange",
   });
+  const { classes } = useStyles();
+  const [input, setInput] = React.useState<string[]>(
+    Array(CODE_LENGTH).fill("")
+  );
 
-  function onCancel() {
+  const [currentIndex, setCurrentIndex] = React.useState<number>(0);
+  const inputRefs = useRef<any>([]);
+  const [isFocused, setIsFocused] = React.useState<boolean>(false);
+
+  const handleInputChange = (index: number, value: string) => {
+    setCurrentIndex(index);
+    const newInputs = [...input];
+    newInputs[index] = value.replace(/[^0-9]/g, "").substr(0, 1);
+    setInput(newInputs);
+  };
+
+  React.useEffect(() => {
+    const nextIndex = currentIndex + 1;
+
+    if (input.every((str) => str === "") && isFocused === false) {
+      inputRefs.current[0].focus();
+      setIsFocused(true);
+      return;
+    }
+    if (nextIndex < CODE_LENGTH && input[currentIndex] != "") {
+      inputRefs.current[nextIndex].focus();
+      inputRefs.current[nextIndex].select();
+      return;
+    } else if (nextIndex === CODE_LENGTH || input.every((str) => str != "")) {
+      document.getElementById("submit-button")?.focus();
+      return;
+    } else {
+      inputRefs.current[currentIndex].focus();
+      inputRefs.current[currentIndex].select();
+      return;
+    }
+  }, [input, isFocused]);
+
+  function onCancelPhone() {
     navigate(-1);
   }
-  async function onSubmit(data: FieldValues) {
+
+  function onCancelCode() {
+    console.log("to implement");
+  }
+  async function onSubmitPhone(data: FieldValues) {
     console.log("data.phoneNumber " + data.phoneNumber);
   }
 
-  const { classes } = useStyles();
+  async function onSubmitCode() {
+    console.log("input " + input);
+  }
+
+  const OTPInputField = ({ index }: { index: number }) => {
+    return (
+      <TextField
+        name={`textfield-${index}`}
+        type="text"
+        onChange={(e) => handleInputChange(index, e.target.value)}
+        inputProps={{ maxLength: 1 }}
+        inputRef={(ref) => (inputRefs.current[index] = ref)}
+        value={input[index]}
+      ></TextField>
+    );
+  };
+
   return (
     <>
       <Navbar />
@@ -75,14 +135,38 @@ export default function Setup2FA(): React.ReactElement {
                 <Button
                   className={classes.iconButton}
                   variant="outlined"
-                  onClick={handleSubmit(onSubmit)}
+                  onClick={handleSubmit(onSubmitPhone)}
                 >
                   {t(translationKeys.buttons.save)}
                 </Button>
                 <Button
                   className={classes.iconButton}
                   variant="outlined"
-                  onClick={onCancel}
+                  onClick={onCancelPhone}
+                >
+                  {t(translationKeys.buttons.cancel)}
+                </Button>
+              </Box>
+              <Grid className={classes.inputWrapper}>
+                {Array(CODE_LENGTH)
+                  .fill(0)
+                  .map((v: any, index: number) => {
+                    return <OTPInputField index={index} key={index} />;
+                  })}
+              </Grid>
+              <Box className={classes.buttonsWrapper}>
+                <Button
+                  id="submit-button"
+                  className={classes.iconButton}
+                  variant="outlined"
+                  onClick={onSubmitCode}
+                >
+                  {t(translationKeys.buttons.save)}
+                </Button>
+                <Button
+                  className={classes.iconButton}
+                  variant="outlined"
+                  onClick={onCancelCode}
                 >
                   {t(translationKeys.buttons.cancel)}
                 </Button>
@@ -107,5 +191,13 @@ const useStyles = makeStyles()(() => ({
     justifyContent: "center",
     alignItems: "center",
     gap: "1em",
+  },
+  inputWrapper: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: "5px",
+    height: "20%",
+    width: "45%",
   },
 }));
