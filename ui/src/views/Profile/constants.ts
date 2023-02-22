@@ -8,4 +8,5 @@ export const translationKeys = {
   profile: "profile",
   chooseName: "chooseName",
   addFriends: "addFriends",
+  setup2fa: "setup2fa",
 };

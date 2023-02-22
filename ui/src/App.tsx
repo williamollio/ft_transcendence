@@ -2,6 +2,7 @@ import { ReactElement } from "react";
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import ProfileView from "./views/Profile/ProfileView";
+import Setup2FA from "./views/Profile/Setup2FA";
 import LoginView from "./views/Login/LoginView";
 import Login2FAView from "./views/Login/Login2FAView";
 import GameView from "./views/Game/GameView";
@@ -102,7 +103,16 @@ export default function App() {
                 </PrivateRoute>
               }
             />
-            <Route path={RoutePath.LOGIN_2FA} element={<Login2FAView />} />
+            <Route
+              path={RoutePath.SETUP2FA}
+              element={
+                <PrivateRoute>
+                  <Setup2FA />
+                </PrivateRoute>
+              }
+            />
+            <Route path={RoutePath.LOGIN_2FA} element={<Login2FAView />} />{" "}
+            {/* TODO : William Private ? */}
           </Routes>
         </ThemeProvider>
       </Box>
