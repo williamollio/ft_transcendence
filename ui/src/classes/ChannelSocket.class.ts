@@ -37,7 +37,7 @@ export class ChannelSocket {
     });
   };
 
-  deleteRoom = (channel: chatRoom) => {
+  deleteRoom = (channel: chatRoom): Boolean => {
     this.socket.emit("leaveRoom", {
       leaveInfo: { id: channel.id, type: channel.access },
     });
@@ -50,6 +50,7 @@ export class ChannelSocket {
           );
           if (index >= 0) {
             this.channels.splice(index, 1);
+			return false;
           }
         }
       }
@@ -57,6 +58,7 @@ export class ChannelSocket {
     this.socket.on("leaveRoomFailed", () => {
       return true;
     });
+	return false;
   };
 
   joinRoom = (channelObj: chatRoom, password: string) => {

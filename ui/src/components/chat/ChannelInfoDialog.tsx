@@ -19,17 +19,20 @@ import { user } from "../../interfaces/chat.interfaces";
 import { chatRoom } from "../../classes/chatRoom.class";
 import ChannelInfoContext from "./ChannelInfoContext";
 import GetPasswordDialog from "./GetPasswordDialog";
+import { ChannelSocket } from "../../classes/ChannelSocket.class";
 
 export default function ChannelInfoDialog({
   contextMenuClose,
   channelInfoOpen,
   toggleChannelInfo,
   channel,
+  channelSocket,
 }: {
   contextMenuClose: any;
   channelInfoOpen: boolean;
   toggleChannelInfo: any;
-  channel: chatRoom | null;
+  channel: chatRoom;
+  channelSocket: ChannelSocket;
 }) {
   const [selected, setSelected] = useState<user | null>(null);
 
@@ -133,6 +136,7 @@ export default function ChannelInfoDialog({
             <ChannelInfoContext
               contextMenu={contextMenu}
               setContextMenu={setContextMenu}
+			  channelSocket={channelSocket}
             ></ChannelInfoContext>
           </Box>
         </Grid>

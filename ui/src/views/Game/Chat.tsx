@@ -1,7 +1,10 @@
 import {
+	Alert,
   Box,
+  Collapse,
   Divider,
   Grid,
+  IconButton,
   List,
   ListItem,
   ListItemText,
@@ -16,8 +19,7 @@ import { messagesDto } from "../../interfaces/chat.interfaces";
 import { chatRoom } from "../../classes/chatRoom.class";
 import AddChannelDialog from "../../components/chat/AddChannelDialog";
 import RoomContextMenu from "../../components/chat/RoomContextMenu";
-import * as msgpack from "socket.io-msgpack-parser";
-import getUserId from "../../components/hook/get.userId";
+import CloseIcon from "@mui/icons-material/Close";
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
 
 const channelSocket: ChannelSocket = new ChannelSocket();
@@ -32,6 +34,9 @@ export default function Chat() {
     mouseY: number;
     channel: chatRoom;
   } | null>(null);
+  const [alert, toggleAlert] = useState<boolean>(false);
+  const [alertMsg, setAlertMsg] = useState<string>("");
+
   const scrollRef = useRef<HTMLLIElement | null>(null);
 
   const handleChange = (e: any) => {
@@ -143,6 +148,26 @@ export default function Chat() {
 
   return (
     <>
+      <Collapse in={alert}>
+        <Alert
+          sx={{ width: "auto" }}
+          severity="error"
+          action={
+            <IconButton
+              aria-label="close"
+              color="inherit"
+              size="small"
+              onClick={() => {
+                toggleAlert(false);
+              }}
+            >
+              <CloseIcon fontSize="inherit" />
+            </IconButton>
+          }
+        >
+          {alertMsg}
+        </Alert>
+      </Collapse>
       <Paper
         elevation={4}
         sx={{
@@ -202,6 +227,9 @@ export default function Chat() {
               channels={channelSocket.channels}
               setCurrentRoom={setCurrentRoom}
               setMessages={setMessages}
+              channelSocket={channelSocket}
+              setAlertMsg={setAlertMsg}
+              toggleAlert={toggleAlert}
             ></RoomContextMenu>
             <Divider></Divider>
             <Grid container>

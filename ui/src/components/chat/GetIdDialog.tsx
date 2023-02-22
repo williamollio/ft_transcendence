@@ -1,15 +1,18 @@
 import { Dialog, TextField } from "@mui/material";
 import { useState } from "react";
-import { user } from "../../interfaces/chat.interfaces";
+import { ChannelSocket } from "../../classes/ChannelSocket.class";
+import { chatRoom } from "../../classes/chatRoom.class";
 
 export default function GetIdDialog({
   open,
   toggleOpen,
-  user,
+  channel,
+  channelSocket,
 }: {
   open: boolean;
   toggleOpen: any;
-  user: user | null;
+  channel: chatRoom;
+  channelSocket: ChannelSocket;
 }) {
   const [input, setInput] = useState<string>("");
 
@@ -24,7 +27,7 @@ export default function GetIdDialog({
 
   const handleSubmit = (e: any) => {
     if (e.key === "Enter") {
-      //submit invite to room with user.id and channel id
+      channelSocket.inviteToChannel(channel, input)
       handleClose();
     }
   };
@@ -32,7 +35,7 @@ export default function GetIdDialog({
   return (
     <Dialog open={open} onClose={handleClose}>
       <TextField
-        label="Channel-ID"
+        label="User-ID"
         value={input}
         onChange={handleChange}
         onKeyDown={handleSubmit}

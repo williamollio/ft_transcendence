@@ -1,12 +1,13 @@
 import { Menu, MenuItem } from "@mui/material";
 import { useState } from "react";
+import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { user } from "../../interfaces/chat.interfaces";
-import GetIdDialog from "./GetIdDialog";
 import GetTimeDialog from "./GetTimeDialog";
 
 export default function ChannelInfoContext({
   contextMenu,
   setContextMenu,
+  channelSocket,
 }: {
   contextMenu: {
     mouseX: number;
@@ -14,9 +15,9 @@ export default function ChannelInfoContext({
     user: user;
   } | null;
   setContextMenu: any;
+  channelSocket: ChannelSocket;
 }) {
   const [openTime, toggleOpenTime] = useState<boolean>(false);
-  const [openId, toggleOpenId] = useState<boolean>(false);
   const [action, setAction] = useState<"kick" | "mute">("kick");
 
   const handleContextClose = () => {
@@ -25,8 +26,8 @@ export default function ChannelInfoContext({
 
   const handleDM = () => {
     handleContextClose();
-    if (contextMenu && contextMenu.user && contextMenu.user.id) {
-      // setupDM with user.id
+    if (contextMenu && contextMenu.user) {
+      channelSocket.createDm(contextMenu.user);
     }
   };
 
@@ -34,13 +35,6 @@ export default function ChannelInfoContext({
     handleContextClose();
     if (contextMenu && contextMenu.user && contextMenu.user.id) {
       // checkout profile with user.id
-    }
-  };
-
-  const handleInviteChannel = () => {
-    handleContextClose();
-    if (contextMenu && contextMenu.user && contextMenu.user.id) {
-      toggleOpenId(true);
     }
   };
 
@@ -54,7 +48,7 @@ export default function ChannelInfoContext({
   const handleBlock = () => {
     handleContextClose();
     if (contextMenu && contextMenu.user && contextMenu.user.id) {
-      //send request to block user.id
+     
     }
   };
 
@@ -88,17 +82,11 @@ export default function ChannelInfoContext({
       >
         <MenuItem onClick={handleDM}>Whisper</MenuItem>
         <MenuItem onClick={handleProfile}>View Profile</MenuItem>
-        <MenuItem onClick={handleInviteChannel}>Invite to Channel</MenuItem>
         <MenuItem onClick={handleInviteGame}>Invite to Game</MenuItem>
         <MenuItem onClick={handleBlock}>Block</MenuItem>
         <MenuItem onClick={handleMute}>Mute</MenuItem>
         <MenuItem onClick={handleKick}>Kick</MenuItem>
       </Menu>
-      <GetIdDialog
-        open={openId}
-        toggleOpen={toggleOpenId}
-        user={contextMenu ? contextMenu.user : null}
-      ></GetIdDialog>
       <GetTimeDialog
         open={openTime}
         toggleOpen={toggleOpenTime}
