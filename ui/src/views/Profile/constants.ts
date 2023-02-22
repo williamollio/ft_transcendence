@@ -9,4 +9,5 @@ export const translationKeys = {
   chooseName: "chooseName",
   addFriends: "addFriends",
   setup2fa: "setup2fa",
+  enterNumber: "enterNumber",
 };
