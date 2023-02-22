@@ -1,6 +1,7 @@
 import { LOCAL_STORAGE_KEY } from "./localstorage-helper";
 export enum Cookie {
   TOKEN = "access_token",
+  REFRESH_TOKEN = "refresh_token",
 }
 
 interface tokenData {
@@ -43,3 +44,7 @@ export const getIsAuthenticated = () => {
     }
   }
 };
+
+export function eraseCookie(name: string) {
+  document.cookie = name + "=; Max-Age=-99999999;";
+}
