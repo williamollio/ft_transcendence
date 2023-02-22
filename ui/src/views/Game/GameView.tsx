@@ -1,8 +1,9 @@
 import React from "react";
 import Navbar from "../../components/Navbar";
-import { Typography } from "@mui/material";
+import { Typography, TextField, Paper } from "@mui/material";
 import { translationKeys } from "./constants";
 import { useTranslation } from "react-i18next";
+import Chat from "./Chat";
 // import { makeStyles } from "tss-react/mui";
 import {
   Background,
@@ -11,15 +12,21 @@ import {
   TitleWrapper,
   ContentWrapper,
 } from "../../styles/MuiStyles";
+import { QueryClient, QueryClientProvider } from "react-query";
 
-export default function ProfileView(): React.ReactElement {
+const queryClient = new QueryClient();
+
+export default function GameView(): React.ReactElement {
   const { t } = useTranslation();
-//   const { classes } = useStyles();
+  //   const { classes } = useStyles();
   return (
     <>
       <Navbar />
       <Background>
         <ProfileCard>
+          <QueryClientProvider client={queryClient}>
+            <Chat />
+          </QueryClientProvider>
           <CardContainer>
             <TitleWrapper>
               <Typography

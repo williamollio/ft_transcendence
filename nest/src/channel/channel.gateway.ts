@@ -31,6 +31,7 @@ enum acknoledgementStatus {
 @WebSocketGateway(3333, {
   cors: {
     credentials: true,
+	origin: "http://localhost:3000"
   },
   parser: msgpack,
 })

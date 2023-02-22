@@ -35,7 +35,11 @@ export default function NavBar(): React.ReactElement {
   async function fetchProfilePicture(userId: string) {
     if (image === null && userId !== "") {
       const URIGetImage = `${getBaseUrl()}users/upload/${userId}`;
-      const res = await fetch(URIGetImage);
+      const res = await fetch(URIGetImage, {
+        headers: new Headers({
+          Authorization: `Bearer ${localStorage.getItem(Cookie.TOKEN)}`,
+        }),
+      });
       // convert the response object to a blob
       const imageBlob = await res.blob();
       setImage(imageBlob);
