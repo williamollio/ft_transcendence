@@ -1,6 +1,6 @@
-import { Position } from '../entities/game.interface';
+import { Position } from '../entities/game.entity';
 
-export class PositionDto extends Position {
-    room: string;
-    player: number;
+export interface PositionDto extends Position {
+  room: string;
+  player: number;
 }

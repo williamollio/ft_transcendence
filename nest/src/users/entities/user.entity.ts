@@ -56,5 +56,8 @@ export class UserEntity implements User {
 
   @ApiProperty()
   invites?: ChannelEntity[];
+
+  @ApiProperty()
+  eloScore: number;
 }
 

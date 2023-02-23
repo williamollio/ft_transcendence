@@ -30,8 +30,8 @@ model User {
     invites                       Channel[]         @relation("inviteOnChannel")
 
         // Game shit
-    playerOneMatch                Match[]           @relation("playerOne")
-    playerTwoMatch                Match[]           @relation("playerTwo")
+    playerOnMatches  UserMatch[]       @relation("player")
+    //playerTwoMatch                Match[]           @relation("playerTwo")
     eloScore                      Int               @default(0)
 
 
@@ -39,18 +39,28 @@ model User {
 }
 
 model Match {
-    gameId    String   @id @default(cuid())
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-    p1s Int
-    p2s Int
-    playerOneId String
-    playerOne   User   @relation("playerOne", fields: [playerOneId], references: [id], onDelete: Cascade)
-    playerTwoId String
-    playerTwo   User   @relation("playerTwo", fields: [playerTwoId], references: [id], onDelete: Cascade)
-  
-  // @@id([playerOneId, playerTwoId, createdAt])
-  // @@unique(fields: [playerOneId, playerTwoId, createdAt], name: "gameId")
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  match UserMatch[] @relation("match")
+
+  @@map("matches")
+}
+
+model UserMatch {
+  playerId String
+  player   User   @relation("player", fields: [playerId], references: [id], onDelete: Cascade)
+  matchId  String
+  match    Match  @relation("match", fields: [matchId], references: [id], onDelete: Cascade)
+  score    Json   @default("{\"myself\" : 0, \"opponent\" : 0}")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@id([playerId, matchId])
+  @@unique([playerId, matchId])
+  @@map("user_matches")
 }
 
 model Channel {
