@@ -19,7 +19,6 @@ class UsersService {
   }
 
   async postUserImage(file: any, userId: string): Promise<Response<void>> {
-    console.log(userId);
     return resolve<void>(
       axiosInstance
         .post(`${PATH}/upload/${userId}`, file)
