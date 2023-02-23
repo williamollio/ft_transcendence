@@ -23,11 +23,11 @@ export class AuthService {
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(payload, {
         secret: process.env.JWT_SECRET,
-        // expiresIn: '15m',
+        // expiresIn: '15m', // TODO : William set in FE
       }),
       this.jwtService.signAsync(payload, {
         secret: process.env.JWT_REFRESH_SECRET,
-        // expiresIn: '7d',
+        // expiresIn: '7d', // TODO : William set in FE
       }),
     ]);
 
@@ -77,7 +77,10 @@ export class AuthService {
       id: user.id,
       intraId: user.intraId,
     });
-    await this.userService.updateRefreshToken(user.id, tokens.refreshToken);
+    await this.userService.updateRefreshToken(
+      user.id,
+      await argon2.hash(tokens.refreshToken),
+    );
     return tokens;
   }
 

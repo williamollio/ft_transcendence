@@ -5,8 +5,8 @@ import { UsersService } from '../../users/users.service';
 import * as process from 'process';
 
 export type JwtPayload = {
-  sub: string;
-  name: string;
+  id: string;
+  intraId: string;
 };
 
 @Injectable()
@@ -29,15 +29,15 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   }
 
   async validate(payload: JwtPayload) {
-    const user = await this.userService.findOne(payload.sub);
+    const user = await this.userService.findOne(payload.id);
 
     if (!user) {
       throw new UnauthorizedException('Please log in to continue');
     }
 
     return {
-      id: payload.sub,
-      name: payload.name,
+      id: payload.id,
+      intraId: payload.intraId,
     };
   }
 }

@@ -17,7 +17,7 @@ import { ChannelModule } from './channel/channel.module';
     ChannelModule,
     ThrottlerModule.forRoot({
       ttl: 60,
-      limit: 10,
+      limit: 50,
     }),
   ],
   controllers: [AppController],

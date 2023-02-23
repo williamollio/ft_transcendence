@@ -40,6 +40,7 @@ import {
 } from './utils/upload-utils';
 
 @Controller('users')
+@UseGuards(JwtGuard)
 @ApiTags('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -95,7 +96,7 @@ export class UsersController {
     return this.usersService.remove(id, res);
   }
 
-  @Post('upload/:name')
+  @Post('upload/:id')
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
@@ -125,13 +126,15 @@ export class UsersController {
     file: any,
   ): Promise<Observable<unknown>> {
     const filename = await this.usersService.getFilename(id);
-    const filePath = path.resolve(`./uploads/profileimages/${filename}`);
-    fs.unlink(filePath, (err) => {
-      if (err) {
-        console.error(err);
-        return err;
-      }
-    });
+    if (filename !== null) {
+      const filePath = path.resolve(`./uploads/profileimages/${filename}`);
+      fs.unlink(filePath, (err) => {
+        if (err) {
+          console.error(err);
+          return err;
+        }
+      });
+    }
 
     this.usersService.setFilename(file.filename, id);
     return of({ imagePath: file.filename });
