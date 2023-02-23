@@ -2,6 +2,7 @@ import { Socket } from "socket.io-client";
 import { initSocket } from "../components/hook/initSocket";
 import { accessTypes, chatRoom } from "./chatRoom.class";
 import { messagesDto, user } from "../interfaces/chat.interfaces";
+import { Cookie } from "../utils/auth-helper";
 
 export class ChannelSocket {
   socket: Socket;
@@ -19,11 +20,12 @@ export class ChannelSocket {
     setNewChannel: any,
     password?: string
   ) => {
+	var token = "Bearer "+ localStorage.getItem(Cookie.TOKEN);
     this.socket.emit("createRoom", {
       channelInfo: { channelObj, passwordHash: password },
-      query: {
-        Authentication:
-          "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNsZWg2cjdocDAwMDBtY2F4cnVwZ20xbWciLCJpbnRyYUlkIjoiODYwNjAiLCJpYXQiOjE2NzcxNjMzNDYsImV4cCI6MTY3NzE2NDI0Nn0.vktoB325_CQ9mvWz8nP1eOwofOAi7WnP-_uBfcwpEIw",
+      auth: {
+        token:
+          {token},
       },
     });
     this.socket.on("roomCreated", (channelId) => {

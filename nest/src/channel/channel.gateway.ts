@@ -23,6 +23,7 @@ import { socketToUserId } from 'src/users/socketToUserIdStorage.service';
 import { ModerateChannelDto } from './dto/moderateChannelUser.dto';
 import * as msgpack from 'socket.io-msgpack-parser';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
+import { AuthService } from 'src/auth/auth.service';
 
 enum acknoledgementStatus {
   OK = 'OK',
@@ -30,9 +31,9 @@ enum acknoledgementStatus {
 }
 
 @WebSocketGateway(3333, {
-  cors: {
-    credentials: true,
-	origin: "http://localhost:3000"
+	cors: {
+		credentials: true,
+		origin: "http://localhost:3000"
   },
   parser: msgpack,
 })
@@ -41,6 +42,12 @@ export class ChannelGateway {
   @WebSocketServer()
   server: Server;
   constructor(private readonly channelService: ChannelService) {}
+
+  @SubscribeMessage('connect')
+  handleConnection(@ConnectedSocket() clientSocket: Socket) {
+    AuthService
+	clientSocket.emit('userConnected');
+  }
 
   @SubscribeMessage('connectToRoom')
   async connectToChannel(
