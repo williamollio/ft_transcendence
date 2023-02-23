@@ -10,7 +10,7 @@ export class ChannelSocket {
 
   constructor() {
     this.socket = initSocket("http://localhost:3333");
-    this.user = { id: "", name: "" };
+    this.user = { id: "user1", name: "william" };
     this.channels = new Array<chatRoom>();
   }
 
@@ -50,7 +50,7 @@ export class ChannelSocket {
           );
           if (index >= 0) {
             this.channels.splice(index, 1);
-			return false;
+            return false;
           }
         }
       }
@@ -58,7 +58,7 @@ export class ChannelSocket {
     this.socket.on("leaveRoomFailed", () => {
       return true;
     });
-	return false;
+    return false;
   };
 
   joinRoom = (channelObj: chatRoom, password: string) => {
@@ -144,20 +144,23 @@ export class ChannelSocket {
     });
   };
 
-  inviteToChannel = (channel: chatRoom, otherUserId: string) => {
-    this.socket.emit("inviteToChannel", {
-      inviteInfo: {
-        channelId: channel.id,
-        invitedId: otherUserId,
-        type: channel.access,
-      },
-    });
-    this.socket.on("inviteFailed", () => {
-      return true;
-    });
-    this.socket.on("inviteSucceeded", () => {
-      return false;
-    });
+  inviteToChannel = (channel: chatRoom | null, otherUserId: string): boolean => {
+    if (channel) {
+      this.socket.emit("inviteToChannel", {
+        inviteInfo: {
+          channelId: channel.id,
+          invitedId: otherUserId,
+          type: channel.access,
+        },
+      });
+      this.socket.on("inviteFailed", () => {
+        return true;
+      });
+      this.socket.on("inviteSucceeded", () => {
+        return false;
+      });
+    }
+	return true;
   };
 
   banUser = (channelId: String, otherUserId: string, time: number) => {

@@ -81,14 +81,14 @@ export default function RoomContextMenu({
           contextMenuClose={handleContextClose}
           channelInfoOpen={channelInfoOpen}
           toggleChannelInfo={toggleChannelInfo}
-          channel={contextMenu!.channel}
+          channel={contextMenu ? contextMenu.channel : null}
           channelSocket={channelSocket}
         ></ChannelInfoDialog>
         <GetIdDialog
           channelSocket={channelSocket}
           open={openId}
           toggleOpen={toggleOpenId}
-          channel={contextMenu!.channel}
+          channel={contextMenu ? contextMenu.channel : null}
         ></GetIdDialog>
       </Menu>
     </>

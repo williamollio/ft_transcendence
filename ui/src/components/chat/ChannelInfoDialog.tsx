@@ -31,7 +31,7 @@ export default function ChannelInfoDialog({
   contextMenuClose: any;
   channelInfoOpen: boolean;
   toggleChannelInfo: any;
-  channel: chatRoom;
+  channel: chatRoom | null;
   channelSocket: ChannelSocket;
 }) {
   const [selected, setSelected] = useState<user | null>(null);

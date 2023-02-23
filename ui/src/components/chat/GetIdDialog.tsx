@@ -11,7 +11,7 @@ export default function GetIdDialog({
 }: {
   open: boolean;
   toggleOpen: any;
-  channel: chatRoom;
+  channel: chatRoom | null;
   channelSocket: ChannelSocket;
 }) {
   const [input, setInput] = useState<string>("");
