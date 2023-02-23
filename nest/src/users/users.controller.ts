@@ -47,15 +47,16 @@ export class UsersController {
 
   @Get()
   @ApiOkResponse({ type: UserEntity, isArray: true })
-  public async findAll() {
-    return this.usersService.findAll();
+  public async findAll(@Res() res: Response) {
+    return this.usersService.findAll(res);
   }
 
   @Get(':id')
+  //   @UseGuards(JwtGuard)
   @ApiOkResponse({ type: UserEntity })
   public async findOne(@Param('id') id: string) {
     // + operator casts to a number
-    return this.usersService.findOne(+id);
+    return this.usersService.findOne(id);
   }
 
   @Post()
@@ -79,7 +80,7 @@ export class UsersController {
     @Body() updateUserDto: UpdateUserDto,
   ) {
     try {
-      return await this.usersService.update(+id, updateUserDto);
+      return await this.usersService.update(id, updateUserDto);
     } catch (error) {
       console.error(error);
       throw new HttpException(
@@ -91,8 +92,8 @@ export class UsersController {
 
   @Delete(':id')
   @ApiOkResponse({ type: UserEntity })
-  public async remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+  public async remove(@Param('id') id: string, @Res() res: Response) {
+    return this.usersService.remove(id, res);
   }
 
   @Post('upload/:id')
@@ -124,7 +125,7 @@ export class UsersController {
     @UploadedFile()
     file: any,
   ): Promise<Observable<unknown>> {
-    const filename = await this.usersService.getFilename(+id);
+    const filename = await this.usersService.getFilename(id);
     if (filename !== null) {
       const filePath = path.resolve(`./uploads/profileimages/${filename}`);
       fs.unlink(filePath, (err) => {
@@ -135,7 +136,7 @@ export class UsersController {
       });
     }
 
-    this.usersService.setFilename(file.filename, +id);
+    this.usersService.setFilename(file.filename, id);
     return of({ imagePath: file.filename });
   }
 
@@ -143,7 +144,7 @@ export class UsersController {
   @ApiResponse({ status: HttpStatus.OK, description: 'File has been sent' })
   async getFile(@Param('id') id: string, @Res() res: Response) {
     try {
-      const filename = await this.usersService.getFilename(+id);
+      const filename = await this.usersService.getFilename(id);
       if (filename === null) {
         return res.send(null);
       }

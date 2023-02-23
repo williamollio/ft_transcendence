@@ -67,7 +67,7 @@ export class AuthService {
     }
   }
 
-  async refreshTokens(userId: number, refreshToken: string) {
+  async refreshTokens(userId: string, refreshToken: string) {
     const user = await this.userService.findOne(userId);
     if (!user || !user.refreshToken)
       throw new ForbiddenException('Access denied');
@@ -84,7 +84,7 @@ export class AuthService {
     return tokens;
   }
 
-  async logout(userId: number) {
+  async logout(userId: string) {
     const user = await this.userService.findOne(userId);
     if (!user) throw new UnauthorizedException('Unauthorized');
     await this.userService.updateRefreshToken(user.id, '');

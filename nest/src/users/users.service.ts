@@ -1,24 +1,27 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from '../prisma/prisma.service';
-import { User } from '@prisma/client';
+import { User, UserStatus } from '@prisma/client';
 import { Intra42User } from './interface/intra42-user.interface';
+import { Response } from 'express';
+
+// have to update this file and user response to display error
 
 @Injectable()
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
-  public async getFilename(id: number) {
+  public async getFilename(id: string) {
     const User = await this.prisma.user.findUnique({
       where: { id: id },
     });
     return User?.filename;
   }
 
-  public async setFilename(filename: string, id: number) {
+  public async setFilename(filename: string, userId: string) {
     await this.prisma.user.update({
-      where: { id: id },
+      where: { id: userId },
       data: {
         filename: filename,
       },
@@ -30,7 +33,7 @@ export class UsersService {
       const User = await this.prisma.user.create({
         data: {
           name: createUserDto.name,
-          intraId: -1, // TODO : Needs to be adjusted
+          intraId: String(-1), // TODO : Needs to be adjusted
         },
       });
 
@@ -47,7 +50,7 @@ export class UsersService {
       return await this.prisma.user.create({
         data: {
           name: `${dto.providerId}`,
-          intraId: +dto.providerId,
+          intraId: dto.providerId,
         },
       });
     } catch (e) {
@@ -55,15 +58,15 @@ export class UsersService {
     }
   }
 
-  public async findByIntraId(intraId: number) {
+  public async findByIntraId(intraId: string) {
     return this.prisma.user.findUnique({
-      where: { intraId: +intraId },
+      where: { intraId: intraId },
       include: { friends: false },
     });
   }
 
   private async updateFriendsList(
-    userId: number,
+    userId: string,
     userDto: CreateUserDto | UpdateUserDto,
   ) {
     const currentFriends = await this.prisma.user
@@ -76,7 +79,7 @@ export class UsersService {
       (friend) => !newFriends?.find((f) => f.id === friend.id),
     );
 
-    const friendsToRemoveArr: { id: number }[] = [];
+    const friendsToRemoveArr: { id: string }[] = [];
     if (friendsToRemove) {
       for (const friendToRemove of friendsToRemove) {
         friendsToRemoveArr.push({ id: friendToRemove.id });
@@ -87,7 +90,7 @@ export class UsersService {
       (friend) => !currentFriends?.find((f) => f.id === friend.id),
     );
 
-    const friendsToAddArr: { id: number }[] = [];
+    const friendsToAddArr: { id: string }[] = [];
     if (friendsToAdd) {
       for (const friendToAdd of friendsToAdd) {
         friendsToAddArr.push({ id: friendToAdd.id });
@@ -105,21 +108,33 @@ export class UsersService {
     });
   }
 
-  public async findAll() {
-    return this.prisma.user.findMany({ include: { friends: true } });
+  public async findAll(res: Response) {
+    // return this.prisma.user.findMany({ include: { friends: true } });
+    try {
+      const nicknames = await this.prisma.user.findMany({
+        select: {
+          id: true,
+          name: true,
+          status: true,
+        },
+      });
+      return res.status(200).send(nicknames);
+    } catch (error) {
+      return res.status(403).send();
+    }
   }
 
-  public async findOne(id: number) {
+  public async findOne(id: string) {
     return this.prisma.user.findUnique({
       where: { id },
       include: { friends: true },
     });
   }
 
-  public async updateRefreshToken(id: number, refreshToken: string) {
+  public async updateRefreshToken(userId: string, refreshToken: string) {
     try {
       return await this.prisma.user.update({
-        where: { id },
+        where: { id: userId },
         data: { refreshToken },
       });
     } catch (e) {
@@ -127,10 +142,10 @@ export class UsersService {
     }
   }
 
-  public async update(id: number, updateUserDto: UpdateUserDto) {
+  public async update(userId: string, updateUserDto: UpdateUserDto) {
     try {
       const User = await this.prisma.user.update({
-        where: { id },
+        where: { id: userId },
         data: { name: updateUserDto.name },
       });
       this.updateFriendsList(User.id, updateUserDto);
@@ -140,7 +155,75 @@ export class UsersService {
     }
   }
 
-  public async remove(id: number) {
-    return this.prisma.user.delete({ where: { id } });
+  public async remove(id: string, res: Response) {
+    // return this.prisma.user.delete({ where: { id } });
+    try {
+      await this.prisma.user.delete({
+        where: {
+          id,
+        },
+      });
+    } catch (error) {}
+    return res.send(204);
+  }
+
+  // channels api
+  async updateConnectionStatus(userId: string, connectionStatus: UserStatus) {
+    try {
+      if (userId) {
+        await this.prisma.user.update({
+          where: {
+            id: userId,
+          },
+          data: {
+            status: connectionStatus,
+          },
+        });
+      }
+    } catch (error) {}
+  }
+
+  // change the status of the user to offline
+  async logout(res: Response, userId: string) {
+    try {
+      await this.prisma.user.update({
+        where: {
+          id: userId,
+        },
+        data: {
+          status: UserStatus.OFFLINE,
+        },
+      });
+      return res.status(200).clearCookie('jwtToken', { httpOnly: true }).send(); // maybe like this
+    } catch (error) {
+      return res.status(403).send();
+    }
+  }
+
+  // channel invites
+  async getChannelInvites(userId: string) {
+    try {
+      const invitesList = await this.prisma.user.findUnique({
+        where: {
+          id: userId,
+        },
+        select: {
+          invites: {
+            select: {
+              id: true,
+            },
+          },
+        },
+      });
+      if (invitesList) {
+        const invites: { id: string }[] = [];
+        for (const invitees of invitesList.invites) {
+          invites.push(invitees);
+        }
+        return invites;
+      }
+    } catch (error) {
+      throw new ForbiddenException(error);
+    }
   }
 }

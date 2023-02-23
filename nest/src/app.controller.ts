@@ -6,9 +6,8 @@ import { AppService } from './app.service';
 @UseGuards(ThrottlerGuard)
 export class AppController {
   constructor(private readonly appService: AppService) {}
-
   @Get()
   getHello(): string {
-    return this.appService.getHello();
+    return 'works!';
   }
 }

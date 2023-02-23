@@ -1,0 +1,21 @@
+    friends                       User[]      @relation("friends")
+    friendsRelation               User[]      @relation("friends") // stores the many-to-many relation
+
+    friendsRequester              Friendship[]      @relation("requester")
+    friendsAddressee              Friendship[]      @relation("addressee")
+
+
+model Friendship {
+  requesterId Int
+  requester   User   @relation("requester", fields: [requesterId], references: [id], onDelete: Cascade)
+  addresseeId Int
+  addressee   User   @relation("addressee", fields: [addresseeId], references: [id], onDelete: Cascade)
+
+  status    FriendshipStatus @default(REQUESTED)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  @@id([requesterId, addresseeId])
+  @@unique(fields: [requesterId, addresseeId], name: "friendshipId")
+  @@map("friendships")
+}
