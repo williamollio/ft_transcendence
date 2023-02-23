@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  ForbiddenException,
-  Injectable,
-} from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from '../prisma/prisma.service';
@@ -23,9 +19,9 @@ export class UsersService {
     return User?.filename;
   }
 
-  public async setFilename(filename: string, id: string) {
+  public async setFilename(filename: string, userId: string) {
     await this.prisma.user.update({
-      where: { id: id },
+      where: { id: userId },
       data: {
         filename: filename,
       },
@@ -112,7 +108,7 @@ export class UsersService {
     });
   }
 
-  public async findAll(res : Response) {
+  public async findAll(res: Response) {
     // return this.prisma.user.findMany({ include: { friends: true } });
     try {
       const nicknames = await this.prisma.user.findMany({
@@ -135,10 +131,10 @@ export class UsersService {
     });
   }
 
-  public async updateRefreshToken(id: string, refreshToken: string) {
+  public async updateRefreshToken(userId: string, refreshToken: string) {
     try {
       return await this.prisma.user.update({
-        where: { id },
+        where: { id: userId },
         data: { refreshToken },
       });
     } catch (e) {
@@ -146,10 +142,10 @@ export class UsersService {
     }
   }
 
-  public async update(id: string, updateUserDto: UpdateUserDto) {
+  public async update(userId: string, updateUserDto: UpdateUserDto) {
     try {
       const User = await this.prisma.user.update({
-        where: { id },
+        where: { id: userId },
         data: { name: updateUserDto.name },
       });
       this.updateFriendsList(User.id, updateUserDto);
@@ -159,7 +155,7 @@ export class UsersService {
     }
   }
 
-  public async remove(id: string, res : Response) {
+  public async remove(id: string, res: Response) {
     // return this.prisma.user.delete({ where: { id } });
     try {
       await this.prisma.user.delete({
@@ -230,5 +226,4 @@ export class UsersService {
       throw new ForbiddenException(error);
     }
   }
-
 }
