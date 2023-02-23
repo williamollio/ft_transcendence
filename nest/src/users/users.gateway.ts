@@ -15,6 +15,10 @@ import * as msgpack from 'socket.io-msgpack-parser';
 
 // add some cors sanitazation here
 @WebSocketGateway(8888, {
+	cors: {
+		credentials: true,
+		origin: "http://localhost:3000",
+	},
   parser: msgpack,
 })
 // add some guards here

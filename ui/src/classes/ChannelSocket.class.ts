@@ -21,6 +21,10 @@ export class ChannelSocket {
   ) => {
     this.socket.emit("createRoom", {
       channelInfo: { channelObj, passwordHash: password },
+      query: {
+        Authentication:
+          "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNsZWg2cjdocDAwMDBtY2F4cnVwZ20xbWciLCJpbnRyYUlkIjoiODYwNjAiLCJpYXQiOjE2NzcxNjMzNDYsImV4cCI6MTY3NzE2NDI0Nn0.vktoB325_CQ9mvWz8nP1eOwofOAi7WnP-_uBfcwpEIw",
+      },
     });
     this.socket.on("roomCreated", (channelId) => {
       setNewChannel(
@@ -144,7 +148,10 @@ export class ChannelSocket {
     });
   };
 
-  inviteToChannel = (channel: chatRoom | null, otherUserId: string): boolean => {
+  inviteToChannel = (
+    channel: chatRoom | null,
+    otherUserId: string
+  ): boolean => {
     if (channel) {
       this.socket.emit("inviteToChannel", {
         inviteInfo: {
@@ -160,7 +167,7 @@ export class ChannelSocket {
         return false;
       });
     }
-	return true;
+    return true;
   };
 
   banUser = (channelId: String, otherUserId: string, time: number) => {

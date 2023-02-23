@@ -22,6 +22,7 @@ import { Channel, ChannelRole, ChannelType } from '@prisma/client';
 import { socketToUserId } from 'src/users/socketToUserIdStorage.service';
 import { ModerateChannelDto } from './dto/moderateChannelUser.dto';
 import * as msgpack from 'socket.io-msgpack-parser';
+import { JwtGuard } from 'src/auth/guards/jwt.guard';
 
 enum acknoledgementStatus {
   OK = 'OK',
@@ -35,7 +36,7 @@ enum acknoledgementStatus {
   },
   parser: msgpack,
 })
-@UseGuards()
+@UseGuards(JwtGuard)
 export class ChannelGateway {
   @WebSocketServer()
   server: Server;

@@ -6,6 +6,5 @@ export const initSocket = (uri: string) => {
     withCredentials: true,
     parser: msgpack,
   });
-  socket
   return socket;
 };

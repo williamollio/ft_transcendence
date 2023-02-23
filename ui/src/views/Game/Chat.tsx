@@ -21,8 +21,10 @@ import AddChannelDialog from "../../components/chat/AddChannelDialog";
 import RoomContextMenu from "../../components/chat/RoomContextMenu";
 import CloseIcon from "@mui/icons-material/Close";
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
+import { UserSocket } from "../../classes/UserSocket.class";
 
 const channelSocket: ChannelSocket = new ChannelSocket();
+const userSocket: UserSocket = new UserSocket();
 
 export default function Chat() {
   const [open, toggleOpen] = useState(false);
@@ -67,6 +69,11 @@ export default function Chat() {
       console.log(args);
     });
   }, [channelSocket]);
+
+//   useEffect(() => {
+// 	userSocket.socket.onAny((event, ...args) => {
+
+//   }, []);
 
   const listMessages = messages
     ? messages.map((messagesDto: messagesDto, index) => {
