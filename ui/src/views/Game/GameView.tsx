@@ -13,19 +13,35 @@ import {
   ContentWrapper,
 } from "../../styles/MuiStyles";
 import { QueryClient, QueryClientProvider } from "react-query";
+import { Cookie } from "../../utils/auth-helper";
+import { ChannelSocket } from "../../classes/ChannelSocket.class";
+import { UserSocket } from "../../classes/UserSocket.class";
 
 const queryClient = new QueryClient();
 
 export default function GameView(): React.ReactElement {
   const { t } = useTranslation();
   //   const { classes } = useStyles();
+
+  const [channelSocket] = React.useState<ChannelSocket>(new ChannelSocket());
+
+  React.useEffect(() => {
+    let token;
+
+    if ((token = localStorage.getItem(Cookie.TOKEN))) {
+      channelSocket.initializeSocket(token);
+      const userSocket = new UserSocket();
+      userSocket.initializeSocket(token);
+    }
+  }, []);
+
   return (
     <>
       <Navbar />
       <Background>
         <ProfileCard>
           <QueryClientProvider client={queryClient}>
-            <Chat />
+            <Chat channelSocket={channelSocket} />
           </QueryClientProvider>
           <CardContainer>
             <TitleWrapper>
