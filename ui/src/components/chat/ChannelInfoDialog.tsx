@@ -5,6 +5,7 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  Divider,
   Grid,
   Paper,
   Table,
@@ -20,6 +21,7 @@ import { chatRoom } from "../../classes/chatRoom.class";
 import ChannelInfoContext from "./ChannelInfoContext";
 import GetPasswordDialog from "./GetPasswordDialog";
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
+import GetNameDialog from "./GetNameDialog";
 
 export default function ChannelInfoDialog({
   contextMenuClose,
@@ -43,6 +45,8 @@ export default function ChannelInfoDialog({
   } | null>(null);
 
   const [openPassword, toggleOpenPassword] = useState<boolean>(false);
+
+  const [openName, toggleOpenName] = useState<boolean>(false);
 
   const handleClose = () => {
     toggleChannelInfo(false);
@@ -86,7 +90,11 @@ export default function ChannelInfoDialog({
       : false;
 
   const handlePasswordChange = () => {
-	toggleOpenPassword(true);
+    toggleOpenPassword(true);
+  };
+
+  const handleNameChange = () => {
+    toggleOpenName(true);
   };
 
   return (
@@ -99,28 +107,40 @@ export default function ChannelInfoDialog({
         <Grid item>
           <DialogTitle>Channel Info</DialogTitle>
         </Grid>
+		<Divider></Divider>
         <Grid item>
           <DialogContent>
             Channel ID: {channel && channel.id !== "" ? channel.id : "missing"}
           </DialogContent>
         </Grid>
-        <Grid item alignItems={"center"} justifyContent={"center"}>
-          <DialogActions>
-            <Button variant="outlined" onClick={handlePasswordChange}>
-              Change Password
-            </Button>
-          </DialogActions>
-        </Grid>
         <Grid item>
+          <Grid container>
+            <Grid item>
+              <DialogActions>
+                <Button variant="outlined" onClick={handlePasswordChange}>
+                  Change Password
+                </Button>
+              </DialogActions>
+            </Grid>
+            <Grid item>
+              <DialogActions>
+                <Button variant="outlined" onClick={handleNameChange}>
+                  Change Name
+                </Button>
+              </DialogActions>
+            </Grid>
+          </Grid>
+        </Grid>
+        <Grid item alignItems={"center"} justifyContent={"center"}>
           <Box
-            sx={{ height: "275px", width: "260px" }}
+            sx={{ height: "275px", width: "99%" }}
             alignItems="center"
             justifyContent="center"
             display="flex"
           >
             <TableContainer
               component={Paper}
-              sx={{ height: "270px", width: "255px", bgcolor: "grey.600" }}
+              sx={{ height: "270px", width: "99%", bgcolor: "grey.600" }}
             >
               <Table size="small">
                 <TableHead>
@@ -136,11 +156,16 @@ export default function ChannelInfoDialog({
             <ChannelInfoContext
               contextMenu={contextMenu}
               setContextMenu={setContextMenu}
-			  channelSocket={channelSocket}
+              channelSocket={channelSocket}
             ></ChannelInfoContext>
           </Box>
         </Grid>
       </Grid>
+      <GetNameDialog
+        open={openName}
+        toggleOpen={toggleOpenName}
+        channel={channel}
+      ></GetNameDialog>
       <GetPasswordDialog
         open={openPassword}
         toggleOpen={toggleOpenPassword}

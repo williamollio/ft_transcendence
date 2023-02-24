@@ -5,7 +5,7 @@ export enum Cookie {
 
 interface tokenData {
   name: string;
-  id: number;
+  id: string;
 }
 
 export function initAuthToken(): string | null {

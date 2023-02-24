@@ -1,8 +1,11 @@
 import { Socket } from "socket.io-client";
-import { initSocket } from "../components/hook/initSocket";
+import { initSocket } from "../services/initSocket.service";
 import { accessTypes, chatRoom } from "./chatRoom.class";
 import { messagesDto, user } from "../interfaces/chat.interfaces";
-import { Cookie } from "../utils/auth-helper";
+import { getTokenData, Cookie } from "../utils/auth-helper";
+import ChannelService from "../services/channel.service";
+import { channel } from "diagnostics_channel";
+import { ThermostatOutlined } from "@mui/icons-material";
 
 export class ChannelSocket {
   socket: Socket;
@@ -10,9 +13,13 @@ export class ChannelSocket {
   channels: chatRoom[];
 
   constructor() {
+    let token = localStorage.getItem(Cookie.TOKEN);
     this.socket = initSocket("http://localhost:3333");
-    this.user = { id: "user1", name: "william" };
+    token
+      ? (this.user = getTokenData(token))
+      : (this.user = { id: "", name: "" });
     this.channels = new Array<chatRoom>();
+    if (!this.user.name) this.user.name = "missing";
   }
 
   createRoom = (
@@ -20,15 +27,10 @@ export class ChannelSocket {
     setNewChannel: any,
     password?: string
   ) => {
-	var token = "Bearer "+ localStorage.getItem(Cookie.TOKEN);
     this.socket.emit("createRoom", {
       channelInfo: { channelObj, passwordHash: password },
-      auth: {
-        token:
-          {token},
-      },
     });
-    this.socket.on("roomCreated", (channelId) => {
+    this.socket.once("roomCreated", (channelId) => {
       setNewChannel(
         this.channels[
           this.channels.push(
@@ -36,9 +38,11 @@ export class ChannelSocket {
           ) - 1
         ]
       );
+      this.socket.removeAllListeners("createRoomFailed");
       return false;
     });
-    this.socket.on("createRoomFailed", () => {
+    this.socket.once("createRoomFailed", () => {
+      this.socket.removeAllListeners("roomCreated");
       return true;
     });
   };
@@ -67,34 +71,45 @@ export class ChannelSocket {
     return false;
   };
 
-  joinRoom = (channelObj: chatRoom, password: string) => {
+  joinRoom = (channelId: string, access: accessTypes, password?: string) => {
+    console.log("emitting joinRoom");
     this.socket.emit("joinRoom", {
       joinInfo: {
-        id: channelObj.id,
-        type: channelObj.access,
+        id: channelId,
+        type: access,
         passwordHash: password,
       },
     });
-    this.socket.on("roomJoined", (userId: string, channelId: string) => {
-      if (userId === this.user.id)
-        this.channels.push(
-          new chatRoom(channelId, channelObj.key, channelObj.access)
-        );
-      return false;
-    });
+    this.socket.once(
+      "roomJoined",
+      async (userId: string, channelId: string) => {
+        if (userId === this.user.id) {
+          await ChannelService.getChannel(channelId).then((value) => {
+            this.channels.push(
+              new chatRoom(channelId, value.data.name, value.data.type)
+            );
+          });
+        }
+        this.socket.removeAllListeners("joinRoomError");
+        this.socket.removeAllListeners("joinRoomFailed");
+        return false;
+      }
+    );
     ["joinRoomError", "joinRoomFailed"].forEach((element) => {
       this.socket.on(element, () => {
+        this.socket.removeAllListeners("roomJoined");
+        this.socket.removeAllListeners("joinRoomError");
+        this.socket.removeAllListeners("joinRoomFailed");
         return true;
       });
     });
   };
 
   messageRoom = (message: messagesDto) => {
+    console.log("emitting message");
+    console.log(message);
     this.socket.emit("messageRoom", {
       messageInfo: { channelId: message.room, content: message.message },
-    });
-    this.socket.on("messageRoomFailed", () => {
-      return true;
     });
   };
 

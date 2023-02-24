@@ -43,12 +43,6 @@ export class ChannelGateway {
   server: Server;
   constructor(private readonly channelService: ChannelService) {}
 
-  @SubscribeMessage('connect')
-  handleConnection(@ConnectedSocket() clientSocket: Socket) {
-    AuthService
-	clientSocket.emit('userConnected');
-  }
-
   @SubscribeMessage('connectToRoom')
   async connectToChannel(
     @GetCurrentUserId() userId: string,
@@ -140,7 +134,7 @@ export class ChannelGateway {
     } else {
       clientSocket
         .to(messageInfo.channelId)
-        .emit('incomingMessage', messageInfo.content);
+        .emit('incomingMessage', messageInfo);
       return acknoledgementStatus.OK;
     }
   }

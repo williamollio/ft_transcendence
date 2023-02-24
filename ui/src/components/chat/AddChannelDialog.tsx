@@ -59,26 +59,29 @@ export default function AddChannelDialog({
       if (dialogValue.key !== "") {
         if (dialogValue.access !== "PROTECTED" || dialogValue.password !== "") {
           if (dialogValue.access === "PROTECTED") {
-            console.log("emitting");
             channelSocket.createRoom(
               new chatRoom(undefined, dialogValue.key, dialogValue.access),
               setNewChannel,
               dialogValue.password
             );
           } else {
-            console.log("emitting");
             channelSocket.createRoom(
               new chatRoom(undefined, dialogValue.key, dialogValue.access),
               setNewChannel,
               undefined
             );
           }
+          setDialogValue({ key: "", access: "PUBLIC", password: "" });
           toggleOpen(false);
         } else setAlertOpen(true);
       } else setAlertOpen(true);
     } else {
+      channelSocket.joinRoom(
+        dialogJoinValue.id,
+        dialogJoinValue.password !== "" ? "PROTECTED" : "PUBLIC",
+        dialogJoinValue.password !== "" ? dialogJoinValue.password : undefined
+      );
       toggleOpen(false);
-      // try to join room
     }
   };
 

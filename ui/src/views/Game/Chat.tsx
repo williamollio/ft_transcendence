@@ -49,14 +49,12 @@ export default function Chat() {
     if (e.key === "Enter") {
       if (currentRoom && typeof currentRoom !== "boolean" && inputChat !== "") {
         currentRoom.messages.push({
-          message: inputChat,
-          user: "You",
-          room: currentRoom.key,
+          message: "[You]: " + inputChat,
+          room: currentRoom.id,
         });
         channelSocket.messageRoom({
-          message: inputChat,
-          user: "test",
-          room: currentRoom.key,
+          message: "[" + channelSocket.user.name + "]: " + inputChat,
+          room: currentRoom.id,
         });
       }
       setInputChat("");
@@ -64,23 +62,21 @@ export default function Chat() {
   };
 
   useEffect(() => {
-    channelSocket.socket.onAny((event: any, ...args: any) => {
-      console.log(event);
-      console.log(args);
+    channelSocket.socket.on("incomingMessage", (event: any, ...args: any) => {
+      let index = channelSocket.channels.findIndex((element) => element.id === args.channelId);
+	  if (index >= 0)
+		channelSocket.channels[index].messages.push(args.content);
     });
+	channelSocket.socket.on("messageRoomFailed", () => {
+		
+	});
   }, [channelSocket]);
-
-//   useEffect(() => {
-// 	userSocket.socket.onAny((event, ...args) => {
-
-//   }, []);
 
   const listMessages = messages
     ? messages.map((messagesDto: messagesDto, index) => {
         if (
           messagesDto &&
-          messagesDto.message !== "" &&
-          messagesDto.user !== ""
+          messagesDto.message !== ""
         ) {
           return (
             <ListItem
@@ -90,7 +86,7 @@ export default function Chat() {
               key={index}
             >
               <ListItemText
-                primary={"[" + messagesDto.user + "]: " + messagesDto.message}
+                primary={messagesDto.message}
               />
             </ListItem>
           );

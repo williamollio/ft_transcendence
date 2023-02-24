@@ -41,7 +41,7 @@ export default function JoinForm({
                 onChange={(event) =>
                   setDialogJoinValue({
                     ...dialogJoinValue,
-                    key: event.target.value,
+                    id: event.target.value,
                   })
                 }
                 label="id"

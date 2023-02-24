@@ -1,5 +1,5 @@
 import { Socket } from "socket.io-client";
-import { initSocket } from "../components/hook/initSocket";
+import { initSocket } from "../services/initSocket.service";
 
 export class UserSocket {
 	socket: Socket;
