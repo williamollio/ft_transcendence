@@ -36,11 +36,13 @@ export interface HandshakeRequest extends Request {
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(private userService: UsersService) {
     const extractJwtFromSocket = (handshake: HandshakeRequest) => {
-      const authHeader = handshake.handshake.auth.token;
-      if (authHeader && authHeader.split(' ')[0] === 'Bearer') {
-        return authHeader.split(' ')[1];
-      }
-      return null;
+      if (handshake.handshake) {
+        const authHeader = handshake.handshake.auth.token;
+        if (authHeader && authHeader.split(' ')[0] === 'Bearer') {
+          return authHeader.split(' ')[1];
+        }
+        return null;
+      } else return ExtractJwt.fromAuthHeaderAsBearerToken()(handshake as any);
     };
 
     super({
