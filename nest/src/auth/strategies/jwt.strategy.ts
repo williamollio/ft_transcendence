@@ -38,6 +38,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     const extractJwtFromSocket = (handshake: HandshakeRequest) => {
       if (handshake.handshake) {
         const authHeader = handshake.handshake.auth.token;
+		console.log(authHeader);
         if (authHeader && authHeader.split(' ')[0] === 'Bearer') {
           return authHeader.split(' ')[1];
         }

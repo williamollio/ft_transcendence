@@ -26,7 +26,7 @@ export class ChannelSocket {
     channelObj: chatRoom,
     setNewChannel: any,
     password?: string
-  ) => {
+  ): boolean => {
     this.socket.emit("createRoom", {
       channelInfo: { channelObj, passwordHash: password },
     });
@@ -45,6 +45,7 @@ export class ChannelSocket {
       this.socket.removeAllListeners("roomCreated");
       return true;
     });
+	return false;
   };
 
   deleteRoom = (channel: chatRoom): Boolean => {
@@ -119,7 +120,7 @@ export class ChannelSocket {
     password?: string,
     newPassword?: string,
     newName?: string
-  ) => {
+  ): boolean => {
     this.socket.emit("editRoom", {
       channelId: channel.id,
       editInfo: {
@@ -129,23 +130,25 @@ export class ChannelSocket {
         currentPasswordHash: password,
       },
     });
-    this.socket.on("roomEdited", async (newChannelId: string) => {
+    this.socket.once("roomEdited", async (newChannelId: string) => {
+      this.socket.removeAllListeners("editRoomFailed");
       let index = this.channels.findIndex(
         (element) => element.id === channel.id
       );
-	  await ChannelService.getChannel(newChannelId).then((value) => {
-		  this.channels[index].key = value.data.name;
-		  this.channels[index].access = value.data.type;
-	  });
+      await ChannelService.getChannel(newChannelId).then((value) => {
+        this.channels[index].key = value.data.name;
+        this.channels[index].access = value.data.type;
+      });
       if (index >= 0) {
-		  this.channels[index].id = newChannelId;
-		  return false;
-		} else return true;
+        this.channels[index].id = newChannelId;
+        return false;
+      } else return true;
     });
-    this.socket.on("editRoomFailed", () => {
-		console.log("failed");
+    this.socket.once("editRoomFailed", () => {
+      this.socket.removeAllListeners("roomEdited");
       return true;
     });
+	return false;
   };
 
   createDm = (otherUser: user) => {
