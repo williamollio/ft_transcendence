@@ -1,15 +1,18 @@
 import { Dialog, DialogContent, TextField } from "@mui/material";
 import { useState } from "react";
+import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { chatRoom } from "../../classes/chatRoom.class";
 
 export default function GetNameDialog({
   open,
   toggleOpen,
   channel,
+  channelSocket,
 }: {
   open: boolean;
   toggleOpen: any;
   channel: chatRoom | null;
+  channelSocket: ChannelSocket;
 }) {
   const [input, setInput] = useState<string>("");
   const [nameInput, setNameInput] = useState<string>("");
@@ -17,7 +20,7 @@ export default function GetNameDialog({
   const handleClose = () => {
     setInput("");
     setNameInput("");
-    toggleOpen(false);
+    toggleOpen();
   };
 
   const handleChange = (e: any) => {
@@ -30,34 +33,39 @@ export default function GetNameDialog({
 
   const handleSubmit = (e: any) => {
     if (e.key === "Enter") {
-      if (channel && channel.access === "PROTECTED" && input !== "") {
+      if (
+        channel &&
+        (channel.access !== "PROTECTED" ||
+          (channel.access === "PROTECTED" && input !== ""))
+      ) {
         if (nameInput !== "") {
-          //send request with oldInput and input
-        } else {
-          //send request to remove password
+          channelSocket.editRoom(
+            channel,
+            channel.access,
+            channel.access === "PROTECTED" ? input : undefined,
+            undefined,
+            nameInput
+          );
         }
-      } else {
-        //send request with input to change access type to PROTECTED
       }
       handleClose();
     }
   };
 
   return (
-    <Dialog open={open} onClose={handleClose}>
-		<DialogContent>Enter new Name of the channel</DialogContent>
-        <TextField
-          label="New name"
-          type="string"
-          value={nameInput}
-          onChange={handleNameChange}
-        ></TextField>
+    <Dialog open={open} onClose={handleClose} onKeyDown={handleSubmit}>
+      <DialogContent>Enter new Name of the channel</DialogContent>
+      <TextField
+        label="New name"
+        type="string"
+        value={nameInput}
+        onChange={handleNameChange}
+      ></TextField>
       <TextField
         label="Password"
         type="password"
         value={input}
         onChange={handleChange}
-        onKeyDown={handleSubmit}
       ></TextField>
     </Dialog>
   );

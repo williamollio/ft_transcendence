@@ -129,16 +129,21 @@ export class ChannelSocket {
         currentPasswordHash: password,
       },
     });
-    this.socket.on("roomEdited", (newChannelId: string) => {
+    this.socket.on("roomEdited", async (newChannelId: string) => {
       let index = this.channels.findIndex(
         (element) => element.id === channel.id
       );
+	  await ChannelService.getChannel(newChannelId).then((value) => {
+		  this.channels[index].key = value.data.name;
+		  this.channels[index].access = value.data.type;
+	  });
       if (index >= 0) {
-        this.channels[index].id = newChannelId;
-        return false;
-      } else return true;
+		  this.channels[index].id = newChannelId;
+		  return false;
+		} else return true;
     });
     this.socket.on("editRoomFailed", () => {
+		console.log("failed");
       return true;
     });
   };

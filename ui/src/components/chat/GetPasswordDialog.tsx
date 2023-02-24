@@ -1,15 +1,18 @@
 import { Dialog, DialogContent, TextField } from "@mui/material";
 import { useState } from "react";
+import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { chatRoom } from "../../classes/chatRoom.class";
 
 export default function GetPasswordDialog({
   open,
   toggleOpen,
   channel,
+  channelSocket,
 }: {
   open: boolean;
   toggleOpen: any;
   channel: chatRoom | null;
+  channelSocket: ChannelSocket;
 }) {
   const [input, setInput] = useState<string>("");
   const [oldInput, setOldInput] = useState<string>("");
@@ -17,7 +20,7 @@ export default function GetPasswordDialog({
   const handleClose = () => {
     setInput("");
     setOldInput("");
-    toggleOpen(false);
+    toggleOpen();
   };
 
   const handleChange = (e: any) => {
@@ -32,20 +35,25 @@ export default function GetPasswordDialog({
     if (e.key === "Enter") {
       if (channel && channel.access === "PROTECTED" && oldInput !== "") {
         if (input !== "") {
-          //send request with oldInput and input
+          //send request to change password
+          channelSocket.editRoom(channel, channel.access, oldInput, input);
         } else {
           //send request to remove password
+          channelSocket.editRoom(channel, channel.access, oldInput);
         }
-      } else {
+      } else if (channel && channel.access !== "PROTECTED" && input !== "") {
         //send request with input to change access type to PROTECTED
+        channelSocket.editRoom(channel, "PROTECTED", undefined, input);
       }
       handleClose();
     }
   };
 
   return (
-    <Dialog open={open} onClose={handleClose}>
-		<DialogContent>Leave Password empty to remove Password protection</DialogContent>
+    <Dialog open={open} onClose={handleClose} onKeyDown={handleSubmit}>
+      <DialogContent>
+        Leave Password empty to remove Password protection
+      </DialogContent>
       {channel && channel.access === "PROTECTED" ? (
         <TextField
           label="Old Password"
@@ -53,13 +61,14 @@ export default function GetPasswordDialog({
           value={oldInput}
           onChange={handleOldChange}
         ></TextField>
-      ) : false}
+      ) : (
+        false
+      )}
       <TextField
         label="Password"
         type="password"
         value={input}
         onChange={handleChange}
-        onKeyDown={handleSubmit}
       ></TextField>
     </Dialog>
   );

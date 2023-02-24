@@ -31,9 +31,9 @@ enum acknoledgementStatus {
 }
 
 @WebSocketGateway(3333, {
-	cors: {
-		credentials: true,
-		origin: "http://localhost:3000"
+  cors: {
+    credentials: true,
+    origin: 'http://localhost:3000',
   },
   parser: msgpack,
 })
@@ -132,6 +132,9 @@ export class ChannelGateway {
       this.server.to(clientSocket.id).emit('messageRoomFailed');
       return acknoledgementStatus.FAILED;
     } else {
+      ///
+      console.log('sending incoming message');
+      ///
       clientSocket
         .to(messageInfo.channelId)
         .emit('incomingMessage', messageInfo);

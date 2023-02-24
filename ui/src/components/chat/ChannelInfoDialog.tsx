@@ -15,7 +15,7 @@ import {
   TableHead,
   TableRow,
 } from "@mui/material";
-import { useState } from "react";
+import { SyntheticEvent, useState } from "react";
 import { user } from "../../interfaces/chat.interfaces";
 import { chatRoom } from "../../classes/chatRoom.class";
 import ChannelInfoContext from "./ChannelInfoContext";
@@ -89,12 +89,22 @@ export default function ChannelInfoDialog({
         })
       : false;
 
-  const handlePasswordChange = () => {
+  const handlePasswordChange = (e?: SyntheticEvent) => {
+    e ? e.preventDefault() : false;
     toggleOpenPassword(true);
   };
 
-  const handleNameChange = () => {
+  const handleNameChange = (e?: SyntheticEvent) => {
+    e ? e.preventDefault() : false;
     toggleOpenName(true);
+  };
+
+  const closeNameDialog = () => {
+    toggleOpenName(false);
+  };
+
+  const closePasswordDialog = () => {
+    toggleOpenPassword(false);
   };
 
   return (
@@ -107,7 +117,7 @@ export default function ChannelInfoDialog({
         <Grid item>
           <DialogTitle>Channel Info</DialogTitle>
         </Grid>
-		<Divider></Divider>
+        <Divider></Divider>
         <Grid item>
           <DialogContent>
             Channel ID: {channel && channel.id !== "" ? channel.id : "missing"}
@@ -117,14 +127,14 @@ export default function ChannelInfoDialog({
           <Grid container>
             <Grid item>
               <DialogActions>
-                <Button variant="outlined" onClick={handlePasswordChange}>
+                <Button variant="outlined" onMouseUp={(e) => handlePasswordChange()} onMouseDown={handlePasswordChange}>
                   Change Password
                 </Button>
               </DialogActions>
             </Grid>
             <Grid item>
               <DialogActions>
-                <Button variant="outlined" onClick={handleNameChange}>
+                <Button variant="outlined" onMouseUp={(e) => handleNameChange()} onMouseDown={handleNameChange}>
                   Change Name
                 </Button>
               </DialogActions>
@@ -163,13 +173,15 @@ export default function ChannelInfoDialog({
       </Grid>
       <GetNameDialog
         open={openName}
-        toggleOpen={toggleOpenName}
+        toggleOpen={closeNameDialog}
         channel={channel}
+        channelSocket={channelSocket}
       ></GetNameDialog>
       <GetPasswordDialog
         open={openPassword}
-        toggleOpen={toggleOpenPassword}
+        toggleOpen={closePasswordDialog}
         channel={channel}
+        channelSocket={channelSocket}
       ></GetPasswordDialog>
     </Dialog>
   );
