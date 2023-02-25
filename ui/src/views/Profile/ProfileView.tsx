@@ -33,7 +33,8 @@ import {
 import { Controller, FieldValues, useForm } from "react-hook-form";
 import CustomMultiSelect from "../../components/shared/CustomMultiSelect/CustomMultiselect";
 import CustomTextField from "../../components/shared/CustomTextField/CustomTextField";
-import { Cookie, getTokenData, initAuthToken } from "../../utils/auth-helper";
+import { Cookie, getTokenData } from "../../utils/auth-helper";
+import MiniDrawer from "../../components/MiniDrawer";
 
 export default function ProfileView(): React.ReactElement {
   const { t } = useTranslation();
@@ -193,6 +194,7 @@ export default function ProfileView(): React.ReactElement {
   return (
     <>
       <Navbar />
+      <MiniDrawer />
       <Background>
         <ProfileCard>
           <CardContainer>
