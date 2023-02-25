@@ -8,9 +8,10 @@ import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
 import Settings from "@mui/icons-material/Settings";
 import Logout from "@mui/icons-material/Logout";
+import VpnKeyIcon from "@mui/icons-material/VpnKey";
 import { useNavigate } from "react-router-dom";
 import { RoutePath } from "../interfaces/router.interface";
-import { Cookie } from "../utils/auth-helper";
+import { Cookie, eraseCookie } from "../utils/auth-helper";
 
 interface Props {
   image: Blob | File | null;
@@ -19,6 +20,7 @@ interface Props {
 enum AnchorEnum {
   SETTINGS = "SETTINGS",
   LOGOUT = "LOGOUT",
+  SETUP2FA = "SETUP2FA",
 }
 
 export default function PictureMenu(props: Props) {
@@ -33,10 +35,17 @@ export default function PictureMenu(props: Props) {
     switch (type) {
       case AnchorEnum.LOGOUT: {
         localStorage.removeItem(Cookie.TOKEN);
+        eraseCookie(Cookie.TOKEN);
+        eraseCookie(Cookie.REFRESH_TOKEN);
+        navigate(RoutePath.LOGIN);
         break;
       }
       case AnchorEnum.SETTINGS: {
         navigate(RoutePath.PROFILE, { state: { isEditMode: true } });
+        break;
+      }
+      case AnchorEnum.SETUP2FA: {
+        navigate(RoutePath.SETUP2FA);
         break;
       }
       default: {
@@ -109,7 +118,13 @@ export default function PictureMenu(props: Props) {
           <ListItemIcon>
             <Settings fontSize="small" />
           </ListItemIcon>
-          Settings
+          Edit Profile
+        </MenuItem>
+        <MenuItem onClick={() => handleClose(AnchorEnum.SETUP2FA)}>
+          <ListItemIcon>
+            <VpnKeyIcon fontSize="small" />
+          </ListItemIcon>
+          2FA
         </MenuItem>
         <MenuItem onClick={() => handleClose(AnchorEnum.LOGOUT)}>
           <ListItemIcon>
