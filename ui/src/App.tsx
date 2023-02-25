@@ -82,34 +82,20 @@ export default function App() {
             <Route
               path={RoutePath.REDIRECT}
               element={
-                <PrivateRoute>
-                  <RedirectWrapper />
-                </PrivateRoute>
+                <PrivateRoute children={<RedirectWrapper />}></PrivateRoute>
               }
             />
             <Route
               path={RoutePath.PROFILE}
-              element={
-                <PrivateRoute>
-                  <ProfileView />
-                </PrivateRoute>
-              }
+              element={<PrivateRoute children={<ProfileView />}></PrivateRoute>}
             />
             <Route
               path={RoutePath.GAME}
-              element={
-                <PrivateRoute>
-                  <GameView />
-                </PrivateRoute>
-              }
+              element={<PrivateRoute children={<GameView />}></PrivateRoute>}
             />
             <Route
               path={RoutePath.SETUP2FA}
-              element={
-                <PrivateRoute>
-                  <Setup2FA />
-                </PrivateRoute>
-              }
+              element={<PrivateRoute children={<Setup2FA />}></PrivateRoute>}
             />
             <Route path={RoutePath.LOGIN_2FA} element={<Login2FAView />} />{" "}
             {/* TODO : William Private ? */}
