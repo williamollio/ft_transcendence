@@ -4,8 +4,6 @@ import { accessTypes, chatRoom } from "./chatRoom.class";
 import { messagesDto, user } from "../interfaces/chat.interfaces";
 import { getTokenData, Cookie } from "../utils/auth-helper";
 import ChannelService from "../services/channel.service";
-import { channel } from "diagnostics_channel";
-import { ThermostatOutlined } from "@mui/icons-material";
 
 export class ChannelSocket {
   socket: Socket;

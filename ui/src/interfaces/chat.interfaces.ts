@@ -23,3 +23,9 @@ export interface DBChannelElement
 	name: string,
 	type: accessTypes,
 }
+
+export interface DBChannelUserListElement
+{
+	id: string,
+	
+}
