@@ -1,22 +1,17 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  Post,
-  Res,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Res } from '@nestjs/common';
 import { ChannelActionType } from '@prisma/client';
 import { Response } from 'express';
 import { GetCurrentUserId } from '../decorators/getCurrentUserId.decorator';
 import { ChannelService } from './channel.service';
 import { ModerateChannelDto } from './dto/moderateChannelUser.dto';
+import { ApiTags } from '@nestjs/swagger';
 
 // TODO: add channel entities
 
 // TODO: ADD GUARDS
 
 @Controller('channels')
+@ApiTags('channel')
 export class ChannelController {
   constructor(private channelService: ChannelService) {}
 
@@ -33,17 +28,17 @@ export class ChannelController {
   // nest      | src/channel/channel.service.ts:77:15 - error TS2322: Type '{ id: string; status: UserStatus; }[] | undefined' is not assignable to type '{ id: string; name: string; status: UserStatus; }[] | undefined'.
   // nest      |   Type '{ id: string; status: UserStatus; }[]' is not assignable to type '{ id: string; name: string; status: UserStatus; }[]'.
   // nest      |     Property 'name' is missing in type '{ id: string; status: UserStatus; }' but required in type '{ id: string; name: string; status: UserStatus; }'.
-  // nest      | 
+  // nest      |
   // nest      | 77         const channelUser:
   // nest      |                  ~~~~~~~~~~~
-  // nest      | 
+  // nest      |
   // nest      |   src/channel/channel.service.ts:80:15
   // nest      |     80               name: string;
   // nest      |                      ~~~~
   // nest      |     'name' is declared here.
-  // nest      | 
+  // nest      |
   // nest      | [6:35:18 PM] Found 1 error. Watching for file changes.
-  // nest      | 
+  // nest      |
 
   // @Get('get-all-channels-by-user-id')
   // getAllChannelsByUserId(@GetCurrentUserId() userId: string) {

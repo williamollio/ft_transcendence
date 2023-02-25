@@ -2,8 +2,10 @@ import { Body, Controller, Get, Post, Res } from '@nestjs/common';
 import { Response } from 'express';
 import { GetCurrentUserId } from 'src/decorators/getCurrentUserId.decorator';
 import { BlockService } from './block.service';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('block')
+@ApiTags('user-block')
 export class BlockController {
   constructor(private blockService: BlockService) {}
 
