@@ -113,7 +113,7 @@ export default function ProfileView(): React.ReactElement {
         };
       }
     );
-    setUsers(usersAsLabelValue);
+    setUsers(usersAsLabelValue.filter((user) => userId !== user.value));
   }
 
   function navigateToGamePage() {
