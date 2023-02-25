@@ -1,5 +1,5 @@
 import {
-	Alert,
+  Alert,
   Box,
   Collapse,
   Divider,
@@ -23,10 +23,15 @@ import CloseIcon from "@mui/icons-material/Close";
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { UserSocket } from "../../classes/UserSocket.class";
 
-const channelSocket: ChannelSocket = new ChannelSocket();
+//const channelSocket: ChannelSocket = new ChannelSocket();
 const userSocket: UserSocket = new UserSocket();
 
-export default function Chat() {
+interface Props {
+  channelSocket: ChannelSocket;
+}
+
+export default function Chat(props: Props) {
+  const { channelSocket } = props;
   const [open, toggleOpen] = useState(false);
   const [inputChat, setInputChat] = useState<string>("");
   const [messages, setMessages] = useState<Array<messagesDto>>([]);
@@ -63,21 +68,17 @@ export default function Chat() {
 
   useEffect(() => {
     channelSocket.socket.on("incomingMessage", (event: any, ...args: any) => {
-      let index = channelSocket.channels.findIndex((element) => element.id === args.channelId);
-	  if (index >= 0)
-		channelSocket.channels[index].messages.push(args.content);
+      let index = channelSocket.channels.findIndex(
+        (element) => element.id === args.channelId
+      );
+      if (index >= 0) channelSocket.channels[index].messages.push(args.content);
     });
-	channelSocket.socket.on("messageRoomFailed", () => {
-		
-	});
+    channelSocket.socket.on("messageRoomFailed", () => {});
   }, [channelSocket]);
 
   const listMessages = messages
     ? messages.map((messagesDto: messagesDto, index) => {
-        if (
-          messagesDto &&
-          messagesDto.message !== ""
-        ) {
+        if (messagesDto && messagesDto.message !== "") {
           return (
             <ListItem
               disablePadding
@@ -85,9 +86,7 @@ export default function Chat() {
               ref={scrollRef}
               key={index}
             >
-              <ListItemText
-                primary={messagesDto.message}
-              />
+              <ListItemText primary={messagesDto.message} />
             </ListItem>
           );
         }

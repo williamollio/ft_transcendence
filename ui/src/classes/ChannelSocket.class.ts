@@ -11,13 +11,16 @@ export class ChannelSocket {
   channels: chatRoom[];
 
   constructor() {
-    let token = localStorage.getItem(Cookie.TOKEN);
-    this.socket = initSocket("http://localhost:3333");
+    this.socket = initSocket("http://localhost:3333", null);
+    this.user = { id: "", name: "" };
+    this.channels = new Array<chatRoom>();
+  }
+
+  initializeSocket(token: string | null) {
+    this.socket = initSocket("http://localhost:3333", token);
     token
       ? (this.user = getTokenData(token))
       : (this.user = { id: "", name: "" });
-    this.channels = new Array<chatRoom>();
-    if (!this.user.name) this.user.name = "missing";
   }
 
   createRoom = (
@@ -43,7 +46,7 @@ export class ChannelSocket {
       this.socket.removeAllListeners("roomCreated");
       return true;
     });
-	return false;
+    return false;
   };
 
   deleteRoom = (channel: chatRoom): Boolean => {
@@ -146,7 +149,7 @@ export class ChannelSocket {
       this.socket.removeAllListeners("roomEdited");
       return true;
     });
-	return false;
+    return false;
   };
 
   createDm = (otherUser: user) => {

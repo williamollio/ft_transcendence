@@ -1,9 +1,7 @@
 import { io } from "socket.io-client";
 import * as msgpack from "socket.io-msgpack-parser";
-import { Cookie } from "../utils/auth-helper";
 
-export const initSocket = (uri: string) => {
-  const tokenPart = localStorage.getItem(Cookie.TOKEN);
+export const initSocket = (uri: string, tokenPart: string | null) => {
   const tokenFull = "Bearer " + tokenPart;
   const socket = io(uri, {
     withCredentials: true,
