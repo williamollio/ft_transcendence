@@ -14,8 +14,6 @@ model User {
     id                      String          @id @default(cuid())
     intraId                 String          @unique()
     name                    String          @unique
-    friends                 User[]          @relation("friends")
-    friendsRelation         User[]          @relation("friends") // stores the many-to-many relation
     createdAt               DateTime        @default(now())
     updatedAt               DateTime        @updatedAt
     filename                String?
@@ -28,6 +26,8 @@ model User {
     channelBlockedRequester BlockedUser[]   @relation("channelBlockedRequester")
     channelBlockedTarget    BlockedUser[]   @relation("channelBlockedTarget")
     invites                 Channel[]       @relation("inviteOnChannel")
+    friendsRequester        Friendship[]    @relation("requester")
+    friendsAddressee        Friendship[]    @relation("addressee")
 
     @@map("users")
 }
@@ -111,6 +111,21 @@ model BlockedUser {
     @@map("blocked")
 }
 
+model Friendship {
+    requesterId String
+    requester   User   @relation("requester", fields: [requesterId], references: [id], onDelete: Cascade)
+    addresseeId String
+    addressee   User   @relation("addressee", fields: [addresseeId], references: [id], onDelete: Cascade)
+
+    status    FriendshipStatus @default(REQUESTED)
+    createdAt DateTime         @default(now())
+    updatedAt DateTime         @updatedAt
+
+    @@id([requesterId, addresseeId])
+    @@unique(fields: [requesterId, addresseeId], name: "friendshipId")
+    @@map("friendships")
+}
+
 enum ChannelType {
     PUBLIC
     PRIVATE
@@ -133,4 +148,9 @@ enum UserStatus {
 enum ChannelActionType {
     BAN
     MUTE
+}
+
+enum FriendshipStatus {
+    REQUESTED
+    ACCEPTED
 }
