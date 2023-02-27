@@ -1,31 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { FriendshipStatus } from '@prisma/client';
-import { FriendshipDto } from './dto/friendship.dto';
+import { Friendship, FriendshipStatus } from '@prisma/client';
 @Injectable()
 export class FriendshipService {
   constructor(private prisma: PrismaService) {}
-
-  public async requestFrienship(
-    userId: string,
-    friendsRequested: FriendshipDto[],
-  ) {
-    try {
-      for (const friendRequested of friendsRequested) {
-        await this.prisma.friendship.create({
-          data: {
-            requesterId: userId,
-            addresseeId: friendRequested.id,
-            status: FriendshipStatus.REQUESTED,
-          },
-        });
-      }
-      return;
-    } catch (error) {
-      if (typeof error === 'string') return error;
-      return 'errorUserService';
-    }
-  }
 
   public async getNoFriendship(currentUserId: string) {
     try {
@@ -63,12 +41,12 @@ export class FriendshipService {
     }
   }
 
-  public async getFrienships(userId: string, type: FriendshipStatus) {
+  public async getFrienshipRequests(userId: string) {
     try {
       const friendshipRequests = await this.prisma.friendship.findMany({
         where: {
-          addresseeId: userId,
-          status: type,
+          requesterId: userId,
+          status: FriendshipStatus.REQUESTED,
         },
       });
       return friendshipRequests;
@@ -78,12 +56,59 @@ export class FriendshipService {
     }
   }
 
-  public async acceptFrienship(userId: string, friendId: string) {
+  public async getFrienshipAccepted(userId: string) {
+    try {
+      const friendshipRequests = await this.prisma.friendship.findMany({
+        where: {
+          requesterId: userId,
+          status: FriendshipStatus.ACCEPTED,
+        },
+      });
+      return friendshipRequests;
+    } catch (error) {
+      if (typeof error === 'string') return error;
+      return 'errorUserService';
+    }
+  }
+
+  public async getFrienshipsRequestsReceived(userId: string) {
+    try {
+      const friendshipRequests = await this.prisma.friendship.findMany({
+        where: {
+          addresseeId: userId,
+          status: FriendshipStatus.REQUESTED,
+        },
+      });
+      return friendshipRequests;
+    } catch (error) {
+      if (typeof error === 'string') return error;
+      return 'errorUserService';
+    }
+  }
+
+  public async createFrienship(userId: string, friendId: string) {
+    try {
+      const friendship = await this.prisma.friendship.create({
+        data: {
+          requesterId: userId,
+          addresseeId: friendId,
+          status: FriendshipStatus.REQUESTED,
+        },
+      });
+      return friendship;
+    } catch (error) {
+      if (typeof error === 'string') return error;
+      return 'errorUserService';
+    }
+  }
+
+  // TODO : William requested can accept friendship
+  public async acceptFriendship(userId: string, friendId: string) {
     try {
       const friendship = await this.prisma.friendship.findFirst({
         where: {
-          requesterId: userId,
-          addresseeId: friendId,
+          requesterId: friendId,
+          addresseeId: userId,
         },
       });
       if (friendship) {
@@ -94,39 +119,74 @@ export class FriendshipService {
           },
           data: { status: FriendshipStatus.ACCEPTED },
         });
+        return await this.prisma.friendship.findFirst({
+          where: {
+            requesterId: friendId,
+            addresseeId: userId,
+          },
+        });
       } else {
-        throw "This friendship doesn't exists";
+        throw "This friendship can't be updated";
       }
-      return friendship;
     } catch (error) {
       if (typeof error === 'string') return error;
       return 'errorUserService';
     }
   }
 
-  public async denyFrienship(userId: string, friendId: string) {
+  public async denyFriendship(userId: string, friendId: string) {
     try {
       const friendship = await this.prisma.friendship.findFirst({
         where: {
-          requesterId: userId,
-          addresseeId: friendId,
+          OR: [
+            { requesterId: friendId, addresseeId: userId },
+            { requesterId: userId, addresseeId: friendId },
+          ],
         },
       });
       if (friendship) {
         await this.prisma.friendship.updateMany({
           where: {
-            requesterId: friendship.requesterId,
-            addresseeId: friendship.addresseeId,
+            OR: [
+              { requesterId: friendId, addresseeId: userId },
+              { requesterId: userId, addresseeId: friendId },
+            ],
           },
           data: { status: FriendshipStatus.DENY },
         });
       } else {
-        throw "This friendship doesn't exists";
+        throw "This friendship can't be updated";
       }
-      return friendship;
+      return await this.prisma.friendship.findFirst({
+        where: {
+          OR: [
+            { requesterId: friendId, addresseeId: userId },
+            { requesterId: userId, addresseeId: friendId },
+          ],
+        },
+      });
     } catch (error) {
       if (typeof error === 'string') return error;
       return 'errorUserService';
+    }
+  }
+
+  private isFriendshipUpdateValid(
+    friendship: Friendship,
+    type: FriendshipStatus,
+  ) {
+    if (
+      type === FriendshipStatus.ACCEPTED &&
+      friendship.status === FriendshipStatus.REQUESTED
+    ) {
+      return true;
+    } else if (
+      type === FriendshipStatus.DENY &&
+      friendship.status === FriendshipStatus.REQUESTED
+    ) {
+      return true;
+    } else {
+      return false;
     }
   }
 }
