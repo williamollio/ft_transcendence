@@ -15,22 +15,28 @@ import {
   TableHead,
   TableRow,
 } from "@mui/material";
-import { SyntheticEvent, useState } from "react";
-import { user } from "../../interfaces/chat.interfaces";
+import { SyntheticEvent, useEffect, useState } from "react";
+import { channelUser, user } from "../../interfaces/chat.interfaces";
 import { chatRoom } from "../../classes/chatRoom.class";
 import ChannelInfoContext from "./ChannelInfoContext";
 import GetPasswordDialog from "./GetPasswordDialog";
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import GetNameDialog from "./GetNameDialog";
+import { useQuery } from "@tanstack/react-query";
+import { fetchUsersOfChannel } from "./hooks/channelUsers.fetch";
 
 export default function ChannelInfoDialog({
-  contextMenuClose,
+  toggleError,
+  setAlertMsg,
+  setNewChannel,
   channelInfoOpen,
   toggleChannelInfo,
   channel,
   channelSocket,
 }: {
-  contextMenuClose: any;
+  toggleError: any;
+  setAlertMsg: any;
+  setNewChannel: any;
   channelInfoOpen: boolean;
   toggleChannelInfo: any;
   channel: chatRoom | null;
@@ -41,23 +47,51 @@ export default function ChannelInfoDialog({
   const [contextMenu, setContextMenu] = useState<{
     mouseX: number;
     mouseY: number;
-    user: user;
+    user: channelUser;
   } | null>(null);
 
   const [openPassword, toggleOpenPassword] = useState<boolean>(false);
 
   const [openName, toggleOpenName] = useState<boolean>(false);
 
+  const { data, error, isError, isLoading, refetch } = useQuery(
+    ["channelUsers"],
+    () => fetchUsersOfChannel(channel?.id!),
+    { enabled: typeof channel?.id !== "undefined" }
+  );
+
+  if (!isLoading) {
+    data.forEach((element: channelUser) => {
+      if (channel) {
+        channel.users = new Array<channelUser>();
+        channel.users.push({
+          id: element.id,
+          name: "test",
+          status: element.status,
+          rank: "",
+        });
+      }
+    });
+  }
+
+  useEffect(() => {
+    channelSocket.socket?.on(
+      "roomJoined",
+      (userId: string, channelId: string) => {
+        if (userId !== channelSocket.user.id) refetch();
+      }
+    );
+  }, [channelSocket]);
+
   const handleClose = () => {
     toggleChannelInfo(false);
-    contextMenuClose();
   };
 
   const handleSelect = (e: any, data: any) => {
     setSelected(data);
   };
 
-  const handleContextMenu = (event: any, User: user) => {
+  const handleContextMenu = (event: any, User: channelUser) => {
     event.preventDefault();
     setContextMenu(
       contextMenu === null
@@ -82,7 +116,7 @@ export default function ChannelInfoDialog({
               onContextMenu={(e) => handleContextMenu(e, user)}
             >
               <TableCell>{user.name}</TableCell>
-              <TableCell>status</TableCell>
+              <TableCell>{user.status}</TableCell>
               <TableCell>{user.rank}</TableCell>
             </TableRow>
           );
@@ -127,14 +161,22 @@ export default function ChannelInfoDialog({
           <Grid container>
             <Grid item>
               <DialogActions>
-                <Button variant="outlined" onMouseUp={(e) => handlePasswordChange()} onMouseDown={handlePasswordChange}>
+                <Button
+                  variant="outlined"
+                  onMouseUp={(e) => handlePasswordChange()}
+                  onMouseDown={handlePasswordChange}
+                >
                   Change Password
                 </Button>
               </DialogActions>
             </Grid>
             <Grid item>
               <DialogActions>
-                <Button variant="outlined" onMouseUp={(e) => handleNameChange()} onMouseDown={handleNameChange}>
+                <Button
+                  variant="outlined"
+                  onMouseUp={(e) => handleNameChange()}
+                  onMouseDown={handleNameChange}
+                >
                   Change Name
                 </Button>
               </DialogActions>
@@ -164,6 +206,8 @@ export default function ChannelInfoDialog({
               </Table>
             </TableContainer>
             <ChannelInfoContext
+              toggleError={toggleError}
+              channel={channel}
               contextMenu={contextMenu}
               setContextMenu={setContextMenu}
               channelSocket={channelSocket}
@@ -172,12 +216,14 @@ export default function ChannelInfoDialog({
         </Grid>
       </Grid>
       <GetNameDialog
+        toggleError={toggleError}
         open={openName}
         toggleOpen={closeNameDialog}
         channel={channel}
         channelSocket={channelSocket}
       ></GetNameDialog>
       <GetPasswordDialog
+        toggleError={toggleError}
         open={openPassword}
         toggleOpen={closePasswordDialog}
         channel={channel}

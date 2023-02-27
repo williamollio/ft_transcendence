@@ -11,12 +11,14 @@ export default function AddChannelDialog({
   open,
   toggleOpen,
   channelSocket,
-  setNewChannel,
+  toggleAlert,
+  setAlertMsg,
 }: {
   open: boolean;
   toggleOpen: any;
-  setNewChannel: any;
   channelSocket: ChannelSocket;
+  toggleAlert: any;
+  setAlertMsg: any;
 }) {
   const [formSelection, setFormSelection] = useState<number>(0);
 
@@ -55,19 +57,21 @@ export default function AddChannelDialog({
 
   const handleFormSubmit = (e: any) => {
     e.preventDefault();
+    if (alertOpen === true) setAlertOpen(false);
     if (formSelection === 1) {
+      setAlertMsg("Failed to create channel");
       if (dialogValue.key !== "") {
         if (dialogValue.access !== "PROTECTED" || dialogValue.password !== "") {
           if (dialogValue.access === "PROTECTED") {
             channelSocket.createRoom(
               new chatRoom(undefined, dialogValue.key, dialogValue.access),
-              setNewChannel,
+              toggleAlert,
               dialogValue.password
             );
           } else {
             channelSocket.createRoom(
               new chatRoom(undefined, dialogValue.key, dialogValue.access),
-              setNewChannel,
+              toggleAlert,
               undefined
             );
           }
@@ -76,11 +80,14 @@ export default function AddChannelDialog({
         } else setAlertOpen(true);
       } else setAlertOpen(true);
     } else {
+      setAlertMsg("Failed to join channel");
       channelSocket.joinRoom(
         dialogJoinValue.id,
         dialogJoinValue.password !== "" ? "PROTECTED" : "PUBLIC",
+        toggleAlert,
         dialogJoinValue.password !== "" ? dialogJoinValue.password : undefined
       );
+      setDialogJoinValue({ id: "", password: "" });
       toggleOpen(false);
     }
   };

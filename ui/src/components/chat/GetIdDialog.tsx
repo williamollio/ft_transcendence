@@ -4,11 +4,13 @@ import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { chatRoom } from "../../classes/chatRoom.class";
 
 export default function GetIdDialog({
+  toggleError,
   open,
   toggleOpen,
   channel,
   channelSocket,
 }: {
+  toggleError: any;
   open: boolean;
   toggleOpen: any;
   channel: chatRoom | null;
@@ -27,7 +29,7 @@ export default function GetIdDialog({
 
   const handleSubmit = (e: any) => {
     if (e.key === "Enter") {
-      channelSocket.inviteToChannel(channel, input)
+      channelSocket.inviteToChannel(channel, input, toggleError);
       handleClose();
     }
   };

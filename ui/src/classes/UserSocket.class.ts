@@ -2,7 +2,7 @@ import { Socket } from "socket.io-client";
 import { initSocket } from "../services/initSocket.service";
 
 export class UserSocket {
-  socket: Socket;
+  socket: Socket | undefined
 
   constructor() {
     this.socket = initSocket("http://localhost:8888", null);

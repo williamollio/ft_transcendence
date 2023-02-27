@@ -5,9 +5,11 @@ import {
   Param,
   Post,
   Res,
+  UseGuards,
 } from '@nestjs/common';
 import { ChannelActionType } from '@prisma/client';
 import { Response } from 'express';
+import { JwtGuard } from 'src/auth/guards/jwt.guard';
 import { GetCurrentUserId } from '../decorators/getCurrentUserId.decorator';
 import { ChannelService } from './channel.service';
 import { ModerateChannelDto } from './dto/moderateChannelUser.dto';
@@ -15,7 +17,7 @@ import { ModerateChannelDto } from './dto/moderateChannelUser.dto';
 // TODO: add channel entities
 
 // TODO: ADD GUARDS
-
+@UseGuards(JwtGuard)
 @Controller('channels')
 export class ChannelController {
   constructor(private channelService: ChannelService) {}

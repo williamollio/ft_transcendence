@@ -1,6 +1,6 @@
 import React from "react";
 import Navbar from "../../components/Navbar";
-import { Typography, TextField, Paper } from "@mui/material";
+import { Typography } from "@mui/material";
 import { translationKeys } from "./constants";
 import { useTranslation } from "react-i18next";
 import Chat from "./Chat";
@@ -12,27 +12,28 @@ import {
   TitleWrapper,
   ContentWrapper,
 } from "../../styles/MuiStyles";
-import { QueryClient, QueryClientProvider } from "react-query";
 import { Cookie } from "../../utils/auth-helper";
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { UserSocket } from "../../classes/UserSocket.class";
-
-const queryClient = new QueryClient();
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 export default function GameView(): React.ReactElement {
   const { t } = useTranslation();
   //   const { classes } = useStyles();
 
   const [channelSocket] = React.useState<ChannelSocket>(new ChannelSocket());
+  const [userSocket] = React.useState<UserSocket>(new UserSocket());
 
   React.useEffect(() => {
     let token;
-
     if ((token = localStorage.getItem(Cookie.TOKEN))) {
       channelSocket.initializeSocket(token);
-      const userSocket = new UserSocket();
       userSocket.initializeSocket(token);
     }
+	return () => {
+		channelSocket.socket?.disconnect();
+		userSocket.socket?.disconnect();
+	}
   }, []);
 
   return (
@@ -40,9 +41,8 @@ export default function GameView(): React.ReactElement {
       <Navbar />
       <Background>
         <ProfileCard>
-          <QueryClientProvider client={queryClient}>
             <Chat channelSocket={channelSocket} />
-          </QueryClientProvider>
+            <ReactQueryDevtools></ReactQueryDevtools>
           <CardContainer>
             <TitleWrapper>
               <Typography

@@ -8,8 +8,14 @@ export interface messagesDto {
 export interface user {
   name: string;
   id: string;
-  rank?: "" | "Admin" | "Owner";
 }
+
+export interface channelUser {
+	id: string;
+	name: string,
+	status: "OFFLINE" | "ONLINE" | "PLAYING";
+	rank?: "" | "Admin" | "Owner";
+};
 
 export interface CRDialogValue {
   key: string;
@@ -27,5 +33,5 @@ export interface DBChannelElement
 export interface DBChannelUserListElement
 {
 	id: string,
-	
+	users: Array<any>,
 }

@@ -4,11 +4,13 @@ import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { chatRoom } from "../../classes/chatRoom.class";
 
 export default function GetNameDialog({
+  toggleError,
   open,
   toggleOpen,
   channel,
   channelSocket,
 }: {
+  toggleError: any;
   open: boolean;
   toggleOpen: any;
   channel: chatRoom | null;
@@ -41,6 +43,7 @@ export default function GetNameDialog({
         if (nameInput !== "") {
           channelSocket.editRoom(
             channel,
+            toggleError,
             channel.access,
             channel.access === "PROTECTED" ? input : undefined,
             undefined,

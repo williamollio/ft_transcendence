@@ -1,25 +1,23 @@
 import { Menu, MenuItem } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { chatRoom } from "../../classes/chatRoom.class";
 import ChannelInfoDialog from "./ChannelInfoDialog";
 import GetIdDialog from "./GetIdDialog";
 
 export default function RoomContextMenu({
+  toggleError,
+  setNewChannel,
   contextMenu,
   setContextMenu,
-  channels,
-  setCurrentRoom,
-  setMessages,
   channelSocket,
   setAlertMsg,
   toggleAlert,
 }: {
+  toggleError: any;
+  setNewChannel: any;
   contextMenu: { mouseX: number; mouseY: number; channel: chatRoom } | null;
   setContextMenu: any;
-  channels: chatRoom[];
-  setCurrentRoom: any;
-  setMessages: any;
   channelSocket: ChannelSocket;
   setAlertMsg: any;
   toggleAlert: any;
@@ -34,19 +32,14 @@ export default function RoomContextMenu({
 
   const removeRoom = () => {
     toggleAlert(false);
-    if (contextMenu && contextMenu.channel) {
-      let index = channels.findIndex(
-        (element: chatRoom) => element === contextMenu.channel
+    setAlertMsg("Failed to remove channel");
+    if (contextMenu?.channel) {
+      let index = channelSocket.channels.findIndex(
+        (element: chatRoom) => element === contextMenu?.channel
       );
       if (index >= 0) {
-        if (channelSocket.deleteRoom(contextMenu.channel) === false) {
-          setCurrentRoom(channels[index - 1] ? channels[index - 1] : false);
-          setMessages(
-            channels[index - 1] ? channels[index - 1].messages : false
-          );
-        } else setAlertMsg("Failed to remove channel");
+        channelSocket.deleteRoom(contextMenu?.channel, toggleError);
         toggleAlert(true);
-        return;
       }
     }
     handleContextClose();
@@ -55,11 +48,13 @@ export default function RoomContextMenu({
   const handleChannelInfoOpen = () => {
     toggleAlert(false);
     toggleChannelInfo(true);
+    handleContextClose();
   };
 
   const handleInvite = () => {
     toggleAlert(false);
     toggleOpenId(true);
+    handleContextClose();
   };
 
   return (
@@ -77,20 +72,23 @@ export default function RoomContextMenu({
         <MenuItem onClick={removeRoom}>Remove</MenuItem>
         <MenuItem onClick={handleChannelInfoOpen}>Channel Info</MenuItem>
         <MenuItem onClick={handleInvite}>Invite</MenuItem>
-        <ChannelInfoDialog
-          contextMenuClose={handleContextClose}
-          channelInfoOpen={channelInfoOpen}
-          toggleChannelInfo={toggleChannelInfo}
-          channel={contextMenu ? contextMenu.channel : null}
-          channelSocket={channelSocket}
-        ></ChannelInfoDialog>
-        <GetIdDialog
-          channelSocket={channelSocket}
-          open={openId}
-          toggleOpen={toggleOpenId}
-          channel={contextMenu ? contextMenu.channel : null}
-        ></GetIdDialog>
       </Menu>
+      <ChannelInfoDialog
+        toggleError={toggleError}
+		setAlertMsg={setAlertMsg}
+        setNewChannel={setNewChannel}
+        channelInfoOpen={channelInfoOpen}
+        toggleChannelInfo={toggleChannelInfo}
+        channel={contextMenu?.channel ? contextMenu?.channel : null}
+        channelSocket={channelSocket}
+      ></ChannelInfoDialog>
+      <GetIdDialog
+        toggleError={toggleError}
+        channelSocket={channelSocket}
+        open={openId}
+        toggleOpen={toggleOpenId}
+        channel={contextMenu?.channel ? contextMenu?.channel : null}
+      ></GetIdDialog>
     </>
   );
 }

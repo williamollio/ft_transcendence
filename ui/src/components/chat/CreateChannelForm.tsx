@@ -11,20 +11,21 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import { chatRoom } from "../../classes/chatRoom.class";
+import { CRDialogValue } from "../../interfaces/chat.interfaces";
 
 export default function CreateForm({
   dialogValue,
   setDialogValue,
   handleClose,
 }: {
-  dialogValue: any;
+  dialogValue: CRDialogValue;
   setDialogValue: any;
   handleClose: any;
 }) {
   const [pwDisable, setPwDisable] = useState<boolean>(true);
 
   const handleAccessChange = (e: any) => {
-    let tmpCR: chatRoom = { ...dialogValue, access: e.target.value };
+    let tmpCR: CRDialogValue = { ...dialogValue, access: e.target.value };
     if (tmpCR.access !== "PROTECTED") {
       tmpCR.password = "";
       setPwDisable(true);

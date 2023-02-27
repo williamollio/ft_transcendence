@@ -132,9 +132,6 @@ export class ChannelGateway {
       this.server.to(clientSocket.id).emit('messageRoomFailed');
       return acknoledgementStatus.FAILED;
     } else {
-      ///
-      console.log('sending incoming message');
-      ///
       clientSocket
         .to(messageInfo.channelId)
         .emit('incomingMessage', messageInfo);
@@ -192,7 +189,7 @@ export class ChannelGateway {
       }
     } else {
       this.server
-        .to(leaveChannelDto.id)
+        // .to(leaveChannelDto.id)
         .emit('roomLeft', { userId: userId, channelId: leaveChannelDto.id });
       await clientSocket.leave(leaveChannelDto.id);
     }

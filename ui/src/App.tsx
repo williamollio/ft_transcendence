@@ -15,6 +15,7 @@ import classes from "./styles.module.scss";
 import { useImageStore } from "./store/users-store";
 import { PrivateRoute } from "./components/PrivateRoute";
 import { getIsAuthenticated, initAuthToken } from "./utils/auth-helper";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 export default function App() {
   const [image, setImage] = useImageStore((state) => [
@@ -22,6 +23,8 @@ export default function App() {
     state.setImage,
   ]);
   const imageUrl = image ? URL.createObjectURL(image) : "";
+
+  const queryClient = new QueryClient();
 
   // removes the object URL after the component unmounts to prevent memory leaks
   React.useEffect(() => {
@@ -98,7 +101,9 @@ export default function App() {
               path={RoutePath.GAME}
               element={
                 <PrivateRoute>
-                  <GameView />
+                  <QueryClientProvider client={queryClient}>
+                    <GameView />
+                  </QueryClientProvider>
                 </PrivateRoute>
               }
             />
