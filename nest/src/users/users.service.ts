@@ -74,8 +74,6 @@ export class UsersService {
   ) {
     try {
       for (const friendRequested of friendsRequested) {
-        console.log(userId);
-        console.log(friendRequested.id);
         await this.prisma.friendship.create({
           data: {
             requesterId: userId,
