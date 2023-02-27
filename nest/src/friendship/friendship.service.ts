@@ -27,6 +27,42 @@ export class FriendshipService {
     }
   }
 
+  public async getNoFriendship(currentUserId: string) {
+    try {
+      const users = await this.prisma.user.findMany({
+        select: {
+          id: true,
+        },
+      });
+
+      const friendships = await this.prisma.friendship.findMany({
+        select: {
+          addresseeId: true,
+          requesterId: true,
+        },
+      });
+      const usersWithoutFriendshipWithCurrentUser = [];
+      for (const user of users) {
+        for (const friendship of friendships) {
+          if (
+            (user.id === friendship.addresseeId ||
+              user.id === friendship.requesterId) &&
+            (currentUserId === friendship.addresseeId ||
+              currentUserId === friendship.requesterId)
+          ) {
+            continue;
+          } else {
+            usersWithoutFriendshipWithCurrentUser.push(user);
+          }
+        }
+      }
+      return usersWithoutFriendshipWithCurrentUser;
+    } catch (error) {
+      if (typeof error === 'string') return error;
+      return 'errorUserService';
+    }
+  }
+
   public async getFrienships(userId: string, type: FriendshipStatus) {
     try {
       const friendshipRequests = await this.prisma.friendship.findMany({

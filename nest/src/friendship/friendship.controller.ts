@@ -12,7 +12,7 @@ export class FriendshipController {
 
   @Get('none')
   getUsers(@GetCurrentUserId() userId: string) {
-    return this.friendshipService.getFrienships(userId, FriendshipStatus.NONE);
+    return this.friendshipService.getNoFriendship(userId);
   }
 
   @Get('requested')
