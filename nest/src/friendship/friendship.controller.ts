@@ -3,46 +3,55 @@ import { FriendshipService } from './friendship.service';
 import { ApiTags } from '@nestjs/swagger';
 import { GetCurrentUserId } from 'src/decorators/getCurrentUserId.decorator';
 import { FriendshipDto } from './dto/friendship.dto';
+import { FriendshipStatus } from '@prisma/client';
 
 @Controller('friendship')
 @ApiTags('user-friendship')
 export class FriendshipController {
   constructor(private friendshipService: FriendshipService) {}
 
-  @Post('request-friends')
-  addFrienshipRequests(
-    @GetCurrentUserId() userId: string,
-    @Body() data: { friendshipDto: FriendshipDto[] },
-  ) {
-    return this.friendshipService.addFrienshipRequests(
+  @Get('none')
+  getUsers(@GetCurrentUserId() userId: string) {
+    return this.friendshipService.getFrienships(userId, FriendshipStatus.NONE);
+  }
+
+  @Get('requested')
+  getFrienshipRequests(@GetCurrentUserId() userId: string) {
+    return this.friendshipService.getFrienships(
       userId,
-      data.friendshipDto,
+      FriendshipStatus.REQUESTED,
     );
   }
 
-  @Get('friendship-requests')
-  getFrienshipRequests(@GetCurrentUserId() userId: string) {
-    return this.friendshipService.getFrienshipRequests(userId);
-  }
-
-  @Get('friendship-accepted')
+  @Get('accepted')
   getFrienshipAccepted(@GetCurrentUserId() userId: string) {
-    return this.friendshipService.getFrienshipAccepted(userId);
+    return this.friendshipService.getFrienships(
+      userId,
+      FriendshipStatus.ACCEPTED,
+    );
   }
 
-  @Patch('accept-friendship')
-  acceptFrienshipRequest(
+  @Patch('request')
+  requestFrienship(
+    @GetCurrentUserId() userId: string,
+    @Body() data: { friendshipDto: FriendshipDto[] },
+  ) {
+    return this.friendshipService.requestFrienship(userId, data.friendshipDto);
+  }
+
+  @Patch('accept')
+  acceptFrienship(
     @GetCurrentUserId() userId: string,
     @Body() data: { friendId: string },
   ) {
-    return this.friendshipService.acceptFrienshipRequest(userId, data.friendId);
+    return this.friendshipService.acceptFrienship(userId, data.friendId);
   }
 
-  @Patch('deny-friendship')
-  denyFrienshipRequest(
+  @Patch('deny')
+  denyFrienship(
     @GetCurrentUserId() userId: string,
     @Body() data: { friendId: string },
   ) {
-    return this.friendshipService.denyFrienshipRequest(userId, data.friendId);
+    return this.friendshipService.denyFrienship(userId, data.friendId);
   }
 }

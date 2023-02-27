@@ -6,7 +6,7 @@ import { FriendshipDto } from './dto/friendship.dto';
 export class FriendshipService {
   constructor(private prisma: PrismaService) {}
 
-  public async addFrienshipRequests(
+  public async requestFrienship(
     userId: string,
     friendsRequested: FriendshipDto[],
   ) {
@@ -27,12 +27,12 @@ export class FriendshipService {
     }
   }
 
-  public async getFrienshipRequests(userId: string) {
+  public async getFrienships(userId: string, type: FriendshipStatus) {
     try {
       const friendshipRequests = await this.prisma.friendship.findMany({
         where: {
           addresseeId: userId,
-          status: FriendshipStatus.REQUESTED,
+          status: type,
         },
       });
       return friendshipRequests;
@@ -42,22 +42,7 @@ export class FriendshipService {
     }
   }
 
-  public async getFrienshipAccepted(userId: string) {
-    try {
-      const friendshipRequests = await this.prisma.friendship.findMany({
-        where: {
-          addresseeId: userId,
-          status: FriendshipStatus.ACCEPTED,
-        },
-      });
-      return friendshipRequests;
-    } catch (error) {
-      if (typeof error === 'string') return error;
-      return 'errorUserService';
-    }
-  }
-
-  public async acceptFrienshipRequest(userId: string, friendId: string) {
+  public async acceptFrienship(userId: string, friendId: string) {
     try {
       const friendship = await this.prisma.friendship.findFirst({
         where: {
@@ -83,7 +68,7 @@ export class FriendshipService {
     }
   }
 
-  public async denyFrienshipRequest(userId: string, friendId: string) {
+  public async denyFrienship(userId: string, friendId: string) {
     try {
       const friendship = await this.prisma.friendship.findFirst({
         where: {
