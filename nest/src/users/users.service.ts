@@ -5,8 +5,6 @@ import { PrismaService } from '../prisma/prisma.service';
 import { User, UserStatus } from '@prisma/client';
 import { Intra42User } from './interface/intra42-user.interface';
 import { Response } from 'express';
-import { Friends } from './dto/create-user.dto';
-import { FriendshipStatus } from '@prisma/client';
 
 // have to update this file and user response to display error
 
@@ -39,10 +37,6 @@ export class UsersService {
         },
       });
 
-      if (createUserDto.friends) {
-        this.addFrienshipRequests(User.id, createUserDto.friends);
-      }
-
       return User;
     } catch (error) {
       throw error;
@@ -66,27 +60,6 @@ export class UsersService {
     return this.prisma.user.findUnique({
       where: { intraId: intraId },
     });
-  }
-
-  private async addFrienshipRequests(
-    userId: string,
-    friendsRequested: Friends[],
-  ) {
-    try {
-      for (const friendRequested of friendsRequested) {
-        await this.prisma.friendship.create({
-          data: {
-            requesterId: userId,
-            addresseeId: friendRequested.id,
-            status: FriendshipStatus.REQUESTED,
-          },
-        });
-      }
-      return;
-    } catch (error) {
-      if (typeof error === 'string') return error;
-      return 'errorUserService';
-    }
   }
 
   //   private async updateFriendsList(
@@ -178,9 +151,6 @@ export class UsersService {
         where: { id: userId },
         data: { name: updateUserDto.name },
       });
-      if (updateUserDto.friends) {
-        this.addFrienshipRequests(User.id, updateUserDto.friends);
-      }
 
       return User;
     } catch (error) {
