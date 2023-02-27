@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Res } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post } from '@nestjs/common';
 import { FriendshipService } from './friendship.service';
 import { ApiTags } from '@nestjs/swagger';
 import { GetCurrentUserId } from 'src/decorators/getCurrentUserId.decorator';
@@ -10,7 +10,7 @@ export class FriendshipController {
   constructor(private friendshipService: FriendshipService) {}
 
   @Post('request-friends')
-  requestFriends(
+  addFrienshipRequests(
     @GetCurrentUserId() userId: string,
     @Body() data: { friendshipDto: FriendshipDto[] },
   ) {
@@ -18,5 +18,31 @@ export class FriendshipController {
       userId,
       data.friendshipDto,
     );
+  }
+
+  @Get('friendship-requests')
+  getFrienshipRequests(@GetCurrentUserId() userId: string) {
+    return this.friendshipService.getFrienshipRequests(userId);
+  }
+
+  @Get('friendship-accepted')
+  getFrienshipAccepted(@GetCurrentUserId() userId: string) {
+    return this.friendshipService.getFrienshipAccepted(userId);
+  }
+
+  @Patch('accept-friendship')
+  acceptFrienshipRequest(
+    @GetCurrentUserId() userId: string,
+    @Body() data: { friendId: string },
+  ) {
+    return this.friendshipService.acceptFrienshipRequest(userId, data.friendId);
+  }
+
+  @Patch('deny-friendship')
+  denyFrienshipRequest(
+    @GetCurrentUserId() userId: string,
+    @Body() data: { friendId: string },
+  ) {
+    return this.friendshipService.denyFrienshipRequest(userId, data.friendId);
   }
 }

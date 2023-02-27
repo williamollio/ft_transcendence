@@ -26,4 +26,86 @@ export class FriendshipService {
       return 'errorUserService';
     }
   }
+
+  public async getFrienshipRequests(userId: string) {
+    try {
+      const friendshipRequests = await this.prisma.friendship.findMany({
+        where: {
+          addresseeId: userId,
+          status: FriendshipStatus.REQUESTED,
+        },
+      });
+      return friendshipRequests;
+    } catch (error) {
+      if (typeof error === 'string') return error;
+      return 'errorUserService';
+    }
+  }
+
+  public async getFrienshipAccepted(userId: string) {
+    try {
+      const friendshipRequests = await this.prisma.friendship.findMany({
+        where: {
+          addresseeId: userId,
+          status: FriendshipStatus.ACCEPTED,
+        },
+      });
+      return friendshipRequests;
+    } catch (error) {
+      if (typeof error === 'string') return error;
+      return 'errorUserService';
+    }
+  }
+
+  public async acceptFrienshipRequest(userId: string, friendId: string) {
+    try {
+      const friendship = await this.prisma.friendship.findFirst({
+        where: {
+          requesterId: userId,
+          addresseeId: friendId,
+        },
+      });
+      if (friendship) {
+        await this.prisma.friendship.updateMany({
+          where: {
+            requesterId: friendship.requesterId,
+            addresseeId: friendship.addresseeId,
+          },
+          data: { status: FriendshipStatus.ACCEPTED },
+        });
+      } else {
+        throw "This friendship doesn't exists";
+      }
+      return friendship;
+    } catch (error) {
+      if (typeof error === 'string') return error;
+      return 'errorUserService';
+    }
+  }
+
+  public async denyFrienshipRequest(userId: string, friendId: string) {
+    try {
+      const friendship = await this.prisma.friendship.findFirst({
+        where: {
+          requesterId: userId,
+          addresseeId: friendId,
+        },
+      });
+      if (friendship) {
+        await this.prisma.friendship.updateMany({
+          where: {
+            requesterId: friendship.requesterId,
+            addresseeId: friendship.addresseeId,
+          },
+          data: { status: FriendshipStatus.DENY },
+        });
+      } else {
+        throw "This friendship doesn't exists";
+      }
+      return friendship;
+    } catch (error) {
+      if (typeof error === 'string') return error;
+      return 'errorUserService';
+    }
+  }
 }
