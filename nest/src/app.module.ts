@@ -8,6 +8,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { UserGateway } from './users/users.gateway';
 import { ChannelModule } from './channel/channel.module';
+import { FriendshipModule } from './friendship/friendship.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { ChannelModule } from './channel/channel.module';
       ttl: 60,
       limit: 50,
     }),
+    FriendshipModule,
   ],
   controllers: [AppController],
   providers: [
