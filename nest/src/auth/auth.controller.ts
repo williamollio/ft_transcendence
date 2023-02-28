@@ -3,9 +3,11 @@ import {
   Controller,
   Get,
   HttpStatus,
+  Param,
   Post,
   Req,
   Res,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
@@ -56,6 +58,15 @@ export class AuthController {
   @Post('createBypassAuth')
   async bypassCreateAuthUser(@Body() createUserDto: CreateUserDto) {
     return await this.authService.bypassAuth(createUserDto);
+  }
+
+  @Get('bypassAuth/:intraId')
+  async bypassGetAuthUser(@Param('intraId') intraId: string) {
+    try {
+      return await this.authService.bypassAuth({ name: '', intraId });
+    } catch (e) {
+      throw new UnauthorizedException('No such user!');
+    }
   }
 
   @Get('logout')

@@ -52,8 +52,19 @@ export class AuthService {
   }
 
   async bypassAuth(createUserDto: CreateUserDto) {
-    const user = await this.userService.create(createUserDto);
-    return await this.coreSignIn({ id: user.id, intraId: user.intraId });
+    let foundUser = await this.userService.findByIntraId(createUserDto.intraId);
+    if (foundUser == null) {
+      if (createUserDto.name === '') {
+        throw new InternalServerErrorException(
+          'Name of user to be created cannot be empty!',
+        );
+      }
+      foundUser = await this.userService.create(createUserDto);
+    }
+    return await this.coreSignIn({
+      id: foundUser.id,
+      intraId: foundUser.intraId,
+    });
   }
 
   private async coreSignIn(foundUser: { id: string; intraId: string }) {
