@@ -2,10 +2,12 @@ import { Menu, MenuItem } from "@mui/material";
 import { useEffect, useState } from "react";
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { chatRoom } from "../../classes/chatRoom.class";
+import { UserSocket } from "../../classes/UserSocket.class";
 import ChannelInfoDialog from "./ChannelInfoDialog";
 import GetIdDialog from "./GetIdDialog";
 
 export default function RoomContextMenu({
+  userSocket,
   setNewChannel,
   contextMenu,
   setContextMenu,
@@ -13,6 +15,7 @@ export default function RoomContextMenu({
   setAlertMsg,
   toggleAlert,
 }: {
+  userSocket: UserSocket;
   setNewChannel: any;
   contextMenu: { mouseX: number; mouseY: number; channel: chatRoom } | null;
   setContextMenu: any;
@@ -81,6 +84,7 @@ export default function RoomContextMenu({
         <MenuItem onClick={handleInvite}>Invite</MenuItem>
       </Menu>
       <ChannelInfoDialog
+        userSocket={userSocket}
         toggleError={toggleAlert}
         setAlertMsg={setAlertMsg}
         setNewChannel={setNewChannel}

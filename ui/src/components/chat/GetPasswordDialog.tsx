@@ -4,13 +4,11 @@ import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { chatRoom } from "../../classes/chatRoom.class";
 
 export default function GetPasswordDialog({
-  toggleError,
   open,
   toggleOpen,
   channel,
   channelSocket,
 }: {
-  toggleError: any;
   open: boolean;
   toggleOpen: any;
   channel: chatRoom | undefined;
@@ -38,28 +36,14 @@ export default function GetPasswordDialog({
       if (channel && channel.access === "PROTECTED" && oldInput !== "") {
         if (input !== "") {
           //send request to change password
-          channelSocket.editRoom(
-            channel,
-            channel.access,
-            oldInput,
-            input
-          );
+          channelSocket.editRoom(channel, channel.access, oldInput, input);
         } else {
           //send request to remove password
-          channelSocket.editRoom(
-            channel,
-            "PUBLIC",
-            oldInput
-          );
+          channelSocket.editRoom(channel, "PUBLIC", oldInput);
         }
       } else if (channel && channel.access !== "PROTECTED" && input !== "") {
         //send request with input to change access type to PROTECTED
-        channelSocket.editRoom(
-          channel,
-          "PROTECTED",
-          undefined,
-          input
-        );
+        channelSocket.editRoom(channel, "PROTECTED", undefined, input);
       }
       handleClose();
     }

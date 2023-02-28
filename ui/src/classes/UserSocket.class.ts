@@ -2,7 +2,7 @@ import { Socket } from "socket.io-client";
 import { initSocket } from "../services/initSocket.service";
 
 export class UserSocket {
-  socket: Socket | undefined
+  socket: Socket;
 
   constructor() {
     this.socket = initSocket("http://localhost:8888", null);
@@ -11,4 +11,12 @@ export class UserSocket {
   initializeSocket(token: string | null) {
     this.socket = initSocket("http://localhost:8888", token);
   }
+
+  logIn = () => {
+    this.socket.emit("connectUser");
+  };
+
+  logOut = () => {
+    this.socket.disconnect();
+  };
 }

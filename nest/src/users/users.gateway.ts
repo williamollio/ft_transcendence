@@ -15,10 +15,10 @@ import * as msgpack from 'socket.io-msgpack-parser';
 
 // add some cors sanitazation here
 @WebSocketGateway(8888, {
-	cors: {
-		credentials: true,
-		origin: "http://localhost:3000",
-	},
+  cors: {
+    credentials: true,
+    origin: 'http://localhost:3000',
+  },
   parser: msgpack,
 })
 // add some guards here
@@ -34,7 +34,10 @@ export class UserGateway {
     @GetCurrentUserId() userId: number,
     @ConnectedSocket() clientSocket: Socket,
   ) {
-    void this.usersService.updateConnectionStatus(String(userId), UserStatus.ONLINE);
+    void this.usersService.updateConnectionStatus(
+      String(userId),
+      UserStatus.ONLINE,
+    );
     clientSocket.broadcast.emit('userConnected');
   }
 
@@ -43,14 +46,15 @@ export class UserGateway {
     clientSocket.broadcast.emit('userDisconnected');
   }
 
+  // clientSocket.handshake.headers.cookie  ==> clientSocket.handshake.auth
+  // changed it to where the auth token is located on the handshake
+
   @SubscribeMessage('connect')
   handleConnection(@ConnectedSocket() clientSocket: Socket) {
-    if (clientSocket.handshake.headers.cookie) {
-      const base64Payload = clientSocket.handshake.headers.cookie.split('.')[1];
+    if (clientSocket.handshake.auth) {
+      const base64Payload = clientSocket.handshake.auth.token.split('.')[1];
       const payloadBuffer = Buffer.from(base64Payload, 'base64');
-      const user: JwtUser = JSON.parse(
-        payloadBuffer.toString(),
-      ) as JwtUser;
+      const user: JwtUser = JSON.parse(payloadBuffer.toString()) as JwtUser;
       socketToUserId.set(clientSocket.id, String(user.id));
       clientSocket.emit('userConnected');
     }

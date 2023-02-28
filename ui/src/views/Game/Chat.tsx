@@ -21,13 +21,16 @@ import CheckIcon from "@mui/icons-material/Check";
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { ChannelTabs } from "../../components/chat/ChannelTabs";
 import ChannelService from "../../services/channel.service";
+import { useLocation } from "react-router-dom";
+import { UserSocket } from "../../classes/UserSocket.class";
 
 interface Props {
   channelSocket: ChannelSocket;
+  userSocket: UserSocket;
 }
 
 export default function Chat(props: Props) {
-  const { channelSocket } = props;
+  const { channelSocket, userSocket } = props;
   const [open, toggleOpen] = useState(false);
   const [inputChat, setInputChat] = useState<string>("");
   const [messages, setMessages] = useState<Array<messagesDto>>([]);
@@ -49,8 +52,14 @@ export default function Chat(props: Props) {
     type: "PRIVATE",
     name: "",
   });
-
   const scrollRef = useRef<HTMLLIElement | null>(null);
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location && location.state) {
+      channelSocket.createDm(location.state.id); // not sure if that's how it's done
+    }
+  }, [location]);
 
   const handleChange = (e: any) => {
     setInputChat(e.target.value);
@@ -121,10 +130,10 @@ export default function Chat(props: Props) {
     );
     channelSocket.socket.on(
       "inviteSucceeded",
-      (data: { id: string; name: string, type: accessTypes }) => {
-		setRoomInvite(data);
-		toggleInvited(true);
-	  }
+      (data: { id: string; name: string; type: accessTypes }) => {
+        setRoomInvite(data);
+        toggleInvited(true);
+      }
     );
     [
       "joinRoomError",
@@ -242,6 +251,7 @@ export default function Chat(props: Props) {
               setNewChannel={setNewChannel}
             />
             <RoomContextMenu
+              userSocket={userSocket}
               setNewChannel={setNewChannel}
               contextMenu={contextMenu}
               setContextMenu={setContextMenu}

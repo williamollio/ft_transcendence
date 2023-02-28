@@ -24,8 +24,10 @@ import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import GetNameDialog from "./GetNameDialog";
 import { useQuery } from "@tanstack/react-query";
 import { fetchUsersOfChannel } from "./hooks/channelUsers.fetch";
+import { UserSocket } from "../../classes/UserSocket.class";
 
 export default function ChannelInfoDialog({
+  userSocket,
   toggleError,
   setAlertMsg,
   setNewChannel,
@@ -34,6 +36,7 @@ export default function ChannelInfoDialog({
   channel,
   channelSocket,
 }: {
+  userSocket: UserSocket;
   toggleError: any;
   setAlertMsg: any;
   setNewChannel: any;
@@ -79,6 +82,11 @@ export default function ChannelInfoDialog({
   };
 
   useEffect(() => {
+    ["userConnected, userDisconnected"].forEach((element) => {
+      userSocket.socket.on(element, () => {
+        refetch();
+      });
+    });
     channelSocket.socket.on("roomJoined", userJoinedListener);
     channelSocket.socket.on("roomLeft", (userId: string, channelId: string) => {
       if (userId !== channelSocket.user.id) refetch();
@@ -90,6 +98,8 @@ export default function ChannelInfoDialog({
       channelSocket.socket.off("roomJoined");
       channelSocket.socket.off("roomLeft");
       channelSocket.socket.off("roleUpdated");
+	  userSocket.socket.off("userConnected");
+	  userSocket.socket.off("userDisconnected");
     };
   }, [channelSocket.socket]);
 
@@ -236,7 +246,6 @@ export default function ChannelInfoDialog({
         channelSocket={channelSocket}
       ></GetNameDialog>
       <GetPasswordDialog
-        toggleError={toggleError}
         open={openPassword}
         toggleOpen={closePasswordDialog}
         channel={channel}
