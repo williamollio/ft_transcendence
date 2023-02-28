@@ -39,7 +39,7 @@ export default function ChannelInfoDialog({
   setNewChannel: any;
   channelInfoOpen: boolean;
   toggleChannelInfo: any;
-  channel: chatRoom | null;
+  channel: chatRoom | undefined;
   channelSocket: ChannelSocket;
 }) {
   const [selected, setSelected] = useState<user | null>(null);
@@ -55,7 +55,7 @@ export default function ChannelInfoDialog({
   const [openName, toggleOpenName] = useState<boolean>(false);
 
   const { data, error, isError, isLoading, refetch } = useQuery(
-    ["channelUsers"],
+    ["channelUsers", channel?.id],
     () => fetchUsersOfChannel(channel?.id!),
     { enabled: typeof channel?.id !== "undefined" }
   );
@@ -74,14 +74,24 @@ export default function ChannelInfoDialog({
     });
   }
 
+  const userJoinedListener = (userId: string, channelId: string) => {
+    if (userId !== channelSocket.user.id) refetch();
+  };
+
   useEffect(() => {
-    channelSocket.socket?.on(
-      "roomJoined",
-      (userId: string, channelId: string) => {
-        if (userId !== channelSocket.user.id) refetch();
-      }
-    );
-  }, [channelSocket]);
+    channelSocket.socket.on("roomJoined", userJoinedListener);
+    channelSocket.socket.on("roomLeft", (userId: string, channelId: string) => {
+      if (userId !== channelSocket.user.id) refetch();
+    });
+    channelSocket.socket.on("roleUpdated", () => {
+      refetch();
+    });
+    return () => {
+      channelSocket.socket.off("roomJoined");
+      channelSocket.socket.off("roomLeft");
+      channelSocket.socket.off("roleUpdated");
+    };
+  }, [channelSocket.socket]);
 
   const handleClose = () => {
     toggleChannelInfo(false);
@@ -124,11 +134,13 @@ export default function ChannelInfoDialog({
       : false;
 
   const handlePasswordChange = (e?: SyntheticEvent) => {
+    setAlertMsg("Failed to change password");
     e ? e.preventDefault() : false;
     toggleOpenPassword(true);
   };
 
   const handleNameChange = (e?: SyntheticEvent) => {
+    setAlertMsg("Failed to change channel name");
     e ? e.preventDefault() : false;
     toggleOpenName(true);
   };
@@ -154,7 +166,7 @@ export default function ChannelInfoDialog({
         <Divider></Divider>
         <Grid item>
           <DialogContent>
-            Channel ID: {channel && channel.id !== "" ? channel.id : "missing"}
+            Channel ID: {channel?.id !== "" ? channel?.id : "missing"}
           </DialogContent>
         </Grid>
         <Grid item>
@@ -206,6 +218,7 @@ export default function ChannelInfoDialog({
               </Table>
             </TableContainer>
             <ChannelInfoContext
+              setAlertMsg={setAlertMsg}
               toggleError={toggleError}
               channel={channel}
               contextMenu={contextMenu}

@@ -13,7 +13,7 @@ export default function GetNameDialog({
   toggleError: any;
   open: boolean;
   toggleOpen: any;
-  channel: chatRoom | null;
+  channel: chatRoom | undefined;
   channelSocket: ChannelSocket;
 }) {
   const [input, setInput] = useState<string>("");
@@ -43,7 +43,6 @@ export default function GetNameDialog({
         if (nameInput !== "") {
           channelSocket.editRoom(
             channel,
-            toggleError,
             channel.access,
             channel.access === "PROTECTED" ? input : undefined,
             undefined,

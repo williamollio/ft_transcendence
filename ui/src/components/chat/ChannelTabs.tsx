@@ -11,6 +11,7 @@ import AddIcon from "@mui/icons-material/Add";
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { fetchChannelData } from "./hooks/channelData.fetch";
 import { useQuery } from "@tanstack/react-query";
+import { user } from "../../interfaces/chat.interfaces";
 
 export function ChannelTabs({
   currentRoom,
@@ -42,6 +43,7 @@ export function ChannelTabs({
   const [channelQueryId, setChannelQueryId] = useState<string | undefined>(
     undefined
   );
+
   const { data, isLoading, isError, refetch } = useQuery(
     ["channels", channelQueryId],
     () => fetchChannelData(channelQueryId),
@@ -49,22 +51,45 @@ export function ChannelTabs({
   );
 
   useEffect(() => {
-    if (typeof channelQueryId !== "undefined" && !isLoading && !isError) {
-      let index = channelSocket.channels.findIndex((element) => {
-        element.id === data.id;
-      });
+    if (
+      typeof channelQueryId !== "undefined" &&
+      data &&
+      !isLoading &&
+      !isError
+    ) {
+      let index = channelSocket.channels.findIndex(
+        (element) => element.id === data.id
+      );
       if (index != -1) {
-        channelSocket.channels[index].key = data.name;
+        channelSocket.channels[index] = {
+          ...channelSocket.channels[index],
+          key: data.name,
+        };
       } else {
-        setNewChannel(
-          channelSocket.channels[
-            channelSocket.channels.push(
-              new chatRoom(data.id, data.name, data.type)
-            ) - 1
-          ]
-        );
+        if (data.type === "DIRECTMESSAGE") {
+          let index = data.users.findIndex(
+            (element: { userId: string }) =>
+              element.userId !== channelSocket.user.id
+          );
+          if (index >= 0) {
+            setNewChannel(
+              channelSocket.channels[
+                channelSocket.channels.push(
+                  new chatRoom(data.id, data.users[index].user.name, data.type)
+                ) - 1
+              ]
+            );
+          }
+        } else {
+          setNewChannel(
+            channelSocket.channels[
+              channelSocket.channels.push(
+                new chatRoom(data.id, data.name, data.type)
+              ) - 1
+            ]
+          );
+        }
       }
-      setChannelQueryId(undefined);
     }
   }, [data]);
 
@@ -74,37 +99,44 @@ export function ChannelTabs({
 
   const roomJoinedListener = (data: { userId: string; channelId: string }) => {
     if (data.userId === channelSocket.user.id) {
-      console.log("creating");
       setChannelQueryId(data.channelId);
     }
   };
 
   const roomEditedListener = (channelId: string) => {
     setChannelQueryId(channelId);
-  };
-
-  const roomLeftListener = (data: { userId: string; channelId: string }) => {
-    let index = channelSocket.channels.findIndex(
-      (element) => element.id === data.channelId
-    );
-    console.log(index);
-    if (index != -1) {
-      channelSocket.channels.splice(index, 1);
-    }
+    refetch();
   };
 
   useEffect(() => {
+    channelSocket.socket.on(
+      "roomLeft",
+      (data: { userId: string; channelId: string }) => {
+        let index = channelSocket.channels.findIndex(
+          (element) => element.id === data.channelId
+        );
+        if (index != -1) {
+          channelSocket.channels.splice(index, 1);
+          if (channelSocket.channels.length > 0) {
+            if (index == 0) {
+              setNewChannel(channelSocket.channels[index]);
+            } else {
+              setNewChannel(channelSocket.channels[index - 1]);
+            }
+          } else setNewChannel(false);
+        }
+      }
+    );
     channelSocket.socket.on("roomCreated", roomCreatedListener);
-    channelSocket.socket.on("roomLeft", roomLeftListener);
     channelSocket.socket.on("roomJoined", roomJoinedListener);
     channelSocket.socket.on("roomEdited", roomEditedListener);
     return () => {
-      channelSocket.socket.off("roomCreated", roomCreatedListener);
-      channelSocket.socket.off("roomLeft", roomLeftListener);
-      channelSocket.socket.off("Joinedeated", roomJoinedListener);
-      channelSocket.socket.off("roomEdited", roomEditedListener);
+      channelSocket.socket.off("roomLeft");
+      channelSocket.socket.off("roomCreated");
+      channelSocket.socket.off("roomJoined");
+      channelSocket.socket.off("roomEdited");
     };
-  }, []);
+  }, [channelSocket.socket]);
 
   const handleRoomChange = (event: SyntheticEvent, newValue: chatRoom) => {
     setNewChannel(newValue);
@@ -132,7 +164,7 @@ export function ChannelTabs({
   return (
     <Tabs
       sx={{ width: "300px" }}
-      value={currentRoom}
+      value={typeof currentRoom !== "boolean" ? currentRoom.key : false}
       onChange={handleRoomChange}
       variant="scrollable"
     >
@@ -145,7 +177,7 @@ export function ChannelTabs({
               width: "auto",
               maxWidth: "100px",
             }}
-            value={channel}
+            value={channel.key}
             key={channel.id}
             onContextMenu={(e) => handleContextMenu(e, channel)}
             label={

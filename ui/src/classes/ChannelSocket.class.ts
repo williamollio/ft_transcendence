@@ -24,7 +24,7 @@ export class ChannelSocket {
       : (this.user = { id: "", name: "" });
   }
 
-  createRoom = (channelObj: chatRoom, toggleError: any, password?: string) => {
+  createRoom = (channelObj: chatRoom, password?: string) => {
     this.socket.emit("createRoom", {
       createInfo: {
         name: channelObj.key,
@@ -33,48 +33,21 @@ export class ChannelSocket {
         passwordHash: password,
       },
     });
-    this.socket.on("roomCreated", () => {
-      toggleError(false);
-    });
-    this.socket.on("createRoomFailed", (error: string) => {
-      console.log(error);
-      toggleError(true);
-    });
   };
 
-  deleteRoom = (channel: chatRoom, toggleError: any) => {
+  deleteRoom = (channel: chatRoom) => {
     this.socket.emit("leaveRoom", {
       leaveInfo: { id: channel.id, type: channel.access },
     });
-    this.socket.on("roomLeft", () => {
-      toggleError(false);
-    });
-    this.socket.on("leaveRoomFailed", (error: string) => {
-      console.log(error);
-      toggleError(true);
-    });
   };
 
-  joinRoom = (
-    channelId: string,
-    access: accessTypes,
-    toggleError: any,
-    password?: string
-  ) => {
+  joinRoom = (channelId: string, access: accessTypes, password?: string) => {
     this.socket.emit("joinRoom", {
       joinInfo: {
         id: channelId,
         type: access,
         passwordHash: password,
       },
-    });
-    this.socket.on("roomJoined", () => {
-      toggleError(false);
-    });
-    ["joinRoomError", "joinRoomFailed"].forEach((element) => {
-      this.socket.on(element, () => {
-        toggleError(true);
-      });
     });
   };
 
@@ -86,7 +59,6 @@ export class ChannelSocket {
 
   editRoom = (
     channel: chatRoom,
-    toggleError: any,
     type?: accessTypes,
     password?: string,
     newPassword?: string,
@@ -101,15 +73,9 @@ export class ChannelSocket {
         currentPasswordHash: password,
       },
     });
-    this.socket.on("roomEdited", () => {
-      toggleError(false);
-    });
-    this.socket.on("editRoomFailed", () => {
-      toggleError(true);
-    });
   };
 
-  createDm = (otherUser: channelUser, toggleError: any) => {
+  createDm = (otherUser: channelUser) => {
     this.socket.emit("createRoom", {
       createInfo: {
         name: otherUser.name,
@@ -117,19 +83,9 @@ export class ChannelSocket {
         userId: otherUser.id,
       },
     });
-    this.socket.on("roomCreated", () => {
-      toggleError(false);
-    });
-    this.socket.on("createRoomFailed", () => {
-      toggleError(true);
-    });
   };
 
-  inviteToChannel = (
-    channel: chatRoom | null,
-    otherUserId: string,
-    toggleError: any
-  ) => {
+  inviteToChannel = (channel: chatRoom | undefined, otherUserId: string) => {
     if (channel) {
       this.socket.emit("inviteToChannel", {
         inviteInfo: {
@@ -138,16 +94,10 @@ export class ChannelSocket {
           type: channel.access,
         },
       });
-      this.socket.on("inviteFailed", () => {
-        toggleError(true);
-      });
-      this.socket.on("inviteSucceeded", () => {
-        toggleError(false);
-      });
     }
   };
 
-  banUser = (channelId: String, otherUserId: string, toggleError: any) => {
+  banUser = (channelId: String, otherUserId: string) => {
     this.socket.emit("banUser", {
       banInfo: {
         channelActionTargetId: otherUserId,
@@ -155,15 +105,9 @@ export class ChannelSocket {
         type: "BAN",
       },
     });
-    this.socket.on("banSucceeded", () => {
-      toggleError(false);
-    });
-    this.socket.on("banFailed", () => {
-      toggleError(true);
-    });
   };
 
-  muteUser = (channelId: String, otherUserId: string, toggleError: any) => {
+  muteUser = (channelId: String, otherUserId: string) => {
     this.socket.emit("muteUser", {
       banInfo: {
         channelActionTargetId: otherUserId,
@@ -171,24 +115,12 @@ export class ChannelSocket {
         type: "MUTE",
       },
     });
-    this.socket.on("muteSucceeded", () => {
-      toggleError(false);
-    });
-    this.socket.on("muteFailed", () => {
-      toggleError(true);
-    });
   };
 
-  editRole = (channelId: string, userId: string, toggleError: any) => {
+  editRole = (channelId: string, userId: string) => {
     this.socket.emit("updateRole", {
       channelId: channelId,
       targetInfo: { promotedUserId: userId },
-    });
-    this.socket.on("roleUpdated", () => {
-      toggleError(false);
-    });
-    this.socket.on("updateRoleFailed", () => {
-      toggleError(true);
     });
   };
 }

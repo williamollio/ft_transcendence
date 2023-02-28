@@ -1,19 +1,21 @@
 import { Menu, MenuItem } from "@mui/material";
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { chatRoom } from "../../classes/chatRoom.class";
 import { channelUser } from "../../interfaces/chat.interfaces";
 import ChannelService from "../../services/channel.service";
 
 export default function ChannelInfoContext({
+  setAlertMsg,
   toggleError,
   channel,
   contextMenu,
   setContextMenu,
   channelSocket,
 }: {
-  toggleError: any;
-  channel: chatRoom | null;
+  setAlertMsg: Dispatch<SetStateAction<string>>;
+  toggleError: Dispatch<SetStateAction<boolean>>;
+  channel: chatRoom | undefined;
   contextMenu: {
     mouseX: number;
     mouseY: number;
@@ -54,13 +56,15 @@ export default function ChannelInfoContext({
   };
 
   const handleDM = () => {
+    setAlertMsg("Failed to set up directmessaging");
     handleContextClose();
     if (contextMenu && contextMenu.user) {
-      channelSocket.createDm(contextMenu.user, toggleError);
+      channelSocket.createDm(contextMenu.user);
     }
   };
 
   const handleProfile = () => {
+    setAlertMsg("Failed to access profile");
     handleContextClose();
     if (contextMenu && contextMenu.user && contextMenu.user.id) {
       // checkout profile with user.id
@@ -68,6 +72,7 @@ export default function ChannelInfoContext({
   };
 
   const handleInviteGame = () => {
+    setAlertMsg("Failed to invite to play");
     handleContextClose();
     if (contextMenu && contextMenu.user && contextMenu.user.id) {
       // setupGame with user.id
@@ -78,10 +83,12 @@ export default function ChannelInfoContext({
     handleContextClose();
     if (contextMenu && contextMenu.user && contextMenu.user.id) {
       if (blockStatus === "Block") {
+        setAlertMsg("Failed to block User");
         ChannelService.blockUser(contextMenu.user.id).then((resolve) => {
           console.log(resolve.data);
         });
       } else if (blockStatus === "Unblock") {
+        setAlertMsg("Failed to unblock User");
         ChannelService.unblockUser(contextMenu.user.id).then((resolve) => {
           console.log(resolve.data);
         });
@@ -90,6 +97,7 @@ export default function ChannelInfoContext({
   };
 
   const handleMute = () => {
+    setAlertMsg("Failed to mute user");
     handleContextClose();
     if (
       channel &&
@@ -99,11 +107,12 @@ export default function ChannelInfoContext({
       contextMenu.user.id
     ) {
       //   setAction("mute");
-      channelSocket.banUser(channel.id, contextMenu.user.id, toggleError);
+      channelSocket.banUser(channel.id, contextMenu.user.id);
     }
   };
 
   const handleKick = () => {
+    setAlertMsg("Failed to ban user");
     handleContextClose();
     if (
       channel &&
@@ -113,7 +122,20 @@ export default function ChannelInfoContext({
       contextMenu.user.id
     ) {
       //   setAction("kick");
-      channelSocket.muteUser(channel.id, contextMenu.user.id, toggleError);
+      channelSocket.muteUser(channel.id, contextMenu.user.id);
+    }
+  };
+
+  const handlePromote = () => {
+    setAlertMsg("Failed to promote user");
+    if (
+      channel &&
+      channel.id &&
+      contextMenu &&
+      contextMenu.user &&
+      contextMenu.user.id
+    ) {
+      channelSocket.editRole(channel.id, contextMenu.user.id);
     }
   };
 
@@ -131,6 +153,9 @@ export default function ChannelInfoContext({
       >
         <MenuItem disabled={self} onClick={handleDM}>
           Whisper
+        </MenuItem>
+        <MenuItem disabled={self} onClick={handlePromote}>
+          Promote
         </MenuItem>
         <MenuItem disabled={self} onClick={handleProfile}>
           View Profile

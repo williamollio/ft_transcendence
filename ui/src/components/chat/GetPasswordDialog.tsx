@@ -13,7 +13,7 @@ export default function GetPasswordDialog({
   toggleError: any;
   open: boolean;
   toggleOpen: any;
-  channel: chatRoom | null;
+  channel: chatRoom | undefined;
   channelSocket: ChannelSocket;
 }) {
   const [input, setInput] = useState<string>("");
@@ -40,7 +40,6 @@ export default function GetPasswordDialog({
           //send request to change password
           channelSocket.editRoom(
             channel,
-            toggleError,
             channel.access,
             oldInput,
             input
@@ -49,7 +48,6 @@ export default function GetPasswordDialog({
           //send request to remove password
           channelSocket.editRoom(
             channel,
-            toggleError,
             "PUBLIC",
             oldInput
           );
@@ -58,7 +56,6 @@ export default function GetPasswordDialog({
         //send request with input to change access type to PROTECTED
         channelSocket.editRoom(
           channel,
-		  toggleError,
           "PROTECTED",
           undefined,
           input

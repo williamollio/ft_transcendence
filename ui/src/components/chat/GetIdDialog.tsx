@@ -13,7 +13,7 @@ export default function GetIdDialog({
   toggleError: any;
   open: boolean;
   toggleOpen: any;
-  channel: chatRoom | null;
+  channel: chatRoom | undefined;
   channelSocket: ChannelSocket;
 }) {
   const [input, setInput] = useState<string>("");
@@ -29,7 +29,7 @@ export default function GetIdDialog({
 
   const handleSubmit = (e: any) => {
     if (e.key === "Enter") {
-      channelSocket.inviteToChannel(channel, input, toggleError);
+      channelSocket.inviteToChannel(channel, input);
       handleClose();
     }
   };

@@ -23,7 +23,6 @@ import { socketToUserId } from 'src/users/socketToUserIdStorage.service';
 import { ModerateChannelDto } from './dto/moderateChannelUser.dto';
 import * as msgpack from 'socket.io-msgpack-parser';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
-import { AuthService } from 'src/auth/auth.service';
 
 enum acknoledgementStatus {
   OK = 'OK',
@@ -49,6 +48,7 @@ export class ChannelGateway {
     @MessageBody('channelId') channelId: string,
     @ConnectedSocket() clientSocket: Socket,
   ) {
+	console.log(channelId);
     const userOnChannel = await this.channelService.connectToChannel(
       userId,
       channelId,
@@ -189,7 +189,7 @@ export class ChannelGateway {
       }
     } else {
       this.server
-        // .to(leaveChannelDto.id)
+        .to(leaveChannelDto.id)
         .emit('roomLeft', { userId: userId, channelId: leaveChannelDto.id });
       await clientSocket.leave(leaveChannelDto.id);
     }

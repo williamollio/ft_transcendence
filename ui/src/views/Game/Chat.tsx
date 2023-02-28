@@ -13,12 +13,14 @@ import {
 } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 import { messagesDto } from "../../interfaces/chat.interfaces";
-import { chatRoom } from "../../classes/chatRoom.class";
+import { accessTypes, chatRoom } from "../../classes/chatRoom.class";
 import AddChannelDialog from "../../components/chat/AddChannelDialog";
 import RoomContextMenu from "../../components/chat/RoomContextMenu";
 import CloseIcon from "@mui/icons-material/Close";
+import CheckIcon from "@mui/icons-material/Check";
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { ChannelTabs } from "../../components/chat/ChannelTabs";
+import ChannelService from "../../services/channel.service";
 
 interface Props {
   channelSocket: ChannelSocket;
@@ -37,6 +39,16 @@ export default function Chat(props: Props) {
   } | null>(null);
   const [alert, toggleAlert] = useState<boolean>(false);
   const [alertMsg, setAlertMsg] = useState<string>("");
+  const [invited, toggleInvited] = useState<boolean>(false);
+  const [roomIvite, setRoomInvite] = useState<{
+    id: string;
+    name: string;
+    type: accessTypes;
+  }>({
+    id: "",
+    type: "PRIVATE",
+    name: "",
+  });
 
   const scrollRef = useRef<HTMLLIElement | null>(null);
 
@@ -61,17 +73,96 @@ export default function Chat(props: Props) {
   };
 
   useEffect(() => {
-    channelSocket.socket.on("incomingMessage", (event: any, ...args: any) => {
-      let index = channelSocket.channels.findIndex(
-        (element) => element.id === args.channelId
-      );
-      if (index >= 0) channelSocket.channels[index].messages.push(args.content);
-    });
+    channelSocket.socket.on(
+      "incomingMessage",
+      (incomingMessage: { channelId: string; content: string }) => {
+        let index = channelSocket.channels.findIndex(
+          (element) => element.id === incomingMessage.channelId
+        );
+        if (index >= 0)
+          channelSocket.channels[index].messages.push({
+            message: incomingMessage.content,
+            room: incomingMessage.channelId,
+          });
+      }
+    );
     channelSocket.socket.on("messageRoomFailed", () => {
       setAlertMsg("Failed to send message");
       toggleAlert(true);
     });
-  }, [channelSocket]);
+    channelSocket.socket.on("roomLeft", (userId: string, channelId: string) => {
+      let index = channelSocket.channels.findIndex(
+        (element) => element.id === channelId
+      );
+      if (index >= 0) {
+        ChannelService.getUserName(userId).then((res) => {
+          channelSocket.channels[index].messages.push({
+            message: `${res.data.name} left the channel`,
+            room: channelId,
+          });
+        });
+      }
+    });
+    channelSocket.socket.on(
+      "roomJoined",
+      (userId: string, channelId: string) => {
+        let index = channelSocket.channels.findIndex(
+          (element) => element.id === channelId
+        );
+        if (index >= 0) {
+          ChannelService.getUserName(userId).then((res) => {
+            channelSocket.channels[index].messages.push({
+              message: `${res.data.name} joined the channel`,
+              room: channelId,
+            });
+          });
+        }
+      }
+    );
+    channelSocket.socket.on(
+      "inviteSucceeded",
+      (data: { id: string; name: string, type: accessTypes }) => {
+		setRoomInvite(data);
+		toggleInvited(true);
+	  }
+    );
+    [
+      "joinRoomError",
+      "joinRoomFailed",
+      "leaveRoomFailed",
+      "createRoomFailed",
+      "editRoomFailed",
+      "createRoomFailed",
+      "banFailed",
+      "muteFailed",
+      "updateRoleFailed",
+    ].forEach((element) => {
+      channelSocket.socket.on(element, (error) => {
+        console.log(error);
+        toggleAlert(true);
+      });
+    });
+    return () => {
+      [
+        "incomingMessage",
+        "messageRoomFailed",
+        "joinRoomError",
+        "joinRoomFailed",
+        "leaveRoomFailed",
+        "createRoomFailed",
+        "editRoomFailed",
+        "createRoomFailed",
+        "inviteSucceeded",
+        "banFailed",
+        "muteFailed",
+        "updateRoleFailed",
+        "roomLeft",
+        "roomJoined",
+      ].forEach((element) => {
+        channelSocket.socket.off(element);
+      });
+    };
+  }, [channelSocket.socket]);
 
   const listMessages = messages
     ? messages.map((messagesDto: messagesDto, index) => {
@@ -89,30 +180,6 @@ export default function Chat(props: Props) {
         }
       })
     : false;
-
-  //   const testAddUsers = (room: chatRoom | boolean) => {
-  //     if (typeof room !== "boolean") {
-  //       room.users.push({ id: "1", name: "TEST", rank: "Owner" });
-  //       room.users.push({ id: "2", name: "TEST", rank: "Admin" });
-  //       room.users.push({ id: "3", name: "TEST", rank: "" });
-  //       room.users.push({ id: "4", name: "TEST", rank: "" });
-  //       room.users.push({ id: "5", name: "TEST", rank: "" });
-  //       room.users.push({ id: "6", name: "TEST", rank: "" });
-  //       room.users.push({ id: "7", name: "TEST", rank: "" });
-  //       room.users.push({ id: "8", name: "TEST", rank: "" });
-  //       room.users.push({ id: "9", name: "TEST", rank: "" });
-  //       room.users.push({ id: "10", name: "TEST", rank: "" });
-  //       room.users.push({ id: "11", name: "TEST", rank: "" });
-  //       room.users.push({ id: "12", name: "TEST", rank: "" });
-  //       room.users.push({ id: "13", name: "TEST", rank: "" });
-  //     }
-  //   };
-
-  //   useEffect(() => {
-  //     channels[channels.length - 1]
-  //       ? testAddUsers(channels[channels.length - 1])
-  //       : false;
-  //   }, [channels.length]);
 
   useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollIntoView();
@@ -169,13 +236,12 @@ export default function Chat(props: Props) {
               currentRoom={currentRoom}
               setContextMenu={setContextMenu}
               contextMenu={contextMenu}
-			  toggleAlert={toggleAlert}
-			  toggleOpen={toggleOpen}
-			  channelSocket={channelSocket}
-			  setNewChannel={setNewChannel}
+              toggleAlert={toggleAlert}
+              toggleOpen={toggleOpen}
+              channelSocket={channelSocket}
+              setNewChannel={setNewChannel}
             />
             <RoomContextMenu
-              toggleError={toggleAlert}
               setNewChannel={setNewChannel}
               contextMenu={contextMenu}
               setContextMenu={setContextMenu}
@@ -222,6 +288,36 @@ export default function Chat(props: Props) {
             </Grid>
           </>
         </Box>
+        <Collapse in={invited}>
+          <Alert sx={{ width: "auto" }} severity="success">
+            You have been invited to {roomIvite.name}
+          </Alert>
+          <Grid container>
+            <IconButton
+              aria-label="Accept"
+              color="inherit"
+              size="small"
+              onClick={() => {
+                channelSocket.joinRoom(roomIvite.id, roomIvite.type);
+                toggleAlert(false);
+                setRoomInvite({ id: "", type: "PRIVATE", name: "" });
+              }}
+            >
+              <CloseIcon fontSize="inherit" />
+            </IconButton>
+            <IconButton
+              aria-label="Reject"
+              color="inherit"
+              size="small"
+              onClick={() => {
+                toggleAlert(false);
+                setRoomInvite({ id: "", type: "PRIVATE", name: "" });
+              }}
+            >
+              <CheckIcon fontSize="inherit" />
+            </IconButton>
+          </Grid>
+        </Collapse>
       </Paper>
     </>
   );

@@ -4,9 +4,11 @@ import { AxiosResponse } from "axios";
 import {
   DBChannelElement,
   DBChannelUserListElement,
+  user,
 } from "../interfaces/chat.interfaces";
 
 const PATH = "channels";
+const USER_PATH = "users";
 const BLOCK_PATH = "block";
 
 class ChannelService {
@@ -36,6 +38,14 @@ class ChannelService {
     return resolve<DBChannelUserListElement[]>(
       axiosInstance
         .get(`${BLOCK_PATH}/users-blocked-by-current-user`)
+        .then((res: AxiosResponse) => res.data)
+    );
+  }
+
+  async getUserName(id: string): Promise<Response<user>> {
+    return resolve<user>(
+      axiosInstance
+        .get(`${USER_PATH}/${id}`)
         .then((res: AxiosResponse) => res.data)
     );
   }

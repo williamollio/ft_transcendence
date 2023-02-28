@@ -56,6 +56,7 @@ export default function AddChannelDialog({
   };
 
   const handleFormSubmit = (e: any) => {
+    toggleAlert(false);
     e.preventDefault();
     if (alertOpen === true) setAlertOpen(false);
     if (formSelection === 1) {
@@ -65,13 +66,11 @@ export default function AddChannelDialog({
           if (dialogValue.access === "PROTECTED") {
             channelSocket.createRoom(
               new chatRoom(undefined, dialogValue.key, dialogValue.access),
-              toggleAlert,
               dialogValue.password
             );
           } else {
             channelSocket.createRoom(
               new chatRoom(undefined, dialogValue.key, dialogValue.access),
-              toggleAlert,
               undefined
             );
           }
@@ -84,7 +83,6 @@ export default function AddChannelDialog({
       channelSocket.joinRoom(
         dialogJoinValue.id,
         dialogJoinValue.password !== "" ? "PROTECTED" : "PUBLIC",
-        toggleAlert,
         dialogJoinValue.password !== "" ? dialogJoinValue.password : undefined
       );
       setDialogJoinValue({ id: "", password: "" });
