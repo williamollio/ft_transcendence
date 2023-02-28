@@ -11,6 +11,7 @@ import { JwtUser } from '../users/interface/jwt-user.interface';
 import { Intra42User } from '../users/interface/intra42-user.interface';
 import * as process from 'process';
 import * as argon2 from 'argon2';
+import { CreateUserDto } from '../users/dto/create-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -44,7 +45,18 @@ export class AuthService {
     if (foundUser == null) {
       foundUser = await this.registerUser(user);
     }
+    return await this.coreSignIn({
+      id: foundUser.id,
+      intraId: foundUser.intraId,
+    });
+  }
 
+  async bypassAuth(createUserDto: CreateUserDto) {
+    const user = await this.userService.create(createUserDto);
+    return await this.coreSignIn({ id: user.id, intraId: user.intraId });
+  }
+
+  private async coreSignIn(foundUser: { id: string; intraId: string }) {
     const tokens = await this.generateTokens({
       id: foundUser.id,
       intraId: foundUser.intraId,

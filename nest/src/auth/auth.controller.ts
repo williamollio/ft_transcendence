@@ -1,7 +1,9 @@
 import {
+  Body,
   Controller,
   Get,
   HttpStatus,
+  Post,
   Req,
   Res,
   UseGuards,
@@ -13,6 +15,7 @@ import * as process from 'process';
 import { Intra42User } from '../users/interface/intra42-user.interface';
 import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
 import { JwtGuard } from './guards/jwt.guard';
+import { CreateUserDto } from '../users/dto/create-user.dto';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -48,6 +51,11 @@ export class AuthController {
     this.setCookieTokens(tokens, response);
 
     response.redirect(`${process.env.PATH_TO_FRONTEND}redirect`);
+  }
+
+  @Post('createBypassAuth')
+  async bypassCreateAuthUser(@Body() createUserDto: CreateUserDto) {
+    return await this.authService.bypassAuth(createUserDto);
   }
 
   @Get('logout')
