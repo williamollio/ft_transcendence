@@ -59,20 +59,6 @@ export class UsersController {
     return this.usersService.findOne(id);
   }
 
-  @Post()
-  @ApiCreatedResponse({ type: UserEntity })
-  public async create(@Body() createUserDto: CreateUserDto): Promise<User> {
-    try {
-      return await this.usersService.create(createUserDto);
-    } catch (error) {
-      console.error(error);
-      throw new HttpException(
-        'This username already exists',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-  }
-
   @Patch(':id')
   @ApiOkResponse({ type: UserEntity })
   public async update(
