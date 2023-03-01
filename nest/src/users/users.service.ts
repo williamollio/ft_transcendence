@@ -114,6 +114,7 @@ export class UsersService {
       const nicknames = await this.prisma.user.findMany({
         select: {
           id: true,
+          intraId: true,
           name: true,
           status: true,
         },
