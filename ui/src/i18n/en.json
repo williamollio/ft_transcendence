@@ -1,10 +1,12 @@
 {
   "buttons": {
     "save": "Save",
-    "login": "Login",
+    "login42": "Login 42 API",
     "cancel": "Cancel",
     "submit": "Submit"
   },
+  "loginToken": "Enter token",
+  "or": "or",
   "game": "Game",
   "login2fa": "Two-Factor Authentication",
   "setup2fa": "Two-Factor Authentication",
