@@ -1,5 +1,5 @@
 import { Menu, MenuItem } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { chatRoom } from "../../classes/chatRoom.class";
 import { UserSocket } from "../../classes/UserSocket.class";
@@ -94,7 +94,6 @@ export default function RoomContextMenu({
         channelSocket={channelSocket}
       ></ChannelInfoDialog>
       <GetIdDialog
-        toggleError={toggleAlert}
         channelSocket={channelSocket}
         open={openId}
         toggleOpen={toggleOpenId}

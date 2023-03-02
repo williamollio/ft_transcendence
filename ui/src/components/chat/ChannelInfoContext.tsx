@@ -7,14 +7,12 @@ import ChannelService from "../../services/channel.service";
 
 export default function ChannelInfoContext({
   setAlertMsg,
-  toggleError,
   channel,
   contextMenu,
   setContextMenu,
   channelSocket,
 }: {
   setAlertMsg: Dispatch<SetStateAction<string>>;
-  toggleError: Dispatch<SetStateAction<boolean>>;
   channel: chatRoom | undefined;
   contextMenu: {
     mouseX: number;

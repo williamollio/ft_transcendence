@@ -194,19 +194,23 @@ export class ChannelService {
     try {
       await this.checkChannel(channelId);
       const users: {
+        role: ChannelRole;
         user: {
           id: string;
           status: UserStatus;
+          name: string;
         };
       }[] = await this.prisma.channelUser.findMany({
         where: {
           channelId: channelId,
         },
         select: {
+          role: true,
           user: {
             select: {
               id: true,
               status: true,
+              name: true,
             },
           },
         },
@@ -214,9 +218,11 @@ export class ChannelService {
       const flattenUsers: {
         id: string;
         status: UserStatus;
+        name: string;
+        role: ChannelRole;
       }[] = [];
       for (const user of users) {
-        flattenUsers.push(user.user);
+        flattenUsers.push({...user.user, role: user.role});
       }
       return flattenUsers;
     } catch (error) {

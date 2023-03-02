@@ -7,6 +7,7 @@ import authService from "../../services/auth.service";
 import { useNavigate } from "react-router-dom";
 import { RoutePath } from "../../interfaces/router.interface";
 import { Cookie } from "../../utils/auth-helper";
+import { UserSocket } from "../../classes/UserSocket.class";
 
 export default function LoginView(): React.ReactElement {
   const { t } = useTranslation();

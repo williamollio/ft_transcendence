@@ -48,7 +48,7 @@ export class ChannelGateway {
     @MessageBody('channelId') channelId: string,
     @ConnectedSocket() clientSocket: Socket,
   ) {
-	console.log(channelId);
+    console.log(channelId);
     const userOnChannel = await this.channelService.connectToChannel(
       userId,
       channelId,
@@ -91,7 +91,7 @@ export class ChannelGateway {
     }
     typeof channel === 'string' || !channel
       ? this.server.to(clientSocket.id).emit('createRoomFailed', channel)
-      : this.server.emit('roomCreated', channel.id, userId);
+      : this.server.to(clientSocket.id).emit('roomCreated', channel.id, userId);
   }
 
   // When a user join a channel, her ids are added to the users in the corresponding room
@@ -206,12 +206,18 @@ export class ChannelGateway {
       userId,
       inviteChannelDto,
     );
-    if (!inviteToChannel || typeof inviteToChannel === 'string') {
+    const otherUserSocket = socketToUserId.getFromUserId(
+      inviteChannelDto.invitedId,
+    );
+    if (!otherUserSocket)
+      this.server.to(clientSocket.id).emit('inviteFailed', inviteToChannel);
+    else if (!inviteToChannel || typeof inviteToChannel === 'string') {
       this.server.to(clientSocket.id).emit('inviteFailed', inviteToChannel);
     } else {
       this.server
         .to([clientSocket.id, inviteChannelDto.channelId])
         .emit('inviteSucceeded', inviteToChannel);
+      this.server.to([otherUserSocket]).emit('gotInvited', inviteChannelDto.channelId);
     }
   }
 

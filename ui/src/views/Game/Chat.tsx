@@ -56,7 +56,7 @@ export default function Chat(props: Props) {
   const location = useLocation();
 
   useEffect(() => {
-    if (location && location.state) {
+    if (location && location.state && location.state.id) {
       channelSocket.createDm(location.state.id); // not sure if that's how it's done
     }
   }, [location]);

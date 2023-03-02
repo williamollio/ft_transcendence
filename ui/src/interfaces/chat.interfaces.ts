@@ -14,7 +14,7 @@ export interface channelUser {
 	id: string;
 	name: string,
 	status: "OFFLINE" | "ONLINE" | "PLAYING";
-	rank?: "" | "Admin" | "Owner";
+	role?: "USER" | "ADMIN" | "OWNER";
 };
 
 export interface CRDialogValue {

@@ -11,7 +11,6 @@ import AddIcon from "@mui/icons-material/Add";
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { fetchChannelData } from "./hooks/channelData.fetch";
 import { useQuery } from "@tanstack/react-query";
-import { user } from "../../interfaces/chat.interfaces";
 
 export function ChannelTabs({
   currentRoom,
@@ -43,6 +42,9 @@ export function ChannelTabs({
   const [channelQueryId, setChannelQueryId] = useState<string | undefined>(
     undefined
   );
+  const [channelList, setChannelList] = useState<chatRoom[]>(
+    channelSocket.channels
+  );
 
   const { data, isLoading, isError, refetch } = useQuery(
     ["channels", channelQueryId],
@@ -65,6 +67,7 @@ export function ChannelTabs({
           ...channelSocket.channels[index],
           key: data.name,
         };
+        setChannelList(channelSocket.channels);
       } else {
         if (data.type === "DIRECTMESSAGE") {
           let index = data.users.findIndex(
@@ -164,11 +167,11 @@ export function ChannelTabs({
   return (
     <Tabs
       sx={{ width: "300px" }}
-      value={typeof currentRoom !== "boolean" ? currentRoom.key : false}
+      value={typeof currentRoom !== "boolean" ? currentRoom.id : false}
       onChange={handleRoomChange}
       variant="scrollable"
     >
-      {channelSocket.channels.map((channel: chatRoom) => {
+      {channelList.map((channel: chatRoom) => {
         return (
           <Tab
             sx={{
@@ -177,7 +180,7 @@ export function ChannelTabs({
               width: "auto",
               maxWidth: "100px",
             }}
-            value={channel.key}
+            value={channel.id}
             key={channel.id}
             onContextMenu={(e) => handleContextMenu(e, channel)}
             label={

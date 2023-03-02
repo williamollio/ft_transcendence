@@ -34,8 +34,14 @@ import { Controller, FieldValues, useForm } from "react-hook-form";
 import CustomMultiSelect from "../../components/shared/CustomMultiSelect/CustomMultiselect";
 import CustomTextField from "../../components/shared/CustomTextField/CustomTextField";
 import { Cookie, getTokenData, initAuthToken } from "../../utils/auth-helper";
+import { UserSocket } from "../../classes/UserSocket.class";
 
-export default function ProfileView(): React.ReactElement {
+interface Props {
+  userSocket: UserSocket;
+}
+
+export default function ProfileView(props: Props): React.ReactElement {
+  const { userSocket } = props;
   const { t } = useTranslation();
   const { classes } = useStyles();
   const navigate = useNavigate();
@@ -61,6 +67,17 @@ export default function ProfileView(): React.ReactElement {
   } = useForm({
     mode: "onChange",
   });
+
+  React.useEffect(() => {
+    let token = localStorage.getItem(Cookie.TOKEN);
+    if (token) {
+      userSocket.initializeSocket(token);
+      userSocket.logIn();
+    }
+    return () => {
+      userSocket.socket?.disconnect();
+    };
+  }, []);
 
   React.useEffect(() => {
     let token;

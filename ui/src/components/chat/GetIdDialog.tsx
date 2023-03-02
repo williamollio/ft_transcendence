@@ -4,13 +4,11 @@ import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { chatRoom } from "../../classes/chatRoom.class";
 
 export default function GetIdDialog({
-  toggleError,
   open,
   toggleOpen,
   channel,
   channelSocket,
 }: {
-  toggleError: any;
   open: boolean;
   toggleOpen: any;
   channel: chatRoom | undefined;

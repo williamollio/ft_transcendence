@@ -17,23 +17,28 @@ import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { UserSocket } from "../../classes/UserSocket.class";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
-export default function GameView(): React.ReactElement {
+interface Props {
+  userSocket: UserSocket;
+}
+
+export default function GameView(props: Props): React.ReactElement {
+  const { userSocket } = props;
   const { t } = useTranslation();
-  //   const { classes } = useStyles();
+  // const { classes } = useStyles();
 
   const [channelSocket] = React.useState<ChannelSocket>(new ChannelSocket());
-  const [userSocket] = React.useState<UserSocket>(new UserSocket());
+  //   const [userSocket] = React.useState<UserSocket>(new UserSocket());
 
   React.useEffect(() => {
     let token;
     if ((token = localStorage.getItem(Cookie.TOKEN))) {
       channelSocket.initializeSocket(token);
-      userSocket.initializeSocket(token);
+      //   userSocket.initializeSocket(token);
     }
-	return () => {
-		channelSocket.socket?.disconnect();
-		userSocket.socket?.disconnect();
-	}
+    return () => {
+      channelSocket.socket?.disconnect();
+      //   userSocket.socket?.disconnect();
+    };
   }, []);
 
   return (
@@ -41,8 +46,8 @@ export default function GameView(): React.ReactElement {
       <Navbar />
       <Background>
         <ProfileCard>
-            <Chat channelSocket={channelSocket} />
-            <ReactQueryDevtools></ReactQueryDevtools>
+          <Chat channelSocket={channelSocket} userSocket={userSocket} />
+          <ReactQueryDevtools></ReactQueryDevtools>
           <CardContainer>
             <TitleWrapper>
               <Typography

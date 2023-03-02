@@ -28,9 +28,7 @@ import { UserSocket } from "../../classes/UserSocket.class";
 
 export default function ChannelInfoDialog({
   userSocket,
-  toggleError,
   setAlertMsg,
-  setNewChannel,
   channelInfoOpen,
   toggleChannelInfo,
   channel,
@@ -57,21 +55,21 @@ export default function ChannelInfoDialog({
 
   const [openName, toggleOpenName] = useState<boolean>(false);
 
-  const { data, error, isError, isLoading, refetch } = useQuery(
+  const { data, isError, isLoading, refetch } = useQuery(
     ["channelUsers", channel?.id],
     () => fetchUsersOfChannel(channel?.id!),
     { enabled: typeof channel?.id !== "undefined" }
   );
 
-  if (!isLoading) {
+  if (!isLoading && !isError) {
     data.forEach((element: channelUser) => {
       if (channel) {
         channel.users = new Array<channelUser>();
         channel.users.push({
           id: element.id,
-          name: "test",
+          name: element.name,
           status: element.status,
-          rank: "",
+          role: element.role,
         });
       }
     });
@@ -83,7 +81,7 @@ export default function ChannelInfoDialog({
 
   useEffect(() => {
     ["userConnected, userDisconnected"].forEach((element) => {
-      userSocket.socket.on(element, () => {
+      userSocket.socket?.on(element, () => {
         refetch();
       });
     });
@@ -98,8 +96,8 @@ export default function ChannelInfoDialog({
       channelSocket.socket.off("roomJoined");
       channelSocket.socket.off("roomLeft");
       channelSocket.socket.off("roleUpdated");
-	  userSocket.socket.off("userConnected");
-	  userSocket.socket.off("userDisconnected");
+	  userSocket.socket?.off("userConnected");
+	  userSocket.socket?.off("userDisconnected");
     };
   }, [channelSocket.socket]);
 
@@ -137,7 +135,7 @@ export default function ChannelInfoDialog({
             >
               <TableCell>{user.name}</TableCell>
               <TableCell>{user.status}</TableCell>
-              <TableCell>{user.rank}</TableCell>
+              <TableCell>{user.role === "USER" ? "" : user.role}</TableCell>
             </TableRow>
           );
         })
@@ -229,7 +227,6 @@ export default function ChannelInfoDialog({
             </TableContainer>
             <ChannelInfoContext
               setAlertMsg={setAlertMsg}
-              toggleError={toggleError}
               channel={channel}
               contextMenu={contextMenu}
               setContextMenu={setContextMenu}
@@ -239,7 +236,6 @@ export default function ChannelInfoDialog({
         </Grid>
       </Grid>
       <GetNameDialog
-        toggleError={toggleError}
         open={openName}
         toggleOpen={closeNameDialog}
         channel={channel}

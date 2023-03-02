@@ -2,10 +2,10 @@ import { Socket } from "socket.io-client";
 import { initSocket } from "../services/initSocket.service";
 
 export class UserSocket {
-  socket: Socket;
+  socket: Socket | undefined;
 
   constructor() {
-    this.socket = initSocket("http://localhost:8888", null);
+    this.socket = undefined;
   }
 
   initializeSocket(token: string | null) {
@@ -13,10 +13,10 @@ export class UserSocket {
   }
 
   logIn = () => {
-    this.socket.emit("connectUser");
+    this.socket?.emit("connectUser");
   };
 
   logOut = () => {
-    this.socket.disconnect();
+    this.socket?.disconnect();
   };
 }
