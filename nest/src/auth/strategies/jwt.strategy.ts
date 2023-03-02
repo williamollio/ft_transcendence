@@ -62,7 +62,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 
     return {
       id: payload.id,
-      name: payload.intraId,
+      intraId: payload.intraId,
     };
   }
 }

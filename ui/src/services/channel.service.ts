@@ -18,6 +18,12 @@ class ChannelService {
     );
   }
 
+  async getJoinedChannels(): Promise<Response<DBChannelElement[]>> {
+    return resolve<DBChannelElement[]>(
+      axiosInstance.get(`${PATH}/get-all-channels-by-user-id`).then((res: AxiosResponse) => res.data)
+    );
+  }
+
   async blockUser(id: string): Promise<Response<DBChannelUserListElement>> {
     return resolve<DBChannelUserListElement>(
       axiosInstance

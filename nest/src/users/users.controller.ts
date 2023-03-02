@@ -40,7 +40,7 @@ import {
 } from './utils/upload-utils';
 
 @Controller('users')
-@UseGuards(JwtGuard)
+// @UseGuards(JwtGuard)
 @ApiTags('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -57,20 +57,6 @@ export class UsersController {
   public async findOne(@Param('id') id: string) {
     // + operator casts to a number
     return this.usersService.findOne(id);
-  }
-
-  @Post()
-  @ApiCreatedResponse({ type: UserEntity })
-  public async create(@Body() createUserDto: CreateUserDto): Promise<User> {
-    try {
-      return await this.usersService.create(createUserDto);
-    } catch (error) {
-      console.error(error);
-      throw new HttpException(
-        'This username already exists',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
   }
 
   @Patch(':id')

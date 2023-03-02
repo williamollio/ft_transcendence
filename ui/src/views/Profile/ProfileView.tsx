@@ -254,7 +254,7 @@ export default function ProfileView(props: Props): React.ReactElement {
                   <Box className={classes.inputWrapper}>
                     <Box sx={{ width: "100%" }}>
                       <CustomTextField
-                        label={"Choose a name"}
+                        label={"Name"}
                         isRequired
                         name="name"
                         rules={{

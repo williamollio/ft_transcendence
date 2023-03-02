@@ -40,6 +40,7 @@ services:
     container_name: ui
     volumes:
       - ./ui/:/app
+      - "/app/node_modules"
     ports:
       - "3000:3000"
     restart: always

@@ -3,6 +3,8 @@ import { initSocket } from "../services/initSocket.service";
 import { accessTypes, chatRoom } from "./chatRoom.class";
 import { channelUser, messagesDto, user } from "../interfaces/chat.interfaces";
 import { getTokenData } from "../utils/auth-helper";
+import UserService from "../services/users.service";
+import ChannelService from "../services/channel.service";
 
 export class ChannelSocket {
   socket: Socket;
@@ -13,8 +15,19 @@ export class ChannelSocket {
   constructor() {
     this.socket = initSocket("http://localhost:3333", null);
     this.user = { id: "", name: "" };
-    this.channels = new Array<chatRoom>();
     this.error = false;
+    this.channels = new Array<chatRoom>();
+    ChannelService.getJoinedChannels().then((resolve) => {
+      resolve.data.forEach((element) => {
+        this.channels.push({
+          key: element.name,
+          id: element.id,
+          access: element.type,
+		  messages: new Array<messagesDto>(),
+		  users: new Array<channelUser>(),
+        });
+      });
+    });
   }
 
   initializeSocket(token: string | null) {
@@ -22,6 +35,10 @@ export class ChannelSocket {
     token
       ? (this.user = getTokenData(token))
       : (this.user = { id: "", name: "" });
+    if (this.user.id)
+      UserService.getUser(this.user.id).then((resolve) => {
+        this.user.name = resolve.data.name;
+      });
   }
 
   createRoom = (channelObj: chatRoom, password?: string) => {

@@ -63,11 +63,13 @@ export function ChannelTabs({
         (element) => element.id === data.id
       );
       if (index != -1) {
-        channelSocket.channels[index] = {
-          ...channelSocket.channels[index],
-          key: data.name,
-        };
-        setChannelList(channelSocket.channels);
+        const newList: Array<chatRoom> = [];
+        channelSocket.channels.forEach((element) => {
+          if (element.id === data.id) {
+            newList.push({ ...element, key: data.name });
+          } else newList.push(element);
+        });
+        setChannelList(newList);
       } else {
         if (data.type === "DIRECTMESSAGE") {
           let index = data.users.findIndex(
@@ -75,22 +77,29 @@ export function ChannelTabs({
               element.userId !== channelSocket.user.id
           );
           if (index >= 0) {
-            setNewChannel(
-              channelSocket.channels[
-                channelSocket.channels.push(
-                  new chatRoom(data.id, data.users[index].user.name, data.type)
-                ) - 1
-              ]
+            const newList: Array<chatRoom> = [];
+            let userIndex = data.users.findIndex(
+              (element: { id: string }) => element.id !== channelSocket.user.id
             );
+            let channelIndex = channelSocket.channels.push(
+              new chatRoom(data.id, data.users[userIndex].user.name, data.type)
+            );
+            channelSocket.channels.forEach((element) => {
+              newList.push(element);
+            });
+            setChannelList(newList);
+            setNewChannel(channelSocket.channels[channelIndex - 1]);
           }
         } else {
-          setNewChannel(
-            channelSocket.channels[
-              channelSocket.channels.push(
-                new chatRoom(data.id, data.name, data.type)
-              ) - 1
-            ]
+          const newList: Array<chatRoom> = [];
+          let channelIndex = channelSocket.channels.push(
+            new chatRoom(data.id, data.name, data.type)
           );
+          channelSocket.channels.forEach((element) => {
+            newList.push(element);
+          });
+          setChannelList(newList);
+          setNewChannel(channelSocket.channels[channelIndex - 1]);
         }
       }
     }
@@ -127,6 +136,11 @@ export function ChannelTabs({
               setNewChannel(channelSocket.channels[index - 1]);
             }
           } else setNewChannel(false);
+          const newList: Array<chatRoom> = [];
+          channelSocket.channels.forEach((element) => {
+            newList.push(element);
+          });
+          setChannelList(newList);
         }
       }
     );

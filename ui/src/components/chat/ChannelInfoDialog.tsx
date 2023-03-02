@@ -61,18 +61,18 @@ export default function ChannelInfoDialog({
     { enabled: typeof channel?.id !== "undefined" }
   );
 
-  if (!isLoading && !isError) {
-    data.forEach((element: channelUser) => {
-      if (channel) {
-        channel.users = new Array<channelUser>();
+  if (!isLoading && !isError && data) {
+    if (channel) {
+      channel.users = new Array<channelUser>();
+      data.forEach((element: channelUser) => {
         channel.users.push({
           id: element.id,
           name: element.name,
           status: element.status,
           role: element.role,
         });
-      }
-    });
+      });
+    }
   }
 
   const userJoinedListener = (userId: string, channelId: string) => {
@@ -96,8 +96,8 @@ export default function ChannelInfoDialog({
       channelSocket.socket.off("roomJoined");
       channelSocket.socket.off("roomLeft");
       channelSocket.socket.off("roleUpdated");
-	  userSocket.socket?.off("userConnected");
-	  userSocket.socket?.off("userDisconnected");
+      userSocket.socket?.off("userConnected");
+      userSocket.socket?.off("userDisconnected");
     };
   }, [channelSocket.socket]);
 

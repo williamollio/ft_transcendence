@@ -47,10 +47,10 @@ export class ChannelController {
   // nest      | [6:35:18 PM] Found 1 error. Watching for file changes.
   // nest      | 
 
-  // @Get('get-all-channels-by-user-id')
-  // getAllChannelsByUserId(@GetCurrentUserId() userId: string) {
-  //   return this.channelService.getAllChannelsByUserId(userId);
-  // }
+  @Get('get-all-channels-by-user-id')
+  getAllChannelsByUserId(@GetCurrentUserId() userId: string) {
+    return this.channelService.getAllChannelsByUserId(userId);
+  }
 
   @Get(':id')
   getChannelById(@Param('id') channelId: string) {

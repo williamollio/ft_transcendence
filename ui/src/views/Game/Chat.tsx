@@ -76,9 +76,18 @@ export default function Chat(props: Props) {
           message: "[" + channelSocket.user.name + "]: " + inputChat,
           room: currentRoom.id,
         });
+        updateMessages(currentRoom);
       }
       setInputChat("");
     }
+  };
+
+  const updateMessages = (channel: chatRoom) => {
+    const newList: Array<messagesDto> = [];
+    channel.messages.forEach((element) => {
+      newList.push(element);
+    });
+    setMessages(newList);
   };
 
   useEffect(() => {
@@ -88,11 +97,18 @@ export default function Chat(props: Props) {
         let index = channelSocket.channels.findIndex(
           (element) => element.id === incomingMessage.channelId
         );
-        if (index >= 0)
+        if (index >= 0) {
           channelSocket.channels[index].messages.push({
             message: incomingMessage.content,
             room: incomingMessage.channelId,
           });
+          if (
+            typeof currentRoom !== "boolean" &&
+            incomingMessage.channelId === currentRoom.id
+          ) {
+            updateMessages(channelSocket.channels[index]);
+          }
+        }
       }
     );
     channelSocket.socket.on("messageRoomFailed", () => {

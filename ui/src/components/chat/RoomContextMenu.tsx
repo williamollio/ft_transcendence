@@ -40,7 +40,7 @@ export default function RoomContextMenu({
     setAlertMsg("Failed to remove channel");
     if (contextMenu) {
       let index = channelSocket.channels.findIndex(
-        (element: chatRoom) => element === contextMenu.channel
+        (element: chatRoom) => element.id === contextMenu.channel.id
       );
       if (index >= 0) {
         channelSocket.deleteRoom(contextMenu.channel);

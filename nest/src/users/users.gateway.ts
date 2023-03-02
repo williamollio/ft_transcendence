@@ -12,6 +12,7 @@ import { GetCurrentUserId } from '../decorators/getCurrentUserId.decorator';
 import { socketToUserId } from './socketToUserIdStorage.service';
 import { UsersService } from './users.service';
 import * as msgpack from 'socket.io-msgpack-parser';
+import { JwtGuard } from 'src/auth/guards/jwt.guard';
 
 // add some cors sanitazation here
 @WebSocketGateway(8888, {
@@ -22,6 +23,7 @@ import * as msgpack from 'socket.io-msgpack-parser';
   parser: msgpack,
 })
 // add some guards here
+@UseGuards(JwtGuard)
 export class UserGateway {
   @WebSocketServer()
   server: Server;
