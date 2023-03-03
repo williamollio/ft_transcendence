@@ -40,7 +40,7 @@ import {
 } from './utils/upload-utils';
 
 @Controller('users')
-@UseGuards(JwtGuard)
+// @UseGuards(JwtGuard) TODO : william set back
 @ApiTags('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
