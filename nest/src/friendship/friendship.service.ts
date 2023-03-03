@@ -113,7 +113,11 @@ export class FriendshipService {
           addresseeId: userId,
         },
       });
-      if (friendship) {
+
+      if (
+        friendship &&
+        this.isFriendshipUpdateValid(FriendshipStatus.ACCEPTED, friendship)
+      ) {
         await this.prisma.friendship.updateMany({
           where: {
             requesterId: friendship.requesterId,
@@ -174,17 +178,22 @@ export class FriendshipService {
   }
 
   private isFriendshipUpdateValid(
-    friendship: Friendship,
     type: FriendshipStatus,
+    friendship: Friendship | null,
   ) {
     if (
+      FriendshipStatus.ACCEPTED &&
+      friendship?.status === FriendshipStatus.ACCEPTED
+    ) {
+      throw "This friendship can't be updated";
+    } else if (
       type === FriendshipStatus.ACCEPTED &&
-      friendship.status === FriendshipStatus.REQUESTED
+      friendship?.status === FriendshipStatus.REQUESTED
     ) {
       return true;
     } else if (
       type === FriendshipStatus.DENY &&
-      friendship.status === FriendshipStatus.REQUESTED
+      friendship?.status === FriendshipStatus.REQUESTED
     ) {
       return true;
     } else {
