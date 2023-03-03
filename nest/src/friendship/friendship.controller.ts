@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Patch, Param } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Param, Post } from '@nestjs/common';
 import { FriendshipService } from './friendship.service';
 import { ApiTags } from '@nestjs/swagger';
 // import { GetCurrentUserId } from 'src/decorators/getCurrentUserId.decorator';
@@ -30,7 +30,7 @@ export class FriendshipController {
     return this.friendshipService.getFrienshipAccepted(userId);
   }
 
-  @Patch('request/:id')
+  @Post('request/:id')
   requestFrienship(
     @Param('id') userId: string,
     @Body() friendshipDto: FriendshipDto,
