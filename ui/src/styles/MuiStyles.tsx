@@ -35,6 +35,7 @@ TitleWrapper.defaultProps = {
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
+  paddingTop: "1rem",
 };
 
 export const ContentWrapper = styled(Box)({});
