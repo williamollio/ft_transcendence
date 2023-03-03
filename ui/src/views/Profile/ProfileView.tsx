@@ -49,7 +49,7 @@ export default function ProfileView(): React.ReactElement {
   ]);
   const [users, setUsers] = useState<LabelValue[]>([]);
   const [userId, setUserId] = useState<string>("");
-  const [isEditMode, setIsEditMode] = useState<boolean>(true);
+  const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [currentUser, setCurrentUser] = useState<User>();
 
@@ -65,8 +65,8 @@ export default function ProfileView(): React.ReactElement {
 
   React.useEffect(() => {
     let token;
-    if (location.state && location.state.editMode === false) {
-      setIsEditMode(false);
+    if (location.state && location.state.editMode === true) {
+      setIsEditMode(true);
     }
     token = localStorage.getItem(Cookie.TOKEN);
     if (token === null) {
