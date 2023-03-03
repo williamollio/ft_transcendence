@@ -60,8 +60,10 @@ export class FriendshipService {
     try {
       const friendshipRequests = await this.prisma.friendship.findMany({
         where: {
-          requesterId: userId,
-          status: FriendshipStatus.ACCEPTED,
+          OR: [
+            { requesterId: userId, status: FriendshipStatus.ACCEPTED },
+            { addresseeId: userId, status: FriendshipStatus.ACCEPTED },
+          ],
         },
       });
       return friendshipRequests;
