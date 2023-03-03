@@ -11,6 +11,12 @@ import AddIcon from "@mui/icons-material/Add";
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { fetchChannelData } from "./hooks/channelData.fetch";
 import { useQuery } from "@tanstack/react-query";
+import { fetchJoinedChannels } from "./hooks/joinedChannels.fetch";
+import {
+  channelUser,
+  DBChannelElement,
+  messagesDto,
+} from "../../interfaces/chat.interfaces";
 
 export function ChannelTabs({
   currentRoom,
@@ -46,6 +52,40 @@ export function ChannelTabs({
     channelSocket.channels
   );
 
+  const updateChannelList = () => {
+    const newList: Array<chatRoom> = [];
+    channelSocket.channels.forEach((element) => {
+      newList.push(element);
+    });
+    setChannelList(newList);
+  };
+
+  const {
+    data: joinedChannels,
+    isLoading: joinedChannesLoading,
+    isError: joinedChannesError,
+  } = useQuery(["joinedChannels"], fetchJoinedChannels, {
+    enabled: channelSocket.user.id !== "",
+  });
+
+  useEffect(() => {
+    if (joinedChannels && !joinedChannesLoading && !joinedChannesError) {
+      joinedChannels.forEach((element: DBChannelElement) => {
+        channelSocket.channels.push({
+          key: element.name,
+          id: element.id,
+          access: element.type,
+          users: new Array<channelUser>(),
+          messages: new Array<messagesDto>(),
+        });
+      });
+      updateChannelList();
+      channelSocket.channels.forEach((element) => {
+        channelSocket.connectToRoom(element.id!);
+      });
+    }
+  }, [joinedChannels]);
+
   const { data, isLoading, isError, refetch } = useQuery(
     ["channels", channelQueryId],
     () => fetchChannelData(channelQueryId),
@@ -66,7 +106,7 @@ export function ChannelTabs({
         const newList: Array<chatRoom> = [];
         channelSocket.channels.forEach((element) => {
           if (element.id === data.id) {
-            newList.push({ ...element, key: data.name });
+            newList.push({ ...element, key: data.name, access: data.type});
           } else newList.push(element);
         });
         setChannelList(newList);
@@ -120,38 +160,39 @@ export function ChannelTabs({
     refetch();
   };
 
-  useEffect(() => {
-    channelSocket.socket.on(
-      "roomLeft",
-      (data: { userId: string; channelId: string }) => {
-        let index = channelSocket.channels.findIndex(
-          (element) => element.id === data.channelId
-        );
-        if (index != -1) {
-          channelSocket.channels.splice(index, 1);
-          if (channelSocket.channels.length > 0) {
-            if (index == 0) {
-              setNewChannel(channelSocket.channels[index]);
-            } else {
-              setNewChannel(channelSocket.channels[index - 1]);
-            }
-          } else setNewChannel(false);
-          const newList: Array<chatRoom> = [];
-          channelSocket.channels.forEach((element) => {
-            newList.push(element);
-          });
-          setChannelList(newList);
-        }
+  const roomLeftListener = (data: { userId: string; channelId: string }) => {
+    if (data.userId === channelSocket.user.id) {
+      let index = channelSocket.channels.findIndex(
+        (element) => element.id === data.channelId
+      );
+      if (index != -1) {
+        channelSocket.channels.splice(index, 1);
+        if (channelSocket.channels.length > 0) {
+          if (index == 0) {
+            setNewChannel(channelSocket.channels[index]);
+          } else {
+            setNewChannel(channelSocket.channels[index - 1]);
+          }
+        } else setNewChannel(false);
+        const newList: Array<chatRoom> = [];
+        channelSocket.channels.forEach((element) => {
+          newList.push(element);
+        });
+        setChannelList(newList);
       }
-    );
-    channelSocket.socket.on("roomCreated", roomCreatedListener);
-    channelSocket.socket.on("roomJoined", roomJoinedListener);
-    channelSocket.socket.on("roomEdited", roomEditedListener);
+    }
+  };
+
+  useEffect(() => {
+    channelSocket.registerListener("roomLeft", roomLeftListener);
+    channelSocket.registerListener("roomCreated", roomCreatedListener);
+    channelSocket.registerListener("roomJoined", roomJoinedListener);
+    channelSocket.registerListener("roomEdited", roomEditedListener);
     return () => {
-      channelSocket.socket.off("roomLeft");
-      channelSocket.socket.off("roomCreated");
-      channelSocket.socket.off("roomJoined");
-      channelSocket.socket.off("roomEdited");
+      channelSocket.removeListener("roomLeft", roomLeftListener);
+      channelSocket.removeListener("roomCreated", roomCreatedListener);
+      channelSocket.removeListener("roomJoined", roomJoinedListener);
+      channelSocket.removeListener("roomEdited", roomEditedListener);
     };
   }, [channelSocket.socket]);
 

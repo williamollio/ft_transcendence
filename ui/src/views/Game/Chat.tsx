@@ -23,6 +23,8 @@ import { ChannelTabs } from "../../components/chat/ChannelTabs";
 import ChannelService from "../../services/channel.service";
 import { useLocation } from "react-router-dom";
 import { UserSocket } from "../../classes/UserSocket.class";
+import { fetchBlockedUsers } from "../../components/chat/hooks/blockedUsers.fetch";
+import { useQuery } from "@tanstack/react-query";
 
 interface Props {
   channelSocket: ChannelSocket;
@@ -55,6 +57,15 @@ export default function Chat(props: Props) {
   const scrollRef = useRef<HTMLLIElement | null>(null);
   const location = useLocation();
 
+  const {
+    data: blockedUsers,
+    isLoading,
+    isError,
+    refetch: refetchBlockedUsers,
+  } = useQuery(["blocks"], fetchBlockedUsers, {
+    enabled: channelSocket.user.id !== "",
+  });
+
   useEffect(() => {
     if (location && location.state && location.state.id) {
       channelSocket.createDm(location.state.id); // not sure if that's how it's done
@@ -76,81 +87,143 @@ export default function Chat(props: Props) {
           message: "[" + channelSocket.user.name + "]: " + inputChat,
           room: currentRoom.id,
         });
-        updateMessages(currentRoom);
+        updateMessages(currentRoom, undefined);
       }
       setInputChat("");
     }
   };
 
-  const updateMessages = (channel: chatRoom) => {
-    const newList: Array<messagesDto> = [];
-    channel.messages.forEach((element) => {
-      newList.push(element);
-    });
-    setMessages(newList);
+  const updateMessages = (
+    channel: chatRoom,
+    incChannelId: string | undefined
+  ) => {
+    if (
+      typeof incChannelId === "undefined" ||
+      (typeof currentRoom !== "boolean" && incChannelId === currentRoom.id)
+    ) {
+      const newList: Array<messagesDto> = [];
+      channel.messages.forEach((element) => {
+        newList.push(element);
+      });
+      setMessages(newList);
+    }
+  };
+
+  const incomingMessageListener = (data: {
+    messageInfo: {
+      channelId: string;
+      content: string;
+    };
+    sender: string;
+  }) => {
+    if (!isLoading && !isError && blockedUsers) {
+      if (!blockedUsers.some((element: string) => element === data.sender)) {
+        let index = channelSocket.channels.findIndex(
+          (element) => element.id === data.messageInfo.channelId
+        );
+        if (index >= 0) {
+          channelSocket.channels[index].messages.push({
+            message: data.messageInfo.content,
+            room: data.messageInfo.channelId,
+          });
+          updateMessages(
+            channelSocket.channels[index],
+            data.messageInfo.channelId
+          );
+        }
+      }
+    }
+  };
+
+  const messageRoomFailedListener = () => {
+    setAlertMsg("Failed to send message");
+    toggleAlert(true);
+  };
+
+  const roomLeftListener = (data: { userId: string; channelId: string }) => {
+    let index = channelSocket.channels.findIndex(
+      (element) => element.id === data.channelId
+    );
+    if (index >= 0) {
+      ChannelService.getUserName(data.userId).then((res) => {
+        channelSocket.channels[index].messages.push({
+          message: `${res.data.name} left the channel`,
+          room: data.channelId,
+        });
+        updateMessages(channelSocket.channels[index], data.channelId);
+      });
+    }
+  };
+
+  const roomJoinedListener = (data: { userId: string; channelId: string }) => {
+    let index = channelSocket.channels.findIndex(
+      (element) => element.id === data.channelId
+    );
+    if (index >= 0) {
+      ChannelService.getUserName(data.userId).then((res) => {
+        channelSocket.channels[index].messages.push({
+          message: `${res.data.name} joined the channel`,
+          room: data.channelId,
+        });
+        updateMessages(channelSocket.channels[index], data.channelId);
+      });
+    }
+  };
+
+  const inviteSucceededListener = (data: {
+    id: string;
+    name: string;
+    type: accessTypes;
+  }) => {
+    setRoomInvite(data);
+    toggleInvited(true);
+  };
+
+  const banSuccessListener = (result: {
+    channelActionOnChannelId: string;
+    channelActionTargetId: string;
+  }) => {
+    if (result.channelActionTargetId === channelSocket.user.id) {
+      let bannedChannel = channelSocket.channels.find(
+        (element) => element.id === result.channelActionOnChannelId
+      );
+      if (bannedChannel) channelSocket.deleteRoom(bannedChannel);
+    }
+  };
+
+  const muteSuccessListener = (result: {
+    channelActionOnChannelId: string;
+    channelActionTargetId: string;
+  }) => {
+    if (result.channelActionTargetId === channelSocket.user.id) {
+      const mutedChannel = channelSocket.channels.find(
+        (element) => element.id === result.channelActionOnChannelId
+      );
+      if (mutedChannel) {
+        mutedChannel.messages.push({
+          message: "You have been muted for 30 seconds",
+        });
+        updateMessages(mutedChannel, result.channelActionOnChannelId);
+      }
+    }
+  };
+
+  const failedListener = (error: string) => {
+    console.log(error);
+    toggleAlert(true);
   };
 
   useEffect(() => {
-    channelSocket.socket.on(
-      "incomingMessage",
-      (incomingMessage: { channelId: string; content: string }) => {
-        let index = channelSocket.channels.findIndex(
-          (element) => element.id === incomingMessage.channelId
-        );
-        if (index >= 0) {
-          channelSocket.channels[index].messages.push({
-            message: incomingMessage.content,
-            room: incomingMessage.channelId,
-          });
-          if (
-            typeof currentRoom !== "boolean" &&
-            incomingMessage.channelId === currentRoom.id
-          ) {
-            updateMessages(channelSocket.channels[index]);
-          }
-        }
-      }
+    channelSocket.registerListener("incomingMessage", incomingMessageListener);
+    channelSocket.registerListener(
+      "messageRoomFailed",
+      messageRoomFailedListener
     );
-    channelSocket.socket.on("messageRoomFailed", () => {
-      setAlertMsg("Failed to send message");
-      toggleAlert(true);
-    });
-    channelSocket.socket.on("roomLeft", (userId: string, channelId: string) => {
-      let index = channelSocket.channels.findIndex(
-        (element) => element.id === channelId
-      );
-      if (index >= 0) {
-        ChannelService.getUserName(userId).then((res) => {
-          channelSocket.channels[index].messages.push({
-            message: `${res.data.name} left the channel`,
-            room: channelId,
-          });
-        });
-      }
-    });
-    channelSocket.socket.on(
-      "roomJoined",
-      (userId: string, channelId: string) => {
-        let index = channelSocket.channels.findIndex(
-          (element) => element.id === channelId
-        );
-        if (index >= 0) {
-          ChannelService.getUserName(userId).then((res) => {
-            channelSocket.channels[index].messages.push({
-              message: `${res.data.name} joined the channel`,
-              room: channelId,
-            });
-          });
-        }
-      }
-    );
-    channelSocket.socket.on(
-      "inviteSucceeded",
-      (data: { id: string; name: string; type: accessTypes }) => {
-        setRoomInvite(data);
-        toggleInvited(true);
-      }
-    );
+    channelSocket.registerListener("roomLeft", roomLeftListener);
+    channelSocket.registerListener("roomJoined", roomJoinedListener);
+    channelSocket.registerListener("inviteSucceeded", inviteSucceededListener);
+    channelSocket.registerListener("banSucceeded", banSuccessListener);
+    channelSocket.registerListener("muteSucceeded", muteSuccessListener);
     [
       "joinRoomError",
       "joinRoomFailed",
@@ -162,32 +235,34 @@ export default function Chat(props: Props) {
       "muteFailed",
       "updateRoleFailed",
     ].forEach((element) => {
-      channelSocket.socket.on(element, (error) => {
-        console.log(error);
-        toggleAlert(true);
-      });
+      channelSocket.registerListener(element, failedListener);
     });
     return () => {
-      [
-        "incomingMessage",
+      channelSocket.removeListener("banSucceeded", banSuccessListener);
+      channelSocket.removeListener("muteSucceeded", muteSuccessListener);
+      channelSocket.removeListener("incomingMessage", incomingMessageListener);
+      channelSocket.removeListener(
         "messageRoomFailed",
+        messageRoomFailedListener
+      );
+      channelSocket.removeListener("roomLeft", roomLeftListener);
+      channelSocket.removeListener("roomJoined", roomJoinedListener);
+      channelSocket.removeListener("inviteSucceeded", inviteSucceededListener);
+      [
         "joinRoomError",
         "joinRoomFailed",
         "leaveRoomFailed",
         "createRoomFailed",
         "editRoomFailed",
         "createRoomFailed",
-        "inviteSucceeded",
         "banFailed",
         "muteFailed",
         "updateRoleFailed",
-        "roomLeft",
-        "roomJoined",
       ].forEach((element) => {
-        channelSocket.socket.off(element);
+        channelSocket.removeListener(element, failedListener);
       });
     };
-  }, [channelSocket.socket]);
+  }, [channelSocket.socket, currentRoom]);
 
   const listMessages = messages
     ? messages.map((messagesDto: messagesDto, index) => {
@@ -267,6 +342,8 @@ export default function Chat(props: Props) {
               setNewChannel={setNewChannel}
             />
             <RoomContextMenu
+              blockedUser={blockedUsers}
+              refetchBlockedUsers={refetchBlockedUsers}
               userSocket={userSocket}
               setNewChannel={setNewChannel}
               contextMenu={contextMenu}

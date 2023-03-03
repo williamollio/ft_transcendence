@@ -18,7 +18,7 @@ import {
   InviteChannelDto,
   IncomingMessageDto,
 } from './dto';
-import { Channel, ChannelRole, ChannelType } from '@prisma/client';
+import { Channel, ChannelRole, ChannelType, ChannelUser } from '@prisma/client';
 import { socketToUserId } from 'src/users/socketToUserIdStorage.service';
 import { ModerateChannelDto } from './dto/moderateChannelUser.dto';
 import * as msgpack from 'socket.io-msgpack-parser';
@@ -48,7 +48,6 @@ export class ChannelGateway {
     @MessageBody('channelId') channelId: string,
     @ConnectedSocket() clientSocket: Socket,
   ) {
-    console.log(channelId);
     const userOnChannel = await this.channelService.connectToChannel(
       userId,
       channelId,
@@ -134,7 +133,7 @@ export class ChannelGateway {
     } else {
       clientSocket
         .to(messageInfo.channelId)
-        .emit('incomingMessage', messageInfo);
+        .emit('incomingMessage', {messageInfo: messageInfo, sender: senderId});
       return acknoledgementStatus.OK;
     }
   }
@@ -217,7 +216,6 @@ export class ChannelGateway {
       this.server
         .to([clientSocket.id, inviteChannelDto.channelId])
         .emit('inviteSucceeded', inviteToChannel);
-      this.server.to([otherUserSocket]).emit('gotInvited', inviteChannelDto.channelId);
     }
   }
 

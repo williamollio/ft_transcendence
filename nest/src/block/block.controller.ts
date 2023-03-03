@@ -14,7 +14,6 @@ export class BlockController {
     @GetCurrentUserId() userId: string,
     @Body() data: { targetId: string },
   ) {
-	console.log(data);
     return this.blockService.addBlockedUser(userId, data.targetId);
   }
 

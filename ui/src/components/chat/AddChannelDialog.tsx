@@ -82,7 +82,6 @@ export default function AddChannelDialog({
       setAlertMsg("Failed to join channel");
       channelSocket.joinRoom(
         dialogJoinValue.id,
-        dialogJoinValue.password !== "" ? "PROTECTED" : "PUBLIC",
         dialogJoinValue.password !== "" ? dialogJoinValue.password : undefined
       );
       setDialogJoinValue({ id: "", password: "" });

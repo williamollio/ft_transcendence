@@ -7,6 +7,8 @@ import ChannelInfoDialog from "./ChannelInfoDialog";
 import GetIdDialog from "./GetIdDialog";
 
 export default function RoomContextMenu({
+  blockedUser,
+  refetchBlockedUsers,
   userSocket,
   setNewChannel,
   contextMenu,
@@ -15,6 +17,8 @@ export default function RoomContextMenu({
   setAlertMsg,
   toggleAlert,
 }: {
+  blockedUser: Array<string>;
+  refetchBlockedUsers: any;
   userSocket: UserSocket;
   setNewChannel: any;
   contextMenu: { mouseX: number; mouseY: number; channel: chatRoom } | null;
@@ -84,6 +88,8 @@ export default function RoomContextMenu({
         <MenuItem onClick={handleInvite}>Invite</MenuItem>
       </Menu>
       <ChannelInfoDialog
+        blockedUser={blockedUser}
+        refetchBlockedUsers={refetchBlockedUsers}
         userSocket={userSocket}
         toggleError={toggleAlert}
         setAlertMsg={setAlertMsg}

@@ -27,7 +27,7 @@ class ChannelService {
   async blockUser(id: string): Promise<Response<DBChannelUserListElement>> {
     return resolve<DBChannelUserListElement>(
       axiosInstance
-        .post(`${BLOCK_PATH}/add-blocked-user`, id)
+        .post(`${BLOCK_PATH}/add-blocked-user`, {targetId: id})
         .then((res: AxiosResponse) => res.data)
     );
   }
@@ -35,7 +35,7 @@ class ChannelService {
   async unblockUser(id: string): Promise<Response<DBChannelUserListElement>> {
     return resolve<DBChannelUserListElement>(
       axiosInstance
-        .post(`${BLOCK_PATH}/remove-blocked-user`, id)
+        .post(`${BLOCK_PATH}/remove-blocked-user`, {targetId: id})
         .then((res: AxiosResponse) => res.data)
     );
   }

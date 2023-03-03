@@ -426,9 +426,9 @@ export class ChannelService {
       }
       /* Hash the password */
       if (typeof dto.passwordHash === 'string' && dto.type === 'PROTECTED') {
-        dto.passwordHash = await argon.hash(dto.passwordHash, {
-          type: argon.argon2id,
-        });
+        dto.passwordHash = dto.passwordHash; // await argon.hash(dto.passwordHash, {
+        //   type: argon.argon2id,
+        // });
       }
       /* Then try to create a new channel */
       const createdChannel: Channel = await this.prisma.channel.create({
@@ -686,14 +686,14 @@ export class ChannelService {
           },
         });
         /* Compare passwords */
-        if (typeof channel?.passwordHash === 'string') {
-          const pwdMatches = await argon.verify(
-            channel.passwordHash,
-            channelDto.passwordHash,
-          );
-          /* If passwords don't match, throw error */
-          if (!pwdMatches) throw new Error('InvalidPassword');
-        }
+        // if (typeof channel?.passwordHash === 'string') {
+        //   const pwdMatches = await argon.verify(
+        //     channel.passwordHash,
+        //     channelDto.passwordHash,
+        //   );
+        //   /* If passwords don't match, throw error */
+        //   if (!pwdMatches) throw new Error('InvalidPassword');
+        // }
       }
       /* Then, join channel */
       const joinedChannel: Channel = await this.prisma.channel.update({
@@ -786,9 +786,9 @@ export class ChannelService {
       delete dto.passwordHash;
     } else if (dto.passwordHash) {
       /* There is a new password provided, we hash it for the db */
-      dto.passwordHash = await argon.hash(dto.passwordHash, {
-        type: argon.argon2id,
-      });
+      dto.passwordHash = dto.passwordHash;//await argon.hash(dto.passwordHash, {
+    //     type: argon.argon2id,
+    //   });
     } else {
       /* There is no new password for a Protected type channel */
       throw new Error('passwordIncorrect');
@@ -807,24 +807,24 @@ export class ChannelService {
       }
       /* Check that the user is owner or admin for update rights */
       const userRole: { role: ChannelRole } | null =
-        await this.getRoleOfUserChannel(userId, channelId);
+	  await this.getRoleOfUserChannel(userId, channelId);
       if (!userRole || userRole.role < ChannelRole.ADMIN) {
-        return 'noEligibleRights';
-      }
-      if (dto.type === ChannelType.PROTECTED) {
-        await this.handlePasswords(dto, channelId);
-      }
-      /* Then, update channel's information */
-      const editedChannel: Channel = await this.prisma.channel.update({
-        where: {
-          id: channelId,
-        },
-        data: {
-          ...dto,
-        },
-      });
-      editedChannel.passwordHash = '';
-      return editedChannel;
+		  return 'noEligibleRights';
+		}
+		if (dto.type === ChannelType.PROTECTED) {
+			await this.handlePasswords(dto, channelId);
+		}
+		/* Then, update channel's information */
+		const editedChannel: Channel = await this.prisma.channel.update({
+			where: {
+				id: channelId,
+			},
+			data: {
+				...dto,
+			},
+		});
+		editedChannel.passwordHash = '';
+		return editedChannel;
     } catch (error) {
       if (error.code === 'P2002') {
         return 'alreadyUsed';

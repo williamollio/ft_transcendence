@@ -60,7 +60,7 @@ export default function JoinForm({
                   })
                 }
                 label="password"
-                type="string"
+                type="password"
                 variant="outlined"
               />
             </Grid>

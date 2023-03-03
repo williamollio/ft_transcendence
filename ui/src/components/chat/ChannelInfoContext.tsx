@@ -6,12 +6,16 @@ import { channelUser } from "../../interfaces/chat.interfaces";
 import ChannelService from "../../services/channel.service";
 
 export default function ChannelInfoContext({
+  blockedUser,
+  refetchBlockedUsers,
   setAlertMsg,
   channel,
   contextMenu,
   setContextMenu,
   channelSocket,
 }: {
+  blockedUser: Array<string>;
+  refetchBlockedUsers: any;
   setAlertMsg: Dispatch<SetStateAction<string>>;
   channel: chatRoom | undefined;
   contextMenu: {
@@ -34,17 +38,13 @@ export default function ChannelInfoContext({
         setBlockStatus("Block");
       } else {
         setSelf(false);
-        ChannelService.getBlockedUsers().then((resolve) => {
-          if (
-            resolve.data.some((element) => {
-              element.id === contextMenu.user.id;
-            })
-          ) {
+        if (blockedUser) {
+          if (blockedUser.some((element) => element === contextMenu.user.id)) {
             setBlockStatus("Unblock");
           } else {
             setBlockStatus("Block");
           }
-        });
+        }
       }
     }
   }, [contextMenu]);
@@ -84,11 +84,13 @@ export default function ChannelInfoContext({
         setAlertMsg("Failed to block User");
         ChannelService.blockUser(contextMenu.user.id).then((resolve) => {
           console.log(resolve.data);
+		  refetchBlockedUsers();
         });
       } else if (blockStatus === "Unblock") {
         setAlertMsg("Failed to unblock User");
         ChannelService.unblockUser(contextMenu.user.id).then((resolve) => {
           console.log(resolve.data);
+		  refetchBlockedUsers();
         });
       }
     }
@@ -105,7 +107,7 @@ export default function ChannelInfoContext({
       contextMenu.user.id
     ) {
       //   setAction("mute");
-      channelSocket.banUser(channel.id, contextMenu.user.id);
+      channelSocket.muteUser(channel.id, contextMenu.user.id);
     }
   };
 
@@ -120,11 +122,12 @@ export default function ChannelInfoContext({
       contextMenu.user.id
     ) {
       //   setAction("kick");
-      channelSocket.muteUser(channel.id, contextMenu.user.id);
+      channelSocket.banUser(channel.id, contextMenu.user.id);
     }
   };
 
   const handlePromote = () => {
+    handleContextClose();
     setAlertMsg("Failed to promote user");
     if (
       channel &&
@@ -168,7 +171,7 @@ export default function ChannelInfoContext({
           Mute
         </MenuItem>
         <MenuItem disabled={self} onClick={handleKick}>
-          Kick
+          Ban
         </MenuItem>
       </Menu>
       {/* <GetTimeDialog

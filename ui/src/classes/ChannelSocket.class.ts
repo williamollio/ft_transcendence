@@ -4,7 +4,7 @@ import { accessTypes, chatRoom } from "./chatRoom.class";
 import { channelUser, messagesDto, user } from "../interfaces/chat.interfaces";
 import { getTokenData } from "../utils/auth-helper";
 import UserService from "../services/users.service";
-import ChannelService from "../services/channel.service";
+import { fetchChannelData } from "../components/chat/hooks/channelData.fetch";
 
 export class ChannelSocket {
   socket: Socket;
@@ -17,17 +17,6 @@ export class ChannelSocket {
     this.user = { id: "", name: "" };
     this.error = false;
     this.channels = new Array<chatRoom>();
-    ChannelService.getJoinedChannels().then((resolve) => {
-      resolve.data.forEach((element) => {
-        this.channels.push({
-          key: element.name,
-          id: element.id,
-          access: element.type,
-		  messages: new Array<messagesDto>(),
-		  users: new Array<channelUser>(),
-        });
-      });
-    });
   }
 
   initializeSocket(token: string | null) {
@@ -40,6 +29,10 @@ export class ChannelSocket {
         this.user.name = resolve.data.name;
       });
   }
+
+  connectToRoom = (channelId: string) => {
+    this.socket.emit("connectToRoom", { channelId: channelId });
+  };
 
   createRoom = (channelObj: chatRoom, password?: string) => {
     this.socket.emit("createRoom", {
@@ -58,13 +51,15 @@ export class ChannelSocket {
     });
   };
 
-  joinRoom = (channelId: string, access: accessTypes, password?: string) => {
-    this.socket.emit("joinRoom", {
-      joinInfo: {
-        id: channelId,
-        type: access,
-        passwordHash: password,
-      },
+  joinRoom = (channelId: string, password?: string) => {
+    fetchChannelData(channelId).then((resolve) => {
+      this.socket.emit("joinRoom", {
+        joinInfo: {
+          id: channelId,
+          type: resolve.type,
+          passwordHash: password,
+        },
+      });
     });
   };
 
@@ -84,10 +79,10 @@ export class ChannelSocket {
     this.socket.emit("editRoom", {
       channelId: channel.id,
       editInfo: {
-        name: newName,
+        name: newName ? newName : channel.key,
         type: type,
         passwordHash: newPassword,
-        currentPasswordHash: password,
+        // currentPasswordHash: password,
       },
     });
   };
@@ -126,7 +121,7 @@ export class ChannelSocket {
 
   muteUser = (channelId: String, otherUserId: string) => {
     this.socket.emit("muteUser", {
-      banInfo: {
+      muteInfo: {
         channelActionTargetId: otherUserId,
         channelActionOnChannelId: channelId,
         type: "MUTE",
@@ -139,5 +134,13 @@ export class ChannelSocket {
       channelId: channelId,
       targetInfo: { promotedUserId: userId },
     });
+  };
+
+  registerListener = (event: string, call: (...args: any) => void) => {
+    this.socket.on(event, call);
+  };
+
+  removeListener = (event: string, call?: (...args: any) => void) => {
+    this.socket.off(event, call);
   };
 }

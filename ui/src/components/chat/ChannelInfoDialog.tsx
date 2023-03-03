@@ -27,6 +27,8 @@ import { fetchUsersOfChannel } from "./hooks/channelUsers.fetch";
 import { UserSocket } from "../../classes/UserSocket.class";
 
 export default function ChannelInfoDialog({
+  blockedUser,
+  refetchBlockedUsers,
   userSocket,
   setAlertMsg,
   channelInfoOpen,
@@ -34,6 +36,8 @@ export default function ChannelInfoDialog({
   channel,
   channelSocket,
 }: {
+  blockedUser: Array<string>;
+  refetchBlockedUsers: any;
   userSocket: UserSocket;
   toggleError: any;
   setAlertMsg: any;
@@ -51,6 +55,8 @@ export default function ChannelInfoDialog({
     user: channelUser;
   } | null>(null);
 
+  const [userList, setUserList] = useState<Array<channelUser>>([]);
+
   const [openPassword, toggleOpenPassword] = useState<boolean>(false);
 
   const [openName, toggleOpenName] = useState<boolean>(false);
@@ -61,21 +67,28 @@ export default function ChannelInfoDialog({
     { enabled: typeof channel?.id !== "undefined" }
   );
 
-  if (!isLoading && !isError && data) {
-    if (channel) {
-      channel.users = new Array<channelUser>();
-      data.forEach((element: channelUser) => {
-        channel.users.push({
-          id: element.id,
-          name: element.name,
-          status: element.status,
-          role: element.role,
+  useEffect(() => {
+    if (!isLoading && !isError && data) {
+      if (channel) {
+        const newList = new Array<channelUser>();
+        data.forEach((element: channelUser) => {
+          newList.push({
+            id: element.id,
+            name: element.name,
+            status: element.status,
+            role: element.role,
+          });
         });
-      });
+        setUserList(newList);
+      }
     }
-  }
+  }, [data, isLoading, isError]);
 
   const userJoinedListener = (userId: string, channelId: string) => {
+    if (userId !== channelSocket.user.id) refetch();
+  };
+
+  const userLeftListener = (userId: string, channelId: string) => {
     if (userId !== channelSocket.user.id) refetch();
   };
 
@@ -85,17 +98,15 @@ export default function ChannelInfoDialog({
         refetch();
       });
     });
-    channelSocket.socket.on("roomJoined", userJoinedListener);
-    channelSocket.socket.on("roomLeft", (userId: string, channelId: string) => {
-      if (userId !== channelSocket.user.id) refetch();
-    });
-    channelSocket.socket.on("roleUpdated", () => {
+    channelSocket.registerListener("roomJoined", userJoinedListener);
+    channelSocket.registerListener("roomLeft", userLeftListener);
+    channelSocket.registerListener("roleUpdated", () => {
       refetch();
     });
     return () => {
-      channelSocket.socket.off("roomJoined");
-      channelSocket.socket.off("roomLeft");
-      channelSocket.socket.off("roleUpdated");
+      channelSocket.removeListener("roomJoined", userJoinedListener);
+      channelSocket.removeListener("roomLeft", userLeftListener);
+      channelSocket.removeListener("roleUpdated");
       userSocket.socket?.off("userConnected");
       userSocket.socket?.off("userDisconnected");
     };
@@ -122,24 +133,21 @@ export default function ChannelInfoDialog({
     );
   };
 
-  const listUsers =
-    channel && channel.users
-      ? channel.users.map((user) => {
-          return (
-            <TableRow
-              key={user.id}
-              hover
-              onClick={(e) => handleSelect(e, user)}
-              selected={user.id === (selected ? selected.id : false)}
-              onContextMenu={(e) => handleContextMenu(e, user)}
-            >
-              <TableCell>{user.name}</TableCell>
-              <TableCell>{user.status}</TableCell>
-              <TableCell>{user.role === "USER" ? "" : user.role}</TableCell>
-            </TableRow>
-          );
-        })
-      : false;
+  const listUsers = userList.map((user) => {
+    return (
+      <TableRow
+        key={user.id}
+        hover
+        onClick={(e) => handleSelect(e, user)}
+        selected={user.id === (selected ? selected.id : false)}
+        onContextMenu={(e) => handleContextMenu(e, user)}
+      >
+        <TableCell>{user.name}</TableCell>
+        <TableCell>{user.status}</TableCell>
+        <TableCell>{user.role === "USER" ? "" : user.role}</TableCell>
+      </TableRow>
+    );
+  });
 
   const handlePasswordChange = (e?: SyntheticEvent) => {
     setAlertMsg("Failed to change password");
@@ -226,6 +234,8 @@ export default function ChannelInfoDialog({
               </Table>
             </TableContainer>
             <ChannelInfoContext
+              blockedUser={blockedUser}
+              refetchBlockedUsers={refetchBlockedUsers}
               setAlertMsg={setAlertMsg}
               channel={channel}
               contextMenu={contextMenu}
