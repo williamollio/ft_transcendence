@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Friendship, FriendshipStatus } from '@prisma/client';
+
+const MESSAGE_ERROR_UPDATE_REQUEST = "This friendship can't be updated";
 @Injectable()
 export class FriendshipService {
   constructor(private prisma: PrismaService) {}
@@ -132,7 +134,7 @@ export class FriendshipService {
           },
         });
       } else {
-        throw "This friendship can't be updated";
+        throw MESSAGE_ERROR_UPDATE_REQUEST;
       }
     } catch (error) {
       if (typeof error === 'string') return error;
@@ -150,6 +152,13 @@ export class FriendshipService {
           ],
         },
       });
+
+      if (
+        FriendshipStatus.DENY &&
+        friendship?.status === FriendshipStatus.DENY
+      ) {
+        throw MESSAGE_ERROR_UPDATE_REQUEST;
+      }
       if (friendship) {
         await this.prisma.friendship.updateMany({
           where: {
@@ -161,7 +170,7 @@ export class FriendshipService {
           data: { status: FriendshipStatus.DENY },
         });
       } else {
-        throw "This friendship can't be updated";
+        throw MESSAGE_ERROR_UPDATE_REQUEST;
       }
       return await this.prisma.friendship.findFirst({
         where: {
@@ -185,7 +194,7 @@ export class FriendshipService {
       FriendshipStatus.ACCEPTED &&
       friendship?.status === FriendshipStatus.ACCEPTED
     ) {
-      throw "This friendship can't be updated";
+      throw MESSAGE_ERROR_UPDATE_REQUEST;
     } else if (
       type === FriendshipStatus.ACCEPTED &&
       friendship?.status === FriendshipStatus.REQUESTED
