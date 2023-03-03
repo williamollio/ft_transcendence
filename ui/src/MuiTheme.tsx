@@ -71,14 +71,13 @@ const theme = createTheme({
     MuiButton: {
       styleOverrides: {
         root: {
-          backgroundColor: "red",
           borderRadius: "2px",
-          marginTop: "2rem",
-          marginBottom: "2rem",
-          paddingTop: "1.5rem",
-          paddingBottom: "1.5rem",
-          fontSize: "13px",
+          fontSize: "14px",
           fontFamily: "Helvetica",
+          fontWeight: "500",
+          minHeight: "40%",
+          paddingLeft: "3rem",
+          paddingRight: "3rem",
         },
       },
     },
