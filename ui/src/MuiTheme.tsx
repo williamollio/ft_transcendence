@@ -68,6 +68,20 @@ const theme = createTheme({
         },
       },
     },
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          backgroundColor: "red",
+          borderRadius: "2px",
+          marginTop: "2rem",
+          marginBottom: "2rem",
+          paddingTop: "1.5rem",
+          paddingBottom: "1.5rem",
+          fontSize: "13px",
+          fontFamily: "Helvetica",
+        },
+      },
+    },
   },
 });
 
