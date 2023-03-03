@@ -43,13 +43,12 @@ export default function ProfileView(): React.ReactElement {
   const location = useLocation();
   const { dispatchTranscendanceState } = React.useContext(TranscendanceContext);
   const [picture, setPicture] = useState<any>();
-  const [image, setImage] = useImageStore((state) => [
-    state.image,
-    state.setImage,
-  ]);
+  const [image, setImage] = useImageStore(
+    (state: { image: any; setImage: any }) => [state.image, state.setImage]
+  );
   const [users, setUsers] = useState<LabelValue[]>([]);
   const [userId, setUserId] = useState<string>("");
-  const [isEditMode, setIsEditMode] = useState<boolean>(false);
+  const [isCreationMode, setIsCreationMode] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [currentUser, setCurrentUser] = useState<User>();
 
@@ -65,8 +64,10 @@ export default function ProfileView(): React.ReactElement {
 
   React.useEffect(() => {
     let token;
-    if (location.state && location.state.editMode === true) {
-      setIsEditMode(true);
+    if (location.state && location.state.creationMode === true) {
+      setIsCreationMode(true);
+    } else {
+      setIsCreationMode(false);
     }
     token = localStorage.getItem(Cookie.TOKEN);
     if (token === null) {
@@ -224,11 +225,14 @@ export default function ProfileView(): React.ReactElement {
                   </Box>
                   <Box className={classes.uploadButtonWrapper}>
                     <Button
+                      color="primary"
                       variant="contained"
                       component="label"
                       className={classes.iconButton}
                     >
+                      {/* <Typography color={"white"}> */}
                       {t(translationKeys.updloadPicture)}
+                      {/* </Typography> */}
                       <Input
                         type="file"
                         sx={{ display: "none" }}
@@ -272,13 +276,14 @@ export default function ProfileView(): React.ReactElement {
                   <Box className={classes.buttonsWrapper}>
                     <Button
                       className={classes.iconButton}
-                      variant="outlined"
+                      variant="contained"
                       onClick={handleSubmit(onSubmit)}
                     >
                       {t(translationKeys.buttons.save)}
                     </Button>
-                    {isEditMode && (
+                    {!isCreationMode && (
                       <Button
+                        color="primary"
                         className={classes.iconButton}
                         variant="outlined"
                         onClick={onCancel}
@@ -299,10 +304,7 @@ export default function ProfileView(): React.ReactElement {
 
 // https://github.com/garronej/tss-react
 const useStyles = makeStyles()(() => ({
-  iconButton: {
-    height: "50%",
-    width: "50%",
-  },
+  iconButton: {},
   avatarWrapper: {
     height: "20%",
     width: "70%",
