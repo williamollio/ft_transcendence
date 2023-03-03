@@ -18,10 +18,9 @@ import { PrivateRoute } from "./components/PrivateRoute";
 import { getIsAuthenticated, initAuthToken } from "./utils/auth-helper";
 
 export default function App() {
-  const [image, setImage] = useImageStore((state) => [
-    state.image,
-    state.setImage,
-  ]);
+  const [image, setImage] = useImageStore(
+    (state: { image: any; setImage: any }) => [state.image, state.setImage]
+  );
   const imageUrl = image ? URL.createObjectURL(image) : "";
 
   // removes the object URL after the component unmounts to prevent memory leaks
@@ -45,7 +44,10 @@ export default function App() {
   const RedirectWrapper = () => {
     initAuthToken();
     return (
-      <Navigate to={RoutePath.PROFILE} state={{ editMode: false }}></Navigate>
+      <Navigate
+        to={RoutePath.PROFILE}
+        state={{ creationMode: true }}
+      ></Navigate>
     );
   };
 
