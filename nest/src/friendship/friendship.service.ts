@@ -20,24 +20,23 @@ export class FriendshipService {
         select: {
           addresseeId: true,
           requesterId: true,
+          status: true,
         },
       });
       const usersWithoutFriendshipWithCurrentUser: {
         id: string;
         name: string;
       }[] = [];
-      for (const user of users) {
-        for (const friendship of friendships) {
+      for (const friendship of friendships) {
+        for (const user of users) {
           if (
-            (user.id === friendship.addresseeId ||
-              user.id === friendship.requesterId) &&
-            (currentUserId === friendship.addresseeId ||
-              currentUserId === friendship.requesterId)
-          ) {
-            continue;
-          } else if (
             user.id !== currentUserId &&
-            !usersWithoutFriendshipWithCurrentUser.some((u) => u.id === user.id)
+            !(
+              (user.id === friendship.addresseeId &&
+                currentUserId === friendship.requesterId) ||
+              (currentUserId === friendship.addresseeId &&
+                user.id === friendship.requesterId)
+            )
           ) {
             usersWithoutFriendshipWithCurrentUser.push(user);
           }
