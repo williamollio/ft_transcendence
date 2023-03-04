@@ -67,8 +67,49 @@ export class FriendshipService {
             { addresseeId: userId, status: FriendshipStatus.ACCEPTED },
           ],
         },
+        select: {
+          requester: {
+            select: {
+              id: true,
+              name: true,
+              filename: true,
+            },
+          },
+          addressee: {
+            select: {
+              id: true,
+              name: true,
+              filename: true,
+            },
+          },
+        },
       });
-      return friendshipRequests;
+
+      const users: {
+        id: string;
+        name: string;
+        filename: string | null;
+      }[] = [];
+
+      friendshipRequests.forEach((friendship) => {
+        if (friendship.requester.id !== userId) {
+          users.push({
+            id: friendship.requester.id,
+            name: friendship.requester.name,
+            filename: friendship.requester.filename,
+          });
+        }
+
+        if (friendship.addressee.id !== userId) {
+          users.push({
+            id: friendship.addressee.id,
+            name: friendship.addressee.name,
+            filename: friendship.addressee.filename,
+          });
+        }
+      });
+
+      return users;
     } catch (error) {
       if (typeof error === 'string') return error;
       return 'errorUserService';
