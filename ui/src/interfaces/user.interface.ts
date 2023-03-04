@@ -3,7 +3,6 @@ export interface Friends {
 }
 export interface UserCreation {
   name: string;
-  friends?: Friends[];
 }
 
 export interface User {
@@ -12,5 +11,4 @@ export interface User {
   createdAt: string;
   updatedAt: string;
   filename?: string;
-  friends?: User[];
 }
