@@ -221,7 +221,7 @@ export default function ProfileView(): React.ReactElement {
                   <Box
                     sx={{
                       width: "70%",
-                      height: "9.7rem",
+                      height: "12rem",
                       marginTop: "2rem",
                       display: "flex",
                       justifyContent: "center",
@@ -258,7 +258,7 @@ export default function ProfileView(): React.ReactElement {
                   <Box
                     sx={{
                       width: "70%",
-                      height: "6.5rem",
+                      height: "8rem",
                       marginTop: "2rem",
                       display: "flex",
                       justifyContent: "center",
@@ -327,7 +327,7 @@ export default function ProfileView(): React.ReactElement {
                       />
                     </Box>
                   </Box>
-                  <Box className={classes.buttonsWrapper}>
+                  <Box className={classes.buttonRequestWrapper}>
                     <Button
                       className={classes.iconButton}
                       variant="contained"
@@ -354,35 +354,42 @@ const useStyles = makeStyles()(() => ({
     width: "70%",
     display: "flex",
     justifyContent: "center",
-    alignItems: "center",
+    alignItems: "start",
   },
   buttonsWrapper: {
-    height: "50%",
+    height: "40%",
     width: "50%",
     display: "flex",
     justifyContent: "center",
     alignItems: "start",
     gap: "1em",
   },
-  uploadButtonWrapper: {
+  buttonRequestWrapper: {
+    height: "10%",
+    width: "50%",
     display: "flex",
     justifyContent: "center",
     alignItems: "start",
+  },
+  uploadButtonWrapper: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "end",
     height: "35%",
   },
   inputWrapper: {
     display: "flex",
     justifyContent: "center",
-    alignItems: "center",
-    height: "50%",
+    alignItems: "start",
+    height: "70%",
     width: "70%",
-    backgroundColor: "blue",
+    minHeight: "77px",
   },
   multiInputWrapper: {
-    minHeight: "10%",
     width: "65%",
     display: "flex",
     justifyContent: "center",
-    alignItems: "center",
+    alignItems: "start",
+    minHeight: "77px",
   },
 }));

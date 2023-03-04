@@ -64,7 +64,7 @@ const theme = createTheme({
     MuiAutocomplete: {
       styleOverrides: {
         root: {
-          height: "56px",
+          height: "53px",
           backgroundColor: "white",
         },
         listbox: {
@@ -85,7 +85,7 @@ const theme = createTheme({
           minHeight: "40%",
           paddingLeft: "3rem",
           paddingRight: "3rem",
-          marginTop: "1rem",
+          marginTop: "0.5rem",
         },
       },
     },
