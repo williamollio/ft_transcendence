@@ -15,6 +15,7 @@ import { Avatar, Divider } from "@mui/material";
 import { UserIds } from "../interfaces/user.interface";
 import { Cookie, getTokenData } from "../utils/auth-helper";
 import friendshipsService from "../services/friendships.service";
+import { fetchProfilePicture } from "../utils/picture-helper";
 
 const drawerWidth = 240;
 
@@ -65,6 +66,9 @@ export default function MiniDrawer() {
   const [open, setOpen] = React.useState(false);
   const [friends, setFriends] = React.useState<UserIds[]>([]);
   const [userId, setUserId] = React.useState<string>("");
+  const [profilePictures, setProfilePictures] = React.useState<{
+    [key: string]: string;
+  }>({});
 
   React.useEffect(() => {
     let token = localStorage.getItem(Cookie.TOKEN);
@@ -77,10 +81,32 @@ export default function MiniDrawer() {
     }
   }, [userId]);
 
+  React.useEffect(() => {
+    async function loadProfilePictures() {
+      const pictures: { [key: string]: string } = {};
+      for (const friend of friends) {
+        if (friend.filename) {
+          const picture = await getProfilePicture(friend.id);
+          pictures[friend.id] = picture;
+        } else {
+          pictures[friend.id] = "";
+        }
+      }
+      setProfilePictures(pictures);
+    }
+
+    loadProfilePictures();
+  }, [friends]);
+
   async function fetchFriends() {
     const usersFriends: Response<UserIds[]> =
       await friendshipsService.getAccepted(userId);
     setFriends(usersFriends.data);
+  }
+
+  async function getProfilePicture(friendId: string): Promise<string> {
+    const image = await fetchProfilePicture(friendId);
+    return URL.createObjectURL(image);
   }
 
   const triggerDrawerOpen = () => {
@@ -91,7 +117,7 @@ export default function MiniDrawer() {
     <Box sx={{ display: "flex" }}>
       <Drawer variant="permanent" open={open}>
         <List>
-          {friends.map((friend, index) => (
+          {friends.map((friend: UserIds, index) => (
             <ListItem key={index} disablePadding sx={{ display: "block" }}>
               <ListItemButton
                 onClick={triggerDrawerOpen}
@@ -108,9 +134,12 @@ export default function MiniDrawer() {
                     justifyContent: "center",
                   }}
                 >
-                  <Avatar />
+                  <Avatar key={friend.id} src={profilePictures[friend.id]} />
                 </ListItemIcon>
-                <ListItemText primary={index} sx={{ opacity: open ? 1 : 0 }} />
+                <ListItemText
+                  primary={friend.name}
+                  sx={{ opacity: open ? 1 : 0 }}
+                />
               </ListItemButton>
             </ListItem>
           ))}
