@@ -36,7 +36,10 @@ export class FriendshipService {
                 currentUserId === friendship.requesterId) ||
               (currentUserId === friendship.addresseeId &&
                 user.id === friendship.requesterId)
-            )
+            ) &&
+            friendship.status !== FriendshipStatus.REQUESTED &&
+            friendship.status !== FriendshipStatus.ACCEPTED &&
+            friendship.status !== FriendshipStatus.DENY
           ) {
             usersWithoutFriendshipWithCurrentUser.push(user);
           }
