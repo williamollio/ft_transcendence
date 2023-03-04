@@ -74,7 +74,8 @@ export default function App() {
       <Box
         display={"flex"}
         flexDirection={"column"}
-        minHeight={"100vh"}
+        height={"100vh"}
+        width={"100vw"}
         sx={{ backgroundColor: classes.colorSecondary }}
       >
         <ThemeProvider theme={theme}>
