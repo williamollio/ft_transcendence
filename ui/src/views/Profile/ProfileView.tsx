@@ -54,6 +54,7 @@ export default function ProfileView(): React.ReactElement {
   const [isCreationMode, setIsCreationMode] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [currentUser, setCurrentUser] = useState<User>();
+  const [initialName, setInitialName] = useState<string>();
 
   const {
     formState: { errors },
@@ -94,6 +95,7 @@ export default function ProfileView(): React.ReactElement {
     for (const property in currentUser) {
       if (property === "name") {
         setValue(property, currentUser.name);
+        setInitialName(currentUser.name);
       }
     }
   }, [currentUser]);
@@ -101,6 +103,7 @@ export default function ProfileView(): React.ReactElement {
   async function fetchCurrentUser(userId: string) {
     const payload = await usersService.getUser(userId);
     setCurrentUser(payload.data);
+    setInitialName(currentUser?.name);
   }
 
   async function fetchUsers() {
@@ -146,7 +149,7 @@ export default function ProfileView(): React.ReactElement {
     });
   }
   function onCancel() {
-    navigate(-1);
+    setValue("name", initialName);
   }
 
   async function onSubmit(data: FieldValues) {
@@ -163,6 +166,7 @@ export default function ProfileView(): React.ReactElement {
     if (picture) {
       handleOnSubmitPicture();
     }
+
     const isSuccessUser = !responseUser?.error;
     if (!isSuccessUser) {
       showErrorToast(responseUser?.error);
