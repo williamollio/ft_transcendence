@@ -293,16 +293,14 @@ export default function ProfileView(): React.ReactElement {
                       >
                         {t(translationKeys.buttons.save)}
                       </Button>
-                      {!isCreationMode && (
-                        <Button
-                          color="primary"
-                          className={classes.iconButton}
-                          variant="outlined"
-                          onClick={onCancel}
-                        >
-                          {t(translationKeys.buttons.cancel)}
-                        </Button>
-                      )}
+                      <Button
+                        color="primary"
+                        className={classes.iconButton}
+                        variant="outlined"
+                        onClick={onCancel}
+                      >
+                        {t(translationKeys.buttons.cancel)}
+                      </Button>
                     </Box>
                   </Box>
                   <Divider
