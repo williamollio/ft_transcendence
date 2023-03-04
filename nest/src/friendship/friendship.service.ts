@@ -9,43 +9,34 @@ export class FriendshipService {
 
   public async getNoFriendship(currentUserId: string) {
     try {
-      const users = await this.prisma.user.findMany({
+      const friendships = await this.prisma.friendship.findMany({
+        select: {
+          addresseeId: true,
+          requesterId: true,
+        },
+      });
+
+      const allUser = await this.prisma.user.findMany({
         select: {
           id: true,
           name: true,
         },
       });
 
-      const friendships = await this.prisma.friendship.findMany({
-        select: {
-          addresseeId: true,
-          requesterId: true,
-          status: true,
-        },
-      });
-      const usersWithoutFriendshipWithCurrentUser: {
-        id: string;
-        name: string;
-      }[] = [];
+      const userIdsWithFriendship = new Set<string>();
       for (const friendship of friendships) {
-        for (const user of users) {
-          if (
-            user.id !== currentUserId &&
-            !(
-              (user.id === friendship.addresseeId &&
-                currentUserId === friendship.requesterId) ||
-              (currentUserId === friendship.addresseeId &&
-                user.id === friendship.requesterId)
-            ) &&
-            friendship.status !== FriendshipStatus.REQUESTED &&
-            friendship.status !== FriendshipStatus.ACCEPTED &&
-            friendship.status !== FriendshipStatus.DENY
-          ) {
-            usersWithoutFriendshipWithCurrentUser.push(user);
-          }
+        userIdsWithFriendship.add(friendship.addresseeId);
+        userIdsWithFriendship.add(friendship.requesterId);
+      }
+
+      const userIdsWithoutFriendship = [];
+      for (const user of allUser) {
+        if (user.id !== currentUserId && !userIdsWithFriendship.has(user.id)) {
+          userIdsWithoutFriendship.push(user);
         }
       }
-      return usersWithoutFriendshipWithCurrentUser;
+
+      return userIdsWithoutFriendship;
     } catch (error) {
       if (typeof error === 'string') return error;
       return 'errorUserService';
