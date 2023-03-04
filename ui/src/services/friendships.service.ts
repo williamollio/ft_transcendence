@@ -34,8 +34,8 @@ class FriendshipsService {
     );
   }
 
-  async getAccepted(id: string): Promise<Response<Friendship[]>> {
-    return resolve<Friendship[]>(
+  async getAccepted(id: string): Promise<Response<UserIds[]>> {
+    return resolve<UserIds[]>(
       axiosInstance
         .get(`${PATH}/accepted/${id}`)
         .then((res: AxiosResponse) => res.data)

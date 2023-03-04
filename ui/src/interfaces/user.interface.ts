@@ -1,6 +1,7 @@
 export interface UserIds {
   id: string;
   name?: string;
+  filename?: string;
 }
 
 export interface UserCreation {
