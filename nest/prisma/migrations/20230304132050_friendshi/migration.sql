@@ -5,13 +5,16 @@
 
 */
 -- CreateEnum
-CREATE TYPE "FriendshipStatus" AS ENUM ('REQUESTED', 'ACCEPTED');
+CREATE TYPE "FriendshipStatus" AS ENUM ('REQUESTED', 'ACCEPTED', 'DENY', 'NONE');
 
 -- DropForeignKey
 ALTER TABLE "_friends" DROP CONSTRAINT "_friends_A_fkey";
 
 -- DropForeignKey
 ALTER TABLE "_friends" DROP CONSTRAINT "_friends_B_fkey";
+
+-- AlterTable
+ALTER TABLE "users" ADD COLUMN     "creationMode" BOOLEAN NOT NULL DEFAULT true;
 
 -- DropTable
 DROP TABLE "_friends";
@@ -20,7 +23,7 @@ DROP TABLE "_friends";
 CREATE TABLE "friendships" (
     "requesterId" TEXT NOT NULL,
     "addresseeId" TEXT NOT NULL,
-    "status" "FriendshipStatus" NOT NULL DEFAULT 'REQUESTED',
+    "status" "FriendshipStatus" NOT NULL DEFAULT 'NONE',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 

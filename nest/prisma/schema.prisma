@@ -118,7 +118,7 @@ model Friendship {
     addresseeId String
     addressee   User   @relation("addressee", fields: [addresseeId], references: [id], onDelete: Cascade)
 
-    status    FriendshipStatus @default(REQUESTED)
+    status    FriendshipStatus @default(NONE)
     createdAt DateTime         @default(now())
     updatedAt DateTime         @updatedAt
 
@@ -155,4 +155,5 @@ enum FriendshipStatus {
     REQUESTED
     ACCEPTED
     DENY
+    NONE
 }

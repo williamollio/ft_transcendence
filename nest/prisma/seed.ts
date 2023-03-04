@@ -122,7 +122,17 @@ async function main() {
     },
   });
 
-  console.log({ user1, user2, user3, user4, channelPublic, channelPrivate, channelProtected, directMessage1, directMessage2 });
+  console.log({
+    user1,
+    user2,
+    user3,
+    user4,
+    channelPublic,
+    channelPrivate,
+    channelProtected,
+    directMessage1,
+    directMessage2,
+  });
 }
 
 main()
