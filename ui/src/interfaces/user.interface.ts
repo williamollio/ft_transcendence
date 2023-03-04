@@ -1,6 +1,8 @@
-export interface Friends {
-  id: number;
+export interface UserIds {
+  id: string;
+  name: string;
 }
+
 export interface UserCreation {
   name: string;
 }

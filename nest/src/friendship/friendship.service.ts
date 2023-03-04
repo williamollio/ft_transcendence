@@ -12,6 +12,7 @@ export class FriendshipService {
       const users = await this.prisma.user.findMany({
         select: {
           id: true,
+          name: true,
         },
       });
 
@@ -21,7 +22,10 @@ export class FriendshipService {
           requesterId: true,
         },
       });
-      const usersWithoutFriendshipWithCurrentUser = [];
+      const usersWithoutFriendshipWithCurrentUser: {
+        id: string;
+        name: string;
+      }[] = [];
       for (const user of users) {
         for (const friendship of friendships) {
           if (
@@ -31,7 +35,10 @@ export class FriendshipService {
               currentUserId === friendship.requesterId)
           ) {
             continue;
-          } else {
+          } else if (
+            user.id !== currentUserId &&
+            !usersWithoutFriendshipWithCurrentUser.some((u) => u.id === user.id)
+          ) {
             usersWithoutFriendshipWithCurrentUser.push(user);
           }
         }

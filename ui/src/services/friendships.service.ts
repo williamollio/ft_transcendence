@@ -1,13 +1,9 @@
 import { axiosInstance } from "./common/axios-instance";
 import { resolve, Response } from "./common/resolve";
 import { AxiosResponse } from "axios";
-import { User } from "../interfaces/user.interface";
+import { UserIds } from "../interfaces/user.interface";
 
 const PATH = "friendship";
-
-interface UserIds {
-  id: string;
-}
 
 interface Friendship {
   requesterId: string;
