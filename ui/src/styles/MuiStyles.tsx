@@ -16,8 +16,8 @@ export const ProfileCard = styled(Box)({});
 ProfileCard.defaultProps = {
   borderRadius: "50px",
   boxShadow: "46px 46px 92px #b3a99e, -46px -46px 92px #ffffff",
-  height: "48rem",
-  width: "60rem",
+  height: "38rem",
+  width: "42rem",
   marginBottom: "2rem",
   bgcolor: classes.colorSecondary,
 };

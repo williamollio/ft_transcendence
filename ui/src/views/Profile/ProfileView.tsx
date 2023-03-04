@@ -8,6 +8,7 @@ import {
   Input,
   Avatar,
   CircularProgress,
+  Divider,
 } from "@mui/material";
 import usersService from "../../services/users.service";
 import { UserCreation, User, Friends } from "../../interfaces/user.interface";
@@ -214,46 +215,96 @@ export default function ProfileView(): React.ReactElement {
                 <CircularProgress />
               ) : (
                 <>
-                  <Box className={classes.avatarWrapper}>
-                    <Avatar
-                      src={image ? URL.createObjectURL(image) : ""}
-                      style={{
-                        width: "100px",
-                        height: "100px",
-                      }}
-                    />
-                  </Box>
-                  <Box className={classes.uploadButtonWrapper}>
-                    <Button
-                      color="primary"
-                      variant="contained"
-                      component="label"
-                      className={classes.iconButton}
-                    >
-                      {/* <Typography color={"white"}> */}
-                      {t(translationKeys.updloadPicture)}
-                      {/* </Typography> */}
-                      <Input
-                        type="file"
-                        sx={{ display: "none" }}
-                        onChange={handleOnChangePicture}
-                      />
-                    </Button>
-                  </Box>
-                  <Box className={classes.inputWrapper}>
-                    <Box sx={{ width: "100%" }}>
-                      <CustomTextField
-                        label={"Name"}
-                        isRequired
-                        name="name"
-                        rules={{
-                          required: true,
+                  <Box
+                    sx={{
+                      width: "70%",
+                      height: "9.7rem",
+                      marginTop: "2rem",
+                      display: "flex",
+                      justifyContent: "center",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      flexWrap: "no-wrap",
+                    }}
+                  >
+                    <Box className={classes.avatarWrapper}>
+                      <Avatar
+                        src={image ? URL.createObjectURL(image) : ""}
+                        style={{
+                          width: "100px",
+                          height: "100px",
                         }}
-                        error={errors.name}
-                        register={register}
                       />
                     </Box>
+                    <Box className={classes.uploadButtonWrapper}>
+                      <Button
+                        color="primary"
+                        variant="contained"
+                        component="label"
+                        className={classes.iconButton}
+                      >
+                        {t(translationKeys.updloadPicture)}
+                        <Input
+                          type="file"
+                          sx={{ display: "none" }}
+                          onChange={handleOnChangePicture}
+                        />
+                      </Button>
+                    </Box>
                   </Box>
+                  <Box
+                    sx={{
+                      width: "70%",
+                      height: "6.5rem",
+                      marginTop: "2rem",
+                      display: "flex",
+                      justifyContent: "center",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      flexWrap: "no-wrap",
+                    }}
+                  >
+                    <Box className={classes.inputWrapper}>
+                      <Box sx={{ width: "100%" }}>
+                        <CustomTextField
+                          label={"Name"}
+                          isRequired
+                          name="name"
+                          rules={{
+                            required: true,
+                          }}
+                          error={errors.name}
+                          register={register}
+                        />
+                      </Box>
+                    </Box>
+                    <Box className={classes.buttonsWrapper}>
+                      <Button
+                        className={classes.iconButton}
+                        variant="contained"
+                        onClick={handleSubmit(onSubmit)}
+                      >
+                        {t(translationKeys.buttons.save)}
+                      </Button>
+                      {!isCreationMode && (
+                        <Button
+                          color="primary"
+                          className={classes.iconButton}
+                          variant="outlined"
+                          onClick={onCancel}
+                        >
+                          {t(translationKeys.buttons.cancel)}
+                        </Button>
+                      )}
+                    </Box>
+                  </Box>
+                  <Divider
+                    sx={{
+                      marginTop: "2.5rem",
+                      marginBottom: "2.5rem",
+                      width: "70%",
+                    }}
+                  ></Divider>
                   <Box className={classes.multiInputWrapper}>
                     <Box sx={{ width: "100%" }}>
                       <Controller
@@ -279,18 +330,8 @@ export default function ProfileView(): React.ReactElement {
                       variant="contained"
                       onClick={handleSubmit(onSubmit)}
                     >
-                      {t(translationKeys.buttons.save)}
+                      {t(translationKeys.buttons.sendRequest)}
                     </Button>
-                    {!isCreationMode && (
-                      <Button
-                        color="primary"
-                        className={classes.iconButton}
-                        variant="outlined"
-                        onClick={onCancel}
-                      >
-                        {t(translationKeys.buttons.cancel)}
-                      </Button>
-                    )}
                   </Box>
                 </>
               )}
@@ -306,33 +347,33 @@ export default function ProfileView(): React.ReactElement {
 const useStyles = makeStyles()(() => ({
   iconButton: {},
   avatarWrapper: {
-    height: "20%",
+    height: "65%",
     width: "70%",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
   },
   buttonsWrapper: {
-    height: "20%",
-    width: "70%",
+    height: "50%",
+    width: "50%",
     display: "flex",
     justifyContent: "center",
-    alignItems: "center",
+    alignItems: "start",
     gap: "1em",
   },
   uploadButtonWrapper: {
-    height: "10%",
-    width: "60%",
     display: "flex",
     justifyContent: "center",
-    alignItems: "center",
+    alignItems: "start",
+    height: "35%",
   },
   inputWrapper: {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    height: "20%",
-    width: "45%",
+    height: "50%",
+    width: "70%",
+    backgroundColor: "blue",
   },
   multiInputWrapper: {
     minHeight: "10%",
@@ -340,6 +381,5 @@ const useStyles = makeStyles()(() => ({
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: "4rem",
   },
 }));

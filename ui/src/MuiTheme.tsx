@@ -15,10 +15,17 @@ const theme = createTheme({
     fontFamily: "Arial",
   },
   components: {
+    MuiDivider: {
+      styleOverrides: {
+        root: {
+          borderLeft: "1px solid rgba(0, 0, 0, 0.3)",
+        },
+      },
+    },
     MuiInputLabel: {
       styleOverrides: {
         root: {
-          fontSize: "14px",
+          fontSize: "15px",
           fontWeight: "500",
         },
       },
@@ -78,6 +85,7 @@ const theme = createTheme({
           minHeight: "40%",
           paddingLeft: "3rem",
           paddingRight: "3rem",
+          marginTop: "1rem",
         },
       },
     },

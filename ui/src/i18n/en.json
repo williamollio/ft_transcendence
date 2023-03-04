@@ -3,7 +3,8 @@
     "save": "Save",
     "login42": "Login 42 API",
     "cancel": "Cancel",
-    "submit": "Submit"
+    "submit": "Submit",
+    "sendRequest": "Request"
   },
   "loginToken": "Enter token",
   "or": "or",
@@ -14,7 +15,7 @@
   "updloadPicture": "Upload Picture",
   "profile": "Profile",
   "chooseName": "Choose an unique name",
-  "addFriends": "Add Friends",
+  "addFriends": "Request Frienships",
   "errorMessages": {
     "required": "This field is required"
   }
