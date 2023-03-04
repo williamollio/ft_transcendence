@@ -11,7 +11,8 @@ import {
   Divider,
 } from "@mui/material";
 import usersService from "../../services/users.service";
-import { UserCreation, User, Friends } from "../../interfaces/user.interface";
+import { UserIds } from "../../interfaces/user.interface";
+import { UserCreation, User } from "../../interfaces/user.interface";
 import { useNavigate, useLocation } from "react-router-dom";
 import { RoutePath } from "../../interfaces/router.interface";
 import { idTabs } from "../../interfaces/tab.interface";
@@ -36,6 +37,7 @@ import CustomMultiSelect from "../../components/shared/CustomMultiSelect/CustomM
 import CustomTextField from "../../components/shared/CustomTextField/CustomTextField";
 import { Cookie, getTokenData } from "../../utils/auth-helper";
 import MiniDrawer from "../../components/MiniDrawer";
+import friendshipsService from "../../services/friendships.service";
 
 export default function ProfileView(): React.ReactElement {
   const { t } = useTranslation();
@@ -92,14 +94,9 @@ export default function ProfileView(): React.ReactElement {
     for (const property in currentUser) {
       if (property === "name") {
         setValue(property, currentUser.name);
-      } else if (property === "friends") {
-        const friendsIds: number[] | undefined = currentUser.friends?.map(
-          (friend: Friends) => friend.id
-        );
-        setValue(property, friendsIds);
       }
     }
-  }, [currentUser, users]);
+  }, [currentUser]);
 
   async function fetchCurrentUser(userId: string) {
     const payload = await usersService.getUser(userId);
@@ -107,9 +104,10 @@ export default function ProfileView(): React.ReactElement {
   }
 
   async function fetchUsers() {
-    const usersResponse: Response<User[]> = await usersService.getUsers();
-    const usersAsLabelValue: LabelValue[] = usersResponse.data.map(
-      (user: User) => {
+    const usersFriendshipNone: Response<UserIds[]> =
+      await friendshipsService.getNone(userId);
+    const usersAsLabelValue: LabelValue[] = usersFriendshipNone.data.map(
+      (user: UserIds) => {
         return {
           label: `${user.name}`,
           value: user.id,
@@ -135,34 +133,6 @@ export default function ProfileView(): React.ReactElement {
     }
   }
 
-  async function handleOnSaveUser(data: FieldValues) {
-    let responseUser;
-
-    const friendsList: Friends[] | undefined = data.friends?.map(
-      (friend: LabelValue) => {
-        return {
-          id: friend,
-        };
-      }
-    );
-
-    const userCreation: UserCreation = {
-      name: data.name,
-      friends: friendsList,
-    };
-
-    if (userId) {
-      responseUser = await usersService.patchUser(userId, userCreation);
-    }
-
-    const isSuccessUser = !responseUser?.error;
-    if (isSuccessUser) {
-      navigateToGamePage();
-    } else {
-      showErrorToast(responseUser?.error);
-    }
-  }
-
   function showErrorToast(error?: AxiosError) {
     const message = (error?.response?.data as any).message as string;
 
@@ -180,10 +150,43 @@ export default function ProfileView(): React.ReactElement {
   }
 
   async function onSubmit(data: FieldValues) {
-    handleOnSaveUser(data);
+    let responseUser;
+
+    const userCreation: UserCreation = {
+      name: data.name,
+    };
+
+    if (userId) {
+      responseUser = await usersService.patchUser(userId, userCreation);
+    }
+
     if (picture) {
       handleOnSubmitPicture();
     }
+    const isSuccessUser = !responseUser?.error;
+    if (!isSuccessUser) {
+      showErrorToast(responseUser?.error);
+    }
+  }
+
+  async function onSubmitFriendship(data: FieldValues) {
+    let responseUser;
+
+    const friendsList: UserIds[] | undefined = data.friends?.map(
+      (friend: LabelValue) => {
+        return {
+          id: friend,
+        };
+      }
+    );
+
+    friendsList?.forEach(async function (friend) {
+      responseUser = await friendshipsService.postRequest(userId, friend);
+      const isSuccessUser = !responseUser?.error;
+      if (!isSuccessUser) {
+        showErrorToast(responseUser?.error);
+      }
+    });
   }
 
   function handleOnChangePicture(e: ChangeEvent<HTMLInputElement>) {
@@ -328,7 +331,7 @@ export default function ProfileView(): React.ReactElement {
                     <Button
                       className={classes.iconButton}
                       variant="contained"
-                      onClick={handleSubmit(onSubmit)}
+                      onClick={handleSubmit(onSubmitFriendship)}
                     >
                       {t(translationKeys.buttons.sendRequest)}
                     </Button>

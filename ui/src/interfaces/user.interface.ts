@@ -1,6 +1,6 @@
 export interface UserIds {
   id: string;
-  name: string;
+  name?: string;
 }
 
 export interface UserCreation {
