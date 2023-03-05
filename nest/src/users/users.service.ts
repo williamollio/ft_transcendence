@@ -276,7 +276,6 @@ export class UsersService {
   
         const matchesList = await this.getUserMatches(userName);
         if (matchesList) {
-          // for (let i = 0; i < matchesList.length; i++) {
           for (const match of matchesList) {
             if (
               (match.playerOneId === user.id && match.p1s == 10) ||
