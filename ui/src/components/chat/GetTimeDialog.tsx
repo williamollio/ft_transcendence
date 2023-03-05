@@ -2,6 +2,8 @@ import { Dialog, TextField } from "@mui/material";
 import { useState } from "react";
 import { user } from "../../interfaces/chat.interfaces";
 
+// This is currently not in use
+
 export default function GetTimeDialog({
   open,
   toggleOpen,

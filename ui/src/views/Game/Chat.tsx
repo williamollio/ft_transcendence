@@ -23,7 +23,6 @@ import { ChannelTabs } from "../../components/chat/ChannelTabs";
 import ChannelService from "../../services/channel.service";
 import { useLocation } from "react-router-dom";
 import { UserSocket } from "../../classes/UserSocket.class";
-import { fetchBlockedUsers } from "../../components/chat/hooks/blockedUsers.fetch";
 import { useQuery } from "@tanstack/react-query";
 import GetTextInputDialog from "../../components/chat/GetTextInputDialog";
 
@@ -65,7 +64,7 @@ export default function Chat(props: Props) {
     isError,
 	isRefetching,
     refetch: refetchBlockedUsers,
-  } = useQuery(["blocks"], fetchBlockedUsers, {
+  } = useQuery(["blocks"], ChannelService.fetchBlockedUsers, {
     enabled: channelSocket.user.id !== "",
   });
 

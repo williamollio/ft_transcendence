@@ -9,9 +9,7 @@ import {
 import { chatRoom } from "../../classes/chatRoom.class";
 import AddIcon from "@mui/icons-material/Add";
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
-import { fetchChannelData } from "./hooks/channelData.fetch";
 import { useQuery } from "@tanstack/react-query";
-import { fetchJoinedChannels } from "./hooks/joinedChannels.fetch";
 import {
   channelUser,
   DBChannelElement,
@@ -65,7 +63,7 @@ export function ChannelTabs({
     data: joinedChannels,
     isLoading: joinedChannesLoading,
     isError: joinedChannesError,
-  } = useQuery(["joinedChannels"], fetchJoinedChannels, {
+  } = useQuery(["joinedChannels"], ChannelService.fetchJoinedChannels, {
     enabled: channelSocket.user.id !== "",
   });
 
@@ -107,7 +105,7 @@ export function ChannelTabs({
 
   const { data, isLoading, isError, isRefetching, refetch } = useQuery(
     ["channels", channelQueryId],
-    () => fetchChannelData(channelQueryId),
+    () => ChannelService.fetchChannelData(channelQueryId),
     { enabled: typeof channelQueryId !== "undefined" }
   );
 

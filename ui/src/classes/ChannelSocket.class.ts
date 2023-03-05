@@ -4,7 +4,7 @@ import { accessTypes, chatRoom } from "./chatRoom.class";
 import { channelUser, messagesDto, user } from "../interfaces/chat.interfaces";
 import { getTokenData } from "../utils/auth-helper";
 import UserService from "../services/users.service";
-import { fetchChannelData } from "../components/chat/hooks/channelData.fetch";
+import ChannelService from "../services/channel.service";
 
 export class ChannelSocket {
   socket: Socket;
@@ -52,7 +52,7 @@ export class ChannelSocket {
   };
 
   joinRoom = (channelId: string, password?: string) => {
-    fetchChannelData(channelId).then((resolve) => {
+    ChannelService.fetchChannelData(channelId).then((resolve) => {
       this.socket.emit("joinRoom", {
         joinInfo: {
           id: channelId,

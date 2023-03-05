@@ -33,7 +33,7 @@ export class UserGateway {
 
   @SubscribeMessage('connectUser')
   userConnect(
-    @GetCurrentUserId() userId: number,
+    @GetCurrentUserId() userId: string,
     @ConnectedSocket() clientSocket: Socket,
   ) {
     void this.usersService.updateConnectionStatus(

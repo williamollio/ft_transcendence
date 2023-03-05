@@ -23,8 +23,8 @@ import GetPasswordDialog from "./GetPasswordDialog";
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import GetNameDialog from "./GetNameDialog";
 import { useQuery } from "@tanstack/react-query";
-import { fetchUsersOfChannel } from "./hooks/channelUsers.fetch";
 import { UserSocket } from "../../classes/UserSocket.class";
+import ChannelService from "../../services/channel.service";
 
 export default function ChannelInfoDialog({
   blockedUser,
@@ -63,7 +63,7 @@ export default function ChannelInfoDialog({
 
   const { data, isError, isLoading, refetch } = useQuery(
     ["channelUsers", channel?.id],
-    () => fetchUsersOfChannel(channel?.id!),
+    () => ChannelService.fetchUsersOfChannel(channel?.id!),
     { enabled: typeof channel?.id !== "undefined" }
   );
 
