@@ -93,29 +93,30 @@ export class GameService {
     }
   }
 
-  async leaveWatch(client: Socket, playerId: string) {
-    const game = this.GameMap.getGame(playerId);
-    if (game !== null) {
-      await client.leave(game.gameRoomId);
-    }
-  }
+  // async leaveWatch(client: Socket, playerId: string) {
+  //   const game = this.GameMap.getGame(playerId);
+  //   if (game !== null) {
+  //     await client.leave(game.gameRoomId);
+  //   }
+  // }
 
-  async watch(client: Socket, playerId: string, server: Server) {
-    const game = this.GameMap.getGame(playerId);
-    if (game !== null) {
-      await client.join(game.gameRoomId);
-      server.to(client.id).emit('gameStatus', {
-        gameId: game.gameRoomId,
-        status: game.status,
-        winner: '',
-        player1id: game.p1id,
-        player2id: game.p2id,
-        player1score: game.p1s,
-      });
-    }
-    if (playerId === game?.p1id) return { playerNumber: 1 };
-    return { playerNumber: 2 };
-  }
+  // this is still under testing
+  // async watch(client: Socket, playerId: string, server: Server) {
+  //   const game = this.GameMap.getGame(playerId);
+  //   if (game !== null) {
+  //     await client.join(game.gameRoomId);
+  //     server.to(client.id).emit('gameStatus', {
+  //       gameId: game.gameRoomId,
+  //       status: game.status,
+  //       winner: '',
+  //       player1id: game.p1id,
+  //       player2id: game.p2id,
+  //       player1score: game.p1s,
+  //     });
+  //   }
+  //   if (playerId === game?.p1id) return { playerNumber: 1 };
+  //   return { playerNumber: 2 };
+  // }
 
   async join(client: Socket, userId: string, server: Server, mode: GameMode) {
     let game: Game | null;

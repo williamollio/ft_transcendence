@@ -73,25 +73,23 @@ export class GameGateway {
     );
   }
 
-  @SubscribeMessage('leaveWatch')
-  leaveWatchGame(
-    @MessageBody('playerId') playerId: string,
-    @ConnectedSocket() client: Socket,
-  ) {
-    return this.gameService.leaveWatch(client, playerId);
-  }
+  // @SubscribeMessage('leaveWatch')
+  // leaveWatchGame(
+  //   @MessageBody('playerId') playerId: string,
+  //   @ConnectedSocket() client: Socket,
+  // ) {
+  //   return this.gameService.leaveWatch(client, playerId);
+  // }
 
-  @SubscribeMessage('watchGame')
-  watchGame(
-    @MessageBody('playerId') playerId: string,
-    @ConnectedSocket() client: Socket,
-  ) {
-    // <<<<<<< Updated upstream
-    return this.gameService.watch(client, playerId, this.server);
-    // =======
-    //     return this.gameService.watch(client, playerId);
-    // >>>>>>> Stashed changes
-  }
+
+  // spectating still under tests
+  // @SubscribeMessage('watchGame')
+  // watchGame(
+  //   @MessageBody('playerId') playerId: string,
+  //   @ConnectedSocket() client: Socket,
+  // ) {
+  //   return this.gameService.watch(client, playerId, this.server);
+  // }
 
   @SubscribeMessage('joinGame')
   joinRoom(

@@ -257,7 +257,6 @@ export class Game {
           this.diry = generateRandomNumber(-20, 20);
           break;
         }
-
         case GameMode.MAYHEM: {
           this.bx = this.gameConstants.relativeGameWidth;
           this.dirx =
@@ -346,7 +345,7 @@ export class Game {
       expectedEloPlayer2: expectedElo2,
     };
   }
-  
+
   // Winner is a boolean set to 1 if player 1 won, and zero if he lost
   async getNewElos(prismaService: PrismaService, winner: boolean) {
     const newElos: { eloPlayer1: number; eloPlayer2: number } = {

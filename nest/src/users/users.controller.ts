@@ -160,12 +160,29 @@ export class UsersController {
 
   // Match controller
   @Post('get-user-matches-stats')
-  // @UseGuards() Add guard here
+  @UseGuards(JwtGuard)
   @ApiOkResponse({ type: UserEntity })
   getUserMatchesStats(
     @Res() res: Response,
     @Body() target: { userName: string },
   ) {
     return this.usersService.getUserMatchesStats(target.userName, res);
+  }
+
+  @Post('get-user-match-history')
+  @UseGuards(JwtGuard)
+  @ApiOkResponse({ type: UserEntity })
+  getUserMatchHistory(
+    @Res() res: Response,
+    @Body() target: { userNickname: string },
+  ) {
+    return this.usersService.getUserMatchHistory(target.userNickname, res);
+  }
+
+  @Get('get-leaderboard')
+  @UseGuards(JwtGuard)
+  @ApiOkResponse({ type: UserEntity })
+  getLeaderBoard(@Res() res: Response) {
+    return this.usersService.getLeaderboard(res);
   }
 }

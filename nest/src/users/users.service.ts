@@ -327,4 +327,66 @@ export class UsersService {
     }
 
     // still have to implement the services for the history and the leaderboard
+    // game won / game lost / points ???
+
+    async getUserMatchHistory(userNickname: string, res: Response) {
+      const matchesList = await this.getUserMatches(userNickname);
+      const matchHistory: MatchHistory[] = [];
+      const currentUser = await this.findOneFromuserName(userNickname);
+      let opponent: User | null;
+      let matchWon: boolean;
+      let score: string;
+  
+      if (matchesList && currentUser) {
+        try {
+          for (const match of matchesList) {
+            if (match.playerOneId === currentUser.id) {
+              opponent = await this.getUserInfo(match.playerTwoId);
+              score = match.p1s.toString() + '-' + match.p2s.toString();
+              if (match.p1s == 10) matchWon = true;
+              else matchWon = false;
+            } else {
+              opponent = await this.getUserInfo(match.playerOneId);
+              score = match.p2s.toString() + '-' + match.p1s.toString();
+              if (match.p2s == 10) matchWon = true;
+              else matchWon = false;
+            }
+            if (opponent) {
+              const imageOpponent = opponent.filename;
+              matchHistory.push({
+                id: match.gameId,
+                imageCurrentUser: currentUser.filename,
+                imageOpponent: imageOpponent,
+                score: score,
+                matchWon: matchWon,
+              });
+            }
+          }
+          return res.status(200).send(matchHistory);
+        } catch (error) {
+          throw new ForbiddenException(error);
+        }
+      }
+      return res.status(500).send();
+    }
+  
+    async getLeaderboard(res: Response) {
+      try {
+        const leaderboard = await this.prisma.user.findMany({
+          take: 10,
+          orderBy: {
+            eloScore: 'desc',
+          },
+          select: {
+            id: true,
+            name: true,
+            filename: true,
+            eloScore: true,
+          },
+        });
+        return res.status(200).send(leaderboard);
+      } catch (error) {
+        throw new ForbiddenException(error);
+      }
+    }
 }
