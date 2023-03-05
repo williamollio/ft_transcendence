@@ -36,15 +36,17 @@ export class UserGateway {
     @GetCurrentUserId() userId: string,
     @ConnectedSocket() clientSocket: Socket,
   ) {
+	console.log("login");
     void this.usersService.updateConnectionStatus(
-      String(userId),
-      UserStatus.ONLINE,
-    );
-    clientSocket.broadcast.emit('userConnected');
-  }
-
-  @SubscribeMessage('disconnectUser')
-  userDisconnect(@ConnectedSocket() clientSocket: Socket) {
+		String(userId),
+		UserStatus.ONLINE,
+		);
+		clientSocket.broadcast.emit('userConnected');
+	}
+	
+	@SubscribeMessage('disconnectUser')
+	userDisconnect(@ConnectedSocket() clientSocket: Socket) {
+	  console.log("logout");
     clientSocket.broadcast.emit('userDisconnected');
   }
 

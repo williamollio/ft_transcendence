@@ -33,11 +33,14 @@ export default function GameView(props: Props): React.ReactElement {
     let token;
     if ((token = localStorage.getItem(Cookie.TOKEN))) {
       channelSocket.initializeSocket(token);
-      //   userSocket.initializeSocket(token);
+      userSocket.initializeSocket(token);
+      console.log("login");
+      userSocket.logIn();
     }
     return () => {
       channelSocket.socket?.disconnect();
-      //   userSocket.socket?.disconnect();
+      userSocket.socket?.disconnect();
+      console.log("logout");
     };
   }, []);
 

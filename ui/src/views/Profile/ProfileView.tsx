@@ -72,7 +72,6 @@ export default function ProfileView(props: Props): React.ReactElement {
     let token = localStorage.getItem(Cookie.TOKEN);
     if (token) {
       userSocket.initializeSocket(token);
-	  console.log("loggin in");
       userSocket.logIn();
     }
     return () => {
