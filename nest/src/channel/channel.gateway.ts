@@ -20,9 +20,11 @@ import {
 } from './dto';
 import { Channel, ChannelRole, ChannelType, ChannelUser } from '@prisma/client';
 import { socketToUserId } from 'src/users/socketToUserIdStorage.service';
+import { socketToChannelId } from 'src/channel/socketToChannelIdStorage.service';
 import { ModerateChannelDto } from './dto/moderateChannelUser.dto';
 import * as msgpack from 'socket.io-msgpack-parser';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
+import { JwtUser } from 'src/users/interface/jwt-user.interface';
 
 enum acknoledgementStatus {
   OK = 'OK',
@@ -41,6 +43,25 @@ export class ChannelGateway {
   @WebSocketServer()
   server: Server;
   constructor(private readonly channelService: ChannelService) {}
+
+  @SubscribeMessage('connect')
+  handleConnection(@ConnectedSocket() clientSocket: Socket) {
+    if (
+      clientSocket.handshake.auth &&
+      clientSocket.handshake.auth.token !== ''
+    ) {
+      const base64Payload = clientSocket.handshake.auth.token.split('.')[1];
+      const payloadBuffer = Buffer.from(base64Payload, 'base64');
+      const user: JwtUser = JSON.parse(payloadBuffer.toString()) as JwtUser;
+      socketToChannelId.set(clientSocket.id, user.id);
+      clientSocket.emit('userConnected');
+    }
+  }
+
+  @SubscribeMessage('disconnect')
+  disconnect(@ConnectedSocket() clientSocket: Socket) {
+    socketToChannelId.delete(clientSocket.id);
+  }
 
   @SubscribeMessage('connectToRoom')
   async connectToChannel(
@@ -65,6 +86,8 @@ export class ChannelGateway {
     @MessageBody('createInfo') dto: CreateChannelDto,
     @ConnectedSocket() clientSocket: Socket,
   ) {
+    const targetSockets: Array<string> = [];
+    targetSockets.push(clientSocket.id);
     dto = {
       ...dto,
     };
@@ -77,9 +100,16 @@ export class ChannelGateway {
       );
       /** Get the second user's socketId and make it join the channel's room */
       if (typeof dto.userId === 'string') {
-        const secondUserSocket = socketToUserId.getFromUserId(dto.userId);
-        if (secondUserSocket && channel && typeof channel !== 'string')
+        const secondUserSocket = socketToChannelId.getFromUserId(dto.userId);
+        if (secondUserSocket && channel && typeof channel !== 'string') {
           this.server.in([secondUserSocket]).socketsJoin(channel.id);
+          if (secondUserSocket) {
+            targetSockets.push(secondUserSocket);
+          } else {
+            this.server.socketsLeave(channel.id);
+            channel = 'Cannot find other user';
+          }
+        }
       }
     } else {
       channel = await this.channelService.createChannelWS(
@@ -90,7 +120,7 @@ export class ChannelGateway {
     }
     typeof channel === 'string' || !channel
       ? this.server.to(clientSocket.id).emit('createRoomFailed', channel)
-      : this.server.to(clientSocket.id).emit('roomCreated', channel.id, userId);
+      : this.server.to(targetSockets).emit('roomCreated', channel.id, userId);
   }
 
   // When a user join a channel, her ids are added to the users in the corresponding room
@@ -131,9 +161,10 @@ export class ChannelGateway {
       this.server.to(clientSocket.id).emit('messageRoomFailed');
       return acknoledgementStatus.FAILED;
     } else {
-      clientSocket
-        .to(messageInfo.channelId)
-        .emit('incomingMessage', {messageInfo: messageInfo, sender: senderId});
+      clientSocket.to(messageInfo.channelId).emit('incomingMessage', {
+        messageInfo: messageInfo,
+        sender: senderId,
+      });
       return acknoledgementStatus.OK;
     }
   }
@@ -205,7 +236,7 @@ export class ChannelGateway {
       userId,
       inviteChannelDto,
     );
-    const otherUserSocket = socketToUserId.getFromUserId(
+    const otherUserSocket = socketToChannelId.getFromUserId(
       inviteChannelDto.invitedId,
     );
     if (!otherUserSocket)
@@ -214,8 +245,11 @@ export class ChannelGateway {
       this.server.to(clientSocket.id).emit('inviteFailed', inviteToChannel);
     } else {
       this.server
-        .to([clientSocket.id, inviteChannelDto.channelId])
-        .emit('inviteSucceeded', inviteToChannel);
+        .to([clientSocket.id, inviteChannelDto.channelId, otherUserSocket])
+        .emit('inviteSucceeded', {
+          ...inviteToChannel,
+          invited: inviteChannelDto.invitedId,
+        });
     }
   }
 

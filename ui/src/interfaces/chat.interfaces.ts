@@ -11,7 +11,7 @@ export interface user {
 }
 
 export interface channelUser {
-	id: string;
+	id: string,
 	name: string,
 	status: "OFFLINE" | "ONLINE" | "PLAYING";
 	role?: "USER" | "ADMIN" | "OWNER";
@@ -28,6 +28,7 @@ export interface DBChannelElement
 	id: string,
 	name: string,
 	type: accessTypes,
+	users: channelUser[],
 }
 
 export interface DBChannelUserListElement

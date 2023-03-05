@@ -222,7 +222,7 @@ export class ChannelService {
         role: ChannelRole;
       }[] = [];
       for (const user of users) {
-        flattenUsers.push({...user.user, role: user.role});
+        flattenUsers.push({ ...user.user, role: user.role });
       }
       return flattenUsers;
     } catch (error) {
@@ -659,6 +659,13 @@ export class ChannelService {
     clientSocket: Socket,
   ) {
     try {
+      const usersUnderBan = await this.getUsersUnderModerationAction(
+        channelDto.id,
+        ChannelActionType.BAN,
+      );
+      if (usersUnderBan?.includes(userId)) {
+        throw new Error('userBanned');
+      }
       /** If private channel, check the invitation to the channel */
       if (channelDto.type === ChannelType.PRIVATE) {
         const isInvited = await this.getIsInvitedInAChannel(
@@ -786,9 +793,9 @@ export class ChannelService {
       delete dto.passwordHash;
     } else if (dto.passwordHash) {
       /* There is a new password provided, we hash it for the db */
-      dto.passwordHash = dto.passwordHash;//await argon.hash(dto.passwordHash, {
-    //     type: argon.argon2id,
-    //   });
+      dto.passwordHash = dto.passwordHash; //await argon.hash(dto.passwordHash, {
+      //     type: argon.argon2id,
+      //   });
     } else {
       /* There is no new password for a Protected type channel */
       throw new Error('passwordIncorrect');
@@ -807,24 +814,24 @@ export class ChannelService {
       }
       /* Check that the user is owner or admin for update rights */
       const userRole: { role: ChannelRole } | null =
-	  await this.getRoleOfUserChannel(userId, channelId);
-      if (!userRole || userRole.role < ChannelRole.ADMIN) {
-		  return 'noEligibleRights';
-		}
-		if (dto.type === ChannelType.PROTECTED) {
-			await this.handlePasswords(dto, channelId);
-		}
-		/* Then, update channel's information */
-		const editedChannel: Channel = await this.prisma.channel.update({
-			where: {
-				id: channelId,
-			},
-			data: {
-				...dto,
-			},
-		});
-		editedChannel.passwordHash = '';
-		return editedChannel;
+        await this.getRoleOfUserChannel(userId, channelId);
+      if (!userRole || userRole.role === ChannelRole.USER) {
+        return 'noEligibleRights';
+      }
+      if (dto.type === ChannelType.PROTECTED) {
+        await this.handlePasswords(dto, channelId);
+      }
+      /* Then, update channel's information */
+      const editedChannel: Channel = await this.prisma.channel.update({
+        where: {
+          id: channelId,
+        },
+        data: {
+          ...dto,
+        },
+      });
+      editedChannel.passwordHash = '';
+      return editedChannel;
     } catch (error) {
       if (error.code === 'P2002') {
         return 'alreadyUsed';
@@ -894,12 +901,15 @@ export class ChannelService {
   }
 
   async inviteToChannelWS(userId: string, inviteDto: InviteChannelDto) {
-    if (inviteDto.type !== ChannelType.PRIVATE) return 'notPrivateChannel';
-    else if (!inviteDto.channelId || !inviteDto.invitedId)
-      return 'missingDtoData';
+    // if (inviteDto.type !== ChannelType.PRIVATE) return 'notPrivateChannel';
+    if (!inviteDto.channelId || !inviteDto.invitedId) return 'missingDtoData';
     const userRole: { role: ChannelRole } | null =
       await this.getRoleOfUserChannel(userId, inviteDto.channelId);
-    if (!userRole || userRole.role < ChannelRole.ADMIN) {
+    if (
+      inviteDto.type !== ChannelType.PUBLIC ||
+      !userRole ||
+      userRole.role === ChannelRole.USER
+    ) {
       return 'noEligibleRights';
     }
     try {
@@ -907,18 +917,28 @@ export class ChannelService {
         inviteDto.invitedId,
         inviteDto.channelId,
       );
-      if (isInvited) throw new Error('alreadyInvited');
-      const channelInvite: Channel = await this.prisma.channel.update({
-        where: {
-          id: inviteDto.channelId,
-        },
-        data: {
-          invites: {
-            connect: { id: inviteDto.invitedId },
+      //   if (!isInvited) throw new Error('alreadyInvited');
+      if (!isInvited) {
+        const channelInvite: Channel = await this.prisma.channel.update({
+          where: {
+            id: inviteDto.channelId,
           },
-        },
-      });
-      return channelInvite;
+          data: {
+            invites: {
+              connect: { id: inviteDto.invitedId },
+            },
+          },
+        });
+        return channelInvite;
+      } else {
+        const channelInvite: Channel =
+          await this.prisma.channel.findUniqueOrThrow({
+            where: {
+              id: inviteDto.channelId,
+            },
+          });
+        return channelInvite;
+      }
     } catch (error) {
       if (typeof error === 'string' && error == 'Error: alreadyInvited') {
         return 'alreadyInvited';
@@ -1052,9 +1072,10 @@ export class ChannelService {
       /** First, check the current user asking promotion is the owner of the channel */
       const userRole: { role: ChannelRole } | null =
         await this.getRoleOfUserChannel(userId, channelId);
-      if (!userRole || userRole.role < ChannelRole.ADMIN) {
+      if (!userRole || userRole.role === ChannelRole.USER) {
         return 'noEligibleRights';
       }
+
       /** Then, check the targeted user exists + is user or admin of the channel */
       const targetRole: { role: ChannelRole } | null =
         await this.getRoleOfUserChannel(dto.promotedUserId, channelId);

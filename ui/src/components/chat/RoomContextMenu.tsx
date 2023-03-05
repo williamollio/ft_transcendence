@@ -1,5 +1,5 @@
 import { Menu, MenuItem } from "@mui/material";
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { chatRoom } from "../../classes/chatRoom.class";
 import { UserSocket } from "../../classes/UserSocket.class";
@@ -24,8 +24,8 @@ export default function RoomContextMenu({
   contextMenu: { mouseX: number; mouseY: number; channel: chatRoom } | null;
   setContextMenu: any;
   channelSocket: ChannelSocket;
-  setAlertMsg: any;
-  toggleAlert: any;
+  setAlertMsg: Dispatch<SetStateAction<string>>;
+  toggleAlert: Dispatch<SetStateAction<boolean>>;
 }) {
   const [channelInfoOpen, toggleChannelInfo] = useState(false);
 
@@ -100,6 +100,7 @@ export default function RoomContextMenu({
         channelSocket={channelSocket}
       ></ChannelInfoDialog>
       <GetIdDialog
+        setAlertMsg={setAlertMsg}
         channelSocket={channelSocket}
         open={openId}
         toggleOpen={toggleOpenId}

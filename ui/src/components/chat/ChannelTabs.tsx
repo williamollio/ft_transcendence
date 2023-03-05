@@ -17,6 +17,7 @@ import {
   DBChannelElement,
   messagesDto,
 } from "../../interfaces/chat.interfaces";
+import ChannelService from "../../services/channel.service";
 
 export function ChannelTabs({
   currentRoom,
@@ -70,66 +71,78 @@ export function ChannelTabs({
 
   useEffect(() => {
     if (joinedChannels && !joinedChannesLoading && !joinedChannesError) {
+      channelSocket.channels = new Array<chatRoom>();
       joinedChannels.forEach((element: DBChannelElement) => {
-        channelSocket.channels.push({
-          key: element.name,
-          id: element.id,
-          access: element.type,
-          users: new Array<channelUser>(),
-          messages: new Array<messagesDto>(),
-        });
-      });
-      updateChannelList();
-      channelSocket.channels.forEach((element) => {
-        channelSocket.connectToRoom(element.id!);
+        if (element.type !== "DIRECTMESSAGE") {
+          channelSocket.channels.push({
+            key: element.name,
+            id: element.id,
+            access: element.type,
+            users: new Array<channelUser>(),
+            messages: new Array<messagesDto>(),
+          });
+          updateChannelList();
+          channelSocket.connectToRoom(element.id!);
+        } else {
+          ChannelService.getUsersChannel(element.id).then((resolve) => {
+            let dmName = resolve.data.find(
+              (user) => user.id !== channelSocket.user.id
+            )?.name;
+            if (dmName) {
+              channelSocket.channels.push({
+                key: dmName,
+                id: element.id,
+                access: element.type,
+                users: new Array<channelUser>(),
+                messages: new Array<messagesDto>(),
+              });
+              updateChannelList();
+            }
+            channelSocket.connectToRoom(element.id!);
+          });
+        }
       });
     }
   }, [joinedChannels]);
 
-  const { data, isLoading, isError, refetch } = useQuery(
+  const { data, isLoading, isError, isRefetching, refetch } = useQuery(
     ["channels", channelQueryId],
     () => fetchChannelData(channelQueryId),
     { enabled: typeof channelQueryId !== "undefined" }
   );
 
   useEffect(() => {
-    if (
-      typeof channelQueryId !== "undefined" &&
-      data &&
-      !isLoading &&
-      !isError
-    ) {
+    if (data && data !== "" && !isLoading && !isError && !isRefetching) {
       let index = channelSocket.channels.findIndex(
         (element) => element.id === data.id
       );
       if (index != -1) {
         const newList: Array<chatRoom> = [];
+        channelSocket.channels[index] = {
+          ...channelSocket.channels[index],
+          key: data.name,
+          access: data.type,
+        };
         channelSocket.channels.forEach((element) => {
-          if (element.id === data.id) {
-            newList.push({ ...element, key: data.name, access: data.type});
-          } else newList.push(element);
+          newList.push(element);
         });
         setChannelList(newList);
       } else {
         if (data.type === "DIRECTMESSAGE") {
-          let index = data.users.findIndex(
-            (element: { userId: string }) =>
-              element.userId !== channelSocket.user.id
-          );
-          if (index >= 0) {
-            const newList: Array<chatRoom> = [];
-            let userIndex = data.users.findIndex(
-              (element: { id: string }) => element.id !== channelSocket.user.id
-            );
+          const newList: Array<chatRoom> = [];
+          ChannelService.getUsersChannel(data.id).then((resolve) => {
+            let userName = resolve.data.find(
+              (element) => element.id !== channelSocket.user.id
+            )?.name;
             let channelIndex = channelSocket.channels.push(
-              new chatRoom(data.id, data.users[userIndex].user.name, data.type)
+              new chatRoom(data.id, userName ? userName : "missing", data.type)
             );
             channelSocket.channels.forEach((element) => {
               newList.push(element);
             });
             setChannelList(newList);
             setNewChannel(channelSocket.channels[channelIndex - 1]);
-          }
+          });
         } else {
           const newList: Array<chatRoom> = [];
           let channelIndex = channelSocket.channels.push(
@@ -142,10 +155,11 @@ export function ChannelTabs({
           setNewChannel(channelSocket.channels[channelIndex - 1]);
         }
       }
+      setChannelQueryId(undefined);
     }
-  }, [data]);
+  }, [data, isLoading, isError, isRefetching]);
 
-  const roomCreatedListener = (channelId: string, creatorId: string) => {
+  const roomCreatedListener = (channelId: string, _creatorId: string) => {
     setChannelQueryId(channelId);
   };
 
@@ -161,7 +175,11 @@ export function ChannelTabs({
   };
 
   const roomLeftListener = (data: { userId: string; channelId: string }) => {
-    if (data.userId === channelSocket.user.id) {
+    if (
+      data.userId === channelSocket.user.id ||
+      channelSocket.channels.find((element) => element.id === data.channelId)
+        ?.access === "DIRECTMESSAGE"
+    ) {
       let index = channelSocket.channels.findIndex(
         (element) => element.id === data.channelId
       );

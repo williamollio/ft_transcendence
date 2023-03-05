@@ -11,7 +11,7 @@ import {
   Paper,
   TextField,
 } from "@mui/material";
-import { useEffect, useRef, useState } from "react";
+import { SyntheticEvent, useEffect, useRef, useState } from "react";
 import { messagesDto } from "../../interfaces/chat.interfaces";
 import { accessTypes, chatRoom } from "../../classes/chatRoom.class";
 import AddChannelDialog from "../../components/chat/AddChannelDialog";
@@ -25,6 +25,7 @@ import { useLocation } from "react-router-dom";
 import { UserSocket } from "../../classes/UserSocket.class";
 import { fetchBlockedUsers } from "../../components/chat/hooks/blockedUsers.fetch";
 import { useQuery } from "@tanstack/react-query";
+import GetTextInputDialog from "../../components/chat/GetTextInputDialog";
 
 interface Props {
   channelSocket: ChannelSocket;
@@ -45,7 +46,8 @@ export default function Chat(props: Props) {
   const [alert, toggleAlert] = useState<boolean>(false);
   const [alertMsg, setAlertMsg] = useState<string>("");
   const [invited, toggleInvited] = useState<boolean>(false);
-  const [roomIvite, setRoomInvite] = useState<{
+  const [invitePassword, toggleInvitePassword] = useState<boolean>(false);
+  const [roomInvite, setRoomInvite] = useState<{
     id: string;
     name: string;
     type: accessTypes;
@@ -61,6 +63,7 @@ export default function Chat(props: Props) {
     data: blockedUsers,
     isLoading,
     isError,
+	isRefetching,
     refetch: refetchBlockedUsers,
   } = useQuery(["blocks"], fetchBlockedUsers, {
     enabled: channelSocket.user.id !== "",
@@ -78,7 +81,7 @@ export default function Chat(props: Props) {
 
   const handleSubmit = async (e: any) => {
     if (e.key === "Enter") {
-      if (currentRoom && typeof currentRoom !== "boolean" && inputChat !== "") {
+      if (currentRoom && typeof currentRoom !== "boolean" && inputChat.trim()) {
         currentRoom.messages.push({
           message: "[You]: " + inputChat,
           room: currentRoom.id,
@@ -90,6 +93,21 @@ export default function Chat(props: Props) {
         updateMessages(currentRoom, undefined);
       }
       setInputChat("");
+    }
+  };
+
+  const handleInviteSubmit = (e?: SyntheticEvent) => {
+    setAlertMsg("Failed to join channel");
+    if (e) {
+      e.preventDefault();
+    } else {
+      if (roomInvite.type === "PROTECTED") {
+        toggleInvitePassword(true);
+      } else {
+        channelSocket.joinRoom(roomInvite.id);
+        toggleInvited(false);
+        setRoomInvite({ id: "", type: "PRIVATE", name: "" });
+      }
     }
   };
 
@@ -116,7 +134,7 @@ export default function Chat(props: Props) {
     };
     sender: string;
   }) => {
-    if (!isLoading && !isError && blockedUsers) {
+    if (!isRefetching && !isLoading && !isError && blockedUsers) {
       if (!blockedUsers.some((element: string) => element === data.sender)) {
         let index = channelSocket.channels.findIndex(
           (element) => element.id === data.messageInfo.channelId
@@ -174,9 +192,12 @@ export default function Chat(props: Props) {
     id: string;
     name: string;
     type: accessTypes;
+    invited: string;
   }) => {
-    setRoomInvite(data);
-    toggleInvited(true);
+    if (data.invited === channelSocket.user.id) {
+      setRoomInvite(data);
+      toggleInvited(true);
+    }
   };
 
   const banSuccessListener = (result: {
@@ -225,6 +246,7 @@ export default function Chat(props: Props) {
     channelSocket.registerListener("banSucceeded", banSuccessListener);
     channelSocket.registerListener("muteSucceeded", muteSuccessListener);
     [
+      "inviteFailed",
       "joinRoomError",
       "joinRoomFailed",
       "leaveRoomFailed",
@@ -249,6 +271,7 @@ export default function Chat(props: Props) {
       channelSocket.removeListener("roomJoined", roomJoinedListener);
       channelSocket.removeListener("inviteSucceeded", inviteSucceededListener);
       [
+        "inviteFailed",
         "joinRoomError",
         "joinRoomFailed",
         "leaveRoomFailed",
@@ -262,7 +285,7 @@ export default function Chat(props: Props) {
         channelSocket.removeListener(element, failedListener);
       });
     };
-  }, [channelSocket.socket, currentRoom]);
+  }, [channelSocket.socket, currentRoom, blockedUsers]);
 
   const listMessages = messages
     ? messages.map((messagesDto: messagesDto, index) => {
@@ -392,34 +415,48 @@ export default function Chat(props: Props) {
           </>
         </Box>
         <Collapse in={invited}>
-          <Alert sx={{ width: "auto" }} severity="success">
-            You have been invited to {roomIvite.name}
+          <Alert
+            sx={{ width: "auto" }}
+            severity="success"
+            action={
+              <>
+                <IconButton
+                  aria-label="Accept"
+                  color="inherit"
+                  size="small"
+                  onMouseUp={(e) => handleInviteSubmit()}
+                  onMouseDown={handleInviteSubmit}
+                >
+                  <CheckIcon fontSize="inherit" />
+                </IconButton>
+                <IconButton
+                  aria-label="Reject"
+                  color="inherit"
+                  size="small"
+                  onClick={() => {
+                    toggleInvited(false);
+                    setRoomInvite({ id: "", type: "PRIVATE", name: "" });
+                  }}
+                >
+                  <CloseIcon fontSize="inherit" />
+                </IconButton>
+                <GetTextInputDialog
+                  open={invitePassword}
+                  toggleOpen={toggleInvitePassword}
+                  handleSubmit={(input: string) => {
+                    channelSocket.joinRoom(roomInvite.id, input);
+                    toggleInvited(false);
+                    setRoomInvite({ id: "", type: "PRIVATE", name: "" });
+                  }}
+                  dialogContent={"This channel requires a password"}
+                  label={"password"}
+                  type={"password"}
+                ></GetTextInputDialog>
+              </>
+            }
+          >
+            Invite to: {roomInvite.name}
           </Alert>
-          <Grid container>
-            <IconButton
-              aria-label="Accept"
-              color="inherit"
-              size="small"
-              onClick={() => {
-                channelSocket.joinRoom(roomIvite.id, roomIvite.type);
-                toggleAlert(false);
-                setRoomInvite({ id: "", type: "PRIVATE", name: "" });
-              }}
-            >
-              <CloseIcon fontSize="inherit" />
-            </IconButton>
-            <IconButton
-              aria-label="Reject"
-              color="inherit"
-              size="small"
-              onClick={() => {
-                toggleAlert(false);
-                setRoomInvite({ id: "", type: "PRIVATE", name: "" });
-              }}
-            >
-              <CheckIcon fontSize="inherit" />
-            </IconButton>
-          </Grid>
         </Collapse>
       </Paper>
     </>

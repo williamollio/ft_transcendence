@@ -1,14 +1,17 @@
 import { Dialog, TextField } from "@mui/material";
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { chatRoom } from "../../classes/chatRoom.class";
+import ChannelService from "../../services/channel.service";
 
 export default function GetIdDialog({
+  setAlertMsg,
   open,
   toggleOpen,
   channel,
   channelSocket,
 }: {
+  setAlertMsg: Dispatch<SetStateAction<string>>;
   open: boolean;
   toggleOpen: any;
   channel: chatRoom | undefined;
@@ -27,7 +30,10 @@ export default function GetIdDialog({
 
   const handleSubmit = (e: any) => {
     if (e.key === "Enter") {
-      channelSocket.inviteToChannel(channel, input);
+      setAlertMsg("Failed to invite user");
+      ChannelService.getUserByName(input).then((resolve) => {
+        channelSocket.inviteToChannel(channel, resolve.data.id);
+      });
       handleClose();
     }
   };

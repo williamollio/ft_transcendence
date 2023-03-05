@@ -77,21 +77,17 @@ export default function ChannelInfoContext({
     }
   };
 
-  const handleBlock = () => {
+  const handleBlock = async () => {
     handleContextClose();
     if (contextMenu && contextMenu.user && contextMenu.user.id) {
       if (blockStatus === "Block") {
         setAlertMsg("Failed to block User");
-        ChannelService.blockUser(contextMenu.user.id).then((resolve) => {
-          console.log(resolve.data);
-		  refetchBlockedUsers();
-        });
+        await ChannelService.blockUser(contextMenu.user.id)
+        refetchBlockedUsers();
       } else if (blockStatus === "Unblock") {
         setAlertMsg("Failed to unblock User");
-        ChannelService.unblockUser(contextMenu.user.id).then((resolve) => {
-          console.log(resolve.data);
-		  refetchBlockedUsers();
-        });
+        await ChannelService.unblockUser(contextMenu.user.id)
+        refetchBlockedUsers();
       }
     }
   };
