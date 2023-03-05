@@ -157,4 +157,15 @@ export class UsersController {
       );
     }
   }
+
+  // Match controller
+  @Post('get-user-matches-stats')
+  // @UseGuards() Add guard here
+  @ApiOkResponse({ type: UserEntity })
+  getUserMatchesStats(
+    @Res() res: Response,
+    @Body() target: { userName: string },
+  ) {
+    return this.usersService.getUserMatchesStats(target.userName, res);
+  }
 }

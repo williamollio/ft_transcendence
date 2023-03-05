@@ -49,7 +49,9 @@
     "socket.io": "^4.5.3",
     "socket.io-msgpack-parser": "^3.0.2",
     "uuid": "^9.0.0",
-    "argon2": "^0.28.2"
+    "argon2": "^0.28.2",
+    "nestjs-proto-gen-ts": "^1.0.0",
+    "protobufjs": "^6.11.2"
   },
   "devDependencies": {
     "@nestjs/cli": "^9.0.0",

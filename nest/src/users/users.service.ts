@@ -6,9 +6,12 @@ import {
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from '../prisma/prisma.service';
-import { User, UserStatus } from '@prisma/client';
+import { User, UserStatus, Match } from '@prisma/client';
 import { Intra42User } from './interface/intra42-user.interface';
 import { Response } from 'express';
+import { MatchHistory } from 'src/game/interfaces/matchHistory.interface';
+import { Stat } from 'src/game/interfaces/stats.interface';
+// import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 
 // have to update this file and user response to display error
 
@@ -231,4 +234,97 @@ export class UsersService {
     }
   }
 
+
+    // Game shit 
+    async getUserMatches(userName: string) {
+      const matches = await this.prisma.user.findUnique({
+        where: {
+          name: userName,
+        },
+        select: {
+          playerOneMatch: {},
+          playerTwoMatch: {},
+        },
+      });
+      if (matches) {
+        const matchesList: Match[] = [];
+  
+        for (const match of matches.playerOneMatch) {
+          matchesList.push(match);
+        }
+  
+        for (const match of matches.playerTwoMatch) {
+          matchesList.push(match);
+        }
+  
+        matchesList.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+        return matchesList;
+      }
+      return null;
+    }
+  
+    async getUserMatchesStats(userName: string, res: Response) {
+      const user = await this.findOneFromuserName(userName);
+      const ranking = await this.getUserRanking(userName);
+      if (user && ranking) {
+        const stats: Stat = {
+          numberOfWin: 0,
+          numberOfLoss: 0,
+          ranking: ranking,
+          eloScore: user.eloScore,
+        };
+  
+        const matchesList = await this.getUserMatches(userName);
+        if (matchesList) {
+          // for (let i = 0; i < matchesList.length; i++) {
+          for (const match of matchesList) {
+            if (
+              (match.playerOneId === user.id && match.p1s == 10) ||
+              (match.playerTwoId === user.id && match.p2s == 10)
+            )
+              stats.numberOfWin++;
+          }
+          stats.numberOfLoss = matchesList.length - stats.numberOfWin;
+          return res.status(200).send(stats);
+        }
+      }
+    }
+
+    async findOneFromuserName(userName: string): Promise<User | null> {
+      return await this.prisma.user.findUnique({
+        where: {
+          name: userName,
+        },
+      });
+    }
+
+    async getUserInfo(userId: string): Promise<User | null> {
+      const user = await this.prisma.user.findUnique({
+        where: {
+          id: userId,
+        },
+      });
+      return user;
+    }
+  
+    async getUserRanking(userName: string) {
+      let userRank = '';
+  
+      const users = await this.prisma.user.findMany({
+        orderBy: {
+          eloScore: 'desc',
+        },
+      });
+      for (let i = 0; i < users.length; i++) {
+        if (users[i].name == userName) {
+          const rank = i + 1;
+          userRank = rank.toString() + '/' + users.length.toString();
+
+          return userRank;
+        }
+      }
+      return userRank;
+    }
+
+    // still have to implement the services for the history and the leaderboard
 }

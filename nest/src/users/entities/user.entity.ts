@@ -6,6 +6,7 @@ import { ChannelActionEntity } from './channel-action.entity';
 import { BlockedUserEntity } from './blocked-user.entity';
 import { ChannelEntity } from './channel.entity';
 import { Injectable } from '@nestjs/common';
+import { MatchEntity } from './match.entity';
 
 @Injectable()
 export class UserEntity implements User {
@@ -59,5 +60,11 @@ export class UserEntity implements User {
 
   @ApiProperty()
   eloScore: number;
+
+  @ApiProperty()
+  playerOneMatch?: MatchEntity[];
+
+  @ApiProperty()
+  playerTwoMatch?: MatchEntity[];
 }
 
