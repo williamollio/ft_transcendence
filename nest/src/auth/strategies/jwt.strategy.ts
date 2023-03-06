@@ -10,7 +10,7 @@ export type JwtPayload = {
 };
 
 export interface HandshakeRequest extends Request {
-  handshake: { auth: {token: string}};
+  handshake: { auth: { token: string } };
 }
 
 @Injectable()
@@ -19,7 +19,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     const extractJwtFromSocket = (handshake: HandshakeRequest) => {
       if (handshake.handshake) {
         const authHeader = handshake.handshake.auth.token;
-		
+
         if (authHeader && authHeader.split(' ')[0] === 'Bearer') {
           return authHeader.split(' ')[1];
         }
