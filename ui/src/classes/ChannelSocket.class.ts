@@ -1,4 +1,4 @@
-import { Socket } from "socket.io-client";
+import { io, Socket } from "socket.io-client";
 import { initSocket } from "../services/initSocket.service";
 import { accessTypes, chatRoom } from "./chatRoom.class";
 import { channelUser, messagesDto, user } from "../interfaces/chat.interfaces";
@@ -13,7 +13,7 @@ export class ChannelSocket {
   error: any;
 
   constructor() {
-    this.socket = initSocket("http://localhost:3333", null);
+    this.socket = io({ autoConnect: false });
     this.user = { id: "", name: "" };
     this.error = false;
     this.channels = new Array<chatRoom>();

@@ -62,7 +62,7 @@ export default function Chat(props: Props) {
     data: blockedUsers,
     isLoading,
     isError,
-	isRefetching,
+    isRefetching,
     refetch: refetchBlockedUsers,
   } = useQuery(["blocks"], ChannelService.fetchBlockedUsers, {
     enabled: channelSocket.user.id !== "",

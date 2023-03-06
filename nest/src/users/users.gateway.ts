@@ -37,14 +37,14 @@ export class UserGateway {
     @ConnectedSocket() clientSocket: Socket,
   ) {
     void this.usersService.updateConnectionStatus(
-		String(userId),
-		UserStatus.ONLINE,
-		);
-		clientSocket.broadcast.emit('userConnected');
-	}
-	
-	@SubscribeMessage('disconnectUser')
-	userDisconnect(@ConnectedSocket() clientSocket: Socket) {
+      String(userId),
+      UserStatus.ONLINE,
+    );
+    clientSocket.broadcast.emit('userConnected');
+  }
+
+  @SubscribeMessage('disconnectUser')
+  userDisconnect(@ConnectedSocket() clientSocket: Socket) {
     clientSocket.broadcast.emit('userDisconnected');
   }
 

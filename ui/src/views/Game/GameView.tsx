@@ -15,7 +15,6 @@ import {
 import { Cookie } from "../../utils/auth-helper";
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { UserSocket } from "../../classes/UserSocket.class";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 interface Props {
   userSocket: UserSocket;
@@ -47,7 +46,6 @@ export default function GameView(props: Props): React.ReactElement {
       <Background>
         <ProfileCard>
           <Chat channelSocket={channelSocket} userSocket={userSocket} />
-          <ReactQueryDevtools></ReactQueryDevtools>
           <CardContainer>
             <TitleWrapper>
               <Typography
