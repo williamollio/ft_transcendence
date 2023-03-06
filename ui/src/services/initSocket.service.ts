@@ -1,3 +1,4 @@
+import { Socket } from "dgram";
 import { io } from "socket.io-client";
 import * as msgpack from "socket.io-msgpack-parser";
 

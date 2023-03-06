@@ -95,16 +95,15 @@ export class AuthService {
     const user = await this.userService.findOne(userId);
     if (!user || !user.refreshToken)
       throw new ForbiddenException('Access denied');
-    // if (!(await argon2.verify(user.refreshToken, refreshToken)))
-    //   throw new ForbiddenException('Access denied');
+    if (!(await argon2.verify(user.refreshToken, refreshToken)))
+      throw new ForbiddenException('Access denied');
     const tokens = await this.generateTokens({
       id: user.id,
       intraId: user.intraId,
     });
     await this.userService.updateRefreshToken(
       user.id,
-    //   await argon2.hash(tokens.refreshToken),
-      tokens.refreshToken,
+      await argon2.hash(tokens.refreshToken),
     );
     return tokens;
   }

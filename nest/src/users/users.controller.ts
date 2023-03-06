@@ -40,7 +40,7 @@ import {
 } from './utils/upload-utils';
 
 @Controller('users')
-// @UseGuards(JwtGuard)
+@UseGuards(JwtGuard)
 @ApiTags('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -52,7 +52,7 @@ export class UsersController {
   }
 
   @Get(':id')
-  //   @UseGuards(JwtGuard)
+  @UseGuards(JwtGuard)
   @ApiOkResponse({ type: UserEntity })
   public async findOne(@Param('id') id: string) {
     // + operator casts to a number
@@ -60,7 +60,7 @@ export class UsersController {
   }
 
   @Get('byName/:name')
-  //   @UseGuards(JwtGuard)
+  @UseGuards(JwtGuard)
   @ApiOkResponse({ type: UserEntity })
   public async findOneByName(@Param('name') name: string) {
     // + operator casts to a number

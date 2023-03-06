@@ -18,7 +18,7 @@ import { JwtGuard } from 'src/auth/guards/jwt.guard';
 @WebSocketGateway(8888, {
   cors: {
     credentials: true,
-    origin: 'http://localhost:3000',
+    origin: process.env.FRONTEND_URL,
   },
   parser: msgpack,
 })
@@ -36,7 +36,6 @@ export class UserGateway {
     @GetCurrentUserId() userId: string,
     @ConnectedSocket() clientSocket: Socket,
   ) {
-	console.log("login");
     void this.usersService.updateConnectionStatus(
 		String(userId),
 		UserStatus.ONLINE,
@@ -46,12 +45,8 @@ export class UserGateway {
 	
 	@SubscribeMessage('disconnectUser')
 	userDisconnect(@ConnectedSocket() clientSocket: Socket) {
-	  console.log("logout");
     clientSocket.broadcast.emit('userDisconnected');
   }
-
-  // clientSocket.handshake.headers.cookie  ==> clientSocket.handshake.auth
-  // changed it to where the auth token is located on the handshake
 
   @SubscribeMessage('connect')
   handleConnection(@ConnectedSocket() clientSocket: Socket) {

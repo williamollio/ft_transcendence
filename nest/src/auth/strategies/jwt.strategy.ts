@@ -13,25 +13,6 @@ export interface HandshakeRequest extends Request {
   handshake: { auth: {token: string}};
 }
 
-// @Injectable()
-// export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
-//   constructor(private userService: UsersService) {
-//     const extractJwtFromCookie = (req: any) => {
-//       let token = null;
-
-//       if (req && req.cookies) {
-//         token = req.cookies['access_token'];
-//       }
-//       return token || ExtractJwt.fromAuthHeaderAsBearerToken()(req);
-//     };
-
-//     super({
-//       ignoreExpiration: false,
-//       secretOrKey: process.env.JWT_SECRET,
-//       jwtFromRequest: extractJwtFromCookie,
-//     });
-//   }
-
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(private userService: UsersService) {
@@ -66,17 +47,3 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     };
   }
 }
-
-//   async validate(payload: JwtPayload) {
-//     const user = await this.userService.findOne(payload.id);
-
-//     if (!user) {
-//       throw new UnauthorizedException('Please log in to continue');
-//     }
-
-//     return {
-//       id: payload.id,
-//       intraId: payload.intraId,
-//     };
-//   }
-// }
