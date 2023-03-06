@@ -18,7 +18,7 @@ import { JwtGuard } from 'src/auth/guards/jwt.guard';
 @WebSocketGateway(8888, {
   cors: {
     credentials: true,
-    origin: process.env.FRONTEND_URL,
+    origin: process.env.PATH_TO_FRONTEND,
   },
   parser: msgpack,
 })

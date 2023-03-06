@@ -34,7 +34,7 @@ enum acknoledgementStatus {
 @WebSocketGateway(3333, {
   cors: {
     credentials: true,
-    origin: process.env.FRONTEND_URL,
+    origin: process.env.PATH_TO_FRONTEND,
   },
   parser: msgpack,
 })
