@@ -1,4 +1,4 @@
-import { ReactElement } from "react";
+import { ReactElement, useState } from "react";
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import ProfileView from "./views/Profile/ProfileView";
@@ -16,13 +16,18 @@ import classes from "./styles.module.scss";
 import { useImageStore } from "./store/users-store";
 import { PrivateRoute } from "./components/PrivateRoute";
 import { getIsAuthenticated, initAuthToken } from "./utils/auth-helper";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { UserSocket } from "./classes/UserSocket.class";
 
 export default function App() {
+  const [userSocket] = useState<UserSocket>(new UserSocket());
   const [image, setImage] = useImageStore((state) => [
     state.image,
     state.setImage,
   ]);
   const imageUrl = image ? URL.createObjectURL(image) : "";
+
+  const queryClient = new QueryClient();
 
   // removes the object URL after the component unmounts to prevent memory leaks
   React.useEffect(() => {
@@ -91,7 +96,7 @@ export default function App() {
               path={RoutePath.PROFILE}
               element={
                 <PrivateRoute>
-                  <ProfileView />
+                  <ProfileView userSocket={userSocket} />
                 </PrivateRoute>
               }
             />
@@ -99,7 +104,9 @@ export default function App() {
               path={RoutePath.GAME}
               element={
                 <PrivateRoute>
-                  <GameView />
+                  <QueryClientProvider client={queryClient}>
+                    <GameView userSocket={userSocket}/>
+                  </QueryClientProvider>
                 </PrivateRoute>
               }
             />

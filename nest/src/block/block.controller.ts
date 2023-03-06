@@ -1,8 +1,10 @@
-import { Body, Controller, Get, Post, Res } from '@nestjs/common';
+import { Body, Controller, Get, Post, Res, UseGuards } from '@nestjs/common';
 import { Response } from 'express';
+import { JwtGuard } from 'src/auth/guards/jwt.guard';
 import { GetCurrentUserId } from 'src/decorators/getCurrentUserId.decorator';
 import { BlockService } from './block.service';
 
+@UseGuards(JwtGuard)
 @Controller('block')
 export class BlockController {
   constructor(private blockService: BlockService) {}

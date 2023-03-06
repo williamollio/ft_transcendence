@@ -52,11 +52,19 @@ export class UsersController {
   }
 
   @Get(':id')
-  //   @UseGuards(JwtGuard)
+  @UseGuards(JwtGuard)
   @ApiOkResponse({ type: UserEntity })
   public async findOne(@Param('id') id: string) {
     // + operator casts to a number
     return this.usersService.findOne(id);
+  }
+
+  @Get('byName/:name')
+  @UseGuards(JwtGuard)
+  @ApiOkResponse({ type: UserEntity })
+  public async findOneByName(@Param('name') name: string) {
+    // + operator casts to a number
+    return this.usersService.findOneByName(name);
   }
 
   @Patch(':id')

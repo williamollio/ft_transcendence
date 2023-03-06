@@ -6,7 +6,7 @@ export enum Cookie {
 
 interface tokenData {
   name: string;
-  id: number; // TODO : william id to string
+  id: string;
 }
 
 export function initAuthToken(): string | null {

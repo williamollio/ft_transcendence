@@ -9,22 +9,28 @@ export type JwtPayload = {
   intraId: string;
 };
 
+export interface HandshakeRequest extends Request {
+  handshake: { auth: { token: string } };
+}
+
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(private userService: UsersService) {
-    const extractJwtFromCookie = (req: any) => {
-      let token = null;
+    const extractJwtFromSocket = (handshake: HandshakeRequest) => {
+      if (handshake.handshake) {
+        const authHeader = handshake.handshake.auth.token;
 
-      if (req && req.cookies) {
-        token = req.cookies['access_token'];
-      }
-      return token || ExtractJwt.fromAuthHeaderAsBearerToken()(req);
+        if (authHeader && authHeader.split(' ')[0] === 'Bearer') {
+          return authHeader.split(' ')[1];
+        }
+        return null;
+      } else return ExtractJwt.fromAuthHeaderAsBearerToken()(handshake as any);
     };
 
     super({
       ignoreExpiration: false,
       secretOrKey: process.env.JWT_SECRET,
-      jwtFromRequest: extractJwtFromCookie,
+      jwtFromRequest: extractJwtFromSocket,
     });
   }
 
