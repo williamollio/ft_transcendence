@@ -61,24 +61,31 @@ export function ChannelTabs({
 
   const {
     data: joinedChannels,
-    isLoading: joinedChannesLoading,
-    isError: joinedChannesError,
+    isLoading: joinedChannelsLoading,
+    isError: joinedChannelsError,
+    isFetching,
   } = useQuery(["joinedChannels"], ChannelService.fetchJoinedChannels, {
     enabled: channelSocket.user.id !== "",
   });
 
   useEffect(() => {
-    if (joinedChannels && !joinedChannesLoading && !joinedChannesError) {
-      channelSocket.channels = new Array<chatRoom>();
+    if (
+      joinedChannels &&
+      !joinedChannelsLoading &&
+      !joinedChannelsError &&
+      !isFetching
+    ) {
+      const newList = new Array<chatRoom>();
       joinedChannels.forEach((element: DBChannelElement) => {
         if (element.type !== "DIRECTMESSAGE") {
-          channelSocket.channels.push({
+          newList.push({
             key: element.name,
             id: element.id,
             access: element.type,
             users: new Array<channelUser>(),
             messages: new Array<messagesDto>(),
           });
+          channelSocket.channels = newList;
           updateChannelList();
           channelSocket.connectToRoom(element.id!);
         } else {
@@ -87,21 +94,22 @@ export function ChannelTabs({
               (user) => user.id !== channelSocket.user.id
             )?.name;
             if (dmName) {
-              channelSocket.channels.push({
+              newList.push({
                 key: dmName,
                 id: element.id,
                 access: element.type,
                 users: new Array<channelUser>(),
                 messages: new Array<messagesDto>(),
               });
-              updateChannelList();
             }
+            channelSocket.channels = newList;
+            updateChannelList();
             channelSocket.connectToRoom(element.id!);
           });
         }
       });
     }
-  }, [joinedChannels]);
+  }, [joinedChannels, joinedChannelsLoading, joinedChannelsError, isFetching]);
 
   const { data, isLoading, isError, isRefetching, refetch } = useQuery(
     ["channels", channelQueryId],
