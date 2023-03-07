@@ -265,7 +265,6 @@ export default function ProfileView(props: Props): React.ReactElement {
                         color="primary"
                         variant="contained"
                         component="label"
-                        className={classes.iconButton}
                       >
                         {t(translationKeys.updloadPicture)}
                         <Input
@@ -304,7 +303,6 @@ export default function ProfileView(props: Props): React.ReactElement {
                     </Box>
                     <Box className={classes.buttonsWrapper}>
                       <Button
-                        className={classes.iconButton}
                         variant="contained"
                         onClick={handleSubmit(onSubmit)}
                       >
@@ -312,7 +310,6 @@ export default function ProfileView(props: Props): React.ReactElement {
                       </Button>
                       <Button
                         color="primary"
-                        className={classes.iconButton}
                         variant="outlined"
                         onClick={onCancel}
                       >
@@ -348,7 +345,6 @@ export default function ProfileView(props: Props): React.ReactElement {
                   </Box>
                   <Box className={classes.buttonRequestWrapper}>
                     <Button
-                      className={classes.iconButton}
                       variant="contained"
                       onClick={handleSubmit(onSubmitFriendship)}
                     >
@@ -367,7 +363,6 @@ export default function ProfileView(props: Props): React.ReactElement {
 
 // https://github.com/garronej/tss-react
 const useStyles = makeStyles()(() => ({
-  iconButton: {},
   avatarWrapper: {
     height: "65%",
     width: "70%",
