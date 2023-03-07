@@ -18,6 +18,7 @@ import { PrivateRoute } from "./components/PrivateRoute";
 import { getIsAuthenticated, initAuthToken } from "./utils/auth-helper";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { UserSocket } from "./classes/UserSocket.class";
+import StatsView from "./views/Stats/StatsView";
 
 export default function App() {
   const [userSocket] = useState<UserSocket>(new UserSocket());
@@ -106,6 +107,16 @@ export default function App() {
                 <PrivateRoute>
                   <QueryClientProvider client={queryClient}>
                     <GameView userSocket={userSocket}/>
+                  </QueryClientProvider>
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path={RoutePath.STATS}
+              element={
+                <PrivateRoute>
+                  <QueryClientProvider client={queryClient}>
+                    <StatsView userSocket={userSocket}/>
                   </QueryClientProvider>
                 </PrivateRoute>
               }
