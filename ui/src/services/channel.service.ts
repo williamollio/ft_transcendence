@@ -6,7 +6,7 @@ import {
   DBChannelElement,
   DBChannelUserListElement,
   user,
-} from "../interfaces/chat.interfaces";
+} from "../interfaces/chat.interface";
 
 const PATH = "channels";
 const USER_PATH = "users";

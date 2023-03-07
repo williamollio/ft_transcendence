@@ -16,7 +16,7 @@ import {
   TableRow,
 } from "@mui/material";
 import { SyntheticEvent, useEffect, useState } from "react";
-import { channelUser, user } from "../../interfaces/chat.interfaces";
+import { channelUser, user } from "../../interfaces/chat.interface";
 import { chatRoom } from "../../classes/chatRoom.class";
 import ChannelInfoContext from "./ChannelInfoContext";
 import GetPasswordDialog from "./GetPasswordDialog";

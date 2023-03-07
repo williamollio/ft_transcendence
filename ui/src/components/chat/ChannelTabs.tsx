@@ -14,7 +14,7 @@ import {
   channelUser,
   DBChannelElement,
   messagesDto,
-} from "../../interfaces/chat.interfaces";
+} from "../../interfaces/chat.interface";
 import ChannelService from "../../services/channel.service";
 
 export function ChannelTabs({
@@ -69,33 +69,36 @@ export function ChannelTabs({
 
   useEffect(() => {
     if (joinedChannels && !joinedChannesLoading && !joinedChannesError) {
-      channelSocket.channels = new Array<chatRoom>();
+		console.log(joinedChannels);
+      const newList = new Array<chatRoom>();
       joinedChannels.forEach((element: DBChannelElement) => {
         if (element.type !== "DIRECTMESSAGE") {
-          channelSocket.channels.push({
-            key: element.name,
-            id: element.id,
-            access: element.type,
-            users: new Array<channelUser>(),
-            messages: new Array<messagesDto>(),
-          });
-          updateChannelList();
-          channelSocket.connectToRoom(element.id!);
+			newList.push({
+				key: element.name,
+				id: element.id,
+				access: element.type,
+				users: new Array<channelUser>(),
+				messages: new Array<messagesDto>(),
+			});
+			channelSocket.channels = newList;
+			updateChannelList();
+			channelSocket.connectToRoom(element.id!);
         } else {
-          ChannelService.getUsersChannel(element.id).then((resolve) => {
+			ChannelService.getUsersChannel(element.id).then((resolve) => {
             let dmName = resolve.data.find(
               (user) => user.id !== channelSocket.user.id
             )?.name;
             if (dmName) {
-              channelSocket.channels.push({
+				newList.push({
                 key: dmName,
                 id: element.id,
                 access: element.type,
                 users: new Array<channelUser>(),
                 messages: new Array<messagesDto>(),
               });
-              updateChannelList();
             }
+			channelSocket.channels = newList;
+            updateChannelList();
             channelSocket.connectToRoom(element.id!);
           });
         }

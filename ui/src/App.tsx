@@ -113,16 +113,6 @@ export default function App() {
               }
             />
             <Route
-              path={RoutePath.STATS}
-              element={
-                <PrivateRoute>
-                  <QueryClientProvider client={queryClient}>
-                    <StatsView userSocket={userSocket}/>
-                  </QueryClientProvider>
-                </PrivateRoute>
-              }
-            />
-            <Route
               path={RoutePath.SETUP2FA}
               element={
                 <PrivateRoute>
@@ -141,9 +131,9 @@ export default function App() {
             <Route
               path={RoutePath.STATS}
               element={
-                <PrivateRoute>
-                  <StatsView />
-                </PrivateRoute>
+                <QueryClientProvider client={queryClient}>
+                    <StatsView userSocket={userSocket}/>
+                  </QueryClientProvider>
               }
             />
             <Route path={RoutePath.LOGIN_2FA} element={<Login2FAView />} />

@@ -1,7 +1,7 @@
 import { io, Socket } from "socket.io-client";
 import { initSocket } from "../services/initSocket.service";
 import { accessTypes, chatRoom } from "./chatRoom.class";
-import { channelUser, messagesDto, user } from "../interfaces/chat.interfaces";
+import { channelUser, messagesDto, user } from "../interfaces/chat.interface";
 import { getTokenData } from "../utils/auth-helper";
 import UserService from "../services/users.service";
 import ChannelService from "../services/channel.service";

@@ -12,7 +12,7 @@ import {
   TextField,
 } from "@mui/material";
 import { SyntheticEvent, useEffect, useRef, useState } from "react";
-import { messagesDto } from "../../interfaces/chat.interfaces";
+import { messagesDto } from "../../interfaces/chat.interface";
 import { accessTypes, chatRoom } from "../../classes/chatRoom.class";
 import AddChannelDialog from "../../components/chat/AddChannelDialog";
 import RoomContextMenu from "../../components/chat/RoomContextMenu";

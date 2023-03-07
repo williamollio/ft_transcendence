@@ -14,6 +14,7 @@ import {
   ContentWrapper,
 } from "../../styles/MuiStyles";
 import { Cookie } from "../../utils/auth-helper";
+import MainTable from "../../components/leaderboard/MainTable";
 
 interface Props {
   userSocket: UserSocket;
@@ -53,7 +54,7 @@ export default function StatsView(props: Props): React.ReactElement {
               </Typography>
             </TitleWrapper>
             <ContentWrapper>
-              <Typography></Typography>
+				<MainTable></MainTable>
             </ContentWrapper>
           </CardContainer>
         </ProfileCard>
