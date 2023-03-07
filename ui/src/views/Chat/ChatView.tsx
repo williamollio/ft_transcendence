@@ -20,7 +20,7 @@ interface Props {
   userSocket: UserSocket;
 }
 
-export default function GameView(props: Props): React.ReactElement {
+export default function ChatView(props: Props): React.ReactElement {
   const { userSocket } = props;
   const { t } = useTranslation();
   // const { classes } = useStyles();
@@ -54,7 +54,7 @@ export default function GameView(props: Props): React.ReactElement {
                 fontWeight={"bold"}
                 sx={{ textDecoration: "underline" }}
               >
-                {t(translationKeys.game)}
+                {t(translationKeys.chat)}
               </Typography>
             </TitleWrapper>
             <ContentWrapper>

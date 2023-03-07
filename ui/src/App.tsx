@@ -5,7 +5,7 @@ import ProfileView from "./views/Profile/ProfileView";
 import Setup2FA from "./views/Profile/Setup2FA";
 import LoginView from "./views/Login/LoginView";
 import Login2FAView from "./views/Login/Login2FAView";
-import GameView from "./views/Game/GameView";
+import ChatView from "./views/Chat/ChatView";
 import { RoutePath } from "./interfaces/router.interface";
 import { TranscendanceContext } from "./context/transcendance-context";
 import { TranscendanceStateActionType } from "./context/transcendance-reducer";
@@ -105,7 +105,7 @@ export default function App() {
               element={
                 <PrivateRoute>
                   <QueryClientProvider client={queryClient}>
-                    <GameView userSocket={userSocket}/>
+                    <ChatView userSocket={userSocket} />
                   </QueryClientProvider>
                 </PrivateRoute>
               }

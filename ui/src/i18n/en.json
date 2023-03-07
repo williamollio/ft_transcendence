@@ -8,6 +8,7 @@
   "loginToken": "Enter token",
   "or": "or",
   "game": "Game",
+  "chat": "Chat",
   "login2fa": "Two-Factor Authentication",
   "setup2fa": "Two-Factor Authentication",
   "enterNumber": "Enter your phone number",

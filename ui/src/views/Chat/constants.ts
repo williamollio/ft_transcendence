@@ -1,3 +1,3 @@
 export const translationKeys = {
-  game: "game",
+  chat: "chat",
 };
