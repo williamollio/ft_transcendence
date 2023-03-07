@@ -2,6 +2,10 @@ import { Typography } from "@mui/material";
 import { useEffect } from "react";
 import { UserSocket } from "../../classes/UserSocket.class";
 import Navbar from "../../components/Navbar";
+import React from "react";
+import { translationKeys } from "./constants";
+import { useTranslation } from "react-i18next";
+// import { makeStyles } from "tss-react/mui";
 import {
   Background,
   ProfileCard,
@@ -16,6 +20,8 @@ interface Props {
 }
 
 export default function StatsView(props: Props): React.ReactElement {
+	const { t } = useTranslation();
+	// const { classes } = useStyles();
   const { userSocket } = props;
 
   useEffect(() => {
@@ -28,6 +34,8 @@ export default function StatsView(props: Props): React.ReactElement {
       userSocket.socket?.disconnect();
     };
   }, []);
+
+
   return (
     <>
       <Navbar />
@@ -41,7 +49,7 @@ export default function StatsView(props: Props): React.ReactElement {
                 fontWeight={"bold"}
                 sx={{ textDecoration: "underline" }}
               >
-                Stats
+                {t(translationKeys.stats)}
               </Typography>
             </TitleWrapper>
             <ContentWrapper>
@@ -53,3 +61,5 @@ export default function StatsView(props: Props): React.ReactElement {
     </>
   );
 }
+
+// const useStyles = makeStyles()(() => ({}));

@@ -5,7 +5,7 @@ import ProfileView from "./views/Profile/ProfileView";
 import Setup2FA from "./views/Profile/Setup2FA";
 import LoginView from "./views/Login/LoginView";
 import Login2FAView from "./views/Login/Login2FAView";
-import GameView from "./views/Game/GameView";
+import ChatView from "./views/Chat/ChatView";
 import { RoutePath } from "./interfaces/router.interface";
 import { TranscendanceContext } from "./context/transcendance-context";
 import { TranscendanceStateActionType } from "./context/transcendance-reducer";
@@ -18,6 +18,7 @@ import { PrivateRoute } from "./components/PrivateRoute";
 import { getIsAuthenticated, initAuthToken } from "./utils/auth-helper";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { UserSocket } from "./classes/UserSocket.class";
+import GameView from "./views/Game/GameView";
 import StatsView from "./views/Stats/StatsView";
 
 export default function App() {
@@ -102,11 +103,11 @@ export default function App() {
               }
             />
             <Route
-              path={RoutePath.GAME}
+              path={RoutePath.CHAT}
               element={
                 <PrivateRoute>
                   <QueryClientProvider client={queryClient}>
-                    <GameView userSocket={userSocket}/>
+                    <ChatView userSocket={userSocket} />
                   </QueryClientProvider>
                 </PrivateRoute>
               }
@@ -129,7 +130,23 @@ export default function App() {
                 </PrivateRoute>
               }
             />
-            <Route path={RoutePath.LOGIN_2FA} element={<Login2FAView />} />{" "}
+            <Route
+              path={RoutePath.GAME}
+              element={
+                <PrivateRoute>
+                  <GameView />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path={RoutePath.STATS}
+              element={
+                <PrivateRoute>
+                  <StatsView />
+                </PrivateRoute>
+              }
+            />
+            <Route path={RoutePath.LOGIN_2FA} element={<Login2FAView />} />
             {/* TODO : William Private ? */}
           </Routes>
         </ThemeProvider>
