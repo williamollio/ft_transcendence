@@ -135,8 +135,9 @@ export default function Setup2FA(): React.ReactElement {
               </Box>
               <Box className={classes.buttonsWrapper}>
                 <Button
+                  variant="contained"
                   className={classes.iconButton}
-                  variant="outlined"
+                  color="primary"
                   onClick={handleSubmit(onSubmitPhone)}
                 >
                   {t(translationKeys.buttons.save)}
@@ -160,7 +161,8 @@ export default function Setup2FA(): React.ReactElement {
                 <Button
                   id="submit-button"
                   className={classes.iconButton}
-                  variant="outlined"
+                  variant="contained"
+                  color="primary"
                   onClick={onSubmitCode}
                 >
                   {t(translationKeys.buttons.save)}
