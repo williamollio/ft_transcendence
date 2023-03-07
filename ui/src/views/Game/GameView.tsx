@@ -35,7 +35,7 @@ export default function GameView(props: Props): React.ReactElement {
       userSocket.logIn();
     }
     return () => {
-      channelSocket.socket?.disconnect();
+      channelSocket.socket.disconnect();
       userSocket.socket?.disconnect();
     };
   }, []);

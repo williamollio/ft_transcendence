@@ -59,7 +59,7 @@ export class ChannelGateway {
   }
 
   @SubscribeMessage('disconnect')
-  disconnect(@ConnectedSocket() clientSocket: Socket) {
+  handleDisconnect(@ConnectedSocket() clientSocket: Socket) {
     socketToChannelId.delete(clientSocket.id);
   }
 
