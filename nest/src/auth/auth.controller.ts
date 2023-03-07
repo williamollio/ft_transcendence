@@ -52,7 +52,7 @@ export class AuthController {
 
     this.setCookieTokens(tokens, response);
 
-    response.redirect(`${process.env.PATH_TO_FRONTEND}redirect`);
+    response.redirect(`${process.env.PATH_TO_FRONTEND}/redirect`);
   }
 
   @Post('createBypassAuth')

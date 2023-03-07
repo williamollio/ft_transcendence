@@ -25,6 +25,8 @@ services:
       - ./nest/:/app/nest
     ports:
       - "8080:8080"
+      - "3333:3333"
+      - "8888:8888"
     depends_on:
       - postgres
     restart: always

@@ -15,18 +15,15 @@ import {
 } from '@nestjs/common';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import {
   ApiBody,
   ApiConsumes,
-  ApiCreatedResponse,
   ApiOkResponse,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import { UserEntity } from './entities/user.entity';
-import { User } from '@prisma/client';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { Observable, of } from 'rxjs';
@@ -56,6 +53,14 @@ export class UsersController {
   public async findOne(@Param('id') id: string) {
     // + operator casts to a number
     return this.usersService.findOne(id);
+  }
+
+  @Get('byName/:name')
+  @UseGuards(JwtGuard)
+  @ApiOkResponse({ type: UserEntity })
+  public async findOneByName(@Param('name') name: string) {
+    // + operator casts to a number
+    return this.usersService.findOneByName(name);
   }
 
   @Patch(':id')

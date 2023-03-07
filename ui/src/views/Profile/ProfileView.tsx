@@ -38,8 +38,14 @@ import CustomTextField from "../../components/shared/CustomTextField/CustomTextF
 import { Cookie, getTokenData } from "../../utils/auth-helper";
 import MiniDrawer from "../../components/MiniDrawer";
 import friendshipsService from "../../services/friendships.service";
+import { UserSocket } from "../../classes/UserSocket.class";
 
-export default function ProfileView(): React.ReactElement {
+interface Props {
+  userSocket: UserSocket;
+}
+
+export default function ProfileView(props: Props): React.ReactElement {
+  const { userSocket } = props;
   const { t } = useTranslation();
   const { classes } = useStyles();
   const navigate = useNavigate();
@@ -65,6 +71,17 @@ export default function ProfileView(): React.ReactElement {
   } = useForm({
     mode: "onChange",
   });
+
+  React.useEffect(() => {
+    let token = localStorage.getItem(Cookie.TOKEN);
+    if (token) {
+      userSocket.initializeSocket(token);
+      userSocket.logIn();
+    }
+    return () => {
+      userSocket.socket?.disconnect();
+    };
+  }, []);
 
   React.useEffect(() => {
     let token;

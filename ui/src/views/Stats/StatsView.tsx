@@ -3,7 +3,6 @@ import Navbar from "../../components/Navbar";
 import { Typography } from "@mui/material";
 import { translationKeys } from "./constants";
 import { useTranslation } from "react-i18next";
-import MiniDrawer from "../../components/MiniDrawer";
 // import { makeStyles } from "tss-react/mui";
 import {
   Background,
@@ -13,13 +12,13 @@ import {
   ContentWrapper,
 } from "../../styles/MuiStyles";
 
-export default function GameView(): React.ReactElement {
+export default function StatsView(): React.ReactElement {
   const { t } = useTranslation();
-  //   const { classes } = useStyles();
+  // const { classes } = useStyles();
+
   return (
     <>
       <Navbar />
-      <MiniDrawer />
       <Background>
         <ProfileCard>
           <CardContainer>
@@ -30,7 +29,7 @@ export default function GameView(): React.ReactElement {
                 fontWeight={"bold"}
                 sx={{ textDecoration: "underline" }}
               >
-                {t(translationKeys.game)}
+                {t(translationKeys.stats)}
               </Typography>
             </TitleWrapper>
             <ContentWrapper>

@@ -6,4 +6,6 @@ export enum RoutePath {
   LOGIN_CALLBACK = "/login/callback",
   REDIRECT = "/redirect",
   SETUP2FA = "/setup2FA",
+  STATS = "/statistics",
+  CHAT = "/chat",
 }

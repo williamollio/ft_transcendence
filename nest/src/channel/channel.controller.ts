@@ -1,6 +1,15 @@
-import { Body, Controller, Get, Param, Post, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { ChannelActionType } from '@prisma/client';
 import { Response } from 'express';
+import { JwtGuard } from 'src/auth/guards/jwt.guard';
 import { GetCurrentUserId } from '../decorators/getCurrentUserId.decorator';
 import { ChannelService } from './channel.service';
 import { ModerateChannelDto } from './dto/moderateChannelUser.dto';
@@ -9,7 +18,7 @@ import { ApiTags } from '@nestjs/swagger';
 // TODO: add channel entities
 
 // TODO: ADD GUARDS
-
+@UseGuards(JwtGuard)
 @Controller('channels')
 @ApiTags('channel')
 export class ChannelController {
@@ -40,10 +49,10 @@ export class ChannelController {
   // nest      | [6:35:18 PM] Found 1 error. Watching for file changes.
   // nest      |
 
-  // @Get('get-all-channels-by-user-id')
-  // getAllChannelsByUserId(@GetCurrentUserId() userId: string) {
-  //   return this.channelService.getAllChannelsByUserId(userId);
-  // }
+  @Get('get-all-channels-by-user-id')
+  getAllChannelsByUserId(@GetCurrentUserId() userId: string) {
+    return this.channelService.getAllChannelsByUserId(userId);
+  }
 
   @Get(':id')
   getChannelById(@Param('id') channelId: string) {
