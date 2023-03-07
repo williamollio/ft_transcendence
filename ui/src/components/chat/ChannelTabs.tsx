@@ -61,8 +61,8 @@ export function ChannelTabs({
 
   const {
     data: joinedChannels,
-    isLoading: joinedChannesLoading,
-    isError: joinedChannesError,
+    isLoading: joinedChannelsLoading,
+    isError: joinedChannelsError,
     isFetching,
   } = useQuery(["joinedChannels"], ChannelService.fetchJoinedChannels, {
     enabled: channelSocket.user.id !== "",
@@ -71,8 +71,8 @@ export function ChannelTabs({
   useEffect(() => {
     if (
       joinedChannels &&
-      !joinedChannesLoading &&
-      !joinedChannesError &&
+      !joinedChannelsLoading &&
+      !joinedChannelsError &&
       !isFetching
     ) {
       const newList = new Array<chatRoom>();
@@ -109,7 +109,7 @@ export function ChannelTabs({
         }
       });
     }
-  }, [joinedChannels, joinedChannesLoading, joinedChannesError, isFetching]);
+  }, [joinedChannels, joinedChannelsLoading, joinedChannelsError, isFetching]);
 
   const { data, isLoading, isError, isRefetching, refetch } = useQuery(
     ["channels", channelQueryId],

@@ -4,6 +4,8 @@ export enum idTabs {
   PROFILE = 0,
   GAME = 1,
   LOGIN = 2,
+  CHAT = 3,
+  STATS = 4,
 }
 
 export interface TabWithId extends NavTab {
@@ -23,5 +25,13 @@ export const tabs: NavTab[] = [
   {
     label: "game",
     link: RoutePath.GAME,
+  },
+  {
+    label: "chat",
+    link: RoutePath.CHAT,
+  },
+  {
+    label: "stats",
+    link: RoutePath.STATS,
   },
 ];
