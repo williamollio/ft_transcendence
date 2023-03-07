@@ -96,6 +96,7 @@ export default function App() {
               }
             />
             <Route
+              path={RoutePath.PROFILE}
               element={
                 <PrivateRoute>
                   <ProfileView userSocket={userSocket} />

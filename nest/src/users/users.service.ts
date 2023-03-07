@@ -93,7 +93,6 @@ export class UsersService {
   public async findOneByName(name: string) {
     return this.prisma.user.findUnique({
       where: { name },
-      include: { friends: true },
     });
   }
 
