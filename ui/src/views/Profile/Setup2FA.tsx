@@ -165,7 +165,7 @@ export default function Setup2FA(): React.ReactElement {
                   color="primary"
                   onClick={onSubmitCode}
                 >
-                  {t(translationKeys.buttons.save)}
+                  {t(translationKeys.buttons.submit)}
                 </Button>
                 <Button
                   className={classes.iconButton}

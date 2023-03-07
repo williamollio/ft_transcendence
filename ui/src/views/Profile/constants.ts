@@ -4,6 +4,7 @@ export const translationKeys = {
     save: "buttons.save",
     cancel: "buttons.cancel",
     sendRequest: "buttons.sendRequest",
+    submit: "buttons.submit",
   },
   updloadPicture: "updloadPicture",
   profile: "profile",
