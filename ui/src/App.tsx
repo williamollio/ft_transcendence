@@ -18,6 +18,8 @@ import { PrivateRoute } from "./components/PrivateRoute";
 import { getIsAuthenticated, initAuthToken } from "./utils/auth-helper";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { UserSocket } from "./classes/UserSocket.class";
+import GameView from "./views/Game/GameView";
+import StatsView from "./views/Stats/StatsView";
 
 export default function App() {
   const [userSocket] = useState<UserSocket>(new UserSocket());
@@ -101,7 +103,7 @@ export default function App() {
               }
             />
             <Route
-              path={RoutePath.GAME}
+              path={RoutePath.CHAT}
               element={
                 <PrivateRoute>
                   <QueryClientProvider client={queryClient}>
@@ -118,7 +120,23 @@ export default function App() {
                 </PrivateRoute>
               }
             />
-            <Route path={RoutePath.LOGIN_2FA} element={<Login2FAView />} />{" "}
+            <Route
+              path={RoutePath.GAME}
+              element={
+                <PrivateRoute>
+                  <GameView />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path={RoutePath.STATS}
+              element={
+                <PrivateRoute>
+                  <StatsView />
+                </PrivateRoute>
+              }
+            />
+            <Route path={RoutePath.LOGIN_2FA} element={<Login2FAView />} />
             {/* TODO : William Private ? */}
           </Routes>
         </ThemeProvider>
