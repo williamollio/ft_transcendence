@@ -38,10 +38,11 @@ import { UserSocket } from "../../classes/UserSocket.class";
 
 interface Props {
   userSocket: UserSocket;
+  setToken: React.Dispatch<React.SetStateAction<string>>;
 }
 
 export default function ProfileView(props: Props): React.ReactElement {
-  const { userSocket } = props;
+  const { userSocket, setToken } = props;
   const { t } = useTranslation();
   const { classes } = useStyles();
   const navigate = useNavigate();
@@ -72,12 +73,11 @@ export default function ProfileView(props: Props): React.ReactElement {
     if (userSocket.socket.connected === false) {
       let gotToken = localStorage.getItem(Cookie.TOKEN);
       if (gotToken) {
-        if (typeof userSocket.socket.auth === "object")
-          userSocket.socket.auth.token = "Bearer " + gotToken;
+        if (typeof userSocket.socket.auth === "object") {
+          setToken("Bearer " + gotToken);
+        }
       }
-    }
-	else
-		userSocket.logIn();
+    } else userSocket.logIn();
   }, []);
 
   React.useEffect(() => {

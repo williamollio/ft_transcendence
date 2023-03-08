@@ -70,7 +70,7 @@ export function ChannelTabs({
   });
 
   useEffect(() => {
-    if (channelSocket.channels) {
+    if (channelSocket.channels.length === 0) {
       if (
         joinedChannels &&
         !joinedChannelsLoading &&

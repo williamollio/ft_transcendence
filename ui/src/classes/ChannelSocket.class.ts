@@ -19,14 +19,16 @@ export class ChannelSocket {
     this.channels = new Array<chatRoom>();
   }
 
-  initializeSocket(token: string | null) {
-    token
-      ? (this.user = getTokenData(token))
-      : (this.user = { id: "", name: "" });
-    if (this.user.id)
-      UserService.getUser(this.user.id).then((resolve) => {
-        this.user.name = resolve.data.name;
-      });
+  initializeName(token: string | null) {
+    if (token) {
+      if (this.user.id === "") {
+        this.user = getTokenData(token);
+      } else {
+        UserService.getUser(this.user.id).then((resolve) => {
+          this.user.name = resolve.data.name;
+        });
+      }
+    }
   }
 
   connectToRoom = (channelId: string) => {
@@ -96,7 +98,10 @@ export class ChannelSocket {
     });
   };
 
-  inviteToChannel = (channel: chatRoom | undefined, otherUserId: string | undefined) => {
+  inviteToChannel = (
+    channel: chatRoom | undefined,
+    otherUserId: string | undefined
+  ) => {
     if (channel) {
       this.socket.emit("inviteToChannel", {
         inviteInfo: {
