@@ -18,26 +18,25 @@ import { UserSocket } from "../../classes/UserSocket.class";
 
 interface Props {
   userSocket: UserSocket;
+  channelSocket: ChannelSocket;
 }
 
 export default function GameView(props: Props): React.ReactElement {
-  const { userSocket } = props;
+  const { userSocket, channelSocket } = props;
   const { t } = useTranslation();
   // const { classes } = useStyles();
 
-  const [channelSocket] = React.useState<ChannelSocket>(new ChannelSocket());
+  //   const [channelSocket] = React.useState<ChannelSocket>(new ChannelSocket());
 
   React.useEffect(() => {
-    let token;
-    if ((token = localStorage.getItem(Cookie.TOKEN))) {
-      channelSocket.initializeSocket(token);
-      userSocket.initializeSocket(token);
-      userSocket.logIn();
+    if (channelSocket.socket.connected === false) {
+      let gotToken;
+      if ((gotToken = localStorage.getItem(Cookie.TOKEN))) {
+        if (typeof channelSocket.socket.auth === "object")
+          channelSocket.socket.auth.token = "Bearer " + gotToken;
+      }
+      channelSocket.initializeSocket(gotToken);
     }
-    return () => {
-      channelSocket.socket?.disconnect();
-      userSocket.socket?.disconnect();
-    };
   }, []);
 
   return (

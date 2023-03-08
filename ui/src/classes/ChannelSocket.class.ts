@@ -23,16 +23,10 @@ export class ChannelSocket {
     token
       ? (this.user = getTokenData(token))
       : (this.user = { id: "", name: "" });
-    let localStorageUser = localStorage.getItem("userInfo" + this.user.id);
-    if (localStorageUser) {
-		this.user = JSON.parse(localStorageUser);
-    } else {
-      if (this.user.id)
-        UserService.getUser(this.user.id).then((resolve) => {
-          this.user.name = resolve.data.name;
-          localStorage.setItem("userInfo" + this.user.id, JSON.stringify(this.user));
-        });
-    }
+    if (this.user.id)
+      UserService.getUser(this.user.id).then((resolve) => {
+        this.user.name = resolve.data.name;
+      });
   }
 
   connectToRoom = (channelId: string) => {
@@ -102,7 +96,7 @@ export class ChannelSocket {
     });
   };
 
-  inviteToChannel = (channel: chatRoom | undefined, otherUserId: string) => {
+  inviteToChannel = (channel: chatRoom | undefined, otherUserId: string | undefined) => {
     if (channel) {
       this.socket.emit("inviteToChannel", {
         inviteInfo: {

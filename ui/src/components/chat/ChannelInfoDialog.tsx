@@ -64,7 +64,7 @@ export default function ChannelInfoDialog({
   const { data, isError, isLoading, refetch } = useQuery(
     ["channelUsers", channel?.id],
     () => ChannelService.fetchUsersOfChannel(channel?.id!),
-    { enabled: typeof channel?.id !== "undefined" && channelInfoOpen === true}
+    { enabled: typeof channel?.id !== "undefined" && channelInfoOpen === true }
   );
 
   useEffect(() => {
@@ -94,23 +94,27 @@ export default function ChannelInfoDialog({
 
   useEffect(() => {
     ["userConnected, userDisconnected"].forEach((element) => {
-      userSocket.socket?.on(element, () => {
+      userSocket.socket.on(element, () => {
         refetch();
       });
     });
-    channelSocket.registerListener("roomJoined", userJoinedListener);
-    channelSocket.registerListener("roomLeft", userLeftListener);
-    channelSocket.registerListener("roleUpdated", () => {
-      refetch();
-    });
+    if (channelSocket.socket.connected) {
+      channelSocket.registerListener("roomJoined", userJoinedListener);
+      channelSocket.registerListener("roomLeft", userLeftListener);
+      channelSocket.registerListener("roleUpdated", () => {
+        refetch();
+      });
+    }
     return () => {
-      channelSocket.removeListener("roomJoined", userJoinedListener);
-      channelSocket.removeListener("roomLeft", userLeftListener);
-      channelSocket.removeListener("roleUpdated");
-      userSocket.socket?.off("userConnected");
-      userSocket.socket?.off("userDisconnected");
+      if (channelSocket.socket.connected) {
+        channelSocket.removeListener("roomJoined", userJoinedListener);
+        channelSocket.removeListener("roomLeft", userLeftListener);
+        channelSocket.removeListener("roleUpdated");
+	}
+        userSocket.socket.off("userConnected");
+        userSocket.socket.off("userDisconnected");
     };
-  }, [channelSocket.socket]);
+  }, [channelSocket.socket, channelSocket.socket.connected]);
 
   const handleClose = () => {
     toggleChannelInfo(false);

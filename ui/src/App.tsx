@@ -16,7 +16,6 @@ import classes from "./styles.module.scss";
 import { useImageStore } from "./store/users-store";
 import { PrivateRoute } from "./components/PrivateRoute";
 import { getIsAuthenticated, initAuthToken } from "./utils/auth-helper";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { UserSocket } from "./classes/UserSocket.class";
 import { ChannelSocket } from "./classes/ChannelSocket.class";
 
@@ -29,7 +28,26 @@ export default function App() {
   ]);
   const imageUrl = image ? URL.createObjectURL(image) : "";
 
-  const queryClient = new QueryClient();
+  // different method to initialize out sockets that makes them persistent over all views
+  React.useEffect(() => {
+    if (userSocket.socket.connected === false) {
+      let userToken: {
+        [key: string]: any;
+      } = userSocket.socket.auth;
+      if (userToken.token !== "") {
+        userSocket.socket.connect();
+        userSocket.logIn();
+      }
+    }
+    if (channelSocket.socket.connected === false) {
+      let channelToken: {
+        [key: string]: any;
+      } = channelSocket.socket.auth;
+      if (channelToken.token !== "") {
+        channelSocket.socket.connect();
+      }
+    }
+  }, [userSocket.socket.auth, channelSocket.socket.auth]);
 
   // removes the object URL after the component unmounts to prevent memory leaks
   React.useEffect(() => {
@@ -106,9 +124,10 @@ export default function App() {
               path={RoutePath.GAME}
               element={
                 <PrivateRoute>
-                  <QueryClientProvider client={queryClient}>
-                    <GameView userSocket={userSocket}/>
-                  </QueryClientProvider>
+                  <GameView
+                    userSocket={userSocket}
+                    channelSocket={channelSocket}
+                  />
                 </PrivateRoute>
               }
             />

@@ -6,13 +6,7 @@ export class UserSocket {
 
   constructor() {
     this.socket = initSocket("http://localhost:8888", null);
-	this.socket.auth = {token: "asdasd"};
-	console.log(this.socket.auth);
 }
-
-  initializeSocket(token: string | null) {
-    this.socket = initSocket("http://localhost:8888", token);
-  }
 
   logIn = () => {
     this.socket?.emit("connectUser");

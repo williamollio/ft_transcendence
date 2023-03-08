@@ -11,6 +11,6 @@ export const initSocket = (uri: string, tokenPart: string | null) => {
     auth: {
       token: tokenFull,
     },
-  });
+  }); 
   return socket;
 };

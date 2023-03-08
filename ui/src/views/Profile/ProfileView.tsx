@@ -69,14 +69,15 @@ export default function ProfileView(props: Props): React.ReactElement {
   });
 
   React.useEffect(() => {
-    let token = localStorage.getItem(Cookie.TOKEN);
-    if (token) {
-      userSocket.initializeSocket(token);
-      userSocket.logIn();
+    if (userSocket.socket.connected === false) {
+      let gotToken = localStorage.getItem(Cookie.TOKEN);
+      if (gotToken) {
+        if (typeof userSocket.socket.auth === "object")
+          userSocket.socket.auth.token = "Bearer " + gotToken;
+      }
     }
-    return () => {
-      userSocket.socket?.disconnect();
-    };
+	else
+		userSocket.logIn();
   }, []);
 
   React.useEffect(() => {
@@ -167,7 +168,7 @@ export default function ProfileView(props: Props): React.ReactElement {
 
     if (userId) {
       responseUser = await usersService.patchUser(userId, userCreation);
-	  localStorage.setItem("userName" + userId, data.name);
+      localStorage.setItem("userName" + userId, data.name);
     }
 
     const isSuccessUser = !responseUser?.error;
