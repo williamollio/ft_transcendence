@@ -1,4 +1,4 @@
-import { ReactElement, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import ProfileView from "./views/Profile/ProfileView";
@@ -18,9 +18,11 @@ import { PrivateRoute } from "./components/PrivateRoute";
 import { getIsAuthenticated, initAuthToken } from "./utils/auth-helper";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { UserSocket } from "./classes/UserSocket.class";
+import { ChannelSocket } from "./classes/ChannelSocket.class";
 
 export default function App() {
   const [userSocket] = useState<UserSocket>(new UserSocket());
+  const [channelSocket] = useState<ChannelSocket>(new ChannelSocket());
   const [image, setImage] = useImageStore((state) => [
     state.image,
     state.setImage,

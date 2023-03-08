@@ -64,7 +64,7 @@ export default function ChannelInfoDialog({
   const { data, isError, isLoading, refetch } = useQuery(
     ["channelUsers", channel?.id],
     () => ChannelService.fetchUsersOfChannel(channel?.id!),
-    { enabled: typeof channel?.id !== "undefined" }
+    { enabled: typeof channel?.id !== "undefined" && channelInfoOpen === true}
   );
 
   useEffect(() => {

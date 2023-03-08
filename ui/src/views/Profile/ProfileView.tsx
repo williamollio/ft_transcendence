@@ -167,6 +167,7 @@ export default function ProfileView(props: Props): React.ReactElement {
 
     if (userId) {
       responseUser = await usersService.patchUser(userId, userCreation);
+	  localStorage.setItem("userName" + userId, data.name);
     }
 
     const isSuccessUser = !responseUser?.error;

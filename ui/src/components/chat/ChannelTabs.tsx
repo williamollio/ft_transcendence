@@ -47,6 +47,11 @@ export function ChannelTabs({
   const [channelQueryId, setChannelQueryId] = useState<string | undefined>(
     undefined
   );
+
+  const [joinedInLocalStorage] = useState<string | null>(
+    localStorage.getItem("joinedChannels" + channelSocket.user.id)
+  );
+
   const [channelList, setChannelList] = useState<chatRoom[]>(
     channelSocket.channels
   );
@@ -69,13 +74,23 @@ export function ChannelTabs({
   });
 
   useEffect(() => {
-    if (
+    if (joinedInLocalStorage !== null) {
+      var storedChannels = JSON.parse(joinedInLocalStorage);
+    }
+    if (storedChannels && storedChannels === joinedChannels) {
+      channelSocket.channels = channelList;
+      updateChannelList();
+    } else if (
       joinedChannels &&
       !joinedChannelsLoading &&
       !joinedChannelsError &&
       !isFetching
     ) {
       const newList = new Array<chatRoom>();
+      if (joinedChannels.length === 0) {
+        channelSocket.channels = newList;
+        updateChannelList();
+      }
       joinedChannels.forEach((element: DBChannelElement) => {
         if (element.type !== "DIRECTMESSAGE") {
           newList.push({
@@ -109,7 +124,13 @@ export function ChannelTabs({
         }
       });
     }
-  }, [joinedChannels, joinedChannelsLoading, joinedChannelsError, isFetching]);
+  }, [
+    joinedChannels,
+    joinedChannelsLoading,
+    joinedChannelsError,
+    isFetching,
+    joinedInLocalStorage,
+  ]);
 
   const { data, isLoading, isError, isRefetching, refetch } = useQuery(
     ["channels", channelQueryId],
@@ -161,6 +182,10 @@ export function ChannelTabs({
           setNewChannel(channelSocket.channels[channelIndex - 1]);
         }
       }
+      localStorage.setItem(
+        "joinedChannels" + channelSocket.user.id,
+        JSON.stringify(channelSocket.channels)
+      );
       setChannelQueryId(undefined);
     }
   }, [data, isLoading, isError, isRefetching]);

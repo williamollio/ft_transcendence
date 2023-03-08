@@ -5,6 +5,7 @@ import * as msgpack from "socket.io-msgpack-parser";
 export const initSocket = (uri: string, tokenPart: string | null) => {
   const tokenFull = typeof tokenPart === "string" ? "Bearer " + tokenPart : "";
   const socket = io(uri, {
+	autoConnect: false,
     withCredentials: true,
     parser: msgpack,
     auth: {

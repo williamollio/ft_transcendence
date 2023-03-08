@@ -13,21 +13,26 @@ export class ChannelSocket {
   error: any;
 
   constructor() {
-    this.socket = io({ autoConnect: false });
+    this.socket = initSocket("http://localhost:3333", null);
     this.user = { id: "", name: "" };
     this.error = false;
     this.channels = new Array<chatRoom>();
   }
 
   initializeSocket(token: string | null) {
-    this.socket = initSocket("http://localhost:3333", token);
     token
       ? (this.user = getTokenData(token))
       : (this.user = { id: "", name: "" });
-    if (this.user.id)
-      UserService.getUser(this.user.id).then((resolve) => {
-        this.user.name = resolve.data.name;
-      });
+    let localStorageUser = localStorage.getItem("userInfo" + this.user.id);
+    if (localStorageUser) {
+		this.user = JSON.parse(localStorageUser);
+    } else {
+      if (this.user.id)
+        UserService.getUser(this.user.id).then((resolve) => {
+          this.user.name = resolve.data.name;
+          localStorage.setItem("userInfo" + this.user.id, JSON.stringify(this.user));
+        });
+    }
   }
 
   connectToRoom = (channelId: string) => {
