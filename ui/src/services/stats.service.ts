@@ -1,12 +1,11 @@
-
+import { axiosInstance } from "./common/axios-instance";
 
 const PATH = "/users";
 
 class StatsService {
-// 	fetchPlayerList = () => {
-// 		return resolve<>(
-// 			axiosInstance.get(`${PATH}/playerList`).then((res: AxiosResponse) => res.data)
-// 		  );
-// 	};
+  async fetchUserData() {
+    const { data } = await axiosInstance.get(`${PATH}`);
+    return data;
+  }
 }
-export default new StatsService
+export default new StatsService();

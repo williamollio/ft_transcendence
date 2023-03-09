@@ -1,27 +1,79 @@
-import { Box, Paper, Table, TableContainer } from "@mui/material";
+import {
+  Box,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+} from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import LeaderboardTableHead from "./LeaderboardTableHead";
+import PlayerRow from "./PlayerRow";
 import TableToolbar from "./TableToolbar";
 
+interface testList {
+  id: string;
+  name: string;
+  rank: number;
+  rating: number;
+  wins: number;
+  loss: number;
+}
 
+interface Props {
+  query: {
+    data: any;
+    isLoading: boolean;
+    isError: boolean;
+    isRefetching: boolean;
+  };
+}
 
-export default function MainTalbe() {
-	// const [filteredList, setFilteredList] = useState<string>("");
+export default function MainTalbe(props: Props) {
+  const [filteredList, setFilteredList] = useState<Array<testList>>([]);
+  const [fullList, setFullList] = useState<Array<testList>>([]);
 
-	// const {data, isLoading, isError, refetch} = useQuery("playerList", fetchPlayerList);
+  const { data, isLoading, isError, isRefetching } = props.query;
 
-	// const filter = (filterValue: string) => {
-	// 	// filter player list
-	// };
+  useEffect(() => {
+    if (data && !isLoading && !isError && !isRefetching) {
+      const newList = new Array<testList>();
+      data.forEach((element: { name: string; id: string }, index: number) => {
+        newList.push({ ...element, rating: index, wins: 0, loss: 0, rank: 0 });
+      });
+      newList.sort((a, b) => b.rating - a.rating);
+      newList.forEach((element: testList, index: number) => {
+        element.rank = index + 1;
+      });
+      setFullList(newList);
+      setFilteredList(newList);
+    }
+  }, [data, isLoading, isError, isRefetching]);
+
+  const filter = (filterValue: string) => {
+    setFilteredList(
+      fullList.filter((element: testList) => element.name.includes(filterValue))
+    );
+  };
 
   return (
-    <Box sx={{ width: "97%" }}>
-    {/* //   <Paper sx={{ width: "100%", mb: 2 }}>
-    //     <TableToolbar filter={filter} } />
-    //     <TableContainer>
-    //       <Table></Table>
-    //     </TableContainer>
-    //   </Paper> */}
+    <Box sx={{ width: "97%", height: "97%" }}>
+      <Paper sx={{ width: "100%", mb: 2, overflow: "hidden" }}>
+        <TableToolbar filter={filter} />
+        <TableContainer sx={{ maxHeight: "600px" }}>
+          <Table stickyHeader>
+            <LeaderboardTableHead />
+            <TableBody>
+              {filteredList.map((element, index) => (
+                <PlayerRow key={index} player={element}></PlayerRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Paper>
     </Box>
   );
 }
