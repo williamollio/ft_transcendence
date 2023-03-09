@@ -1,54 +1,36 @@
-import {
-  TableContainer,
-  Table,
-  TableBody,
-  TableRow,
-  TableCell,
-  Box,
-  TablePagination,
-} from "@mui/material";
+import { TableContainer, Table, TableBody, Box } from "@mui/material";
+import Match from "./Match";
 
-interface match {
-	player1: {
-		id: string;
-		score: string;
-	}
-	player2: {
-		id: string;
-		score: string;
-	}
+interface testMatch {
+  player1: {
+    id: string;
+    name: string;
+    score: number;
+  };
+  player2: {
+    id: string;
+    name: string;
+    score: number;
+  };
+  winner: boolean;
+  gameMode: "RANKED" | "CASUAL";
 }
 
-export default function MatchHistory() {
+interface Props {
+  match: testMatch[];
+}
+
+export default function MatchHistory(props: Props) {
+  const { match } = props;
+
   return (
     <Box>
       <TableContainer>
         <Table>
           <TableBody>
-            <TableRow
-              sx={{
-                "& > *": { borderBottom: "unset" },
-                backgroundColor: "firebrick",
-              }}
-            >
-              <TableCell
-                align="left"
-                sx={{ width: "100px", borderBottom: "unset" }}
-              >
-                Ranked
-              </TableCell>
-              <TableCell align="right">Player 1 name</TableCell>
-              <TableCell align="right">score</TableCell>
-              <TableCell
-                align="center"
-                sx={{ width: 0, borderBottom: "unset" }}
-              >
-                to
-              </TableCell>
-              <TableCell align="left">score</TableCell>
-              <TableCell align="left">Player 2 name</TableCell>
-              <TableCell></TableCell>
-            </TableRow>
+            {match.map((element, index) => (
+              <Match match={element} key={index}/>
+            ))}
           </TableBody>
         </Table>
       </TableContainer>
