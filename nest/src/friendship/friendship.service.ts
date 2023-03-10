@@ -68,13 +68,11 @@ export class FriendshipService {
       }[] = [];
 
       friendshipRequests.forEach((friendship) => {
-        if (friendship.addressee.id !== userId) {
-          users.push({
-            id: friendship.addressee.id,
-            name: friendship.addressee.name,
-            filename: friendship.addressee.filename,
-          });
-        }
+        users.push({
+          id: friendship.addressee.id,
+          name: friendship.addressee.name,
+          filename: friendship.addressee.filename,
+        });
       });
 
       return users;
@@ -149,8 +147,32 @@ export class FriendshipService {
           addresseeId: userId,
           status: FriendshipStatus.REQUESTED,
         },
+        select: {
+          requester: {
+            select: {
+              id: true,
+              name: true,
+              filename: true,
+            },
+          },
+        },
       });
-      return friendshipRequests;
+
+      const users: {
+        id: string;
+        name: string;
+        filename: string | null;
+      }[] = [];
+
+      friendshipRequests.forEach((friendship) => {
+        users.push({
+          id: friendship.requester.id,
+          name: friendship.requester.name,
+          filename: friendship.requester.filename,
+        });
+      });
+
+      return users;
     } catch (error) {
       if (typeof error === 'string') return error;
       return 'errorUserService';
