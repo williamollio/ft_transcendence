@@ -23,7 +23,7 @@ export class FriendshipService {
         },
       });
 
-      const userIdsWithFriendship = new Set<string>();
+      const userIdsWithFriendship = new Set<string>(); // TODO : return users that don't have friendship with the current user
       for (const friendship of friendships) {
         userIdsWithFriendship.add(friendship.addresseeId);
         userIdsWithFriendship.add(friendship.requesterId);
