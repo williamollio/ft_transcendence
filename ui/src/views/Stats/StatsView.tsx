@@ -1,5 +1,5 @@
 import { Typography } from "@mui/material";
-import { useEffect } from "react";
+import { useState } from "react";
 import { UserSocket } from "../../classes/UserSocket.class";
 import Navbar from "../../components/Navbar";
 import React from "react";
@@ -13,10 +13,11 @@ import {
   TitleWrapper,
   ContentWrapper,
 } from "../../styles/MuiStyles";
-import { Cookie } from "../../utils/auth-helper";
+import { Cookie, getTokenData } from "../../utils/auth-helper";
 import MainTable from "../../components/leaderboard/MainTable";
 import StatsService from "../../services/stats.service";
 import { useQuery } from "@tanstack/react-query";
+import PersonalStatPanel from "../../components/leaderboard/PersonalStatPanel";
 
 interface Props {
   userSocket: UserSocket;
@@ -28,10 +29,20 @@ export default function StatsView(props: Props): React.ReactElement {
   const { t } = useTranslation();
   // const { classes } = useStyles();
 
-  const query: { data: any, isLoading: boolean, isError: boolean, isRefetching: boolean } = useQuery(
-    ["playerList"],
-    StatsService.fetchUserData
-  );
+  const getUserId = (): {id: string} => {
+    let token = localStorage.getItem(Cookie.TOKEN);
+    if (token) return getTokenData(token);
+	return ({id: ""});
+  };
+
+  const [userId] = useState<string>(getUserId().id);
+
+  const query: {
+    data: any;
+    isLoading: boolean;
+    isError: boolean;
+    isRefetching: boolean;
+  } = useQuery(["playerList"], StatsService.fetchUserData);
 
   React.useEffect(() => {
     if (userSocket.socket.connected === false) {
@@ -48,6 +59,7 @@ export default function StatsView(props: Props): React.ReactElement {
     <>
       <Navbar />
       <Background>
+        <PersonalStatPanel lr={true} title={"General"} />
         <ProfileCard>
           <CardContainer>
             <TitleWrapper>
@@ -65,6 +77,7 @@ export default function StatsView(props: Props): React.ReactElement {
             </ContentWrapper>
           </CardContainer>
         </ProfileCard>
+        <PersonalStatPanel lr={false} title={"Ranked"} />
       </Background>
     </>
   );
