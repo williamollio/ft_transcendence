@@ -18,7 +18,7 @@ import { FriendshipModule } from './friendship/friendship.module';
     ChannelModule,
     ThrottlerModule.forRoot({
       ttl: 60,
-      limit: 50,
+      limit: 200, // TODO : find right one
     }),
     FriendshipModule,
   ],
