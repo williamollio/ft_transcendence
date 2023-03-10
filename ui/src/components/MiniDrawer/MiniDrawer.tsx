@@ -65,6 +65,7 @@ export default function MiniDrawer() {
   const [open, setOpen] = React.useState(false);
   const [friends, setFriends] = React.useState<UserIds[]>([]);
   const [requests, setRequests] = React.useState<UserIds[]>([]);
+  const [requestsReceived, setRequestsReceived] = React.useState<UserIds[]>([]);
   const [userId, setUserId] = React.useState<string>("");
 
   React.useEffect(() => {
@@ -76,6 +77,7 @@ export default function MiniDrawer() {
     if (userId) {
       fetchFriends();
       fetchRequests();
+      fetchRequestsReceived();
     }
   }, [userId]);
 
@@ -89,6 +91,12 @@ export default function MiniDrawer() {
     const usersRequests: Response<UserIds[]> =
       await friendshipsService.getRequests(userId);
     setRequests(usersRequests.data);
+  }
+
+  async function fetchRequestsReceived() {
+    const usersRequestsReceived: Response<UserIds[]> =
+      await friendshipsService.getRequestsReceived(userId);
+    setRequestsReceived(usersRequestsReceived.data);
   }
 
   const triggerDrawerOpen = () => {
@@ -135,7 +143,7 @@ export default function MiniDrawer() {
             color={"#8A8A8A"}
             sx={{ textDecoration: "underline" }}
           >
-            Pending
+            Sent
           </Typography>
         </Box>
         <ListMiniDrawer
@@ -160,12 +168,12 @@ export default function MiniDrawer() {
             color={"#8A8A8A"}
             sx={{ textDecoration: "underline" }}
           >
-            Requests
+            Received
           </Typography>
         </Box>
         <ListMiniDrawer
           open={open}
-          users={requests}
+          users={requestsReceived}
           triggerDrawerOpen={triggerDrawerOpen}
         />
       </Drawer>

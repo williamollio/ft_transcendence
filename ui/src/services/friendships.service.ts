@@ -18,8 +18,8 @@ class FriendshipsService {
         .then((res: AxiosResponse) => res.data)
     );
   }
-  async getRequestsReceived(id: string): Promise<Response<Friendship[]>> {
-    return resolve<Friendship[]>(
+  async getRequestsReceived(id: string): Promise<Response<UserIds[]>> {
+    return resolve<UserIds[]>(
       axiosInstance
         .get(`${PATH}/requests-received/${id}`)
         .then((res: AxiosResponse) => res.data)
