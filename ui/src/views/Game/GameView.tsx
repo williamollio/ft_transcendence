@@ -3,7 +3,7 @@ import Navbar from "../../components/Navbar";
 import { Typography } from "@mui/material";
 import { translationKeys } from "./constants";
 import { useTranslation } from "react-i18next";
-import MiniDrawer from "../../components/MiniDrawer";
+import MiniDrawer from "../../components/MiniDrawer/MiniDrawer";
 // import { makeStyles } from "tss-react/mui";
 import {
   Background,

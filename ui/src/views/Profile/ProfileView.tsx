@@ -36,7 +36,7 @@ import { Controller, FieldValues, useForm } from "react-hook-form";
 import CustomMultiSelect from "../../components/shared/CustomMultiSelect/CustomMultiselect";
 import CustomTextField from "../../components/shared/CustomTextField/CustomTextField";
 import { Cookie, getTokenData } from "../../utils/auth-helper";
-import MiniDrawer from "../../components/MiniDrawer";
+import MiniDrawer from "../../components/MiniDrawer/MiniDrawer";
 import friendshipsService from "../../services/friendships.service";
 import { UserSocket } from "../../classes/UserSocket.class";
 
