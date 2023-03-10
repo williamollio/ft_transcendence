@@ -49,7 +49,7 @@ export default function ListMiniDrawer(props: Props) {
       {users.map((user: UserIds, index) => (
         <ListItem key={index} disablePadding sx={{ display: "block" }}>
           <ListItemButton
-            onClick={() => triggerDrawerOpen}
+            onClick={triggerDrawerOpen}
             sx={{
               minHeight: 48,
               justifyContent: open ? "initial" : "center",
