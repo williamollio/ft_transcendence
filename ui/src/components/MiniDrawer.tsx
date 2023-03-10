@@ -11,7 +11,7 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
 import MailIcon from "@mui/icons-material/Mail";
-import { Avatar, Divider } from "@mui/material";
+import { Avatar, Divider, Typography } from "@mui/material";
 import { UserIds } from "../interfaces/user.interface";
 import { Cookie, getTokenData } from "../utils/auth-helper";
 import friendshipsService from "../services/friendships.service";
@@ -65,6 +65,7 @@ export default function MiniDrawer() {
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
   const [friends, setFriends] = React.useState<UserIds[]>([]);
+  const [requests, setRequests] = React.useState<UserIds[]>([]);
   const [userId, setUserId] = React.useState<string>("");
   const [profilePictures, setProfilePictures] = React.useState<{
     [key: string]: string;
@@ -78,6 +79,7 @@ export default function MiniDrawer() {
     }
     if (userId) {
       fetchFriends();
+      fetchRequests();
     }
   }, [userId]);
 
@@ -92,16 +94,30 @@ export default function MiniDrawer() {
           pictures[friend.id] = "";
         }
       }
+      for (const request of requests) {
+        if (request.filename) {
+          const picture = await getProfilePicture(request.id);
+          pictures[request.id] = picture;
+        } else {
+          pictures[request.id] = "";
+        }
+      }
       setProfilePictures(pictures);
     }
 
     loadProfilePictures();
-  }, [friends]);
+  }, [friends, requests]);
 
   async function fetchFriends() {
     const usersFriends: Response<UserIds[]> =
       await friendshipsService.getAccepted(userId);
     setFriends(usersFriends.data);
+  }
+
+  async function fetchRequests() {
+    const usersRequests: Response<UserIds[]> =
+      await friendshipsService.getRequests(userId);
+    setRequests(usersRequests.data);
   }
 
   async function getProfilePicture(friendId: string): Promise<string> {
@@ -116,6 +132,21 @@ export default function MiniDrawer() {
   return (
     <Box sx={{ display: "flex" }}>
       <Drawer variant="permanent" open={open}>
+        {/* TODO : william responsiveness */}
+        <Box
+          display={"flex"}
+          justifyContent="center"
+          width={"calc(64px + 1px)"}
+          mt="2.5rem"
+        >
+          <Typography
+            fontSize="12px"
+            color={"#8A8A8A"}
+            sx={{ textDecoration: "underline" }}
+          >
+            Friends
+          </Typography>
+        </Box>
         <List>
           {friends.map((friend: UserIds, index) => (
             <ListItem key={index} disablePadding sx={{ display: "block" }}>
@@ -151,6 +182,48 @@ export default function MiniDrawer() {
             marginBottom: "2.5rem",
           }}
         ></Divider>
+        {/* TODO : william responsiveness */}
+        <Box
+          display={"flex"}
+          justifyContent="center"
+          width={"calc(64px + 1px)"}
+        >
+          <Typography
+            fontSize="12px"
+            color={"#8A8A8A"}
+            sx={{ textDecoration: "underline" }}
+          >
+            Requests
+          </Typography>
+        </Box>
+        <List>
+          {requests.map((request: UserIds, index) => (
+            <ListItem key={index} disablePadding sx={{ display: "block" }}>
+              <ListItemButton
+                onClick={triggerDrawerOpen}
+                sx={{
+                  minHeight: 48,
+                  justifyContent: open ? "initial" : "center",
+                  px: 2.5,
+                }}
+              >
+                <ListItemIcon
+                  sx={{
+                    minWidth: 0,
+                    mr: open ? 3 : "auto",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Avatar key={request.id} src={profilePictures[request.id]} />
+                </ListItemIcon>
+                <ListItemText
+                  primary={request.name}
+                  sx={{ opacity: open ? 1 : 0 }}
+                />
+              </ListItemButton>
+            </ListItem>
+          ))}
+        </List>
       </Drawer>
       <Box component="main" sx={{ flexGrow: 1, p: 3 }}></Box>
     </Box>
