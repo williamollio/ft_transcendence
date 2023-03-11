@@ -355,7 +355,9 @@ export class UsersService {
               matchHistory.push({
                 id: match.gameId,
                 imageCurrentUser: currentUser.filename,
+                currentUserId: currentUser.id,
                 imageOpponent: imageOpponent,
+                opponentId: opponent.id,
                 score: score,
                 matchWon: matchWon,
               });
@@ -372,7 +374,6 @@ export class UsersService {
     async getLeaderboard(res: Response) {
       try {
         const leaderboard = await this.prisma.user.findMany({
-          take: 10,
           orderBy: {
             eloScore: 'desc',
           },
