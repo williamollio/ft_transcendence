@@ -358,7 +358,9 @@ export class UsersService {
                 currentUserId: currentUser.id,
                 imageOpponent: imageOpponent,
                 opponentId: opponent.id,
-                score: score,
+                p1Score: match.p1s,
+                p2Score: match.p2s,
+                // score: score,
                 matchWon: matchWon,
               });
             }

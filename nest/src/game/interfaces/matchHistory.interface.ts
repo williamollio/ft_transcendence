@@ -4,6 +4,8 @@ export interface MatchHistory {
     currentUserId: string;
     imageOpponent: string | null;
     opponentId: string;
-    score: string;
+    //score: string;
+    p1Score: number;
+    p2Score: number;
     matchWon: boolean;
   }
