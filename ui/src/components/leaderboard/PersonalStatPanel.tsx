@@ -33,31 +33,42 @@ export default function PersonalStatPanel(props: Props) {
             </Grid>
           </Grid>
           <Divider />
-          <TwoStatsComponent
-            leftTitle="Games Won"
-            rightTitle="Games Lost"
-            leftValue="0"
-            rightValue="0"
-          ></TwoStatsComponent>
-          <SingleStatComponent
-            title="Total Games"
-            value="0"
-          ></SingleStatComponent>
-          <SingleStatComponent title="Win %" value="0%"></SingleStatComponent>
           {title === "Ranked" ? (
             <>
-              <SingleStatComponent
+              {/* <SingleStatComponent
                 title="Highest Rating"
                 value="0"
-              ></SingleStatComponent>
-				<TwoStatsComponent bottomBorder={false} leftTitle="Current Rating" rightTitle="Leaderboard Rank" leftValue="0" rightValue="#0"></TwoStatsComponent>
-			</>
+			></SingleStatComponent> */}
+              <TwoStatsComponent
+                bottomBorder={false}
+                leftTitle="Current Rating"
+                rightTitle="Leaderboard Rank"
+                leftValue="0"
+                rightValue="#0"
+              ></TwoStatsComponent>
+            </>
           ) : (
-            <SingleStatComponent
-			bottomBorder={false}
-              title="Highest Score"
-              value="0"
-            ></SingleStatComponent>
+            <>
+              <TwoStatsComponent
+                leftTitle="Games Won"
+                rightTitle="Games Lost"
+                leftValue="0"
+                rightValue="0"
+              ></TwoStatsComponent>
+              <SingleStatComponent
+                title="Total Games"
+                value="0"
+              ></SingleStatComponent>
+              <SingleStatComponent
+                title="Win %"
+                value="0%"
+              ></SingleStatComponent>
+              <SingleStatComponent
+                bottomBorder={false}
+                title="Highest Score"
+                value="0"
+              ></SingleStatComponent>
+            </>
           )}
         </Box>
       </Paper>

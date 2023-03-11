@@ -3,12 +3,8 @@ import {
   Paper,
   Table,
   TableBody,
-  TableCell,
   TableContainer,
-  TableHead,
-  TableRow,
 } from "@mui/material";
-import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import LeaderboardTableHead from "./LeaderboardTableHead";
 import PlayerRow from "./PlayerRow";

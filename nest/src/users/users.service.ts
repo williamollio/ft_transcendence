@@ -2,9 +2,12 @@ import { ForbiddenException, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from '../prisma/prisma.service';
-import { User, UserStatus } from '@prisma/client';
+import { User, UserStatus, Match } from '@prisma/client';
 import { Intra42User } from './interface/intra42-user.interface';
 import { Response } from 'express';
+import { MatchHistory } from 'src/game/interfaces/matchHistory.interface';
+import { Stat } from 'src/game/interfaces/stats.interface';
+// import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 
 // have to update this file and user response to display error
 
@@ -234,4 +237,162 @@ export class UsersService {
       throw new ForbiddenException(error);
     }
   }
+
+
+    // Game shit 
+    async getUserMatches(userName: string) {
+      const matches = await this.prisma.user.findUnique({
+        where: {
+          name: userName,
+        },
+        select: {
+          playerOneMatch: {},
+          playerTwoMatch: {},
+        },
+      });
+      if (matches) {
+        const matchesList: Match[] = [];
+  
+        for (const match of matches.playerOneMatch) {
+          matchesList.push(match);
+        }
+  
+        for (const match of matches.playerTwoMatch) {
+          matchesList.push(match);
+        }
+  
+        matchesList.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+        return matchesList;
+      }
+      return null;
+    }
+  
+    async getUserMatchesStats(userName: string, res: Response) {
+      const user = await this.findOneFromuserName(userName);
+      const ranking = await this.getUserRanking(userName);
+      if (user && ranking) {
+        const stats: Stat = {
+          numberOfWin: 0,
+          numberOfLoss: 0,
+          ranking: ranking,
+          eloScore: user.eloScore,
+        };
+  
+        const matchesList = await this.getUserMatches(userName);
+        if (matchesList) {
+          for (const match of matchesList) {
+            if (
+              (match.playerOneId === user.id && match.p1s == 10) ||
+              (match.playerTwoId === user.id && match.p2s == 10)
+            )
+              stats.numberOfWin++;
+          }
+          stats.numberOfLoss = matchesList.length - stats.numberOfWin;
+          return res.status(200).send(stats);
+        }
+      }
+    }
+
+    async findOneFromuserName(userName: string): Promise<User | null> {
+      return await this.prisma.user.findUnique({
+        where: {
+          name: userName,
+        },
+      });
+    }
+
+    async getUserInfo(userId: string): Promise<User | null> {
+      const user = await this.prisma.user.findUnique({
+        where: {
+          id: userId,
+        },
+      });
+      return user;
+    }
+  
+    async getUserRanking(userName: string) {
+      let userRank = '';
+  
+      const users = await this.prisma.user.findMany({
+        orderBy: {
+          eloScore: 'desc',
+        },
+      });
+      for (let i = 0; i < users.length; i++) {
+        if (users[i].name == userName) {
+          const rank = i + 1;
+          userRank = rank.toString() + '/' + users.length.toString();
+
+          return userRank;
+        }
+      }
+      return userRank;
+    }
+
+    // still have to implement the services for the history and the leaderboard
+    // game won / game lost / points ???
+
+    async getUserMatchHistory(userNickname: string, res: Response) {
+      const matchesList = await this.getUserMatches(userNickname);
+      const matchHistory: MatchHistory[] = [];
+      const currentUser = await this.findOneFromuserName(userNickname);
+      let opponent: User | null;
+      let matchWon: boolean;
+      let score: string;
+  
+      if (matchesList && currentUser) {
+        try {
+          for (const match of matchesList) {
+            if (match.playerOneId === currentUser.id) {
+              opponent = await this.getUserInfo(match.playerTwoId);
+              score = match.p1s.toString() + '-' + match.p2s.toString();
+              if (match.p1s == 10) matchWon = true;
+              else matchWon = false;
+            } else {
+              opponent = await this.getUserInfo(match.playerOneId);
+              score = match.p2s.toString() + '-' + match.p1s.toString();
+              if (match.p2s == 10) matchWon = true;
+              else matchWon = false;
+            }
+            if (opponent) {
+              const imageOpponent = opponent.filename;
+              matchHistory.push({
+                id: match.gameId,
+                imageCurrentUser: currentUser.filename,
+                currentUserId: currentUser.id,
+                imageOpponent: imageOpponent,
+                opponentId: opponent.id,
+                p1Score: match.p1s,
+                p2Score: match.p2s,
+                // score: score,
+                matchWon: matchWon,
+              });
+            }
+          }
+          return res.status(200).send(matchHistory);
+        } catch (error) {
+          throw new ForbiddenException(error);
+        }
+      }
+      return res.status(500).send();
+    }
+  
+    async getLeaderboard(res: Response) {
+      try {
+        const leaderboard = await this.prisma.user.findMany({
+          orderBy: {
+            eloScore: 'desc',
+          },
+          select: {
+            id: true,
+            name: true,
+            filename: true,
+            eloScore: true,
+          },
+        });
+        return res.status(200).send(leaderboard);
+      } catch (error) {
+        throw new ForbiddenException(error);
+      }
+    }
 }
