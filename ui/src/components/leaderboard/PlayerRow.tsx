@@ -10,53 +10,29 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import { useState } from "react";
 import MatchHistory from "./MatchHistoy";
-
-interface testMatch {
-  player1: {
-    id: string;
-    name: string;
-    score: number;
-  };
-  player2: {
-    id: string;
-    name: string;
-    score: number;
-  };
-  winner: boolean;
-  gameMode: "RANKED" | "CASUAL";
-}
-
-interface testList {
-  id: string;
-  name: string;
-  rank: number;
-  rating: number;
-  wins: number;
-  loss: number;
-}
+import { leaderBoardEntry } from "../../interfaces/stats.interface";
 
 interface Props {
   key: any;
-  player: testList;
+  player: leaderBoardEntry;
+  findName: (id: string) => string;
 }
 
 export default function PlayerRow(props: Props) {
-  const { player } = props;
+  const { player, findName } = props;
   const [open, toggleOpen] = useState(false);
 
-  const matchList = new Array<testMatch>();
+//   const populateMatchList = () => {
+//     matchList.push({player1: {id: "test", name: "test", score: 5}, player2: {id: "test2", name: "test2", score: 2}, winner: true, gameMode: "CASUAL"});
+//     matchList.push({player1: {id: "test", name: "test", score: 3}, player2: {id: "test2", name: "test2", score: 6}, winner: false, gameMode: "RANKED"});
+//     matchList.push({player1: {id: "test", name: "test", score: 4}, player2: {id: "test2", name: "test2", score: 3}, winner: true, gameMode: "RANKED"});
+//     matchList.push({player1: {id: "test", name: "test", score: 5}, player2: {id: "test2", name: "test2", score: 8}, winner: false, gameMode: "CASUAL"});
+//     matchList.push({player1: {id: "test", name: "test", score: 7}, player2: {id: "test2", name: "test2", score: 1}, winner: true, gameMode: "CASUAL"});
+//     matchList.push({player1: {id: "test", name: "test", score: 5}, player2: {id: "test2", name: "test2", score: 20}, winner: false, gameMode: "RANKED"});
+//     matchList.push({player1: {id: "test", name: "test", score: 10}, player2: {id: "test2", name: "test2", score: 0}, winner: true, gameMode: "CASUAL"});
+//   };
 
-  const populateMatchList = () => {
-    matchList.push({player1: {id: "test", name: "test", score: 5}, player2: {id: "test2", name: "test2", score: 2}, winner: true, gameMode: "CASUAL"});
-    matchList.push({player1: {id: "test", name: "test", score: 3}, player2: {id: "test2", name: "test2", score: 6}, winner: false, gameMode: "RANKED"});
-    matchList.push({player1: {id: "test", name: "test", score: 4}, player2: {id: "test2", name: "test2", score: 3}, winner: true, gameMode: "RANKED"});
-    matchList.push({player1: {id: "test", name: "test", score: 5}, player2: {id: "test2", name: "test2", score: 8}, winner: false, gameMode: "CASUAL"});
-    matchList.push({player1: {id: "test", name: "test", score: 7}, player2: {id: "test2", name: "test2", score: 1}, winner: true, gameMode: "CASUAL"});
-    matchList.push({player1: {id: "test", name: "test", score: 5}, player2: {id: "test2", name: "test2", score: 20}, winner: false, gameMode: "RANKED"});
-    matchList.push({player1: {id: "test", name: "test", score: 10}, player2: {id: "test2", name: "test2", score: 0}, winner: true, gameMode: "CASUAL"});
-  };
-
-  populateMatchList();
+//   populateMatchList();
 
   return (
     <>
@@ -101,7 +77,7 @@ export default function PlayerRow(props: Props) {
           colSpan={5}
         >
           <Collapse in={open} unmountOnExit>
-            <MatchHistory match={matchList} />
+            <MatchHistory open={open} playerId={player.id} findName={findName}/>
           </Collapse>
         </TableCell>
       </TableRow>

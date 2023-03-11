@@ -1,35 +1,56 @@
 import { TableContainer, Table, TableBody, Box } from "@mui/material";
 import Match from "./Match";
-
-interface testMatch {
-  player1: {
-    id: string;
-    name: string;
-    score: number;
-  };
-  player2: {
-    id: string;
-    name: string;
-    score: number;
-  };
-  winner: boolean;
-  gameMode: "RANKED" | "CASUAL";
-}
+import { useQuery } from "@tanstack/react-query";
+import StatsService from "../../services/stats.service";
+import { useEffect, useState } from "react";
+import { match, MatchHistoryDto } from "../../interfaces/stats.interface";
 
 interface Props {
-  match: testMatch[];
+  open: boolean;
+  playerId: string;
+  findName: (id: string) => string;
 }
 
 export default function MatchHistory(props: Props) {
-  const { match } = props;
+  const { playerId, open, findName } = props;
+
+  const { data, isLoading, isError, isRefetching } = useQuery(
+    ["matchHistory", playerId],
+    () => StatsService.fetchMatchHistory(playerId),
+    { enabled: playerId !== "" && open === true }
+  );
+
+  const [matchHistory, setMatchHistory] = useState<Array<match>>([]);
+
+  useEffect(() => {
+    if (data && !isLoading && !isError && !isRefetching) {
+      const newList = new Array<match>();
+      data.forEach((element: MatchHistoryDto) => {
+        newList.push({
+          player1: {
+            id: element.id,
+            score: element.p1Score,
+            image: element.imageCurrentUser,
+          },
+          player2: {
+            id: element.opponentId,
+            score: element.p2Score,
+            image: element.imageOpponent,
+          },
+		  winner: element.matchWon,
+        });
+      });
+	  setMatchHistory(newList);
+    }
+  }, [data, isLoading, isError, isRefetching]);
 
   return (
     <Box>
       <TableContainer>
         <Table>
           <TableBody>
-            {match.map((element, index) => (
-              <Match match={element} key={index}/>
+            {matchHistory.map((element, index) => (
+              <Match match={element} key={index} findName={findName}/>
             ))}
           </TableBody>
         </Table>

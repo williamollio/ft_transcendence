@@ -38,8 +38,7 @@
     "tss-react": "^4.4.4",
     "typescript": "^4.8.4",
     "web-vitals": "^2.1.4",
-    "zustand": "^4.3.2",
-    "socket.io-client": "^4.4.0"
+    "zustand": "^4.3.2"
   },
   "devDependencies": {
     "@types/react": "^18.0.26",

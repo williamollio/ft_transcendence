@@ -3,12 +3,13 @@ import { Grid, Typography, Divider } from "@mui/material";
 interface Props {
   bottomBorder?: boolean;
   title: string;
-  value: string;
-
+  value: number;
+  prefix?: string;
+  postfix?: string;
 }
 
 export default function SingleStatComponent(props: Props) {
-  const { bottomBorder, title, value } = props;
+  const { bottomBorder, title, value, prefix, postfix } = props;
 
   return (
     <>
@@ -19,7 +20,11 @@ export default function SingleStatComponent(props: Props) {
       </Grid>
       <Grid container justifyContent="space-around">
         <Grid item>
-          <Typography fontSize={"26px"}>{value}</Typography>
+          <Typography fontSize={"26px"}>
+            {prefix ? prefix : false}
+            {value}
+            {postfix ? postfix : false}
+          </Typography>
         </Grid>
       </Grid>
       {bottomBorder !== false ? <Divider /> : false}

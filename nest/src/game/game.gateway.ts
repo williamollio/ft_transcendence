@@ -13,7 +13,7 @@ import { GetCurrentUserId } from 'src/decorators/getCurrentUserId.decorator';
 import { FrontendUser, GameMode } from './entities/game.entity';
 import * as msgpack from 'socket.io-msgpack-parser';
 
-@WebSocketGateway(3333, {
+@WebSocketGateway(4444, {
   cors: {
     credentials: true,
   },

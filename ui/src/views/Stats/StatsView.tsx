@@ -42,7 +42,7 @@ export default function StatsView(props: Props): React.ReactElement {
     isLoading: boolean;
     isError: boolean;
     isRefetching: boolean;
-  } = useQuery(["playerList"], StatsService.fetchUserData);
+  } = useQuery(["playerList"], StatsService.fetchLeaderboard);
 
   React.useEffect(() => {
     if (userSocket.socket.connected === false) {
@@ -59,7 +59,7 @@ export default function StatsView(props: Props): React.ReactElement {
     <>
       <Navbar />
       <Background>
-        <PersonalStatPanel lr={true} title={"General"} />
+        <PersonalStatPanel playerId={userId} lr={true} title={"General"}/>
         <ProfileCard>
           <CardContainer>
             <TitleWrapper>
@@ -77,7 +77,7 @@ export default function StatsView(props: Props): React.ReactElement {
             </ContentWrapper>
           </CardContainer>
         </ProfileCard>
-        <PersonalStatPanel lr={false} title={"Ranked"} />
+        <PersonalStatPanel playerId={userId} lr={false} title={"Ranked"}/>
       </Background>
     </>
   );

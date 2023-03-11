@@ -391,8 +391,8 @@ export class UsersService {
           },
         });
         return res.status(200).send(leaderboard);
-      } catch (error) {
-        throw new ForbiddenException(error);
+	} catch (error) {
+		throw new ForbiddenException(error);
       }
     }
 }

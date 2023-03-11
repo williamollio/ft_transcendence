@@ -4,8 +4,8 @@ interface Props {
   bottomBorder?: boolean;
   leftTitle: string;
   rightTitle: string;
-  leftValue: string;
-  rightValue: string;
+  leftValue: number;
+  rightValue: number;
 }
 
 export default function TwoStatsComponent(props: Props) {
