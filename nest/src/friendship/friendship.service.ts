@@ -9,32 +9,36 @@ export class FriendshipService {
 
   public async getNoFriendship(currentUserId: string) {
     try {
-      const friendships = await this.prisma.friendship.findMany({
+      const userFriendships = await this.prisma.friendship.findMany({
+        where: {
+          OR: [{ addresseeId: currentUserId }, { requesterId: currentUserId }],
+        },
         select: {
           addresseeId: true,
           requesterId: true,
         },
       });
 
-      const allUser = await this.prisma.user.findMany({
+      const userIdsWithFriendship = new Set<string>();
+      for (const friendship of userFriendships) {
+        if (friendship.addresseeId !== currentUserId) {
+          userIdsWithFriendship.add(friendship.addresseeId);
+        } else {
+          userIdsWithFriendship.add(friendship.requesterId);
+        }
+      }
+
+      const userIdsWithoutFriendship = await this.prisma.user.findMany({
+        where: {
+          NOT: {
+            id: { in: [...userIdsWithFriendship] },
+          },
+        },
         select: {
           id: true,
           name: true,
         },
       });
-
-      const userIdsWithFriendship = new Set<string>(); // TODO : return users that don't have friendship with the current user
-      for (const friendship of friendships) {
-        userIdsWithFriendship.add(friendship.addresseeId);
-        userIdsWithFriendship.add(friendship.requesterId);
-      }
-
-      const userIdsWithoutFriendship = [];
-      for (const user of allUser) {
-        if (user.id !== currentUserId && !userIdsWithFriendship.has(user.id)) {
-          userIdsWithoutFriendship.push(user);
-        }
-      }
 
       return userIdsWithoutFriendship;
     } catch (error) {
