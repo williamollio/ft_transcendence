@@ -51,9 +51,10 @@ class FriendshipsService {
   }
 
   async patchAccept(id: string, userId: string): Promise<Response<void>> {
+    const friendshipDto = { id: userId };
     return resolve<void>(
       axiosInstance
-        .patch(`${PATH}/accept/${id}`, userId)
+        .patch(`${PATH}/accept/${id}`, friendshipDto)
         .then((res: AxiosResponse) => res.data)
     );
   }

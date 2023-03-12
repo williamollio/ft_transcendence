@@ -39,12 +39,18 @@ export class FriendshipController {
   }
 
   @Patch('accept/:id')
-  acceptFrienship(@Param('id') userId: string, @Body() friendId: string) {
-    return this.friendshipService.acceptFriendship(userId, friendId);
+  acceptFrienship(
+    @Param('id') userId: string,
+    @Body() friendshipDto: FriendshipDto,
+  ) {
+    return this.friendshipService.acceptFriendship(userId, friendshipDto.id);
   }
 
   @Patch('deny/:id')
-  denyFrienship(@Param('id') userId: string, @Body() friendId: string) {
-    return this.friendshipService.denyFriendship(userId, friendId);
+  denyFrienship(
+    @Param('id') userId: string,
+    @Body() friendshipDto: FriendshipDto,
+  ) {
+    return this.friendshipService.denyFriendship(userId, friendshipDto.id);
   }
 }
