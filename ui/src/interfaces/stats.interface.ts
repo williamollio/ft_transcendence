@@ -5,6 +5,7 @@ export interface leaderBoardEntry {
   rating: number;
   wins: number;
   loss: number;
+  image: string;
 }
 
 export interface match {

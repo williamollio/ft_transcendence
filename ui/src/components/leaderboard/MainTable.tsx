@@ -1,10 +1,4 @@
-import {
-  Box,
-  Paper,
-  Table,
-  TableBody,
-  TableContainer,
-} from "@mui/material";
+import { Box, Paper, Table, TableBody, TableContainer } from "@mui/material";
 import { useEffect, useState } from "react";
 import { leaderBoardEntry } from "../../interfaces/stats.interface";
 import LeaderboardTableHead from "./LeaderboardTableHead";
@@ -27,16 +21,28 @@ export default function MainTalbe(props: Props) {
   const { data, isLoading, isError, isRefetching } = props.query;
 
   useEffect(() => {
-	console.log(data);
     if (data && !isLoading && !isError && !isRefetching) {
       const newList = new Array<leaderBoardEntry>();
-      data.forEach((element: { name: string; id: string }, index: number) => {
-        newList.push({ ...element, rating: index, wins: 0, loss: 0, rank: 0 });
-      });
-      newList.sort((a, b) => b.rating - a.rating);
-      newList.forEach((element: leaderBoardEntry, index: number) => {
-        element.rank = index + 1;
-      });
+      data.forEach(
+        (
+          element: {
+            name: string;
+            id: string;
+            eloScore: number;
+            fileName: string;
+          },
+          index: number
+        ) => {
+          newList.push({
+            ...element,
+            rating: element.eloScore,
+            wins: 0,
+            loss: 0,
+            rank: index + 1,
+            image: element.fileName,
+          });
+        }
+      );
       setFullList(newList);
       setFilteredList(newList);
     }
@@ -44,15 +50,16 @@ export default function MainTalbe(props: Props) {
 
   const filter = (filterValue: string) => {
     setFilteredList(
-      fullList.filter((element: leaderBoardEntry) => element.name.includes(filterValue))
+      fullList.filter((element: leaderBoardEntry) =>
+        element.name.includes(filterValue)
+      )
     );
   };
 
   const findName = (id: string) => {
-	let found = fullList.find((element: {id: string}) => element.id === id);
-	if (found)
-		return (found.name);
-	return ("Unknown Player");
+    let found = fullList.find((element: { id: string }) => element.id === id);
+    if (found) return found.name;
+    return "Unknown Player";
   };
 
   return (
@@ -64,7 +71,11 @@ export default function MainTalbe(props: Props) {
             <LeaderboardTableHead />
             <TableBody>
               {filteredList.map((element, index) => (
-                <PlayerRow key={index} player={element} findName={findName}></PlayerRow>
+                <PlayerRow
+                  key={index}
+                  player={element}
+                  findName={findName}
+                ></PlayerRow>
               ))}
             </TableBody>
           </Table>

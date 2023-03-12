@@ -48,7 +48,7 @@ export default function PlayerRow(props: Props) {
                   width: "45px",
                   height: "45px",
                 }}
-                src={""}
+                src={player.image ? player.image : ""}
               />
             </Grid>
             <Grid item marginLeft="10px">

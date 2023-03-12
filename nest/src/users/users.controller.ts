@@ -45,6 +45,13 @@ import {
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @Get('get-leaderboard')
+  @UseGuards(JwtGuard)
+  @ApiOkResponse({ type: UserEntity })
+  getLeaderboard(@Res() res: Response) {
+	return this.usersService.getLeaderboard(res);
+  }
+
   @Get()
   @ApiOkResponse({ type: UserEntity, isArray: true })
   public async findAll(@Res() res: Response) {
@@ -156,30 +163,25 @@ export class UsersController {
   }
 
   // Match controller
-  @Post('get-user-matches-stats')
+  @Get('get-user-matches-stats/:id')
   @UseGuards(JwtGuard)
   @ApiOkResponse({ type: UserEntity })
   getUserMatchesStats(
+	@Param('id') id: string,
     @Res() res: Response,
-    @Body() target: { userName: string },
   ) {
-    return this.usersService.getUserMatchesStats(target.userName, res);
+    return this.usersService.getUserMatchesStats(id, res);
   }
 
-  @Post('get-user-match-history')
+  @Get('get-user-match-history/:id')
   @UseGuards(JwtGuard)
   @ApiOkResponse({ type: UserEntity })
   getUserMatchHistory(
+	@Param('id') id: string,
     @Res() res: Response,
-    @Body() target: { userNickname: string },
   ) {
-    return this.usersService.getUserMatchHistory(target.userNickname, res);
+    return this.usersService.getUserMatchHistory(id, res);
   }
 
-  @Get('get-leaderboard')
-  @UseGuards(JwtGuard)
-  @ApiOkResponse({ type: UserEntity })
-  getLeaderBoard(@Res() res: Response) {
-    return this.usersService.getLeaderboard(res);
-  }
+  
 }

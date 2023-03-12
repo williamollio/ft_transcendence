@@ -1,6 +1,6 @@
 import { axiosInstance } from "./common/axios-instance";
 
-const PATH = "/users";
+const PATH = "users";
 
 class StatsService {
   async fetchLeaderboard() {
@@ -9,12 +9,12 @@ class StatsService {
   }
 
   async fetchMatchHistory(id: string) {
-	const { data } = await axiosInstance.post(`${PATH}/get-user-match-history`, {target: {userId: id}});
+	const { data } = await axiosInstance.get(`${PATH}/get-user-match-history/${id}`);
 	return data;
   }
 
   async fetchPersonalStats(id: string) {
-	const { data } = await axiosInstance.post(`${PATH}/get-user-matches-stats`, {target: {userId: id}});
+	const { data } = await axiosInstance.get(`${PATH}/get-user-matches-stats/${id}`);
 	return data;
   }
 }
