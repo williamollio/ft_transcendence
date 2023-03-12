@@ -4,17 +4,13 @@ import { Response } from "../../services/common/resolve";
 import Box from "@mui/material/Box";
 import MuiDrawer from "@mui/material/Drawer";
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import { Avatar, Divider, Typography } from "@mui/material";
+import { Divider, Typography } from "@mui/material";
 import { UserIds } from "../../interfaces/user.interface";
 import { Cookie, getTokenData } from "../../utils/auth-helper";
 import friendshipsService from "../../services/friendships.service";
-
-import ListMiniDrawer from "./ListMiniDrawer";
+import ListFriends from "./ListFriends";
+import ListSent from "./ListSent";
+import ListReceived from "./ListReceived";
 
 const drawerWidth = 240;
 
@@ -121,7 +117,8 @@ export default function MiniDrawer() {
             Friends
           </Typography>
         </Box>
-        <ListMiniDrawer
+        <ListFriends
+          userId={userId}
           open={open}
           users={friends}
           triggerDrawerOpen={triggerDrawerOpen}
@@ -146,7 +143,8 @@ export default function MiniDrawer() {
             Sent
           </Typography>
         </Box>
-        <ListMiniDrawer
+        <ListSent
+          userId={userId}
           open={open}
           users={requests}
           triggerDrawerOpen={triggerDrawerOpen}
@@ -171,7 +169,8 @@ export default function MiniDrawer() {
             Received
           </Typography>
         </Box>
-        <ListMiniDrawer
+        <ListReceived
+          userId={userId}
           open={open}
           users={requestsReceived}
           triggerDrawerOpen={triggerDrawerOpen}
