@@ -54,13 +54,6 @@ export class FriendshipController {
     return this.friendshipService.acceptFriendship(userId, friendshipDto.id);
   }
 
-  @Patch('deny/:id')
-  denyFrienship(
-    @Param('id') userId: string,
-    @Body() friendshipDto: FriendshipDto,
-  ) {
-    return this.friendshipService.denyFriendship(userId, friendshipDto.id);
-  }
   @Delete('delete/:id')
   deleteFrienship(
     @Param('id') userId: string,

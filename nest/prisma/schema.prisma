@@ -154,6 +154,5 @@ enum ChannelActionType {
 enum FriendshipStatus {
     REQUESTED
     ACCEPTED
-    DENY
     NONE
 }

@@ -59,14 +59,6 @@ class FriendshipsService {
     );
   }
 
-  async patchDeny(id: string, userIds: UserIds): Promise<Response<void>> {
-    return resolve<void>(
-      axiosInstance
-        .patch(`${PATH}/deny/${id}`, userIds)
-        .then((res: AxiosResponse) => res.data)
-    );
-  }
-
   async deleteRequest(id: string, userId: string): Promise<Response<void>> {
     const friendshipDto = { id: userId };
     return resolve<void>(
