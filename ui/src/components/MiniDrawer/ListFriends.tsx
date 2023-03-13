@@ -10,6 +10,8 @@ import ChatIcon from "@mui/icons-material/Chat";
 import { UserIds } from "../../interfaces/user.interface";
 import React from "react";
 import { fetchProfilePicture } from "../../utils/picture-helper";
+import friendshipsService from "../../services/friendships.service";
+import CloseIcon from "@mui/icons-material/Close";
 
 interface Props {
   userId: string;
@@ -22,6 +24,10 @@ export default function ListFriends(props: Props) {
 
   function createDmChat() {
     console.log("createDmChat");
+  }
+
+  async function deleteFriendship(friendId: string) {
+    await friendshipsService.deleteRequest(userId, friendId);
   }
 
   const [profilePictures, setProfilePictures] = React.useState<{
@@ -65,8 +71,8 @@ export default function ListFriends(props: Props) {
               onClick={triggerDrawerOpen}
               sx={{
                 minWidth: 0,
-                mr: open ? 3 : "auto",
-                ml: !open ? 4 : 0,
+                mr: open ? 3 : 0,
+                ml: !open ? 8 : 0,
                 justifyContent: "center",
               }}
             >
@@ -88,6 +94,18 @@ export default function ListFriends(props: Props) {
               }}
             >
               <ChatIcon />
+            </ListItemButton>
+            <ListItemButton
+              onClick={() => deleteFriendship(user.id)}
+              sx={{
+                opacity: open ? 1 : 0,
+                color: "red",
+                width: "7px",
+                display: "flex",
+                justifyContent: "center",
+              }}
+            >
+              <CloseIcon />
             </ListItemButton>
           </ListItemButton>
         </ListItem>
