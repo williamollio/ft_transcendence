@@ -29,7 +29,11 @@ export default function ListReceived(props: Props) {
   async function acceptRequestReceived(friendId: string) {
     await friendshipsService.patchAccept(userId, friendId);
   }
-  function denyRequestReceived(friendId: string) {}
+
+  async function cancelRequestReceived(friendId: string) {
+    await friendshipsService.deleteRequest(userId, friendId);
+  }
+
   React.useEffect(() => {
     async function loadProfilePictures() {
       const pictures: { [key: string]: string } = {};
@@ -92,7 +96,7 @@ export default function ListReceived(props: Props) {
               <CheckIcon />
             </ListItemButton>
             <ListItemButton
-              onClick={() => denyRequestReceived(user.id)}
+              onClick={() => cancelRequestReceived(user.id)}
               sx={{
                 opacity: open ? 1 : 0,
                 color: "red",
