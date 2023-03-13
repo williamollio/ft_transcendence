@@ -8,9 +8,9 @@ import { Divider, Typography } from "@mui/material";
 import { UserIds } from "../../interfaces/user.interface";
 import { Cookie, getTokenData } from "../../utils/auth-helper";
 import friendshipsService from "../../services/friendships.service";
-import ListFriends from "./ListFriends";
-import ListSent from "./ListSent";
-import ListReceived from "./ListReceived";
+import ListFriends from "./List/ListFriends";
+import ListSent from "./List/ListSent";
+import ListReceived from "./List/ListReceived";
 
 const drawerWidth = 240;
 
