@@ -246,10 +246,7 @@ export class FriendshipService {
         },
       });
 
-      if (
-        FriendshipStatus.DENY &&
-        friendship?.status === FriendshipStatus.DENY
-      ) {
+      if (friendship?.status === FriendshipStatus.DENY) {
         throw MESSAGE_ERROR_UPDATE_REQUEST;
       }
       if (friendship) {
@@ -273,6 +270,23 @@ export class FriendshipService {
           ],
         },
       });
+    } catch (error) {
+      if (typeof error === 'string') return error;
+      return 'errorUserService';
+    }
+  }
+
+  public async deleteFriendship(userId: string, friendId: string) {
+    try {
+      const friendshipDeleted = await this.prisma.friendship.deleteMany({
+        where: {
+          OR: [
+            { requesterId: friendId, addresseeId: userId },
+            { requesterId: userId, addresseeId: friendId },
+          ],
+        },
+      });
+      return friendshipDeleted;
     } catch (error) {
       if (typeof error === 'string') return error;
       return 'errorUserService';

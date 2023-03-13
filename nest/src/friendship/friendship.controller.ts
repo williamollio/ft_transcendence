@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Patch, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Patch,
+  Param,
+  Post,
+  Delete,
+} from '@nestjs/common';
 import { FriendshipService } from './friendship.service';
 import { ApiTags } from '@nestjs/swagger';
 // import { GetCurrentUserId } from 'src/decorators/getCurrentUserId.decorator';
@@ -52,5 +60,12 @@ export class FriendshipController {
     @Body() friendshipDto: FriendshipDto,
   ) {
     return this.friendshipService.denyFriendship(userId, friendshipDto.id);
+  }
+  @Delete('delete/:id')
+  deleteFrienship(
+    @Param('id') userId: string,
+    @Body() friendshipDto: FriendshipDto,
+  ) {
+    return this.friendshipService.deleteFriendship(userId, friendshipDto.id);
   }
 }

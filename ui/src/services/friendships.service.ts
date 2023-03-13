@@ -66,6 +66,15 @@ class FriendshipsService {
         .then((res: AxiosResponse) => res.data)
     );
   }
+
+  async deleteRequest(id: string, userId: string): Promise<Response<void>> {
+    const friendshipDto = { id: userId };
+    return resolve<void>(
+      axiosInstance
+        .delete(`${PATH}/delete/${id}`, { data: friendshipDto })
+        .then((res: AxiosResponse) => res.data)
+    );
+  }
 }
 // eslint-disable-next-line
 export default new FriendshipsService();

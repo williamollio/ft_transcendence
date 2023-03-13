@@ -10,6 +10,7 @@ import { UserIds } from "../../interfaces/user.interface";
 import React from "react";
 import { fetchProfilePicture } from "../../utils/picture-helper";
 import CloseIcon from "@mui/icons-material/Close";
+import friendshipsService from "../../services/friendships.service";
 
 interface Props {
   userId: string;
@@ -24,7 +25,9 @@ export default function ListSent(props: Props) {
     [key: string]: string;
   }>({});
 
-  function cancelRequestSent() {}
+  async function cancelRequestSent(friendId: string) {
+    await friendshipsService.deleteRequest(userId, friendId);
+  }
 
   React.useEffect(() => {
     async function loadProfilePictures() {
@@ -53,7 +56,6 @@ export default function ListSent(props: Props) {
       {users.map((user: UserIds, index) => (
         <ListItem key={index} disablePadding sx={{ display: "block" }}>
           <ListItemButton
-            onClick={triggerDrawerOpen}
             sx={{
               minHeight: 48,
               justifyContent: open ? "initial" : "center",
@@ -61,6 +63,7 @@ export default function ListSent(props: Props) {
             }}
           >
             <ListItemIcon
+              onClick={triggerDrawerOpen}
               sx={{
                 minWidth: 0,
                 mr: open ? 3 : "auto",
@@ -72,7 +75,7 @@ export default function ListSent(props: Props) {
             </ListItemIcon>
             <ListItemText primary={user.name} sx={{ opacity: open ? 1 : 0 }} />
             <ListItemButton
-              onClick={cancelRequestSent}
+              onClick={() => cancelRequestSent(user.id)}
               sx={{
                 opacity: open ? 1 : 0,
                 color: "red",
