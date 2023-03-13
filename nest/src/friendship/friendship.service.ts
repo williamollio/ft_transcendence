@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Friendship, FriendshipStatus } from '@prisma/client';
+import { Friendship, FriendshipStatus, UserStatus } from '@prisma/client';
 
 const MESSAGE_ERROR_UPDATE_REQUEST = "This friendship can't be updated";
 @Injectable()
@@ -37,6 +37,7 @@ export class FriendshipService {
         select: {
           id: true,
           name: true,
+          status: true,
         },
       });
 
@@ -60,6 +61,7 @@ export class FriendshipService {
               id: true,
               name: true,
               filename: true,
+              status: true,
             },
           },
         },
@@ -69,6 +71,7 @@ export class FriendshipService {
         id: string;
         name: string;
         filename: string | null;
+        status: UserStatus;
       }[] = [];
 
       friendshipRequests.forEach((friendship) => {
@@ -76,6 +79,7 @@ export class FriendshipService {
           id: friendship.addressee.id,
           name: friendship.addressee.name,
           filename: friendship.addressee.filename,
+          status: friendship.addressee.status,
         });
       });
 
@@ -101,6 +105,7 @@ export class FriendshipService {
               id: true,
               name: true,
               filename: true,
+              status: true,
             },
           },
           addressee: {
@@ -108,6 +113,7 @@ export class FriendshipService {
               id: true,
               name: true,
               filename: true,
+              status: true,
             },
           },
         },
@@ -117,6 +123,7 @@ export class FriendshipService {
         id: string;
         name: string;
         filename: string | null;
+        status: UserStatus;
       }[] = [];
 
       friendshipRequests.forEach((friendship) => {
@@ -125,6 +132,7 @@ export class FriendshipService {
             id: friendship.requester.id,
             name: friendship.requester.name,
             filename: friendship.requester.filename,
+            status: friendship.requester.status,
           });
         }
 
@@ -133,6 +141,7 @@ export class FriendshipService {
             id: friendship.addressee.id,
             name: friendship.addressee.name,
             filename: friendship.addressee.filename,
+            status: friendship.addressee.status,
           });
         }
       });
@@ -157,6 +166,7 @@ export class FriendshipService {
               id: true,
               name: true,
               filename: true,
+              status: true,
             },
           },
         },
@@ -166,6 +176,7 @@ export class FriendshipService {
         id: string;
         name: string;
         filename: string | null;
+        status: UserStatus;
       }[] = [];
 
       friendshipRequests.forEach((friendship) => {
@@ -173,6 +184,7 @@ export class FriendshipService {
           id: friendship.requester.id,
           name: friendship.requester.name,
           filename: friendship.requester.filename,
+          status: friendship.requester.status,
         });
       });
 
