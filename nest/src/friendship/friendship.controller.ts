@@ -10,7 +10,7 @@ import {
 import { FriendshipService } from './friendship.service';
 import { ApiTags } from '@nestjs/swagger';
 // import { GetCurrentUserId } from 'src/decorators/getCurrentUserId.decorator';
-import { FriendshipDto } from './dto/friendship.dto';
+import { FriendDto } from './dto/friend.dto';
 
 @Controller('friendship')
 @ApiTags('user-friendship')
@@ -39,26 +39,17 @@ export class FriendshipController {
   }
 
   @Post('request/:id')
-  requestFrienship(
-    @Param('id') userId: string,
-    @Body() friendshipDto: FriendshipDto,
-  ) {
-    return this.friendshipService.createFrienship(userId, friendshipDto.id);
+  requestFrienship(@Param('id') userId: string, @Body() friendDto: FriendDto) {
+    return this.friendshipService.createFrienship(userId, friendDto.id);
   }
 
   @Patch('accept/:id')
-  acceptFrienship(
-    @Param('id') userId: string,
-    @Body() friendshipDto: FriendshipDto,
-  ) {
-    return this.friendshipService.acceptFriendship(userId, friendshipDto.id);
+  acceptFrienship(@Param('id') userId: string, @Body() friendDto: FriendDto) {
+    return this.friendshipService.acceptFriendship(userId, friendDto.id);
   }
 
   @Delete('delete/:id')
-  deleteFrienship(
-    @Param('id') userId: string,
-    @Body() friendshipDto: FriendshipDto,
-  ) {
-    return this.friendshipService.deleteFriendship(userId, friendshipDto.id);
+  deleteFrienship(@Param('id') userId: string, @Body() friendDto: FriendDto) {
+    return this.friendshipService.deleteFriendship(userId, friendDto.id);
   }
 }

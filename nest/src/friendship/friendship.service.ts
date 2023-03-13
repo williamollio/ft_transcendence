@@ -7,11 +7,11 @@ const MESSAGE_ERROR_UPDATE_REQUEST = "This friendship can't be updated";
 export class FriendshipService {
   constructor(private prisma: PrismaService) {}
 
-  public async getNoFriendship(currentUserId: string) {
+  public async getNoFriendship(userId: string) {
     try {
       const userFriendships = await this.prisma.friendship.findMany({
         where: {
-          OR: [{ addresseeId: currentUserId }, { requesterId: currentUserId }],
+          OR: [{ addresseeId: userId }, { requesterId: userId }],
         },
         select: {
           addresseeId: true,
@@ -21,7 +21,7 @@ export class FriendshipService {
 
       const userIdsWithFriendship = new Set<string>();
       for (const friendship of userFriendships) {
-        if (friendship.addresseeId !== currentUserId) {
+        if (friendship.addresseeId !== userId) {
           userIdsWithFriendship.add(friendship.addresseeId);
         } else {
           userIdsWithFriendship.add(friendship.requesterId);
@@ -263,11 +263,6 @@ export class FriendshipService {
       throw MESSAGE_ERROR_UPDATE_REQUEST;
     } else if (
       type === FriendshipStatus.ACCEPTED &&
-      friendship?.status === FriendshipStatus.REQUESTED
-    ) {
-      return true;
-    } else if (
-      type === FriendshipStatus.DENY &&
       friendship?.status === FriendshipStatus.REQUESTED
     ) {
       return true;

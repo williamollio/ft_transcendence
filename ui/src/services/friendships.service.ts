@@ -5,65 +5,66 @@ import { UserIds } from "../interfaces/user.interface";
 
 const PATH = "friendship";
 
-interface Friendship {
-  requesterId: string;
-  addresseId: string;
-}
-
 class FriendshipsService {
-  async getNone(id: string): Promise<Response<UserIds[]>> {
+  async getNone(userId: string): Promise<Response<UserIds[]>> {
     return resolve<UserIds[]>(
       axiosInstance
-        .get(`${PATH}/none/${id}`)
+        .get(`${PATH}/none/${userId}`)
         .then((res: AxiosResponse) => res.data)
     );
   }
-  async getRequestsReceived(id: string): Promise<Response<UserIds[]>> {
+  async getRequestsReceived(userId: string): Promise<Response<UserIds[]>> {
     return resolve<UserIds[]>(
       axiosInstance
-        .get(`${PATH}/requests-received/${id}`)
-        .then((res: AxiosResponse) => res.data)
-    );
-  }
-
-  async getRequests(id: string): Promise<Response<UserIds[]>> {
-    return resolve<UserIds[]>(
-      axiosInstance
-        .get(`${PATH}/requests/${id}`)
+        .get(`${PATH}/requests-received/${userId}`)
         .then((res: AxiosResponse) => res.data)
     );
   }
 
-  async getAccepted(id: string): Promise<Response<UserIds[]>> {
+  async getRequests(userId: string): Promise<Response<UserIds[]>> {
     return resolve<UserIds[]>(
       axiosInstance
-        .get(`${PATH}/accepted/${id}`)
+        .get(`${PATH}/requests/${userId}`)
         .then((res: AxiosResponse) => res.data)
     );
   }
 
-  async postRequest(id: string, userIds: UserIds): Promise<Response<void>> {
+  async getAccepted(userId: string): Promise<Response<UserIds[]>> {
+    return resolve<UserIds[]>(
+      axiosInstance
+        .get(`${PATH}/accepted/${userId}`)
+        .then((res: AxiosResponse) => res.data)
+    );
+  }
+
+  async postRequest(
+    userId: string,
+    friendIds: UserIds
+  ): Promise<Response<void>> {
     return resolve<void>(
       axiosInstance
-        .post(`${PATH}/request/${id}`, userIds)
+        .post(`${PATH}/request/${userId}`, friendIds)
         .then((res: AxiosResponse) => res.data)
     );
   }
 
-  async patchAccept(id: string, userId: string): Promise<Response<void>> {
-    const friendshipDto = { id: userId };
+  async patchAccept(userId: string, friendId: string): Promise<Response<void>> {
+    const friendshipDto = { id: friendId };
     return resolve<void>(
       axiosInstance
-        .patch(`${PATH}/accept/${id}`, friendshipDto)
+        .patch(`${PATH}/accept/${userId}`, friendshipDto)
         .then((res: AxiosResponse) => res.data)
     );
   }
 
-  async deleteRequest(id: string, userId: string): Promise<Response<void>> {
-    const friendshipDto = { id: userId };
+  async deleteRequest(
+    userId: string,
+    friendId: string
+  ): Promise<Response<void>> {
+    const friendshipDto = { id: friendId };
     return resolve<void>(
       axiosInstance
-        .delete(`${PATH}/delete/${id}`, { data: friendshipDto })
+        .delete(`${PATH}/delete/${userId}`, { data: friendshipDto })
         .then((res: AxiosResponse) => res.data)
     );
   }
