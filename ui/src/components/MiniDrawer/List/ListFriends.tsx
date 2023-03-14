@@ -13,23 +13,17 @@ import { fetchProfilePicture } from "../../../utils/picture-helper";
 import friendshipsService from "../../../services/friendships.service";
 import CloseIcon from "@mui/icons-material/Close";
 import { StyledAvatarBadge } from "../AvatarBadge/StyledAvatarBadge";
+import { AxiosError } from "axios";
 
 interface Props {
   userId: string;
   open: boolean;
   users: User[];
   triggerDrawerOpen: () => void;
+  showErrorToast: (error?: AxiosError) => void;
 }
 export default function ListFriends(props: Props) {
-  const { userId, open, users, triggerDrawerOpen } = props;
-
-  function createDmChat() {
-    console.log("createDmChat");
-  }
-
-  async function deleteFriendship(friendId: string) {
-    await friendshipsService.deleteRequest(userId, friendId);
-  }
+  const { userId, open, users, triggerDrawerOpen, showErrorToast } = props;
 
   const [profilePictures, setProfilePictures] = React.useState<{
     [key: string]: string;
@@ -57,6 +51,21 @@ export default function ListFriends(props: Props) {
     const image = await fetchProfilePicture(friendId);
     return URL.createObjectURL(image);
   }
+  function createDmChat() {
+    console.log("createDmChat");
+  }
+
+  async function deleteFriendship(friendId: string) {
+    const responseDelete = await friendshipsService.deleteRequest(
+      userId,
+      friendId
+    );
+    const isSuccess = !responseDelete?.error;
+    if (!isSuccess) {
+      showErrorToast(responseDelete.error);
+    }
+  }
+
   return (
     <List>
       {users.map((user: User, index) => (

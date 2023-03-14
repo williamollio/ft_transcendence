@@ -12,23 +12,21 @@ import { fetchProfilePicture } from "../../../utils/picture-helper";
 import CloseIcon from "@mui/icons-material/Close";
 import friendshipsService from "../../../services/friendships.service";
 import { StyledAvatarBadge } from "../AvatarBadge/StyledAvatarBadge";
+import { AxiosError } from "axios";
 
 interface Props {
   userId: string;
   open: boolean;
   users: User[];
   triggerDrawerOpen: () => void;
+  showErrorToast: (error?: AxiosError) => void;
 }
 export default function ListSent(props: Props) {
-  const { userId, open, users, triggerDrawerOpen } = props;
+  const { userId, open, users, triggerDrawerOpen, showErrorToast } = props;
 
   const [profilePictures, setProfilePictures] = React.useState<{
     [key: string]: string;
   }>({});
-
-  async function cancelRequestSent(friendId: string) {
-    await friendshipsService.deleteRequest(userId, friendId);
-  }
 
   React.useEffect(() => {
     async function loadProfilePictures() {
@@ -52,6 +50,18 @@ export default function ListSent(props: Props) {
     const image = await fetchProfilePicture(friendId);
     return URL.createObjectURL(image);
   }
+
+  async function cancelRequestSent(friendId: string) {
+    const responseDelete = await friendshipsService.deleteRequest(
+      userId,
+      friendId
+    );
+    const isSuccess = !responseDelete?.error;
+    if (!isSuccess) {
+      showErrorToast(responseDelete.error);
+    }
+  }
+
   return (
     <List>
       {users.map((user: User, index) => (

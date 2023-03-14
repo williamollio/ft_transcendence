@@ -13,27 +13,21 @@ import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
 import friendshipsService from "../../../services/friendships.service";
 import { StyledAvatarBadge } from "../AvatarBadge/StyledAvatarBadge";
+import { AxiosError } from "axios";
 
 interface Props {
   userId: string;
   open: boolean;
   users: User[];
   triggerDrawerOpen: () => void;
+  showErrorToast: (error?: AxiosError) => void;
 }
 export default function ListReceived(props: Props) {
-  const { userId, open, users, triggerDrawerOpen } = props;
+  const { userId, open, users, triggerDrawerOpen, showErrorToast } = props;
 
   const [profilePictures, setProfilePictures] = React.useState<{
     [key: string]: string;
   }>({});
-
-  async function acceptRequestReceived(friendId: string) {
-    await friendshipsService.patchAccept(userId, friendId);
-  }
-
-  async function cancelRequestReceived(friendId: string) {
-    await friendshipsService.deleteRequest(userId, friendId);
-  }
 
   React.useEffect(() => {
     async function loadProfilePictures() {
@@ -57,6 +51,29 @@ export default function ListReceived(props: Props) {
     const image = await fetchProfilePicture(friendId);
     return URL.createObjectURL(image);
   }
+
+  async function acceptRequestReceived(friendId: string) {
+    const responseAccept = await friendshipsService.patchAccept(
+      userId,
+      "user4"
+    );
+    const isSuccess = !responseAccept?.error;
+    if (!isSuccess) {
+      showErrorToast(responseAccept.error);
+    }
+  }
+
+  async function cancelRequestReceived(friendId: string) {
+    const responseDelete = await friendshipsService.deleteRequest(
+      userId,
+      friendId
+    );
+    const isSuccess = !responseDelete?.error;
+    if (!isSuccess) {
+      showErrorToast(responseDelete.error);
+    }
+  }
+
   return (
     <List>
       {users.map((user: User, index) => (
