@@ -8,6 +8,9 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { UserGateway } from './users/users.gateway';
 import { ChannelModule } from './channel/channel.module';
+import { GameModule } from './game/game.module';
+import { ScheduleModule } from '@nestjs/schedule';
+
 
 @Module({
   imports: [
@@ -19,6 +22,8 @@ import { ChannelModule } from './channel/channel.module';
       ttl: 60,
       limit: 50,
     }),
+    GameModule,
+    ScheduleModule.forRoot(),
   ],
   controllers: [AppController],
   providers: [

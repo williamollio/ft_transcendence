@@ -45,6 +45,13 @@ import {
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @Get('get-leaderboard')
+  @UseGuards(JwtGuard)
+  @ApiOkResponse({ type: UserEntity })
+  getLeaderboard(@Res() res: Response) {
+	return this.usersService.getLeaderboard(res);
+  }
+
   @Get()
   @ApiOkResponse({ type: UserEntity, isArray: true })
   public async findAll(@Res() res: Response) {
@@ -154,4 +161,27 @@ export class UsersController {
       );
     }
   }
+
+  // Match controller
+  @Get('get-user-matches-stats/:id')
+  @UseGuards(JwtGuard)
+  @ApiOkResponse({ type: UserEntity })
+  getUserMatchesStats(
+	@Param('id') id: string,
+    @Res() res: Response,
+  ) {
+    return this.usersService.getUserMatchesStats(id, res);
+  }
+
+  @Get('get-user-match-history/:id')
+  @UseGuards(JwtGuard)
+  @ApiOkResponse({ type: UserEntity })
+  getUserMatchHistory(
+	@Param('id') id: string,
+    @Res() res: Response,
+  ) {
+    return this.usersService.getUserMatchHistory(id, res);
+  }
+
+  
 }

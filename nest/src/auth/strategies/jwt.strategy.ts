@@ -3,15 +3,12 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { UsersService } from '../../users/users.service';
 import * as process from 'process';
+import { HandshakeRequest } from 'src/game/entities/game.entity';
 
 export type JwtPayload = {
   id: string;
   intraId: string;
 };
-
-export interface HandshakeRequest extends Request {
-  handshake: { auth: { token: string } };
-}
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {

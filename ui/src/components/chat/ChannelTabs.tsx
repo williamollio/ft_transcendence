@@ -14,7 +14,7 @@ import {
   channelUser,
   DBChannelElement,
   messagesDto,
-} from "../../interfaces/chat.interfaces";
+} from "../../interfaces/chat.interface";
 import ChannelService from "../../services/channel.service";
 
 export function ChannelTabs({
@@ -47,6 +47,7 @@ export function ChannelTabs({
   const [channelQueryId, setChannelQueryId] = useState<string | undefined>(
     undefined
   );
+
   const [channelList, setChannelList] = useState<chatRoom[]>(
     channelSocket.channels
   );
@@ -61,47 +62,61 @@ export function ChannelTabs({
 
   const {
     data: joinedChannels,
-    isLoading: joinedChannesLoading,
-    isError: joinedChannesError,
+    isLoading: joinedChannelsLoading,
+    isError: joinedChannelsError,
+    isFetching,
   } = useQuery(["joinedChannels"], ChannelService.fetchJoinedChannels, {
     enabled: channelSocket.user.id !== "",
   });
 
   useEffect(() => {
-    if (joinedChannels && !joinedChannesLoading && !joinedChannesError) {
-      channelSocket.channels = new Array<chatRoom>();
-      joinedChannels.forEach((element: DBChannelElement) => {
-        if (element.type !== "DIRECTMESSAGE") {
-          channelSocket.channels.push({
-            key: element.name,
-            id: element.id,
-            access: element.type,
-            users: new Array<channelUser>(),
-            messages: new Array<messagesDto>(),
-          });
+    if (channelSocket.channels.length === 0) {
+      if (
+        joinedChannels &&
+        !joinedChannelsLoading &&
+        !joinedChannelsError &&
+        !isFetching
+      ) {
+        const newList = new Array<chatRoom>();
+        if (joinedChannels.length === 0) {
+          channelSocket.channels = newList;
           updateChannelList();
-          channelSocket.connectToRoom(element.id!);
-        } else {
-          ChannelService.getUsersChannel(element.id).then((resolve) => {
-            let dmName = resolve.data.find(
-              (user) => user.id !== channelSocket.user.id
-            )?.name;
-            if (dmName) {
-              channelSocket.channels.push({
-                key: dmName,
-                id: element.id,
-                access: element.type,
-                users: new Array<channelUser>(),
-                messages: new Array<messagesDto>(),
-              });
-              updateChannelList();
-            }
-            channelSocket.connectToRoom(element.id!);
-          });
         }
-      });
+        joinedChannels.forEach((element: DBChannelElement) => {
+          if (element.type !== "DIRECTMESSAGE") {
+            newList.push({
+              key: element.name,
+              id: element.id,
+              access: element.type,
+              users: new Array<channelUser>(),
+              messages: new Array<messagesDto>(),
+            });
+            channelSocket.channels = newList;
+            updateChannelList();
+            channelSocket.connectToRoom(element.id!);
+          } else {
+            ChannelService.getUsersChannel(element.id).then((resolve) => {
+              let dmName = resolve.data.find(
+                (user) => user.id !== channelSocket.user.id
+              )?.name;
+              if (dmName) {
+                newList.push({
+                  key: dmName,
+                  id: element.id,
+                  access: element.type,
+                  users: new Array<channelUser>(),
+                  messages: new Array<messagesDto>(),
+                });
+              }
+              channelSocket.channels = newList;
+              updateChannelList();
+              channelSocket.connectToRoom(element.id!);
+            });
+          }
+        });
+      }
     }
-  }, [joinedChannels]);
+  }, [joinedChannels, joinedChannelsLoading, joinedChannelsError, isFetching]);
 
   const { data, isLoading, isError, isRefetching, refetch } = useQuery(
     ["channels", channelQueryId],
@@ -153,6 +168,10 @@ export function ChannelTabs({
           setNewChannel(channelSocket.channels[channelIndex - 1]);
         }
       }
+      localStorage.setItem(
+        "joinedChannels" + channelSocket.user.id,
+        JSON.stringify(channelSocket.channels)
+      );
       setChannelQueryId(undefined);
     }
   }, [data, isLoading, isError, isRefetching]);
@@ -200,17 +219,21 @@ export function ChannelTabs({
   };
 
   useEffect(() => {
-    channelSocket.registerListener("roomLeft", roomLeftListener);
-    channelSocket.registerListener("roomCreated", roomCreatedListener);
-    channelSocket.registerListener("roomJoined", roomJoinedListener);
-    channelSocket.registerListener("roomEdited", roomEditedListener);
+    if (channelSocket.socket.connected) {
+      channelSocket.registerListener("roomLeft", roomLeftListener);
+      channelSocket.registerListener("roomCreated", roomCreatedListener);
+      channelSocket.registerListener("roomJoined", roomJoinedListener);
+      channelSocket.registerListener("roomEdited", roomEditedListener);
+    }
     return () => {
-      channelSocket.removeListener("roomLeft", roomLeftListener);
-      channelSocket.removeListener("roomCreated", roomCreatedListener);
-      channelSocket.removeListener("roomJoined", roomJoinedListener);
-      channelSocket.removeListener("roomEdited", roomEditedListener);
+      if (channelSocket.socket.connected) {
+        channelSocket.removeListener("roomLeft", roomLeftListener);
+        channelSocket.removeListener("roomCreated", roomCreatedListener);
+        channelSocket.removeListener("roomJoined", roomJoinedListener);
+        channelSocket.removeListener("roomEdited", roomEditedListener);
+      }
     };
-  }, [channelSocket.socket]);
+  }, [channelSocket.socket, channelSocket.socket.connected]);
 
   const handleRoomChange = (event: SyntheticEvent, newValue: chatRoom) => {
     setNewChannel(newValue);

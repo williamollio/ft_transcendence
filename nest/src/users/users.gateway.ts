@@ -70,4 +70,22 @@ export class UserGateway {
       clientSocket.broadcast.emit('userDisconnected');
     }
   }
+  // GAme gateway
+  @SubscribeMessage('joinGame')
+  userInGame(
+    @ConnectedSocket() clientSocket: Socket,
+    @GetCurrentUserId() userId: string,
+  ) {
+    void this.usersService.updateConnectionStatus(userId, UserStatus.PLAYING);
+    clientSocket.broadcast.emit('userInGame');
+  }
+
+  @SubscribeMessage('leaveGame')
+  gameEnded(
+    @ConnectedSocket() clientSocket: Socket,
+    @GetCurrentUserId() userId: string,
+  ) {
+    void this.usersService.updateConnectionStatus(userId, UserStatus.ONLINE);
+    clientSocket.broadcast.emit('userGameEnded');
+  }
 }

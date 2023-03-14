@@ -18,26 +18,23 @@ import { UserSocket } from "../../classes/UserSocket.class";
 
 interface Props {
   userSocket: UserSocket;
+  channelSocket: ChannelSocket;
+  setToken: React.Dispatch<React.SetStateAction<string>>;
 }
 
 export default function ChatView(props: Props): React.ReactElement {
-  const { userSocket } = props;
+  const { userSocket, channelSocket, setToken } = props;
   const { t } = useTranslation();
   // const { classes } = useStyles();
 
-  const [channelSocket] = React.useState<ChannelSocket>(new ChannelSocket());
-
   React.useEffect(() => {
-    let token;
-    if ((token = localStorage.getItem(Cookie.TOKEN))) {
-      channelSocket.initializeSocket(token);
-      userSocket.initializeSocket(token);
-      userSocket.logIn();
+    let gotToken = localStorage.getItem(Cookie.TOKEN);
+    if (gotToken) {
+      if (channelSocket.socket.connected === false) {
+        setToken("Bearer " + gotToken);
+      }
+      channelSocket.initializeName(gotToken);
     }
-    return () => {
-      channelSocket.socket?.disconnect();
-      userSocket.socket?.disconnect();
-    };
   }, []);
 
   return (

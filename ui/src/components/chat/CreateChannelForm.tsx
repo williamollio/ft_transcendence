@@ -10,7 +10,7 @@ import {
   Button,
 } from "@mui/material";
 import { useState } from "react";
-import { CRDialogValue } from "../../interfaces/chat.interfaces";
+import { CRDialogValue } from "../../interfaces/chat.interface";
 
 export default function CreateForm({
   dialogValue,

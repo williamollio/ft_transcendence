@@ -1,6 +1,6 @@
 import { Dialog, TextField } from "@mui/material";
 import { useState } from "react";
-import { user } from "../../interfaces/chat.interfaces";
+import { user } from "../../interfaces/chat.interface";
 
 // This is currently not in use
 

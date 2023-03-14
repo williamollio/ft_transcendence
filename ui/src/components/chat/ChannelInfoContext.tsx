@@ -2,7 +2,7 @@ import { Menu, MenuItem } from "@mui/material";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { chatRoom } from "../../classes/chatRoom.class";
-import { channelUser } from "../../interfaces/chat.interfaces";
+import { channelUser } from "../../interfaces/chat.interface";
 import ChannelService from "../../services/channel.service";
 
 export default function ChannelInfoContext({
