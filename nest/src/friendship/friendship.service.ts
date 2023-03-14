@@ -2,11 +2,13 @@ import { Injectable, HttpStatus } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Friendship, FriendshipStatus, UserStatus } from '@prisma/client';
 import { Response } from 'express';
+import { GetFriendDto } from './dto/friend.dto';
 
 const MESSAGE_ERROR_UPDATE_REQUEST = "This friendship can't be updated";
 
 // TODO : william return correct error message/code
 // TODO : william add more safety conditions
+// TODO : william work with entity
 
 @Injectable()
 export class FriendshipService {
@@ -86,12 +88,7 @@ export class FriendshipService {
         },
       });
 
-      const usersReceived: {
-        id: string;
-        name: string;
-        filename: string | null;
-        status: UserStatus;
-      }[] = [];
+      const usersReceived: GetFriendDto[] = [];
 
       friendshipReceived.forEach((friendship) => {
         usersReceived.push({
@@ -133,12 +130,7 @@ export class FriendshipService {
         },
       });
 
-      const usersRequested: {
-        id: string;
-        name: string;
-        filename: string | null;
-        status: UserStatus;
-      }[] = [];
+      const usersRequested: GetFriendDto[] = [];
 
       friendshipRequested.forEach((friendship) => {
         usersRequested.push({
@@ -190,12 +182,7 @@ export class FriendshipService {
         },
       });
 
-      const friends: {
-        id: string;
-        name: string;
-        filename: string | null;
-        status: UserStatus;
-      }[] = [];
+      const friends: GetFriendDto[] = [];
 
       friendshipRequests.forEach((friendship) => {
         if (friendship.requester.id !== userId) {

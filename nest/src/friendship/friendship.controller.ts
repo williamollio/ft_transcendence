@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { FriendshipService } from './friendship.service';
 import { ApiTags } from '@nestjs/swagger';
-import { FriendDto } from './dto/friend.dto';
+import { PatchFriendDto } from './dto/friend.dto';
 import { Response } from 'express';
 
 @Controller('friendship')
@@ -41,7 +41,7 @@ export class FriendshipController {
   @Post('request/:id')
   requestFriendship(
     @Param('id') userId: string,
-    @Body() friendDto: FriendDto,
+    @Body() friendDto: PatchFriendDto,
     @Res() res: Response,
   ) {
     return this.friendshipService.createFriendship(userId, friendDto.id, res);
@@ -50,7 +50,7 @@ export class FriendshipController {
   @Patch('accept/:id')
   acceptFriendship(
     @Param('id') userId: string,
-    @Body() friendDto: FriendDto,
+    @Body() friendDto: PatchFriendDto,
     @Res() res: Response,
   ) {
     return this.friendshipService.acceptFriendship(userId, friendDto.id, res);
@@ -59,7 +59,7 @@ export class FriendshipController {
   @Delete('delete/:id')
   deleteFriendship(
     @Param('id') userId: string,
-    @Body() friendDto: FriendDto,
+    @Body() friendDto: PatchFriendDto,
     @Res() res: Response,
   ) {
     return this.friendshipService.deleteFriendship(userId, friendDto.id, res);
