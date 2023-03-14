@@ -30,9 +30,18 @@ export class FriendshipService {
 
       const userIdsWithoutFriendship = await this.prisma.user.findMany({
         where: {
-          NOT: {
-            id: { in: [...userIdsWithFriendship] },
-          },
+          AND: [
+            {
+              NOT: {
+                id: { equals: userId },
+              },
+            },
+            {
+              NOT: {
+                id: { in: [...userIdsWithFriendship] },
+              },
+            },
+          ],
         },
         select: {
           id: true,
