@@ -46,9 +46,9 @@ export default function PlayerRow(props: Props) {
           </Grid>
         </TableCell>
         <TableCell align="center">{player.rating}</TableCell>
-        <TableCell align="center">
+        {/* <TableCell align="center">
           {player.wins}:{player.loss}
-        </TableCell>
+        </TableCell> */}
         <TableCell align="right">
           <IconButton
             onClick={() => {

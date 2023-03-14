@@ -41,8 +41,6 @@ export default function MainTalbe(props: Props) {
           newList.push({
             ...element,
             rating: element.eloScore,
-            wins: 0,
-            loss: 0,
             rank: index + 1,
             image: element.fileName,
           });

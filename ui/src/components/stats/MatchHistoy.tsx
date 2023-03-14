@@ -42,19 +42,6 @@ export default function MatchHistory(props: Props) {
           winner: element.matchWon,
         });
       });
-      newList.push({
-        player1: {
-          id: "test1",
-          score: 10,
-          image: "",
-        },
-        player2: {
-          id: "test2",
-          score: 9,
-          image: "",
-        },
-        winner: true,
-      });
       setMatchHistory(newList);
       toggleOpenView(true);
     }

@@ -14,10 +14,10 @@ import {
   ContentWrapper,
 } from "../../styles/MuiStyles";
 import { Cookie, getTokenData } from "../../utils/auth-helper";
-import MainTable from "../../components/leaderboard/MainTable";
+import MainTable from "../../components/stats/MainTable";
 import StatsService from "../../services/stats.service";
 import { useQuery } from "@tanstack/react-query";
-import PersonalStatPanel from "../../components/leaderboard/PersonalStatPanel";
+import PersonalStatPanel from "../../components/stats/PersonalStatPanel";
 
 interface Props {
   userSocket: UserSocket;

@@ -3,8 +3,8 @@ export interface leaderBoardEntry {
   name: string;
   rank: number;
   rating: number;
-  wins: number;
-  loss: number;
+//   wins: number;
+//   loss: number;
   image: string;
 }
 

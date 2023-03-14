@@ -11,7 +11,7 @@ export default function LeaderboardTableHead() {
         <TableCell align="left">Rank</TableCell>
         <TableCell align="center">Player</TableCell>
         <TableCell align="center">Rating</TableCell>
-        <TableCell align="center">Win : Loss</TableCell>
+        {/* <TableCell align="center">Win : Loss</TableCell> */}
         <TableCell align="center" sx={{ width: "90px" }}>
           Match History
         </TableCell>
