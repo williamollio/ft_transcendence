@@ -12,10 +12,9 @@ import {
 } from "@mui/material";
 import usersService from "../../services/users.service";
 import { UserIds } from "../../interfaces/user.interface";
-import { UserCreation, User } from "../../interfaces/user.interface";
-import { useNavigate, useLocation } from "react-router-dom";
+import { User } from "../../interfaces/user.interface";
+import { useNavigate } from "react-router-dom";
 import { RoutePath } from "../../interfaces/router.interface";
-import { idTabs } from "../../interfaces/tab.interface";
 import { AxiosError } from "axios";
 import { TranscendanceContext } from "../../context/transcendance-context";
 import { ToastType } from "../../context/toast";
@@ -49,7 +48,6 @@ export default function ProfileView(props: Props): React.ReactElement {
   const { t } = useTranslation();
   const { classes } = useStyles();
   const navigate = useNavigate();
-  const location = useLocation();
   const { dispatchTranscendanceState } = React.useContext(TranscendanceContext);
   const [picture, setPicture] = useState<any>();
   const [image, setImage] = useImageStore(
@@ -57,10 +55,10 @@ export default function ProfileView(props: Props): React.ReactElement {
   );
   const [users, setUsers] = useState<LabelValue[]>([]);
   const [userId, setUserId] = useState<string>("");
-  const [isCreationMode, setIsCreationMode] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [currentUser, setCurrentUser] = useState<User>();
+  const [currentUser, setCurrentUser] = useState<User | null>();
   const [initialName, setInitialName] = useState<string>();
+  const [token] = useState<string | null>(localStorage.getItem(Cookie.TOKEN));
 
   const {
     formState: { errors },
@@ -73,7 +71,6 @@ export default function ProfileView(props: Props): React.ReactElement {
   });
 
   React.useEffect(() => {
-    let token = localStorage.getItem(Cookie.TOKEN);
     if (token) {
       userSocket.initializeSocket(token);
       userSocket.logIn();
@@ -84,19 +81,12 @@ export default function ProfileView(props: Props): React.ReactElement {
   }, []);
 
   React.useEffect(() => {
-    let token;
-    if (location.state && location.state.creationMode === true) {
-      setIsCreationMode(true);
-    } else {
-      setIsCreationMode(false);
-    }
-    token = localStorage.getItem(Cookie.TOKEN);
     if (token === null) {
       navigate(RoutePath.LOGIN);
     } else {
-      setUserId(getTokenData(token).id.toString());
+      setUserId(getTokenData(token).id);
       if (userId) {
-        Promise.all([fetchUsers(), fetchCurrentUser(userId)])
+        Promise.all([fetchUsersWithoutFriendship(), fetchCurrentUser()])
           .then(() => {
             setIsLoading(false);
           })
@@ -117,45 +107,40 @@ export default function ProfileView(props: Props): React.ReactElement {
     }
   }, [currentUser]);
 
-  async function fetchCurrentUser(userId: string) {
-    const payload = await usersService.getUser(userId);
-    setCurrentUser(payload.data);
-    setInitialName(currentUser?.name);
-  }
-
-  async function fetchUsers() {
-    const usersFriendshipNone: Response<UserIds[]> =
-      await friendshipsService.getNone(userId);
-    const usersAsLabelValue: LabelValue[] = usersFriendshipNone.data.map(
-      (user: UserIds) => {
-        return {
-          label: `${user.name}`,
-          value: user.id,
-        };
-      }
-    );
-    setUsers(usersAsLabelValue.filter((user) => userId !== user.value));
-  }
-
-  function navigateToGamePage() {
-    navigate(RoutePath.GAME, { state: { activeTabId: idTabs.GAME } });
-  }
-
-  async function handleOnSubmitPicture() {
-    let response;
-    const formData = new FormData();
-    formData.append("file", picture, picture.name);
-    response = await usersService.postUserImage(formData, userId);
-    const isSuccess = !response?.error;
+  async function fetchCurrentUser() {
+    const user = await usersService.getUser(userId);
+    setCurrentUser(user.data);
+    const isSuccess = !user?.error;
     if (!isSuccess) {
-      showErrorToast(response.error);
-      setImage(null);
+      showErrorToast(user.error);
+      setCurrentUser(null);
+    } else {
+      setCurrentUser(user.data);
+      setInitialName(user.data.name);
+    }
+  }
+
+  async function fetchUsersWithoutFriendship() {
+    const usersWithoutFriendship: Response<UserIds[]> =
+      await friendshipsService.getNone(userId);
+    const isSuccess = !usersWithoutFriendship?.error;
+    if (!isSuccess) {
+      showErrorToast(usersWithoutFriendship.error);
+    } else {
+      const usersAsLabelValue: LabelValue[] = usersWithoutFriendship.data.map(
+        (user: UserIds) => {
+          return {
+            label: `${user.name}`,
+            value: user.id,
+          };
+        }
+      );
+      setUsers(usersAsLabelValue);
     }
   }
 
   function showErrorToast(error?: AxiosError) {
     const message = (error?.response?.data as any).message as string;
-
     dispatchTranscendanceState({
       type: TranscendanceStateActionType.TOGGLE_TOAST,
       toast: {
@@ -165,34 +150,33 @@ export default function ProfileView(props: Props): React.ReactElement {
       },
     });
   }
+
   function onCancel() {
     setValue("name", initialName);
   }
 
   async function onSubmit(data: FieldValues) {
-    let responseUser;
-
-    const userCreation: UserCreation = {
-      name: data.name,
-    };
-
-    if (userId) {
-      responseUser = await usersService.patchUser(userId, userCreation);
-    }
-
-    if (picture) {
-      handleOnSubmitPicture();
-    }
-
+    const responseUser = await usersService.patchUser(userId, data.name);
     const isSuccessUser = !responseUser?.error;
     if (!isSuccessUser) {
       showErrorToast(responseUser?.error);
+    } else if (picture) {
+      handleOnSubmitPicture();
+    }
+  }
+
+  async function handleOnSubmitPicture() {
+    const formData = new FormData();
+    formData.append("file", picture, picture.name);
+    const response = await usersService.postUserImage(formData, userId);
+    const isSuccess = !response?.error;
+    if (!isSuccess) {
+      showErrorToast(response.error);
+      setImage(null);
     }
   }
 
   async function onSubmitFriendship(data: FieldValues) {
-    let responseUser;
-
     const friendsList: UserIds[] | undefined = data.friends?.map(
       (friend: LabelValue) => {
         return {
@@ -201,11 +185,13 @@ export default function ProfileView(props: Props): React.ReactElement {
       }
     );
 
+    let responseFrienship;
     friendsList?.forEach(async function (friend) {
-      responseUser = await friendshipsService.postRequest(userId, friend);
-      const isSuccessUser = !responseUser?.error;
-      if (!isSuccessUser) {
-        showErrorToast(responseUser?.error);
+      responseFrienship = await friendshipsService.postRequest(userId, friend);
+      const isSuccessFriendship = !responseFrienship?.error;
+      if (!isSuccessFriendship) {
+        showErrorToast(responseFrienship?.error);
+        return;
       }
     });
   }
