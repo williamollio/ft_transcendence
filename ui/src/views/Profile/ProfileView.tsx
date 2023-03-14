@@ -85,14 +85,9 @@ export default function ProfileView(props: Props): React.ReactElement {
     } else {
       setUserId(getTokenData(token).id);
       if (userId) {
-        Promise.all([fetchUsersWithoutFriendship(), fetchCurrentUser()])
-          .then(() => {
-            setIsLoading(false);
-          })
-          .catch((error) => {
-            setIsLoading(false);
-            showErrorToast(error);
-          });
+        fetchCurrentUser();
+        fetchUsersWithoutFriendship();
+        setIsLoading(false);
       }
     }
   }, [userId]);
