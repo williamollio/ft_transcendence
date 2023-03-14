@@ -101,6 +101,18 @@ export default function ProfileView(props: Props): React.ReactElement {
     }
   }, [currentUser]);
 
+  function showErrorToast(error?: AxiosError) {
+    const message = (error?.response?.data as any).message as string;
+    dispatchTranscendanceState({
+      type: TranscendanceStateActionType.TOGGLE_TOAST,
+      toast: {
+        type: ToastType.ERROR,
+        title: "Error",
+        message: message,
+      },
+    });
+  }
+
   async function fetchCurrentUser() {
     const user = await usersService.getUser(userId);
     setCurrentUser(user.data);
@@ -131,18 +143,6 @@ export default function ProfileView(props: Props): React.ReactElement {
       );
       setUsers(usersAsLabelValue);
     }
-  }
-
-  function showErrorToast(error?: AxiosError) {
-    const message = (error?.response?.data as any).message as string;
-    dispatchTranscendanceState({
-      type: TranscendanceStateActionType.TOGGLE_TOAST,
-      toast: {
-        type: ToastType.ERROR,
-        title: "Error",
-        message: message,
-      },
-    });
   }
 
   function onCancel() {

@@ -4,7 +4,6 @@ import { AxiosResponse } from "axios";
 import { User } from "../interfaces/user.interface";
 
 const PATH = "friendship";
-
 class FriendshipsService {
   async getNone(userId: string): Promise<Response<User[]>> {
     return resolve<User[]>(
