@@ -96,13 +96,6 @@ export default function ChannelInfoDialog({
   };
 
   useEffect(() => {
-    // if (userSocket.socket.connected) {
-    //   ["userConnected, userDisconnected"].forEach((element) => {
-    //     userSocket.socket.on(element, () => {
-    //       refetch();
-    //     });
-    //   });
-    // }
     if (channelSocket.socket.connected) {
       channelSocket.registerListener("roomJoined", userJoinedListener);
       channelSocket.registerListener("roomLeft", userLeftListener);
@@ -116,10 +109,6 @@ export default function ChannelInfoDialog({
         channelSocket.removeListener("roomLeft", userLeftListener);
         channelSocket.removeListener("roleUpdated");
       }
-      //   if (userSocket.socket.connected) {
-      //     userSocket.socket.off("userConnected");
-      //     userSocket.socket.off("userDisconnected");
-      //   }
     };
   }, [channelSocket.socket, channelSocket.socket.connected]);
 

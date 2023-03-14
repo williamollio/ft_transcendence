@@ -68,10 +68,6 @@ export default function PersonalStatPanel(props: Props) {
           <Divider />
           {title === "Ranked" ? (
             <>
-              {/* <SingleStatComponent
-                title="Highest Rating"
-                value="0"
-			></SingleStatComponent> */}
               <TwoStatsComponent
                 bottomBorder={false}
                 leftTitle="Current Rating"
@@ -101,11 +97,6 @@ export default function PersonalStatPanel(props: Props) {
                 }
                 postfix="%"
               ></SingleStatComponent>
-              {/* <SingleStatComponent
-                bottomBorder={false}
-                title="Highest Score"
-                value="0"
-              ></SingleStatComponent> */}
             </>
           )}
         </Paper>
