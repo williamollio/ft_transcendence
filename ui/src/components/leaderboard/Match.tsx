@@ -27,7 +27,7 @@ export default function Match(props: Props) {
           Ranked
         </TableCell>
         <TableCell align="right" sx={{ borderBottom: "unset" }}>
-          <Grid container alignItems="center" justifyContent="left">
+          <Grid container alignItems="center" justifyContent="right">
             <Grid item>
               <Avatar
                 style={{

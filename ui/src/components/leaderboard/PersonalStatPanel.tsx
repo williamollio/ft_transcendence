@@ -5,6 +5,8 @@ import TwoStatsComponent from "./TwoStatsComponen";
 import StatsService from "../../services/stats.service";
 import { useEffect, useState } from "react";
 import { playerStats } from "../../interfaces/stats.interface";
+import { makeStyles } from "tss-react/mui";
+import classes from "../../styles.module.scss";
 
 interface Props {
   playerId: string;
@@ -13,6 +15,7 @@ interface Props {
 }
 
 export default function PersonalStatPanel(props: Props) {
+  const { classes } = useStyles();
   const { lr, title, playerId } = props;
 
   const { data, isLoading, isError, isRefetching } = useQuery(
@@ -41,16 +44,17 @@ export default function PersonalStatPanel(props: Props) {
 
   return (
     <>
-      <Paper
-        sx={{
-          position: "absolute",
-          top: "185px",
-          height: "auto",
-          width: "20%",
-          ...(lr ? { left: "77px" } : { right: "77px" }),
-        }}
-      >
-        <Box>
+      <Box>
+        <Paper
+          className={classes.colorScheme}
+          sx={{
+            position: "absolute",
+            top: "185px",
+            height: "auto",
+            width: "20%",
+            ...(lr ? { left: "77px" } : { right: "77px" }),
+          }}
+        >
           <Grid
             direction={"column"}
             container
@@ -104,8 +108,16 @@ export default function PersonalStatPanel(props: Props) {
               ></SingleStatComponent> */}
             </>
           )}
-        </Box>
-      </Paper>
+        </Paper>
+      </Box>
     </>
   );
 }
+
+const useStyles = makeStyles()(() => ({
+  colorScheme: {
+    backgroundColor: classes.colorPrimary,
+    color: classes.colorPrimary,
+    WebkitTextFillColor: classes.colorSecondary,
+  },
+}));

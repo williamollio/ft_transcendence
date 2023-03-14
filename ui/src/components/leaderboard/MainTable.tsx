@@ -4,6 +4,9 @@ import { leaderBoardEntry } from "../../interfaces/stats.interface";
 import LeaderboardTableHead from "./LeaderboardTableHead";
 import PlayerRow from "./PlayerRow";
 import TableToolbar from "./TableToolbar";
+import { makeStyles } from "tss-react/mui";
+import classes from "../../styles.module.scss";
+
 
 interface Props {
   query: {
@@ -15,6 +18,8 @@ interface Props {
 }
 
 export default function MainTalbe(props: Props) {
+  const { classes } = useStyles();
+
   const [filteredList, setFilteredList] = useState<Array<leaderBoardEntry>>([]);
   const [fullList, setFullList] = useState<Array<leaderBoardEntry>>([]);
 
@@ -63,11 +68,16 @@ export default function MainTalbe(props: Props) {
   };
 
   return (
-    <Box sx={{ width: "97%", height: "97%" }}>
-      <Paper sx={{ width: "100%", mb: 2, overflow: "hidden" }}>
+    <Box className={classes.boxStyle}>
+      <Paper className={classes.paperStyle}>
         <TableToolbar filter={filter} />
-        <TableContainer sx={{ maxHeight: "600px" }}>
-          <Table stickyHeader>
+        <TableContainer
+          className={classes.colorScheme}
+          sx={{
+            maxHeight: "600px",
+          }}
+        >
+          <Table className={classes.colorScheme} stickyHeader>
             <LeaderboardTableHead />
             <TableBody>
               {filteredList.map((element, index) => (
@@ -84,3 +94,23 @@ export default function MainTalbe(props: Props) {
     </Box>
   );
 }
+
+const useStyles = makeStyles()(() => ({
+  colorScheme: {
+    backgroundColor: classes.colorPrimary,
+    color: classes.colorPrimary,
+    WebkitTextFillColor: classes.colorSecondary,
+  },
+  boxStyle: {
+    width: "97%",
+    height: "97%",
+  },
+  paperStyle: {
+    width: "100%",
+	height: "100%",
+    mb: 2,
+    overflow: "hidden",
+    backgroundColor: classes.colorPrimary,
+    color: classes.colorPrimary,
+  },
+}));
