@@ -1,13 +1,18 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpStatus } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Friendship, FriendshipStatus, UserStatus } from '@prisma/client';
+import { Response } from 'express';
 
 const MESSAGE_ERROR_UPDATE_REQUEST = "This friendship can't be updated";
+
+// TODO : william return correct error message/code
+// TODO : william add more safety conditions
+
 @Injectable()
 export class FriendshipService {
   constructor(private prisma: PrismaService) {}
 
-  public async getNoFriendship(userId: string) {
+  public async getNoFriendship(userId: string, res: Response) {
     try {
       const userFriendships = await this.prisma.friendship.findMany({
         where: {
@@ -19,16 +24,16 @@ export class FriendshipService {
         },
       });
 
-      const userIdsWithFriendship = new Set<string>();
+      const usersWithFriendship = new Set<string>();
       for (const friendship of userFriendships) {
         if (friendship.addresseeId !== userId) {
-          userIdsWithFriendship.add(friendship.addresseeId);
+          usersWithFriendship.add(friendship.addresseeId);
         } else {
-          userIdsWithFriendship.add(friendship.requesterId);
+          usersWithFriendship.add(friendship.requesterId);
         }
       }
 
-      const userIdsWithoutFriendship = await this.prisma.user.findMany({
+      const userWithoutFriendship = await this.prisma.user.findMany({
         where: {
           AND: [
             {
@@ -38,7 +43,7 @@ export class FriendshipService {
             },
             {
               NOT: {
-                id: { in: [...userIdsWithFriendship] },
+                id: { in: [...usersWithFriendship] },
               },
             },
           ],
@@ -50,16 +55,68 @@ export class FriendshipService {
         },
       });
 
-      return userIdsWithoutFriendship;
+      return res.status(HttpStatus.OK).send(userWithoutFriendship);
     } catch (error) {
-      if (typeof error === 'string') return error;
-      return 'errorUserService';
+      let errorMessage;
+      if (typeof error === 'string') {
+        errorMessage = error;
+      } else {
+        errorMessage = 'errorFriendshipService';
+      }
+      return res.status(HttpStatus.FORBIDDEN).send(errorMessage);
     }
   }
 
-  public async getFrienshipRequests(userId: string) {
+  public async getFriendshipsReceived(userId: string, res: Response) {
     try {
-      const friendshipRequests = await this.prisma.friendship.findMany({
+      const friendshipReceived = await this.prisma.friendship.findMany({
+        where: {
+          addresseeId: userId,
+          status: FriendshipStatus.REQUESTED,
+        },
+        select: {
+          requester: {
+            select: {
+              id: true,
+              name: true,
+              filename: true,
+              status: true,
+            },
+          },
+        },
+      });
+
+      const usersReceived: {
+        id: string;
+        name: string;
+        filename: string | null;
+        status: UserStatus;
+      }[] = [];
+
+      friendshipReceived.forEach((friendship) => {
+        usersReceived.push({
+          id: friendship.requester.id,
+          name: friendship.requester.name,
+          filename: friendship.requester.filename,
+          status: friendship.requester.status,
+        });
+      });
+
+      return res.status(HttpStatus.OK).send(usersReceived);
+    } catch (error) {
+      let errorMessage;
+      if (typeof error === 'string') {
+        errorMessage = error;
+      } else {
+        errorMessage = 'errorFriendshipService';
+      }
+      return res.status(HttpStatus.FORBIDDEN).send(errorMessage);
+    }
+  }
+
+  public async getFriendshipRequested(userId: string, res: Response) {
+    try {
+      const friendshipRequested = await this.prisma.friendship.findMany({
         where: {
           requesterId: userId,
           status: FriendshipStatus.REQUESTED,
@@ -76,15 +133,15 @@ export class FriendshipService {
         },
       });
 
-      const users: {
+      const usersRequested: {
         id: string;
         name: string;
         filename: string | null;
         status: UserStatus;
       }[] = [];
 
-      friendshipRequests.forEach((friendship) => {
-        users.push({
+      friendshipRequested.forEach((friendship) => {
+        usersRequested.push({
           id: friendship.addressee.id,
           name: friendship.addressee.name,
           filename: friendship.addressee.filename,
@@ -92,14 +149,19 @@ export class FriendshipService {
         });
       });
 
-      return users;
+      return res.status(HttpStatus.OK).send(usersRequested);
     } catch (error) {
-      if (typeof error === 'string') return error;
-      return 'errorUserService';
+      let errorMessage;
+      if (typeof error === 'string') {
+        errorMessage = error;
+      } else {
+        errorMessage = 'errorFriendshipService';
+      }
+      return res.status(HttpStatus.FORBIDDEN).send(errorMessage);
     }
   }
 
-  public async getFrienshipAccepted(userId: string) {
+  public async getFriendshipAccepted(userId: string, res: Response) {
     try {
       const friendshipRequests = await this.prisma.friendship.findMany({
         where: {
@@ -128,7 +190,7 @@ export class FriendshipService {
         },
       });
 
-      const users: {
+      const friends: {
         id: string;
         name: string;
         filename: string | null;
@@ -137,7 +199,7 @@ export class FriendshipService {
 
       friendshipRequests.forEach((friendship) => {
         if (friendship.requester.id !== userId) {
-          users.push({
+          friends.push({
             id: friendship.requester.id,
             name: friendship.requester.name,
             filename: friendship.requester.filename,
@@ -146,7 +208,7 @@ export class FriendshipService {
         }
 
         if (friendship.addressee.id !== userId) {
-          users.push({
+          friends.push({
             id: friendship.addressee.id,
             name: friendship.addressee.name,
             filename: friendship.addressee.filename,
@@ -155,73 +217,49 @@ export class FriendshipService {
         }
       });
 
-      return users;
+      return res.status(HttpStatus.OK).send(friends);
     } catch (error) {
-      if (typeof error === 'string') return error;
-      return 'errorUserService';
+      let errorMessage;
+      if (typeof error === 'string') {
+        errorMessage = error;
+      } else {
+        errorMessage = 'errorFriendshipService';
+      }
+      return res.status(HttpStatus.FORBIDDEN).send(errorMessage);
     }
   }
 
-  public async getFrienshipsRequestsReceived(userId: string) {
+  public async createFriendship(
+    userId: string,
+    friendId: string,
+    res: Response,
+  ) {
     try {
-      const friendshipRequests = await this.prisma.friendship.findMany({
-        where: {
-          addresseeId: userId,
-          status: FriendshipStatus.REQUESTED,
-        },
-        select: {
-          requester: {
-            select: {
-              id: true,
-              name: true,
-              filename: true,
-              status: true,
-            },
-          },
-        },
-      });
-
-      const users: {
-        id: string;
-        name: string;
-        filename: string | null;
-        status: UserStatus;
-      }[] = [];
-
-      friendshipRequests.forEach((friendship) => {
-        users.push({
-          id: friendship.requester.id,
-          name: friendship.requester.name,
-          filename: friendship.requester.filename,
-          status: friendship.requester.status,
-        });
-      });
-
-      return users;
-    } catch (error) {
-      if (typeof error === 'string') return error;
-      return 'errorUserService';
-    }
-  }
-
-  public async createFrienship(userId: string, friendId: string) {
-    try {
-      const friendship = await this.prisma.friendship.create({
+      const friendshipCreated = await this.prisma.friendship.create({
         data: {
           requesterId: userId,
           addresseeId: friendId,
           status: FriendshipStatus.REQUESTED,
         },
       });
-      return friendship;
+      return res.status(HttpStatus.OK).send(friendshipCreated);
     } catch (error) {
-      if (typeof error === 'string') return error;
-      return 'errorUserService';
+      let errorMessage;
+      if (typeof error === 'string') {
+        errorMessage = error;
+      } else {
+        errorMessage = 'errorFriendshipService';
+      }
+      return res.status(HttpStatus.FORBIDDEN).send(errorMessage);
     }
   }
 
   // TODO : William requested can accept friendship
-  public async acceptFriendship(userId: string, friendId: string) {
+  public async acceptFriendship(
+    userId: string,
+    friendId: string,
+    res: Response,
+  ) {
     try {
       const friendship = await this.prisma.friendship.findFirst({
         where: {
@@ -241,22 +279,32 @@ export class FriendshipService {
           },
           data: { status: FriendshipStatus.ACCEPTED },
         });
-        return await this.prisma.friendship.findFirst({
+        const friendshipUpdated = await this.prisma.friendship.findFirst({
           where: {
             requesterId: friendId,
             addresseeId: userId,
           },
         });
+        return res.status(HttpStatus.OK).send(friendshipUpdated);
       } else {
         throw MESSAGE_ERROR_UPDATE_REQUEST;
       }
     } catch (error) {
-      if (typeof error === 'string') return error;
-      return 'errorUserService';
+      let errorMessage;
+      if (typeof error === 'string') {
+        errorMessage = error;
+      } else {
+        errorMessage = 'errorFriendshipService';
+      }
+      return res.status(HttpStatus.FORBIDDEN).send(errorMessage);
     }
   }
 
-  public async deleteFriendship(userId: string, friendId: string) {
+  public async deleteFriendship(
+    userId: string,
+    friendId: string,
+    res: Response,
+  ) {
     try {
       const friendshipDeleted = await this.prisma.friendship.deleteMany({
         where: {
@@ -266,10 +314,15 @@ export class FriendshipService {
           ],
         },
       });
-      return friendshipDeleted;
+      return res.status(HttpStatus.OK).send(friendshipDeleted);
     } catch (error) {
-      if (typeof error === 'string') return error;
-      return 'errorUserService';
+      let errorMessage;
+      if (typeof error === 'string') {
+        errorMessage = error;
+      } else {
+        errorMessage = 'errorFriendshipService';
+      }
+      return res.status(HttpStatus.FORBIDDEN).send(errorMessage);
     }
   }
 
@@ -278,15 +331,15 @@ export class FriendshipService {
     friendship: Friendship | null,
   ) {
     if (
-      FriendshipStatus.ACCEPTED &&
-      friendship?.status === FriendshipStatus.ACCEPTED
-    ) {
-      throw MESSAGE_ERROR_UPDATE_REQUEST;
-    } else if (
       type === FriendshipStatus.ACCEPTED &&
       friendship?.status === FriendshipStatus.REQUESTED
     ) {
       return true;
+    } else if (
+      FriendshipStatus.ACCEPTED &&
+      friendship?.status === FriendshipStatus.ACCEPTED
+    ) {
+      return false;
     } else {
       return false;
     }

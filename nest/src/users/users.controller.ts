@@ -51,7 +51,6 @@ export class UsersController {
   @Get(':id')
   @ApiOkResponse({ type: UserEntity })
   public async findOne(@Param('id') id: string) {
-    // + operator casts to a number
     return this.usersService.findOne(id);
   }
 
@@ -59,7 +58,6 @@ export class UsersController {
   @UseGuards(JwtGuard)
   @ApiOkResponse({ type: UserEntity })
   public async findOneByName(@Param('name') name: string) {
-    // + operator casts to a number
     return this.usersService.findOneByName(name);
   }
 
