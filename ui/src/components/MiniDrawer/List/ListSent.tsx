@@ -6,7 +6,7 @@ import {
   Avatar,
   ListItemText,
 } from "@mui/material";
-import { UserIds } from "../../../interfaces/user.interface";
+import { User } from "../../../interfaces/user.interface";
 import React from "react";
 import { fetchProfilePicture } from "../../../utils/picture-helper";
 import CloseIcon from "@mui/icons-material/Close";
@@ -16,7 +16,7 @@ import { StyledAvatarBadge } from "../AvatarBadge/StyledAvatarBadge";
 interface Props {
   userId: string;
   open: boolean;
-  users: UserIds[];
+  users: User[];
   triggerDrawerOpen: () => void;
 }
 export default function ListSent(props: Props) {
@@ -54,7 +54,7 @@ export default function ListSent(props: Props) {
   }
   return (
     <List>
-      {users.map((user: UserIds, index) => (
+      {users.map((user: User, index) => (
         <ListItem key={index} disablePadding sx={{ display: "block" }}>
           <ListItemButton
             sx={{

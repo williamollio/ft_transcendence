@@ -7,7 +7,7 @@ import {
   ListItemText,
 } from "@mui/material";
 import ChatIcon from "@mui/icons-material/Chat";
-import { UserIds } from "../../../interfaces/user.interface";
+import { User } from "../../../interfaces/user.interface";
 import React from "react";
 import { fetchProfilePicture } from "../../../utils/picture-helper";
 import friendshipsService from "../../../services/friendships.service";
@@ -17,7 +17,7 @@ import { StyledAvatarBadge } from "../AvatarBadge/StyledAvatarBadge";
 interface Props {
   userId: string;
   open: boolean;
-  users: UserIds[];
+  users: User[];
   triggerDrawerOpen: () => void;
 }
 export default function ListFriends(props: Props) {
@@ -59,7 +59,7 @@ export default function ListFriends(props: Props) {
   }
   return (
     <List>
-      {users.map((user: UserIds, index) => (
+      {users.map((user: User, index) => (
         <ListItem key={index} disablePadding sx={{ display: "flex" }}>
           <ListItemButton
             sx={{

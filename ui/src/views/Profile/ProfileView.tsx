@@ -11,7 +11,6 @@ import {
   Divider,
 } from "@mui/material";
 import usersService from "../../services/users.service";
-import { UserIds } from "../../interfaces/user.interface";
 import { User } from "../../interfaces/user.interface";
 import { useNavigate } from "react-router-dom";
 import { RoutePath } from "../../interfaces/router.interface";
@@ -121,14 +120,14 @@ export default function ProfileView(props: Props): React.ReactElement {
   }
 
   async function fetchUsersWithoutFriendship() {
-    const usersWithoutFriendship: Response<UserIds[]> =
+    const usersWithoutFriendship: Response<User[]> =
       await friendshipsService.getNone(userId);
     const isSuccess = !usersWithoutFriendship?.error;
     if (!isSuccess) {
       showErrorToast(usersWithoutFriendship.error);
     } else {
       const usersAsLabelValue: LabelValue[] = usersWithoutFriendship.data.map(
-        (user: UserIds) => {
+        (user: User) => {
           return {
             label: `${user.name}`,
             value: user.id,
@@ -177,7 +176,7 @@ export default function ProfileView(props: Props): React.ReactElement {
   }
 
   async function onSubmitFriendship(data: FieldValues) {
-    const friendsList: UserIds[] | undefined = data.friends?.map(
+    const friendsList: User[] | undefined = data.friends?.map(
       (friend: LabelValue) => {
         return {
           id: friend,

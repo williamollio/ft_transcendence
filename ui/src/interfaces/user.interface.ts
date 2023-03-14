@@ -1,15 +1,8 @@
-export interface UserIds {
+export interface User {
   id: string;
-  name?: string;
+  name: string;
   filename?: string;
   status?: UserStatus;
-}
-export interface User {
-  id: number;
-  name: string;
-  createdAt: string;
-  updatedAt: string;
-  filename?: string;
 }
 
 export enum UserStatus {

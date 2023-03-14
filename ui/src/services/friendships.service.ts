@@ -1,46 +1,43 @@
 import { axiosInstance } from "./common/axios-instance";
 import { resolve, Response } from "./common/resolve";
 import { AxiosResponse } from "axios";
-import { UserIds } from "../interfaces/user.interface";
+import { User } from "../interfaces/user.interface";
 
 const PATH = "friendship";
 
 class FriendshipsService {
-  async getNone(userId: string): Promise<Response<UserIds[]>> {
-    return resolve<UserIds[]>(
+  async getNone(userId: string): Promise<Response<User[]>> {
+    return resolve<User[]>(
       axiosInstance
         .get(`${PATH}/none/${userId}`)
         .then((res: AxiosResponse) => res.data)
     );
   }
-  async getRequestsReceived(userId: string): Promise<Response<UserIds[]>> {
-    return resolve<UserIds[]>(
+  async getRequestsReceived(userId: string): Promise<Response<User[]>> {
+    return resolve<User[]>(
       axiosInstance
         .get(`${PATH}/requests-received/${userId}`)
         .then((res: AxiosResponse) => res.data)
     );
   }
 
-  async getRequests(userId: string): Promise<Response<UserIds[]>> {
-    return resolve<UserIds[]>(
+  async getRequests(userId: string): Promise<Response<User[]>> {
+    return resolve<User[]>(
       axiosInstance
         .get(`${PATH}/requests/${userId}`)
         .then((res: AxiosResponse) => res.data)
     );
   }
 
-  async getAccepted(userId: string): Promise<Response<UserIds[]>> {
-    return resolve<UserIds[]>(
+  async getAccepted(userId: string): Promise<Response<User[]>> {
+    return resolve<User[]>(
       axiosInstance
         .get(`${PATH}/accepted/${userId}`)
         .then((res: AxiosResponse) => res.data)
     );
   }
 
-  async postRequest(
-    userId: string,
-    friendIds: UserIds
-  ): Promise<Response<void>> {
+  async postRequest(userId: string, friendIds: User): Promise<Response<void>> {
     return resolve<void>(
       axiosInstance
         .post(`${PATH}/request/${userId}`, friendIds)

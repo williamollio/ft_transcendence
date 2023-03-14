@@ -5,7 +5,7 @@ import Box from "@mui/material/Box";
 import MuiDrawer from "@mui/material/Drawer";
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
 import { Divider, Typography } from "@mui/material";
-import { UserIds } from "../../interfaces/user.interface";
+import { User } from "../../interfaces/user.interface";
 import { Cookie, getTokenData } from "../../utils/auth-helper";
 import friendshipsService from "../../services/friendships.service";
 import ListFriends from "./List/ListFriends";
@@ -59,9 +59,9 @@ const Drawer = styled(MuiDrawer, {
 export default function MiniDrawer() {
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
-  const [friends, setFriends] = React.useState<UserIds[]>([]);
-  const [requests, setRequests] = React.useState<UserIds[]>([]);
-  const [requestsReceived, setRequestsReceived] = React.useState<UserIds[]>([]);
+  const [friends, setFriends] = React.useState<User[]>([]);
+  const [requests, setRequests] = React.useState<User[]>([]);
+  const [requestsReceived, setRequestsReceived] = React.useState<User[]>([]);
   const [userId, setUserId] = React.useState<string>("");
 
   React.useEffect(() => {
@@ -78,19 +78,20 @@ export default function MiniDrawer() {
   }, [userId]);
 
   async function fetchFriends() {
-    const usersFriends: Response<UserIds[]> =
-      await friendshipsService.getAccepted(userId);
+    const usersFriends: Response<User[]> = await friendshipsService.getAccepted(
+      userId
+    );
     setFriends(usersFriends.data);
   }
 
   async function fetchRequests() {
-    const usersRequests: Response<UserIds[]> =
+    const usersRequests: Response<User[]> =
       await friendshipsService.getRequests(userId);
     setRequests(usersRequests.data);
   }
 
   async function fetchRequestsReceived() {
-    const usersRequestsReceived: Response<UserIds[]> =
+    const usersRequestsReceived: Response<User[]> =
       await friendshipsService.getRequestsReceived(userId);
     setRequestsReceived(usersRequestsReceived.data);
   }
