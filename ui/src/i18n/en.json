@@ -20,5 +20,8 @@
   "addFriends": "Request Frienships",
   "errorMessages": {
     "required": "This field is required"
-  }
+  },
+  "friends": "Friends",
+  "requested": "Requested",
+  "received": "Received"
 }

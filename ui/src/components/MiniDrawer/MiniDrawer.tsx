@@ -15,6 +15,8 @@ import { TranscendanceContext } from "../../context/transcendance-context";
 import { AxiosError } from "axios";
 import { ToastType } from "../../context/toast";
 import { TranscendanceStateActionType } from "../../context/transcendance-reducer";
+import { translationKeys } from "./constants";
+import { useTranslation } from "react-i18next";
 
 const drawerWidth = 240;
 
@@ -61,6 +63,7 @@ const Drawer = styled(MuiDrawer, {
 }));
 
 export default function MiniDrawer() {
+  const { t } = useTranslation();
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
   const [friends, setFriends] = React.useState<User[]>([]);
@@ -142,11 +145,11 @@ export default function MiniDrawer() {
           mt="2.5rem"
         >
           <Typography
-            fontSize="12px"
+            fontSize="11px"
             color={"#8A8A8A"}
             sx={{ textDecoration: "underline" }}
           >
-            Friends
+            {t(translationKeys.friends)}
           </Typography>
         </Box>
         <ListFriends
@@ -169,11 +172,11 @@ export default function MiniDrawer() {
           width={"calc(64px + 1px)"}
         >
           <Typography
-            fontSize="12px"
+            fontSize="11px"
             color={"#8A8A8A"}
             sx={{ textDecoration: "underline" }}
           >
-            Sent
+            {t(translationKeys.requested)}
           </Typography>
         </Box>
         <ListRequested
@@ -196,11 +199,11 @@ export default function MiniDrawer() {
           width={"calc(64px + 1px)"}
         >
           <Typography
-            fontSize="12px"
+            fontSize="11px"
             color={"#8A8A8A"}
             sx={{ textDecoration: "underline" }}
           >
-            Received
+            {t(translationKeys.received)}
           </Typography>
         </Box>
         <ListReceived
