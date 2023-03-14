@@ -11,6 +11,10 @@ import friendshipsService from "../../services/friendships.service";
 import ListFriends from "./List/ListFriends";
 import ListSent from "./List/ListSent";
 import ListReceived from "./List/ListReceived";
+import { TranscendanceContext } from "../../context/transcendance-context";
+import { AxiosError } from "axios";
+import { ToastType } from "../../context/toast";
+import { TranscendanceStateActionType } from "../../context/transcendance-reducer";
 
 const drawerWidth = 240;
 
@@ -63,6 +67,7 @@ export default function MiniDrawer() {
   const [requests, setRequests] = React.useState<User[]>([]);
   const [requestsReceived, setRequestsReceived] = React.useState<User[]>([]);
   const [userId, setUserId] = React.useState<string>("");
+  const { dispatchTranscendanceState } = React.useContext(TranscendanceContext);
 
   React.useEffect(() => {
     let token = localStorage.getItem(Cookie.TOKEN);
@@ -77,23 +82,50 @@ export default function MiniDrawer() {
     }
   }, [userId]);
 
+  function showErrorToast(error?: AxiosError) {
+    const message = (error?.response?.data as any).message as string;
+    dispatchTranscendanceState({
+      type: TranscendanceStateActionType.TOGGLE_TOAST,
+      toast: {
+        type: ToastType.ERROR,
+        title: "Error",
+        message: message,
+      },
+    });
+  }
+
   async function fetchFriends() {
     const usersFriends: Response<User[]> = await friendshipsService.getAccepted(
       userId
     );
-    setFriends(usersFriends.data);
+    const isSuccess = !usersFriends?.error;
+    if (!isSuccess) {
+      showErrorToast(usersFriends.error);
+    } else {
+      setFriends(usersFriends.data);
+    }
   }
 
   async function fetchRequests() {
     const usersRequests: Response<User[]> =
       await friendshipsService.getRequests(userId);
-    setRequests(usersRequests.data);
+    const isSuccess = !usersRequests?.error;
+    if (!isSuccess) {
+      showErrorToast(usersRequests.error);
+    } else {
+      setRequests(usersRequests.data);
+    }
   }
 
   async function fetchRequestsReceived() {
     const usersRequestsReceived: Response<User[]> =
       await friendshipsService.getRequestsReceived(userId);
-    setRequestsReceived(usersRequestsReceived.data);
+    const isSuccess = !usersRequestsReceived?.error;
+    if (!isSuccess) {
+      showErrorToast(usersRequestsReceived.error);
+    } else {
+      setRequestsReceived(usersRequestsReceived.data);
+    }
   }
 
   const triggerDrawerOpen = () => {
@@ -103,7 +135,6 @@ export default function MiniDrawer() {
   return (
     <Box sx={{ display: "flex" }}>
       <Drawer variant="permanent" open={open}>
-        {/* TODO : william responsiveness */}
         <Box
           display={"flex"}
           justifyContent="center"
