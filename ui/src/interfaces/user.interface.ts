@@ -4,11 +4,6 @@ export interface UserIds {
   filename?: string;
   status?: UserStatus;
 }
-
-export interface UserCreation {
-  name: string;
-}
-
 export interface User {
   id: number;
   name: string;
