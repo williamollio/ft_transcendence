@@ -12,18 +12,18 @@ class FriendshipsService {
         .then((res: AxiosResponse) => res.data)
     );
   }
-  async getRequestsReceived(userId: string): Promise<Response<User[]>> {
+  async getReceived(userId: string): Promise<Response<User[]>> {
     return resolve<User[]>(
       axiosInstance
-        .get(`${PATH}/requests-received/${userId}`)
+        .get(`${PATH}/received/${userId}`)
         .then((res: AxiosResponse) => res.data)
     );
   }
 
-  async getRequests(userId: string): Promise<Response<User[]>> {
+  async getRequested(userId: string): Promise<Response<User[]>> {
     return resolve<User[]>(
       axiosInstance
-        .get(`${PATH}/requests/${userId}`)
+        .get(`${PATH}/requested/${userId}`)
         .then((res: AxiosResponse) => res.data)
     );
   }

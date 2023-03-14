@@ -55,7 +55,7 @@ export default function ListReceived(props: Props) {
   async function acceptRequestReceived(friendId: string) {
     const responseAccept = await friendshipsService.patchAccept(
       userId,
-      "user4"
+      friendId
     );
     const isSuccess = !responseAccept?.error;
     if (!isSuccess) {

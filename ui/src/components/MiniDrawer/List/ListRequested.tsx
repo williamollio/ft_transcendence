@@ -21,7 +21,7 @@ interface Props {
   triggerDrawerOpen: () => void;
   showErrorToast: (error?: AxiosError) => void;
 }
-export default function ListSent(props: Props) {
+export default function ListRequested(props: Props) {
   const { userId, open, users, triggerDrawerOpen, showErrorToast } = props;
 
   const [profilePictures, setProfilePictures] = React.useState<{

@@ -9,7 +9,7 @@ import { User } from "../../interfaces/user.interface";
 import { Cookie, getTokenData } from "../../utils/auth-helper";
 import friendshipsService from "../../services/friendships.service";
 import ListFriends from "./List/ListFriends";
-import ListSent from "./List/ListSent";
+import ListRequested from "./List/ListRequested";
 import ListReceived from "./List/ListReceived";
 import { TranscendanceContext } from "../../context/transcendance-context";
 import { AxiosError } from "axios";
@@ -77,13 +77,13 @@ export default function MiniDrawer() {
     }
     if (userId) {
       fetchFriends();
-      fetchRequests();
-      fetchRequestsReceived();
+      fetchRequested();
+      fetchReceived();
     }
   }, [userId]);
 
   function showErrorToast(error?: AxiosError) {
-    const message = (error?.response?.data as any).message as string;
+    const message = error?.response?.data as any;
     dispatchTranscendanceState({
       type: TranscendanceStateActionType.TOGGLE_TOAST,
       toast: {
@@ -106,25 +106,25 @@ export default function MiniDrawer() {
     }
   }
 
-  async function fetchRequests() {
-    const usersRequests: Response<User[]> =
-      await friendshipsService.getRequests(userId);
-    const isSuccess = !usersRequests?.error;
+  async function fetchRequested() {
+    const usersRequested: Response<User[]> =
+      await friendshipsService.getRequested(userId);
+    const isSuccess = !usersRequested?.error;
     if (!isSuccess) {
-      showErrorToast(usersRequests.error);
+      showErrorToast(usersRequested.error);
     } else {
-      setRequests(usersRequests.data);
+      setRequests(usersRequested.data);
     }
   }
 
-  async function fetchRequestsReceived() {
-    const usersRequestsReceived: Response<User[]> =
-      await friendshipsService.getRequestsReceived(userId);
-    const isSuccess = !usersRequestsReceived?.error;
+  async function fetchReceived() {
+    const usersReceived: Response<User[]> =
+      await friendshipsService.getReceived(userId);
+    const isSuccess = !usersReceived?.error;
     if (!isSuccess) {
-      showErrorToast(usersRequestsReceived.error);
+      showErrorToast(usersReceived.error);
     } else {
-      setRequestsReceived(usersRequestsReceived.data);
+      setRequestsReceived(usersReceived.data);
     }
   }
 
@@ -176,7 +176,7 @@ export default function MiniDrawer() {
             Sent
           </Typography>
         </Box>
-        <ListSent
+        <ListRequested
           userId={userId}
           open={open}
           users={requests}
