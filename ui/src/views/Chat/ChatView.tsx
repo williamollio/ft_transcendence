@@ -15,7 +15,7 @@ import {
 import { Cookie } from "../../utils/auth-helper";
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { UserSocket } from "../../classes/UserSocket.class";
-import MiniDrawer from "../../components/MiniDrawer/MiniDrawer";
+import MiniDrawer from "../../components/LeftDrawer/MiniDrawer";
 
 interface Props {
   userSocket: UserSocket;
