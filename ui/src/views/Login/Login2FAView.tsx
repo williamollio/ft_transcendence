@@ -1,6 +1,6 @@
 import React, { ReactElement, useRef } from "react";
 import { makeStyles } from "tss-react/mui";
-import { Typography, Button, Grid, TextField } from "@mui/material";
+import { Typography, Button, Grid, TextField, Box } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { translationKeys } from "./constants";
 import {
@@ -100,14 +100,24 @@ export default function Login2FAView(): ReactElement {
                   return <OTPInputField index={index} key={index} />;
                 })}
             </Grid>
-            <Button
-              id="submit-button"
-              onClick={() => handleSubmit()}
-              sx={{ width: "100px", height: "50px" }}
-              variant="contained"
+            <Box
+              sx={{
+                display: "flex",
+                width: "22rem",
+                alignItems: "center",
+                justifyContent: "center",
+                flexDirection: "column",
+              }}
             >
-              {t(translationKeys.buttons.submit)}
-            </Button>
+              <Button
+                id="submit-button"
+                onClick={() => handleSubmit()}
+                sx={{ width: "100px", height: "50px" }}
+                variant="contained"
+              >
+                {t(translationKeys.buttons.submit)}
+              </Button>
+            </Box>
           </ContentWrapper>
         </CardContainer>
       </ProfileCard>

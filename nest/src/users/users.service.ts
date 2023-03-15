@@ -40,8 +40,6 @@ export class UsersService {
         },
       });
 
-      this.updateFriendsList(User.id, createUserDto);
-
       return User;
     } catch (error) {
       throw error;
@@ -64,55 +62,10 @@ export class UsersService {
   public async findByIntraId(intraId: string) {
     return this.prisma.user.findUnique({
       where: { intraId: intraId },
-      include: { friends: false },
-    });
-  }
-
-  private async updateFriendsList(
-    userId: string,
-    userDto: CreateUserDto | UpdateUserDto,
-  ) {
-    const currentFriends = await this.prisma.user
-      .findUnique({ where: { id: userId } })
-      .friends();
-
-    const newFriends = userDto.friends;
-
-    const friendsToRemove = currentFriends?.filter(
-      (friend) => !newFriends?.find((f) => f.id === friend.id),
-    );
-
-    const friendsToRemoveArr: { id: string }[] = [];
-    if (friendsToRemove) {
-      for (const friendToRemove of friendsToRemove) {
-        friendsToRemoveArr.push({ id: friendToRemove.id });
-      }
-    }
-
-    const friendsToAdd = newFriends?.filter(
-      (friend) => !currentFriends?.find((f) => f.id === friend.id),
-    );
-
-    const friendsToAddArr: { id: string }[] = [];
-    if (friendsToAdd) {
-      for (const friendToAdd of friendsToAdd) {
-        friendsToAddArr.push({ id: friendToAdd.id });
-      }
-    }
-
-    await this.prisma.user.update({
-      where: { id: userId },
-      data: {
-        friends: {
-          disconnect: friendsToRemoveArr,
-          connect: friendsToAddArr,
-        },
-      },
     });
   }
 
   public async findAll(res: Response) {
-    // return this.prisma.user.findMany({ include: { friends: true } });
     try {
       const nicknames = await this.prisma.user.findMany({
         select: {
@@ -131,14 +84,18 @@ export class UsersService {
   public async findOne(id: string) {
     return this.prisma.user.findUnique({
       where: { id },
-      include: { friends: true },
+    });
+  }
+
+  public async findFriends(id: string) {
+    return this.prisma.user.findUnique({
+      where: { id },
     });
   }
 
   public async findOneByName(name: string) {
     return this.prisma.user.findUnique({
       where: { name },
-      include: { friends: true },
     });
   }
 
@@ -159,7 +116,7 @@ export class UsersService {
         where: { id: userId },
         data: { name: updateUserDto.name },
       });
-      this.updateFriendsList(User.id, updateUserDto);
+
       return User;
     } catch (error) {
       throw error;

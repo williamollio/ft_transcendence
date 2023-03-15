@@ -1,7 +1,7 @@
 import { axiosInstance } from "./common/axios-instance";
 import { resolve, Response } from "./common/resolve";
 import { AxiosResponse } from "axios";
-import { User, UserCreation } from "../interfaces/user.interface";
+import { User } from "../interfaces/user.interface";
 
 const PATH = "users";
 
@@ -26,16 +26,11 @@ class UsersService {
     );
   }
 
-  async postUser(user: UserCreation): Promise<Response<void>> {
-    return resolve<void>(
-      axiosInstance.post(PATH, user).then((res: AxiosResponse) => res.data)
-    );
-  }
-
-  async patchUser(id: string, user: UserCreation): Promise<Response<void>> {
+  async patchUser(id: string, userName: string): Promise<Response<void>> {
+    const userDto = { name: userName };
     return resolve<void>(
       axiosInstance
-        .patch(`${PATH}/${id}`, user)
+        .patch(`${PATH}/${id}`, userDto)
         .then((res: AxiosResponse) => res.data)
     );
   }

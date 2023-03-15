@@ -8,9 +8,9 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { UserGateway } from './users/users.gateway';
 import { ChannelModule } from './channel/channel.module';
+import { FriendshipModule } from './friendship/friendship.module';
 import { GameModule } from './game/game.module';
 import { ScheduleModule } from '@nestjs/schedule';
-
 
 @Module({
   imports: [
@@ -20,8 +20,9 @@ import { ScheduleModule } from '@nestjs/schedule';
     ChannelModule,
     ThrottlerModule.forRoot({
       ttl: 60,
-      limit: 50,
+      limit: 200, // TODO : find right one
     }),
+    FriendshipModule,
     GameModule,
     ScheduleModule.forRoot(),
   ],

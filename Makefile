@@ -1,5 +1,5 @@
 uibuild :
-	docker compose -f docker-compose.dev.yml build ui
+	docker compose -f docker-compose.dev.yml build ui --no-cache
 
 uiup :
 	docker compose -f docker-compose.dev.yml up ui
@@ -8,7 +8,7 @@ uiclean:
 	docker image rm ft_transcendance_ui
 
 nestbuild :
-	docker compose -f docker-compose.dev.yml build nest
+	docker compose -f docker-compose.dev.yml build nest  --no-cache
 
 nestup :
 	docker compose -f docker-compose.dev.yml up nest

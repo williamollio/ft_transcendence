@@ -15,10 +15,17 @@ const theme = createTheme({
     fontFamily: "Arial",
   },
   components: {
+    MuiDivider: {
+      styleOverrides: {
+        root: {
+          borderLeft: "1px solid rgba(0, 0, 0, 0.3)",
+        },
+      },
+    },
     MuiInputLabel: {
       styleOverrides: {
         root: {
-          fontSize: "14px",
+          fontSize: "15px",
           fontWeight: "500",
         },
       },
@@ -57,7 +64,7 @@ const theme = createTheme({
     MuiAutocomplete: {
       styleOverrides: {
         root: {
-          height: "56px",
+          height: "53px",
           backgroundColor: "white",
         },
         listbox: {
@@ -65,6 +72,20 @@ const theme = createTheme({
             fontSize: "14px",
             fontWeight: "400",
           },
+        },
+      },
+    },
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          borderRadius: "2px",
+          fontSize: "14px",
+          fontFamily: "Helvetica",
+          fontWeight: "500",
+          minHeight: "40%",
+          paddingLeft: "3rem",
+          paddingRight: "3rem",
+          marginTop: "0.5rem",
         },
       },
     },

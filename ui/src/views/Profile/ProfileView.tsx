@@ -8,12 +8,12 @@ import {
   Input,
   Avatar,
   CircularProgress,
+  Divider,
 } from "@mui/material";
 import usersService from "../../services/users.service";
-import { UserCreation, User, Friends } from "../../interfaces/user.interface";
-import { useNavigate, useLocation } from "react-router-dom";
+import { User } from "../../interfaces/user.interface";
+import { useNavigate } from "react-router-dom";
 import { RoutePath } from "../../interfaces/router.interface";
-import { idTabs } from "../../interfaces/tab.interface";
 import { AxiosError } from "axios";
 import { TranscendanceContext } from "../../context/transcendance-context";
 import { ToastType } from "../../context/toast";
@@ -33,7 +33,9 @@ import {
 import { Controller, FieldValues, useForm } from "react-hook-form";
 import CustomMultiSelect from "../../components/shared/CustomMultiSelect/CustomMultiselect";
 import CustomTextField from "../../components/shared/CustomTextField/CustomTextField";
-import { Cookie, getTokenData, initAuthToken } from "../../utils/auth-helper";
+import { Cookie, getTokenData } from "../../utils/auth-helper";
+import MiniDrawer from "../../components/MiniDrawer/MiniDrawer";
+import friendshipsService from "../../services/friendships.service";
 import { UserSocket } from "../../classes/UserSocket.class";
 
 interface Props {
@@ -46,18 +48,17 @@ export default function ProfileView(props: Props): React.ReactElement {
   const { t } = useTranslation();
   const { classes } = useStyles();
   const navigate = useNavigate();
-  const location = useLocation();
   const { dispatchTranscendanceState } = React.useContext(TranscendanceContext);
   const [picture, setPicture] = useState<any>();
-  const [image, setImage] = useImageStore((state) => [
-    state.image,
-    state.setImage,
-  ]);
+  const [image, setImage] = useImageStore(
+    (state: { image: any; setImage: any }) => [state.image, state.setImage]
+  );
   const [users, setUsers] = useState<LabelValue[]>([]);
   const [userId, setUserId] = useState<string>("");
-  const [isEditMode, setIsEditMode] = useState<boolean>(true);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [currentUser, setCurrentUser] = useState<User>();
+  const [currentUser, setCurrentUser] = useState<User | null>();
+  const [initialName, setInitialName] = useState<string>();
+  const [token] = useState<string | null>(localStorage.getItem(Cookie.TOKEN));
 
   const {
     formState: { errors },
@@ -81,24 +82,14 @@ export default function ProfileView(props: Props): React.ReactElement {
   }, []);
 
   React.useEffect(() => {
-    let token;
-    if (location.state && location.state.editMode === false) {
-      setIsEditMode(false);
-    }
-    token = localStorage.getItem(Cookie.TOKEN);
     if (token === null) {
       navigate(RoutePath.LOGIN);
     } else {
-      setUserId(getTokenData(token).id.toString());
+      setUserId(getTokenData(token).id);
       if (userId) {
-        Promise.all([fetchUsers(), fetchCurrentUser(userId)])
-          .then(() => {
-            setIsLoading(false);
-          })
-          .catch((error) => {
-            setIsLoading(false);
-            showErrorToast(error);
-          });
+        fetchCurrentUser();
+        fetchUsersWithoutFriendship();
+        setIsLoading(false);
       }
     }
   }, [userId]);
@@ -107,81 +98,13 @@ export default function ProfileView(props: Props): React.ReactElement {
     for (const property in currentUser) {
       if (property === "name") {
         setValue(property, currentUser.name);
-      } else if (property === "friends") {
-        const friendsIds: number[] | undefined = currentUser.friends?.map(
-          (friend: Friends) => friend.id
-        );
-        setValue(property, friendsIds);
+        setInitialName(currentUser.name);
       }
     }
-  }, [currentUser, users]);
-
-  async function fetchCurrentUser(userId: string) {
-    const payload = await usersService.getUser(userId);
-    setCurrentUser(payload.data);
-  }
-
-  async function fetchUsers() {
-    const usersResponse: Response<User[]> = await usersService.getUsers();
-    const usersAsLabelValue: LabelValue[] = usersResponse.data.map(
-      (user: User) => {
-        return {
-          label: `${user.name}`,
-          value: user.id,
-        };
-      }
-    );
-    setUsers(usersAsLabelValue);
-  }
-
-  function navigateToGamePage() {
-    navigate(RoutePath.GAME, { state: { activeTabId: idTabs.GAME } });
-  }
-
-  async function handleOnSubmitPicture() {
-    let response;
-    const formData = new FormData();
-    formData.append("file", picture, picture.name);
-    response = await usersService.postUserImage(formData, userId);
-    const isSuccess = !response?.error;
-    if (!isSuccess) {
-      showErrorToast(response.error);
-      setImage(null);
-    }
-  }
-
-  async function handleOnSaveUser(data: FieldValues) {
-    let responseUser;
-
-    const friendsList: Friends[] | undefined = data.friends?.map(
-      (friend: LabelValue) => {
-        return {
-          id: friend,
-        };
-      }
-    );
-
-    const userCreation: UserCreation = {
-      name: data.name,
-      friends: friendsList,
-    };
-
-    if (userId) {
-      responseUser = await usersService.patchUser(userId, userCreation);
-      localStorage.setItem("userName" + userId, data.name);
-    }
-
-    const isSuccessUser = !responseUser?.error;
-    if (isSuccessUser) {
-      navigateToGamePage();
-    } else {
-      showErrorToast(responseUser?.error);
-    }
-  }
+  }, [currentUser]);
 
   function showErrorToast(error?: AxiosError) {
     const message = (error?.response?.data as any).message as string;
-
     dispatchTranscendanceState({
       type: TranscendanceStateActionType.TOGGLE_TOAST,
       toast: {
@@ -191,15 +114,86 @@ export default function ProfileView(props: Props): React.ReactElement {
       },
     });
   }
+
+  async function fetchCurrentUser() {
+    const user = await usersService.getUser(userId);
+    setCurrentUser(user.data);
+    const isSuccess = !user?.error;
+    if (!isSuccess) {
+      showErrorToast(user.error);
+      setCurrentUser(null);
+    } else {
+      setCurrentUser(user.data);
+      setInitialName(user.data.name);
+    }
+  }
+
+  async function fetchUsersWithoutFriendship() {
+    const usersWithoutFriendship: Response<User[]> =
+      await friendshipsService.getNone(userId);
+    const isSuccess = !usersWithoutFriendship?.error;
+    if (!isSuccess) {
+      showErrorToast(usersWithoutFriendship.error);
+    } else {
+      const usersAsLabelValue: LabelValue[] = usersWithoutFriendship.data.map(
+        (user: User) => {
+          return {
+            label: `${user.name}`,
+            value: user.id,
+          };
+        }
+      );
+      setUsers(usersAsLabelValue);
+    }
+  }
+
   function onCancel() {
-    navigate(-1);
+    setValue("name", initialName);
   }
 
   async function onSubmit(data: FieldValues) {
-    handleOnSaveUser(data);
+    const responseUser = await usersService.patchUser(userId, data.name);
+    const isSuccessUser = !responseUser?.error;
+    if (!isSuccessUser) {
+      showErrorToast(responseUser?.error);
+    } else {
+      localStorage.setItem("userName" + userId, data.name);
+    }
+
     if (picture) {
       handleOnSubmitPicture();
     }
+  }
+
+  async function handleOnSubmitPicture() {
+    const formData = new FormData();
+    formData.append("file", picture, picture.name);
+    const response = await usersService.postUserImage(formData, userId);
+    const isSuccess = !response?.error;
+    if (!isSuccess) {
+      showErrorToast(response.error);
+      setImage(null);
+    }
+  }
+
+  async function onSubmitFriendship(data: FieldValues) {
+    const friendsList: User[] | undefined = data.friends?.map(
+      (friend: LabelValue) => {
+        return {
+          id: friend,
+        };
+      }
+    );
+
+    let responseFrienship;
+    friendsList?.forEach(async function (friend) {
+      responseFrienship = await friendshipsService.postRequest(userId, friend);
+      const isSuccessFriendship = !responseFrienship?.error;
+      if (!isSuccessFriendship) {
+        showErrorToast(responseFrienship?.error);
+        return;
+      }
+    });
   }
 
   function handleOnChangePicture(e: ChangeEvent<HTMLInputElement>) {
@@ -212,6 +206,7 @@ export default function ProfileView(props: Props): React.ReactElement {
   return (
     <>
       <Navbar />
+      <MiniDrawer />
       <Background>
         <ProfileCard>
           <CardContainer>
@@ -230,43 +225,91 @@ export default function ProfileView(props: Props): React.ReactElement {
                 <CircularProgress />
               ) : (
                 <>
-                  <Box className={classes.avatarWrapper}>
-                    <Avatar
-                      src={image ? URL.createObjectURL(image) : ""}
-                      style={{
-                        width: "100px",
-                        height: "100px",
-                      }}
-                    />
-                  </Box>
-                  <Box className={classes.uploadButtonWrapper}>
-                    <Button
-                      variant="contained"
-                      component="label"
-                      className={classes.iconButton}
-                    >
-                      {t(translationKeys.updloadPicture)}
-                      <Input
-                        type="file"
-                        sx={{ display: "none" }}
-                        onChange={handleOnChangePicture}
-                      />
-                    </Button>
-                  </Box>
-                  <Box className={classes.inputWrapper}>
-                    <Box sx={{ width: "100%" }}>
-                      <CustomTextField
-                        label={"Name"}
-                        isRequired
-                        name="name"
-                        rules={{
-                          required: true,
+                  <Box
+                    sx={{
+                      width: "70%",
+                      height: "12rem",
+                      marginTop: "2rem",
+                      display: "flex",
+                      justifyContent: "center",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      flexWrap: "no-wrap",
+                    }}
+                  >
+                    <Box className={classes.avatarWrapper}>
+                      <Avatar
+                        src={image ? URL.createObjectURL(image) : ""}
+                        style={{
+                          width: "100px",
+                          height: "100px",
                         }}
-                        error={errors.name}
-                        register={register}
                       />
                     </Box>
+                    <Box className={classes.uploadButtonWrapper}>
+                      <Button
+                        color="primary"
+                        variant="contained"
+                        component="label"
+                      >
+                        {t(translationKeys.updloadPicture)}
+                        <Input
+                          type="file"
+                          sx={{ display: "none" }}
+                          onChange={handleOnChangePicture}
+                        />
+                      </Button>
+                    </Box>
                   </Box>
+                  <Box
+                    sx={{
+                      width: "70%",
+                      height: "8rem",
+                      marginTop: "2rem",
+                      display: "flex",
+                      justifyContent: "center",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      flexWrap: "no-wrap",
+                    }}
+                  >
+                    <Box className={classes.inputWrapper}>
+                      <Box sx={{ width: "100%" }}>
+                        <CustomTextField
+                          label={"Name"}
+                          isRequired
+                          name="name"
+                          rules={{
+                            required: true,
+                          }}
+                          error={errors.name}
+                          register={register}
+                        />
+                      </Box>
+                    </Box>
+                    <Box className={classes.buttonsWrapper}>
+                      <Button
+                        variant="contained"
+                        onClick={handleSubmit(onSubmit)}
+                      >
+                        {t(translationKeys.buttons.save)}
+                      </Button>
+                      <Button
+                        color="primary"
+                        variant="outlined"
+                        onClick={onCancel}
+                      >
+                        {t(translationKeys.buttons.cancel)}
+                      </Button>
+                    </Box>
+                  </Box>
+                  <Divider
+                    sx={{
+                      marginTop: "2.5rem",
+                      marginBottom: "2.5rem",
+                      width: "70%",
+                    }}
+                  ></Divider>
                   <Box className={classes.multiInputWrapper}>
                     <Box sx={{ width: "100%" }}>
                       <Controller
@@ -286,23 +329,13 @@ export default function ProfileView(props: Props): React.ReactElement {
                       />
                     </Box>
                   </Box>
-                  <Box className={classes.buttonsWrapper}>
+                  <Box className={classes.buttonRequestWrapper}>
                     <Button
-                      className={classes.iconButton}
-                      variant="outlined"
-                      onClick={handleSubmit(onSubmit)}
+                      variant="contained"
+                      onClick={handleSubmit(onSubmitFriendship)}
                     >
-                      {t(translationKeys.buttons.save)}
+                      {t(translationKeys.buttons.sendRequest)}
                     </Button>
-                    {isEditMode && (
-                      <Button
-                        className={classes.iconButton}
-                        variant="outlined"
-                        onClick={onCancel}
-                      >
-                        {t(translationKeys.buttons.cancel)}
-                      </Button>
-                    )}
                   </Box>
                 </>
               )}
@@ -316,45 +349,47 @@ export default function ProfileView(props: Props): React.ReactElement {
 
 // https://github.com/garronej/tss-react
 const useStyles = makeStyles()(() => ({
-  iconButton: {
-    height: "50%",
-    width: "50%",
-  },
   avatarWrapper: {
-    height: "20%",
+    height: "65%",
     width: "70%",
     display: "flex",
     justifyContent: "center",
-    alignItems: "center",
+    alignItems: "start",
   },
   buttonsWrapper: {
-    height: "20%",
-    width: "70%",
+    height: "40%",
+    width: "50%",
     display: "flex",
     justifyContent: "center",
-    alignItems: "center",
+    alignItems: "start",
     gap: "1em",
   },
-  uploadButtonWrapper: {
+  buttonRequestWrapper: {
     height: "10%",
-    width: "60%",
+    width: "50%",
     display: "flex",
     justifyContent: "center",
-    alignItems: "center",
+    alignItems: "start",
+  },
+  uploadButtonWrapper: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "end",
+    height: "35%",
   },
   inputWrapper: {
     display: "flex",
     justifyContent: "center",
-    alignItems: "center",
-    height: "20%",
-    width: "45%",
+    alignItems: "start",
+    height: "70%",
+    width: "70%",
+    minHeight: "77px",
   },
   multiInputWrapper: {
-    minHeight: "10%",
     width: "65%",
     display: "flex",
     justifyContent: "center",
-    alignItems: "center",
-    marginBottom: "4rem",
+    alignItems: "start",
+    minHeight: "77px",
   },
 }));

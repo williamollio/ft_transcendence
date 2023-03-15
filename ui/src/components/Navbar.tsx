@@ -8,9 +8,9 @@ import { useLocation } from "react-router-dom";
 import classes from "../styles.module.scss";
 import { useImageStore } from "../store/users-store";
 import Box from "@mui/material/Box";
-import { getBaseUrl } from "../utils/url-helper";
 import PictureMenu from "./PictureMenu";
 import { Cookie, getTokenData, initAuthToken } from "../utils/auth-helper";
+import { fetchProfilePicture } from "../utils/picture-helper";
 
 export default function NavBar(): React.ReactElement {
   const state = useLocation().state;
@@ -29,21 +29,14 @@ export default function NavBar(): React.ReactElement {
     if (token) {
       setUserId(getTokenData(token).id.toString());
     }
-    fetchProfilePicture(userId);
+    if (userId && image === null) {
+      wrapperFetchProfilePicture(userId);
+    }
   }, [userId]);
 
-  async function fetchProfilePicture(userId: string) {
-    if (image === null && userId !== "") {
-      const URIGetImage = `${getBaseUrl()}users/upload/${userId}`;
-      const res = await fetch(URIGetImage, {
-        headers: new Headers({
-          Authorization: `Bearer ${localStorage.getItem(Cookie.TOKEN)}`,
-        }),
-      });
-      // convert the response object to a blob
-      const imageBlob = await res.blob();
-      setImage(imageBlob);
-    }
+  async function wrapperFetchProfilePicture(userId: string) {
+    const pictureFetched = await fetchProfilePicture(userId);
+    setImage(pictureFetched);
   }
 
   const [selectedTabId, setSelectedTabId] = useState<number>(

@@ -20,7 +20,7 @@ export class UserEntity implements User {
   intraId: string;
 
   @ApiProperty()
-  friends: User[];
+  creationMode: boolean;
 
   @ApiProperty()
   createdAt: Date;
@@ -67,4 +67,3 @@ export class UserEntity implements User {
   @ApiProperty()
   playerTwoMatch?: MatchEntity[];
 }
-

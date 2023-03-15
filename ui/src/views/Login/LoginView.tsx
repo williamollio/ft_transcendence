@@ -73,13 +73,23 @@ export default function LoginView(): React.ReactElement {
         gap: "3rem",
       }}
     >
-      <Button
-        sx={{ width: "140px", height: "60px" }}
-        variant="contained"
-        onClick={() => handleLogin42()}
+      <Box
+        sx={{
+          display: "flex",
+          width: "22rem",
+          alignItems: "center",
+          justifyContent: "center",
+          flexDirection: "column",
+        }}
       >
-        {t(translationKeys.buttons.login42)}
-      </Button>
+        <Button
+          sx={{ width: "190px", height: "45px" }}
+          variant="contained"
+          onClick={() => handleLogin42()}
+        >
+          {t(translationKeys.buttons.login42)}
+        </Button>
+      </Box>
       <Typography>{t(translationKeys.or)}</Typography>
       <Box
         sx={{

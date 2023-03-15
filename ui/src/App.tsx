@@ -23,11 +23,10 @@ import StatsView from "./views/Stats/StatsView";
 
 export default function App() {
   const [userSocket] = useState<UserSocket>(new UserSocket());
+  const [image, setImage] = useImageStore(
+    (state: { image: any; setImage: any }) => [state.image, state.setImage]
+  );
   const [channelSocket] = useState<ChannelSocket>(new ChannelSocket());
-  const [image, setImage] = useImageStore((state) => [
-    state.image,
-    state.setImage,
-  ]);
   const imageUrl = image ? URL.createObjectURL(image) : "";
   const [token, setToken] = useState<string>("");
 
@@ -71,7 +70,10 @@ export default function App() {
   const RedirectWrapper = () => {
     initAuthToken();
     return (
-      <Navigate to={RoutePath.PROFILE} state={{ editMode: false }}></Navigate>
+      <Navigate
+        to={RoutePath.PROFILE}
+        state={{ creationMode: true }}
+      ></Navigate>
     );
   };
 
@@ -98,7 +100,8 @@ export default function App() {
       <Box
         display={"flex"}
         flexDirection={"column"}
-        minHeight={"100vh"}
+        height={"100vh"}
+        width={"100vw"}
         sx={{ backgroundColor: classes.colorSecondary }}
       >
         <ThemeProvider theme={theme}>
@@ -108,9 +111,7 @@ export default function App() {
             <Route
               path={RoutePath.REDIRECT}
               element={
-                <PrivateRoute>
-                  <RedirectWrapper />
-                </PrivateRoute>
+                <PrivateRoute children={<RedirectWrapper />}></PrivateRoute>
               }
             />
             <Route
@@ -134,26 +135,18 @@ export default function App() {
               }
             />
             <Route
-              path={RoutePath.SETUP2FA}
-              element={
-                <PrivateRoute>
-                  <Setup2FA />
-                </PrivateRoute>
-              }
+              path={RoutePath.GAME}
+              element={<PrivateRoute children={<GameView />}></PrivateRoute>}
             />
             <Route
-              path={RoutePath.GAME}
-              element={
-                <PrivateRoute>
-                  <GameView />
-                </PrivateRoute>
-              }
+              path={RoutePath.SETUP2FA}
+              element={<PrivateRoute children={<Setup2FA />}></PrivateRoute>}
             />
             <Route
               path={RoutePath.STATS}
               element={
                 <PrivateRoute>
-                  <StatsView userSocket={userSocket} setToken={setToken}/>
+                  <StatsView userSocket={userSocket} setToken={setToken} />
                 </PrivateRoute>
               }
             />

@@ -5,6 +5,7 @@ import Navbar from "../../components/Navbar";
 import React from "react";
 import { translationKeys } from "./constants";
 import { useTranslation } from "react-i18next";
+import MiniDrawer from "../../components/MiniDrawer/MiniDrawer";
 // import { makeStyles } from "tss-react/mui";
 import {
   Background,
@@ -58,6 +59,7 @@ export default function StatsView(props: Props): React.ReactElement {
   return (
     <>
       <Navbar />
+      <MiniDrawer />
       <Background>
         <PersonalStatPanel playerId={userId} lr={true} title={"General"}/>
         <ProfileCard>

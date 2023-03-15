@@ -7,7 +7,6 @@ Background.defaultProps = {
   marginTop: "4rem",
   border: "1px",
   width: "100%",
-  height: "calc(100vh - 4rem)",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
@@ -17,8 +16,8 @@ export const ProfileCard = styled(Box)({});
 ProfileCard.defaultProps = {
   borderRadius: "50px",
   boxShadow: "46px 46px 92px #b3a99e, -46px -46px 92px #ffffff",
-  height: "48rem",
-  width: "60rem",
+  height: "42rem",
+  width: "42rem",
   marginBottom: "2rem",
   bgcolor: classes.colorSecondary,
 };
@@ -36,6 +35,7 @@ TitleWrapper.defaultProps = {
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
+  paddingTop: "1rem",
 };
 
 export const ContentWrapper = styled(Box)({});
