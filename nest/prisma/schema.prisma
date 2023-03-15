@@ -30,7 +30,29 @@ model User {
     friendsRequester        Friendship[]    @relation("requester")
     friendsAddressee        Friendship[]    @relation("addressee")
 
+        // Game shit
+    playerOneMatch                Match[]           @relation("playerOne")
+    playerTwoMatch                Match[]           @relation("playerTwo")
+    eloScore                      Int               @default(1000)
+
     @@map("users")
+}
+
+model Match {
+  gameId    String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  p1s Int
+  p2s Int
+
+  playerOneId String
+  playerOne   User   @relation("playerOne", fields: [playerOneId], references: [id], onDelete: Cascade)
+  playerTwoId String
+  playerTwo   User   @relation("playerTwo", fields: [playerTwoId], references: [id], onDelete: Cascade)
+
+  // @@id([playerOneId, playerTwoId, createdAt])
+  // @@unique(fields: [playerOneId, playerTwoId, createdAt], name: "gameId")
 }
 
 model Channel {

@@ -2,15 +2,11 @@ import { Socket } from "socket.io-client";
 import { initSocket } from "../services/initSocket.service";
 
 export class UserSocket {
-  socket: Socket | undefined;
+  socket: Socket;
 
   constructor() {
-    this.socket = undefined;
-  }
-
-  initializeSocket(token: string | null) {
-    this.socket = initSocket("http://localhost:8888", token);
-  }
+    this.socket = initSocket("http://localhost:8888", null);
+}
 
   logIn = () => {
     this.socket?.emit("connectUser");

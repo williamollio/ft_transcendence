@@ -31,9 +31,13 @@ export default function GetIdDialog({
   const handleSubmit = (e: any) => {
     if (e.key === "Enter") {
       setAlertMsg("Failed to invite user");
-      ChannelService.getUserByName(input).then((resolve) => {
-        channelSocket.inviteToChannel(channel, resolve.data.id);
-      });
+      ChannelService.getUserByName(input)
+        .then((resolve) => {
+          channelSocket.inviteToChannel(channel, resolve.data.id);
+        })
+        .catch(() => {
+          channelSocket.inviteToChannel(channel, undefined);
+        });
       handleClose();
     }
   };

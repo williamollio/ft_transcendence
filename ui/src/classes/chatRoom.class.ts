@@ -1,4 +1,4 @@
-import { channelUser, messagesDto } from "../interfaces/chat.interfaces";
+import { channelUser, messagesDto } from "../interfaces/chat.interface";
 
 export type accessTypes = "PUBLIC" | "PRIVATE" | "PROTECTED" | "DIRECTMESSAGE";
 
