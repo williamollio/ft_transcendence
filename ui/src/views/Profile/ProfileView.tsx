@@ -34,7 +34,7 @@ import { Controller, FieldValues, useForm } from "react-hook-form";
 import CustomMultiSelect from "../../components/shared/CustomMultiSelect/CustomMultiselect";
 import CustomTextField from "../../components/shared/CustomTextField/CustomTextField";
 import { Cookie, getTokenData } from "../../utils/auth-helper";
-import MiniDrawer from "../../components/LeftDrawer/MiniDrawer";
+import LeftDrawer from "../../components/LeftDrawer/LeftDrawer";
 import friendshipsService from "../../services/friendships.service";
 import { UserSocket } from "../../classes/UserSocket.class";
 
@@ -206,7 +206,7 @@ export default function ProfileView(props: Props): React.ReactElement {
   return (
     <>
       <Navbar />
-      <MiniDrawer />
+      <LeftDrawer />
       <Background>
         <ProfileCard>
           <CardContainer>

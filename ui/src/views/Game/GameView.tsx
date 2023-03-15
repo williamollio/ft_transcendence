@@ -3,7 +3,7 @@ import Navbar from "../../components/Navbar";
 import { Typography } from "@mui/material";
 import { translationKeys } from "./constants";
 import { useTranslation } from "react-i18next";
-import MiniDrawer from "../../components/LeftDrawer/MiniDrawer";
+import LeftDrawer from "../../components/LeftDrawer/LeftDrawer";
 // import { makeStyles } from "tss-react/mui";
 import {
   Background,
@@ -19,7 +19,7 @@ export default function GameView(): React.ReactElement {
   return (
     <>
       <Navbar />
-      <MiniDrawer />
+      <LeftDrawer />
       <Background>
         <ProfileCard>
           <CardContainer>
