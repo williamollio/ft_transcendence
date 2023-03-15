@@ -71,6 +71,9 @@ export default function NavBar(): React.ReactElement {
   return (
     <>
       <AppBar className={classes.menuBar}>
+        <Box className={classes.picture}>
+          <PictureMenu image={image} />
+        </Box>
         <Box
           sx={{
             width: "100%",
@@ -79,7 +82,6 @@ export default function NavBar(): React.ReactElement {
             justifyContent: "center",
           }}
         >
-          <Box sx={{ width: "5%" }}></Box>
           <Tabs
             value={selectedTabId}
             indicatorColor="secondary"
@@ -107,7 +109,6 @@ export default function NavBar(): React.ReactElement {
               );
             })}
           </Tabs>
-          <PictureMenu image={image} />
         </Box>
       </AppBar>
     </>
@@ -122,6 +123,11 @@ const useStyles = makeStyles()(() => ({
     display: "flex",
     alignItems: "center",
     flexWrap: "wrap",
+  },
+  picture: {
+    position: "absolute",
+    top: 0,
+    left: 55, // 55 !open | 230 open
   },
   tab: {
     color: classes.colorSecondary,
