@@ -37,6 +37,7 @@ import { Cookie, getTokenData } from "../../utils/auth-helper";
 import LeftDrawer from "../../components/LeftDrawer/LeftDrawer";
 import friendshipsService from "../../services/friendships.service";
 import { UserSocket } from "../../classes/UserSocket.class";
+import RightDrawer from "../../components/RightDrawer/RightDrawer";
 
 interface Props {
   userSocket: UserSocket;
@@ -207,6 +208,7 @@ export default function ProfileView(props: Props): React.ReactElement {
     <>
       <Navbar />
       <LeftDrawer />
+      <RightDrawer />
       <Background>
         <ProfileCard>
           <CardContainer>
