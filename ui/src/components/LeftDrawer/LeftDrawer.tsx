@@ -4,7 +4,7 @@ import { Response } from "../../services/common/resolve";
 import Box from "@mui/material/Box";
 import MuiDrawer from "@mui/material/Drawer";
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
-import { Divider, Typography } from "@mui/material";
+import { Divider, IconButton, Toolbar, Typography } from "@mui/material";
 import { User } from "../../interfaces/user.interface";
 import { Cookie, getTokenData } from "../../utils/auth-helper";
 import friendshipsService from "../../services/friendships.service";
@@ -17,6 +17,9 @@ import { ToastType } from "../../context/toast";
 import { TranscendanceStateActionType } from "../../context/transcendance-reducer";
 import { translationKeys } from "./constants";
 import { useTranslation } from "react-i18next";
+import MenuIcon from "@mui/icons-material/Menu";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 
 const drawerWidth = 240;
 
@@ -62,7 +65,39 @@ const Drawer = styled(MuiDrawer, {
   }),
 }));
 
-export default function X() {
+const AppBar = styled(MuiAppBar, {
+  shouldForwardProp: (prop) => prop !== "open",
+})<AppBarProps>(({ theme, open }) => ({
+  transition: theme.transitions.create(["width", "margin"], {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen,
+  }),
+  width: "4rem",
+  right: "auto",
+  backgroundColor: "white",
+  boxShadow: "none",
+  color: theme.palette.primary.main,
+  ...(!open && { zIndex: theme.zIndex.drawer + 1 }),
+  ...(open && {
+    width: `${drawerWidth}px`,
+    marginRight: "0rem",
+    boxShadow: "none",
+    transition: theme.transitions.create(["width", "margin"], {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  }),
+}));
+
+const DrawerHeader = styled("div")(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "flex-end",
+  padding: theme.spacing(0, 1),
+  ...theme.mixins.toolbar,
+}));
+
+export default function MiniDrawer() {
   const { t } = useTranslation();
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
@@ -137,12 +172,37 @@ export default function X() {
 
   return (
     <Box sx={{ display: "flex" }}>
+      <AppBar position="fixed" open={open}>
+        <Toolbar>
+          <IconButton
+            color="inherit"
+            aria-label="open drawer"
+            onClick={triggerDrawerOpen}
+            edge="start"
+            sx={{
+              marginRight: 5,
+              ...(open && { display: "none" }),
+            }}
+          >
+            <MenuIcon />
+          </IconButton>
+        </Toolbar>
+      </AppBar>
       <Drawer variant="permanent" open={open}>
+        <DrawerHeader color={theme.palette.primary.main}>
+          <IconButton onClick={triggerDrawerOpen} color={"inherit"}>
+            {theme.direction === "rtl" ? (
+              <ChevronRightIcon />
+            ) : (
+              <ChevronLeftIcon />
+            )}
+          </IconButton>
+        </DrawerHeader>
         <Box
           display={"flex"}
           justifyContent="center"
           width={"calc(64px + 1px)"}
-          mt="2.5rem"
+          mt="4rem"
         >
           <Typography
             fontSize="11px"
