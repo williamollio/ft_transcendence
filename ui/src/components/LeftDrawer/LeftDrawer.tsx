@@ -181,7 +181,7 @@ export default function MiniDrawer() {
       <AppBar position="fixed" open={open}>
         <Toolbar>
           <IconButton
-            color="inherit"
+            color="secondary"
             aria-label="open drawer"
             onClick={triggerDrawerOpen}
             edge="start"
@@ -196,7 +196,7 @@ export default function MiniDrawer() {
       </AppBar>
       <Drawer variant="permanent" open={open}>
         <DrawerHeader color={theme.palette.primary.main}>
-          <IconButton onClick={triggerDrawerOpen} color={"inherit"}>
+          <IconButton onClick={triggerDrawerOpen} color={"secondary"}>
             {theme.direction === "rtl" ? (
               <ChevronRightIcon />
             ) : (
@@ -204,6 +204,13 @@ export default function MiniDrawer() {
             )}
           </IconButton>
         </DrawerHeader>
+        <Divider
+          variant="middle"
+          sx={{
+            marginTop: "2.5rem",
+            marginBottom: "2.5rem",
+          }}
+        />
         <Box
           display={"flex"}
           justifyContent="center"

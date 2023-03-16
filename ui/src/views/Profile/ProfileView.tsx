@@ -38,14 +38,16 @@ import LeftDrawer from "../../components/LeftDrawer/LeftDrawer";
 import friendshipsService from "../../services/friendships.service";
 import { UserSocket } from "../../classes/UserSocket.class";
 import RightDrawer from "../../components/RightDrawer/RightDrawer";
+import { ChannelSocket } from "../../classes/ChannelSocket.class";
 
 interface Props {
   userSocket: UserSocket;
+  channelSocket: ChannelSocket;
   setToken: React.Dispatch<React.SetStateAction<string>>;
 }
 
 export default function ProfileView(props: Props): React.ReactElement {
-  const { userSocket, setToken } = props;
+  const { userSocket, channelSocket, setToken } = props;
   const { t } = useTranslation();
   const { classes } = useStyles();
   const navigate = useNavigate();
@@ -208,7 +210,7 @@ export default function ProfileView(props: Props): React.ReactElement {
     <>
       <Navbar />
       <LeftDrawer />
-      <RightDrawer />
+      <RightDrawer channelSocket={channelSocket} userSocket={userSocket} />
       <Background>
         <ProfileCard>
           <CardContainer>

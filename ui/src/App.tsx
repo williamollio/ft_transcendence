@@ -118,7 +118,11 @@ export default function App() {
               path={RoutePath.PROFILE}
               element={
                 <PrivateRoute>
-                  <ProfileView userSocket={userSocket} setToken={setToken} />
+                  <ProfileView
+                    userSocket={userSocket}
+                    channelSocket={channelSocket}
+                    setToken={setToken}
+                  />
                 </PrivateRoute>
               }
             />

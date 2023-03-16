@@ -70,7 +70,7 @@ export default function Chat(props: Props) {
 
   useEffect(() => {
     if (location && location.state && location.state.id) {
-      channelSocket.createDm(location.state.id); // not sure if that's how it's done
+      channelSocket.createDm(location.state.id); // TODO : william to implement
     }
   }, [location]);
 
@@ -340,11 +340,9 @@ export default function Chat(props: Props) {
       <Paper
         elevation={4}
         sx={{
-          position: "absolute",
-          top: "50%",
-          left: "40px",
-          width: "300px",
-          height: "auto",
+          overflow: "auto",
+          width: "100%",
+          height: "100%",
           bgcolor: "grey.600",
         }}
       >

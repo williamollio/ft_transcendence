@@ -16,6 +16,7 @@ import { Cookie } from "../../utils/auth-helper";
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { UserSocket } from "../../classes/UserSocket.class";
 import LeftDrawer from "../../components/LeftDrawer/LeftDrawer";
+import RightDrawer from "../../components/RightDrawer/RightDrawer";
 
 interface Props {
   userSocket: UserSocket;
@@ -42,9 +43,9 @@ export default function ChatView(props: Props): React.ReactElement {
     <>
       <Navbar />
       <LeftDrawer />
+      <RightDrawer channelSocket={channelSocket} userSocket={userSocket} />
       <Background>
         <ProfileCard>
-          <Chat channelSocket={channelSocket} userSocket={userSocket} />
           <CardContainer>
             <TitleWrapper>
               <Typography
