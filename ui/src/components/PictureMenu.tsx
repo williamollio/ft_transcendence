@@ -102,7 +102,7 @@ export default function PictureMenu(props: Props) {
               display: "block",
               position: "absolute",
               top: 0,
-              right: 14,
+              left: 14,
               width: 10,
               height: 10,
               bgcolor: "background.paper",
@@ -111,8 +111,8 @@ export default function PictureMenu(props: Props) {
             },
           },
         }}
-        transformOrigin={{ horizontal: "right", vertical: "top" }}
-        anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+        transformOrigin={{ horizontal: "left", vertical: "top" }}
+        anchorOrigin={{ horizontal: "left", vertical: "bottom" }}
       >
         <MenuItem onClick={() => handleClose(AnchorEnum.SETTINGS)}>
           <ListItemIcon>
