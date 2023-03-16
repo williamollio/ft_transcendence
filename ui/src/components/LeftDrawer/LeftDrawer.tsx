@@ -21,8 +21,10 @@ import MenuIcon from "@mui/icons-material/Menu";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import { useDrawersStore } from "../../store/drawers-store";
+import { navbarHeight } from "../Navbar";
 
 const drawerWidth = 240;
+const drawerWidthClosed = "4rem";
 
 const openedMixin = (theme: Theme): CSSObject => ({
   width: drawerWidth,
@@ -39,10 +41,7 @@ const closedMixin = (theme: Theme): CSSObject => ({
     duration: theme.transitions.duration.leavingScreen,
   }),
   overflowX: "hidden",
-  width: `calc(${theme.spacing(7)} + 1px)`,
-  [theme.breakpoints.up("sm")]: {
-    width: `calc(${theme.spacing(8)} + 1px)`,
-  },
+  width: drawerWidthClosed,
 });
 
 interface AppBarProps extends MuiAppBarProps {
@@ -56,6 +55,8 @@ const Drawer = styled(MuiDrawer, {
   flexShrink: 0,
   whiteSpace: "nowrap",
   boxSizing: "border-box",
+  border: "none",
+  backgroundColor: theme.palette.primary.light,
   ...(open && {
     ...openedMixin(theme),
     "& .MuiDrawer-paper": openedMixin(theme),
@@ -73,16 +74,13 @@ const AppBar = styled(MuiAppBar, {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
-  width: "4rem",
+  width: `calc(${drawerWidthClosed} + 1px)`,
+  height: navbarHeight,
   right: "auto",
-  backgroundColor: "white",
-  boxShadow: "none",
-  color: theme.palette.primary.main,
+  border: "none",
   ...(!open && { zIndex: theme.zIndex.drawer + 1 }),
   ...(open && {
-    width: `${drawerWidth}px`,
     marginRight: "0rem",
-    boxShadow: "none",
     transition: theme.transitions.create(["width", "margin"], {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
@@ -91,6 +89,7 @@ const AppBar = styled(MuiAppBar, {
 }));
 
 const DrawerHeader = styled("div")(({ theme }) => ({
+  border: "none",
   display: "flex",
   alignItems: "center",
   justifyContent: "flex-end",
@@ -177,26 +176,46 @@ export default function MiniDrawer() {
   };
 
   return (
-    <Box sx={{ display: "flex" }}>
+    <Box sx={{ display: "flex", zIndex: theme.zIndex.appBar + 1 }}>
       <AppBar position="fixed" open={open}>
-        <Toolbar>
+        <Box
+          display={"flex"}
+          alignContent={"center"}
+          justifyContent={"center"}
+          width="100%"
+          height="100%"
+        >
           <IconButton
-            color="secondary"
-            aria-label="open drawer"
             onClick={triggerDrawerOpen}
-            edge="start"
             sx={{
-              marginRight: 5,
               ...(open && { display: "none" }),
             }}
           >
-            <MenuIcon />
+            <MenuIcon
+              sx={{
+                fill: theme.palette.secondary.main,
+                width: "35px",
+                height: "35px",
+              }}
+            />
           </IconButton>
-        </Toolbar>
+        </Box>
       </AppBar>
-      <Drawer variant="permanent" open={open}>
-        <DrawerHeader color={theme.palette.primary.main}>
-          <IconButton onClick={triggerDrawerOpen} color={"secondary"}>
+      <Drawer
+        variant="permanent"
+        open={open}
+        sx={{
+          "& .MuiDrawer-paper": {
+            backgroundColor: theme.palette.secondary.light,
+          },
+        }}
+      >
+        <DrawerHeader>
+          <IconButton
+            onClick={triggerDrawerOpen}
+            color={"secondary"}
+            sx={{ ...(!open && { display: "none" }) }}
+          >
             {theme.direction === "rtl" ? (
               <ChevronRightIcon />
             ) : (

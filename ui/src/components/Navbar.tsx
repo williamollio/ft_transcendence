@@ -14,6 +14,8 @@ import { fetchProfilePicture } from "../utils/picture-helper";
 import { useDrawersStore } from "../store/drawers-store";
 import { useTheme } from "@emotion/react";
 
+export const navbarHeight = "4rem";
+
 export default function NavBar(): React.ReactElement {
   const theme = useTheme();
   const state = useLocation().state;
@@ -134,7 +136,7 @@ export default function NavBar(): React.ReactElement {
 
 const useStyles = makeStyles()(() => ({
   menuBar: {
-    height: "4rem",
+    height: navbarHeight,
     width: "100%",
     backgroundColor: classes.colorPrimary,
     display: "flex",

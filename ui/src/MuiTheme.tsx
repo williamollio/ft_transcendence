@@ -9,6 +9,7 @@ const theme = createTheme({
     },
     secondary: {
       main: classes.colorAccent,
+      light: classes.colorSecondaryLight,
     },
   },
   typography: {

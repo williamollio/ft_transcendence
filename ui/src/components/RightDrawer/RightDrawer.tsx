@@ -13,28 +13,10 @@ import ChatIcon from "@mui/icons-material/Chat";
 import Chat from "../../views/Chat/Chat";
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { UserSocket } from "../../classes/UserSocket.class";
+import { navbarHeight } from "../Navbar";
 
 const drawerWidth = 300;
-const navbarHeight = "4rem";
-
-const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })<{
-  open?: boolean;
-}>(({ theme, open }) => ({
-  flexGrow: 1,
-  padding: theme.spacing(3),
-  transition: theme.transitions.create("margin", {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.leavingScreen,
-  }),
-  marginRight: -drawerWidth,
-  ...(open && {
-    transition: theme.transitions.create("margin", {
-      easing: theme.transitions.easing.easeOut,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-    marginRight: 0,
-  }),
-}));
+const drawerWidthClosed = "4rem";
 
 interface AppBarProps extends MuiAppBarProps {
   open?: boolean;
@@ -47,17 +29,11 @@ const AppBar = styled(MuiAppBar, {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
-  width: "4rem",
-  marginRight: "0.6rem",
-  marginTop: "6px",
-  height: "3rem",
-  backgroundColor: "transparent",
-  boxShadow: "none",
-  color: theme.palette.secondary.main,
+  width: `calc(${drawerWidthClosed} + 1px)`,
+  height: navbarHeight,
   ...(open && {
     width: `${drawerWidth}px`,
     marginRight: "0rem",
-    boxShadow: "none",
     transition: theme.transitions.create(["margin", "width"], {
       easing: theme.transitions.easing.easeOut,
       duration: theme.transitions.duration.enteringScreen,
@@ -95,30 +71,39 @@ export default function RightDrawer(props: Props) {
   return (
     <Box sx={{ display: "flex" }}>
       <AppBar position="fixed" open={open}>
-        <ListItemButton
-          color={"inherit"}
-          onClick={handleDrawerOpen}
-          sx={{ ...(open && { display: "none" }) }}
+        <Box
+          display={"flex"}
+          alignContent={"center"}
+          justifyContent={"center"}
+          width="100%"
+          height="100%"
         >
-          <ChatIcon
-            sx={{
-              width: "35px",
-              height: "35px",
-            }}
-          />
-        </ListItemButton>
+          <IconButton
+            onClick={handleDrawerOpen}
+            sx={{ ...(open && { display: "none" }) }}
+          >
+            <ChatIcon
+              sx={{
+                fill: theme.palette.secondary.main,
+                width: "35px",
+                height: "35px",
+              }}
+            />
+          </IconButton>
+        </Box>
       </AppBar>
       <Drawer
+        variant="persistent"
+        open={open}
+        anchor="right"
         sx={{
           width: drawerWidth,
           flexShrink: 0,
           "& .MuiDrawer-paper": {
             width: drawerWidth,
+            backgroundColor: theme.palette.secondary.light,
           },
         }}
-        variant="persistent"
-        anchor="right"
-        open={open}
       >
         <DrawerHeader>
           <IconButton onClick={handleDrawerClose} color="secondary">

@@ -343,7 +343,7 @@ export default function Chat(props: Props) {
           overflow: "auto",
           width: "100%",
           height: "100%",
-          bgcolor: "grey.500",
+          bgcolor: "grey.300",
         }}
       >
         <Collapse in={alert}>
