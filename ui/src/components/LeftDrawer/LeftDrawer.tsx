@@ -176,7 +176,7 @@ export default function MiniDrawer() {
   };
 
   return (
-    <Box sx={{ display: "flex", zIndex: theme.zIndex.appBar + 1 }}>
+    <Box sx={{ display: "flex" }}>
       <AppBar position="fixed" open={open}>
         <Box
           display={"flex"}
