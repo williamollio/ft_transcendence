@@ -9,19 +9,27 @@ import classes from "../styles.module.scss";
 import { useImageStore } from "../store/users-store";
 import Box from "@mui/material/Box";
 import PictureMenu from "./PictureMenu";
-import { Cookie, getTokenData, initAuthToken } from "../utils/auth-helper";
+import { Cookie, getTokenData } from "../utils/auth-helper";
 import { fetchProfilePicture } from "../utils/picture-helper";
+import { useDrawersStore } from "../store/drawers-store";
+import { useTheme } from "@emotion/react";
 
 export default function NavBar(): React.ReactElement {
+  const theme = useTheme();
   const state = useLocation().state;
   const navigate = useNavigate();
   const { classes } = useStyles();
   const [userId, setUserId] = useState<string>("");
-
   const [image, setImage] = useImageStore((state) => [
     state.image,
     state.setImage,
   ]);
+  const [isOpen, setIsOpen] = useDrawersStore(
+    (state: { isLeftOpen: any; setIsLeftOpen: any }) => [
+      state.isLeftOpen,
+      state.setIsLeftOpen,
+    ]
+  );
 
   React.useEffect(() => {
     let token = localStorage.getItem(Cookie.TOKEN);
@@ -71,7 +79,18 @@ export default function NavBar(): React.ReactElement {
   return (
     <>
       <AppBar className={classes.menuBar}>
-        <Box className={classes.picture}>
+        <Box
+          className={classes.picture}
+          zIndex={"1"}
+          sx={{
+            left: isOpen ? 230 : 55,
+            transition: (theme) =>
+              theme.transitions.create("left", {
+                easing: theme.transitions.easing.sharp,
+                duration: theme.transitions.duration.leavingScreen,
+              }),
+          }}
+        >
           <PictureMenu image={image} />
         </Box>
         <Box
@@ -127,7 +146,6 @@ const useStyles = makeStyles()(() => ({
   picture: {
     position: "absolute",
     top: 0,
-    left: 55, // 55 !open | 230 open
   },
   tab: {
     color: classes.colorSecondary,

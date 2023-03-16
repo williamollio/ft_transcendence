@@ -20,6 +20,7 @@ import { useTranslation } from "react-i18next";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import { useDrawersStore } from "../../store/drawers-store";
 
 const drawerWidth = 240;
 
@@ -100,12 +101,17 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 export default function MiniDrawer() {
   const { t } = useTranslation();
   const theme = useTheme();
-  const [open, setOpen] = React.useState(false);
   const [friends, setFriends] = React.useState<User[]>([]);
   const [requests, setRequests] = React.useState<User[]>([]);
   const [requestsReceived, setRequestsReceived] = React.useState<User[]>([]);
   const [userId, setUserId] = React.useState<string>("");
   const { dispatchTranscendanceState } = React.useContext(TranscendanceContext);
+  const [open, setOpen] = useDrawersStore(
+    (state: { isLeftOpen: any; setIsLeftOpen: any }) => [
+      state.isLeftOpen,
+      state.setIsLeftOpen,
+    ]
+  );
 
   React.useEffect(() => {
     let token = localStorage.getItem(Cookie.TOKEN);
