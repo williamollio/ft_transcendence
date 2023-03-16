@@ -60,7 +60,7 @@ const AppBar = styled(MuiAppBar, {
   height: "3rem",
   backgroundColor: "transparent",
   boxShadow: "none",
-  color: theme.palette.primary.main,
+  color: theme.palette.secondary.main,
   ...(open && {
     width: `${drawerWidth}px`,
     marginRight: "0rem",

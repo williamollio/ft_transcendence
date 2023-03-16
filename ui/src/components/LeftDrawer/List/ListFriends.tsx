@@ -102,7 +102,7 @@ export default function ListFriends(props: Props) {
             />
             <ListItemButton
               onClick={createDmChat}
-              color="primary"
+              color="secondary"
               sx={{
                 opacity: open ? 1 : 0,
                 width: "7px",
