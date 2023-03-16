@@ -207,7 +207,6 @@ export default function MiniDrawer() {
         <Divider
           variant="middle"
           sx={{
-            marginTop: "2.5rem",
             marginBottom: "2.5rem",
           }}
         />
@@ -215,7 +214,6 @@ export default function MiniDrawer() {
           display={"flex"}
           justifyContent="center"
           width={"calc(64px + 1px)"}
-          mt="4rem"
         >
           <Typography
             fontSize="11px"

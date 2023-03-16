@@ -103,8 +103,6 @@ export default function NavBar(): React.ReactElement {
         >
           <Tabs
             value={selectedTabId}
-            indicatorColor="secondary"
-            textColor="secondary"
             sx={{ width: "90%" }}
             centered={true}
             TabIndicatorProps={{

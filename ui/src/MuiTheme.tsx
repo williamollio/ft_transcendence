@@ -89,6 +89,18 @@ const theme = createTheme({
         },
       },
     },
+    MuiTabs: {
+      styleOverrides: {
+        root: {
+          "& .MuiTabs-indicator": {
+            backgroundColor: classes.colorAccent,
+          },
+          "& .MuiTab-root.Mui-selected": {
+            color: classes.colorAccent,
+          },
+        },
+      },
+    },
   },
 });
 
