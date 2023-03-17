@@ -78,6 +78,7 @@ const AppBar = styled(MuiAppBar, {
   height: navbarHeight,
   right: "auto",
   border: "none",
+  boxShadow: "none",
   ...(!open && { zIndex: theme.zIndex.drawer + 1 }),
   ...(open && {
     marginRight: "0rem",

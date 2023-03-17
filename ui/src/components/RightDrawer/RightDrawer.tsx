@@ -31,6 +31,8 @@ const AppBar = styled(MuiAppBar, {
   }),
   width: `calc(${drawerWidthClosed} + 1px)`,
   height: navbarHeight,
+  border: "none",
+  boxShadow: "none",
   ...(open && {
     width: `${drawerWidth}px`,
     marginRight: "0rem",
