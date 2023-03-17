@@ -1,6 +1,8 @@
 {
   "buttons": {
     "save": "Save",
+    "add": "Add",
+    "join": "Join",
     "login42": "Login 42 API",
     "cancel": "Cancel",
     "submit": "Submit",
