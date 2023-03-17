@@ -116,7 +116,12 @@ export default function RightDrawer(props: Props) {
             )}
           </IconButton>
         </DrawerHeader>
-        <Divider variant="middle" />
+        <Divider
+          variant="middle"
+          sx={{
+            marginBottom: "2.5rem",
+          }}
+        />
         <Chat channelSocket={channelSocket} userSocket={userSocket} />
       </Drawer>
     </Box>

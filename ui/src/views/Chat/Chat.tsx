@@ -336,147 +336,143 @@ export default function Chat(props: Props) {
   };
 
   return (
-    <>
-      <Paper
-        elevation={4}
+    <Paper
+      elevation={4}
+      sx={{
+        overflow: "auto",
+        width: "100%",
+        height: "100%",
+        bgcolor: "grey.300",
+        marginBottom: "2rem",
+      }}
+    >
+      <Collapse in={alert}>
+        <Alert
+          sx={{ width: "auto" }}
+          severity="error"
+          action={
+            <IconButton
+              aria-label="close"
+              color="inherit"
+              size="small"
+              onClick={() => {
+                toggleAlert(false);
+              }}
+            >
+              <CloseIcon fontSize="inherit" />
+            </IconButton>
+          }
+        >
+          {alertMsg}
+        </Alert>
+      </Collapse>
+      <Box
         sx={{
-          overflow: "auto",
-          width: "100%",
-          height: "100%",
-          bgcolor: "grey.300",
+          width: "300px",
+          height: "87.5%", // TODO : responsiveness to be adapted
         }}
       >
-        <Collapse in={alert}>
-          <Alert
-            sx={{ width: "auto" }}
-            severity="error"
-            action={
+        <ChannelTabs
+          currentRoom={currentRoom}
+          setContextMenu={setContextMenu}
+          contextMenu={contextMenu}
+          toggleAlert={toggleAlert}
+          toggleOpen={toggleOpen}
+          channelSocket={channelSocket}
+          setNewChannel={setNewChannel}
+        />
+        <RoomContextMenu
+          blockedUser={blockedUsers}
+          refetchBlockedUsers={refetchBlockedUsers}
+          userSocket={userSocket}
+          setNewChannel={setNewChannel}
+          contextMenu={contextMenu}
+          setContextMenu={setContextMenu}
+          channelSocket={channelSocket}
+          setAlertMsg={setAlertMsg}
+          toggleAlert={toggleAlert}
+        ></RoomContextMenu>
+        <Divider></Divider>
+        <Grid container height="100%">
+          <Grid item height="100%">
+            <List
+              dense
+              disablePadding
+              sx={{
+                color: "white",
+                bgcolor: "grey.700",
+                width: "300px",
+                overflow: "auto",
+                height: "100%",
+              }}
+            >
+              {listMessages}
+            </List>
+          </Grid>
+          <AddChannelDialog
+            open={open}
+            toggleOpen={toggleOpen}
+            channelSocket={channelSocket}
+            setAlertMsg={setAlertMsg}
+            toggleAlert={toggleAlert}
+          ></AddChannelDialog>
+          <Grid item>
+            <TextField
+              variant="filled"
+              size="small"
+              label="Chat"
+              sx={{ width: "300px" }}
+              value={inputChat}
+              onChange={handleChange}
+              onKeyDown={handleSubmit}
+            />
+          </Grid>
+        </Grid>
+      </Box>
+      <Collapse in={invited}>
+        <Alert
+          sx={{ width: "auto" }}
+          severity="success"
+          action={
+            <>
               <IconButton
-                aria-label="close"
+                aria-label="Accept"
+                color="inherit"
+                size="small"
+                onMouseUp={(e) => handleInviteSubmit()}
+                onMouseDown={handleInviteSubmit}
+              >
+                <CheckIcon fontSize="inherit" />
+              </IconButton>
+              <IconButton
+                aria-label="Reject"
                 color="inherit"
                 size="small"
                 onClick={() => {
-                  toggleAlert(false);
+                  toggleInvited(false);
+                  setRoomInvite({ id: "", type: "PRIVATE", name: "" });
                 }}
               >
                 <CloseIcon fontSize="inherit" />
               </IconButton>
-            }
-          >
-            {alertMsg}
-          </Alert>
-        </Collapse>
-        <Box
-          sx={{
-            width: "300px",
-            height: "auto",
-          }}
+              <GetTextInputDialog
+                open={invitePassword}
+                toggleOpen={toggleInvitePassword}
+                handleSubmit={(input: string) => {
+                  channelSocket.joinRoom(roomInvite.id, input);
+                  toggleInvited(false);
+                  setRoomInvite({ id: "", type: "PRIVATE", name: "" });
+                }}
+                dialogContent={"This channel requires a password"}
+                label={"password"}
+                type={"password"}
+              ></GetTextInputDialog>
+            </>
+          }
         >
-          <>
-            <ChannelTabs
-              currentRoom={currentRoom}
-              setContextMenu={setContextMenu}
-              contextMenu={contextMenu}
-              toggleAlert={toggleAlert}
-              toggleOpen={toggleOpen}
-              channelSocket={channelSocket}
-              setNewChannel={setNewChannel}
-            />
-            <RoomContextMenu
-              blockedUser={blockedUsers}
-              refetchBlockedUsers={refetchBlockedUsers}
-              userSocket={userSocket}
-              setNewChannel={setNewChannel}
-              contextMenu={contextMenu}
-              setContextMenu={setContextMenu}
-              channelSocket={channelSocket}
-              setAlertMsg={setAlertMsg}
-              toggleAlert={toggleAlert}
-            ></RoomContextMenu>
-            <Divider></Divider>
-            <Grid container>
-              <Grid item>
-                <List
-                  dense
-                  disablePadding
-                  sx={{
-                    color: "white",
-                    bgcolor: "grey.700",
-                    width: "300px",
-                    position: "relative",
-                    overflow: "auto",
-                    height: "250px",
-                  }}
-                >
-                  {listMessages}
-                </List>
-              </Grid>
-              <AddChannelDialog
-                open={open}
-                toggleOpen={toggleOpen}
-                channelSocket={channelSocket}
-                setAlertMsg={setAlertMsg}
-                toggleAlert={toggleAlert}
-              ></AddChannelDialog>
-              <Grid item>
-                <TextField
-                  variant="filled"
-                  size="small"
-                  label="Chat"
-                  sx={{ width: "300px" }}
-                  value={inputChat}
-                  onChange={handleChange}
-                  onKeyDown={handleSubmit}
-                />
-              </Grid>
-            </Grid>
-          </>
-        </Box>
-        <Collapse in={invited}>
-          <Alert
-            sx={{ width: "auto" }}
-            severity="success"
-            action={
-              <>
-                <IconButton
-                  aria-label="Accept"
-                  color="inherit"
-                  size="small"
-                  onMouseUp={(e) => handleInviteSubmit()}
-                  onMouseDown={handleInviteSubmit}
-                >
-                  <CheckIcon fontSize="inherit" />
-                </IconButton>
-                <IconButton
-                  aria-label="Reject"
-                  color="inherit"
-                  size="small"
-                  onClick={() => {
-                    toggleInvited(false);
-                    setRoomInvite({ id: "", type: "PRIVATE", name: "" });
-                  }}
-                >
-                  <CloseIcon fontSize="inherit" />
-                </IconButton>
-                <GetTextInputDialog
-                  open={invitePassword}
-                  toggleOpen={toggleInvitePassword}
-                  handleSubmit={(input: string) => {
-                    channelSocket.joinRoom(roomInvite.id, input);
-                    toggleInvited(false);
-                    setRoomInvite({ id: "", type: "PRIVATE", name: "" });
-                  }}
-                  dialogContent={"This channel requires a password"}
-                  label={"password"}
-                  type={"password"}
-                ></GetTextInputDialog>
-              </>
-            }
-          >
-            Invite to: {roomInvite.name}
-          </Alert>
-        </Collapse>
-      </Paper>
-    </>
+          Invite to: {roomInvite.name}
+        </Alert>
+      </Collapse>
+    </Paper>
   );
 }
