@@ -7,5 +7,4 @@ export enum RoutePath {
   REDIRECT = "/redirect",
   SETUP2FA = "/setup2FA",
   STATS = "/statistics",
-  CHAT = "/chat",
 }

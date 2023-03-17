@@ -10,7 +10,7 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ListItemButton from "@mui/material/ListItemButton";
 import ChatIcon from "@mui/icons-material/Chat";
-import Chat from "../../views/Chat/Chat";
+import Chat from "../chat/Chat";
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { UserSocket } from "../../classes/UserSocket.class";
 import { navbarHeight } from "../Navbar";

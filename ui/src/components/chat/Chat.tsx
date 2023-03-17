@@ -14,17 +14,17 @@ import {
 import { SyntheticEvent, useEffect, useRef, useState } from "react";
 import { messagesDto } from "../../interfaces/chat.interface";
 import { accessTypes, chatRoom } from "../../classes/chatRoom.class";
-import AddChannelDialog from "../../components/chat/AddChannelDialog";
-import RoomContextMenu from "../../components/chat/RoomContextMenu";
+import AddChannelDialog from "./AddChannelDialog";
+import RoomContextMenu from "./RoomContextMenu";
 import CloseIcon from "@mui/icons-material/Close";
 import CheckIcon from "@mui/icons-material/Check";
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
-import { ChannelTabs } from "../../components/chat/ChannelTabs";
+import { ChannelTabs } from "./ChannelTabs";
 import ChannelService from "../../services/channel.service";
 import { useLocation } from "react-router-dom";
 import { UserSocket } from "../../classes/UserSocket.class";
 import { useQuery } from "@tanstack/react-query";
-import GetTextInputDialog from "../../components/chat/GetTextInputDialog";
+import GetTextInputDialog from "./GetTextInputDialog";
 
 interface Props {
   channelSocket: ChannelSocket;
