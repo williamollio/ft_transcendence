@@ -107,6 +107,23 @@ export class AuthService {
     return tokens;
   }
 
+  async enable2FA(userId: string) {
+    await this.userService.set2FA(userId, true);
+    // TODO: generate secret
+  }
+
+  async disable2FA(userId: string) {
+    await this.userService.set2FA(userId, false);
+  }
+
+  async validateSecondFactor(userId: string) {
+    const user = await this.userService.findOne(userId);
+    if (!user || !user.secondFactorEnabled || !user.secondFactorCode) {
+      throw new UnauthorizedException('Log in!');
+    }
+    // TODO: Check codes...
+  }
+
   async logout(userId: string) {
     const user = await this.userService.findOne(userId);
     if (!user) throw new UnauthorizedException('Unauthorized');
