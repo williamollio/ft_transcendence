@@ -66,4 +66,13 @@ export class UserEntity implements User {
 
   @ApiProperty()
   playerTwoMatch?: MatchEntity[];
+
+  @ApiProperty()
+  secondFactorEnabled: boolean;
+
+  @ApiProperty()
+  secondFactorLogged: boolean;
+
+  @ApiProperty()
+  secondFactorCode: string | null;
 }
