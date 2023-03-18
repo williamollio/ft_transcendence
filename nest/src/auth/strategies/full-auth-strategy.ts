@@ -18,12 +18,12 @@ export class FullAuthStrategy extends PassportStrategy(Strategy, 'jwt-2fa') {
   async validate(payload: JwtPayload) {
     const user = await this.userService.findOne(payload.id);
 
-    // if (user && (!user.is2FAEnabled || user.is2FALogged)) {
-    //   return {
-    //     id: payload.id,
-    //     intraId: payload.intraId,
-    //   };
-    // }
+    if (user && (!user.secondFactorEnabled || user.secondFactorLogged)) {
+      return {
+        id: payload.id,
+        intraId: payload.intraId,
+      };
+    }
 
     throw new UnauthorizedException('Log in to continue');
   }
