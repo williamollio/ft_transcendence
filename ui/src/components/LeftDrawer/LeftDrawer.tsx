@@ -70,6 +70,7 @@ const Drawer = styled(MuiDrawer, {
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== "open",
 })<AppBarProps>(({ theme, open }) => ({
+  zIndex: theme.zIndex.drawer + 1,
   transition: theme.transitions.create(["width", "margin"], {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
@@ -79,9 +80,9 @@ const AppBar = styled(MuiAppBar, {
   right: "auto",
   border: "none",
   boxShadow: "none",
-  ...(!open && { zIndex: theme.zIndex.drawer + 1 }),
   ...(open && {
-    marginRight: "0rem",
+    marginLeft: -drawerWidth,
+    zIndex: -1,
     transition: theme.transitions.create(["width", "margin"], {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
@@ -179,28 +180,30 @@ export default function MiniDrawer() {
   return (
     <Box sx={{ display: "flex" }}>
       <AppBar position="fixed" open={open}>
-        <Box
-          display={"flex"}
-          alignContent={"center"}
-          justifyContent={"center"}
-          width="100%"
-          height="100%"
-        >
-          <IconButton
-            onClick={triggerDrawerOpen}
-            sx={{
-              ...(open && { display: "none" }),
-            }}
+        <Toolbar>
+          <Box
+            display={"flex"}
+            alignContent={"center"}
+            justifyContent={"center"}
+            width="100%"
+            height="100%"
           >
-            <MenuIcon
+            <IconButton
+              onClick={triggerDrawerOpen}
               sx={{
-                fill: theme.palette.secondary.main,
-                width: "35px",
-                height: "35px",
+                ...(open && { display: "none" }),
               }}
-            />
-          </IconButton>
-        </Box>
+            >
+              <MenuIcon
+                sx={{
+                  fill: theme.palette.secondary.main,
+                  width: "35px",
+                  height: "35px",
+                }}
+              />
+            </IconButton>
+          </Box>
+        </Toolbar>
       </AppBar>
       <Drawer
         variant="permanent"
@@ -212,11 +215,7 @@ export default function MiniDrawer() {
         }}
       >
         <DrawerHeader>
-          <IconButton
-            onClick={triggerDrawerOpen}
-            color={"secondary"}
-            sx={{ ...(!open && { display: "none" }) }}
-          >
+          <IconButton onClick={triggerDrawerOpen} color={"secondary"}>
             {theme.direction === "rtl" ? (
               <ChevronRightIcon />
             ) : (
