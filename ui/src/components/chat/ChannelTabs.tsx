@@ -16,6 +16,7 @@ import {
   messagesDto,
 } from "../../interfaces/chat.interface";
 import ChannelService from "../../services/channel.service";
+import { useTheme } from "@mui/material";
 
 export function ChannelTabs({
   currentRoom,
@@ -47,6 +48,7 @@ export function ChannelTabs({
   const [channelQueryId, setChannelQueryId] = useState<string | undefined>(
     undefined
   );
+  const theme = useTheme();
 
   const [channelList, setChannelList] = useState<chatRoom[]>(
     channelSocket.channels
@@ -290,7 +292,11 @@ export function ChannelTabs({
       })}
       <Tab
         key={"AddChannel"}
-        sx={{ width: "30px", minWidth: "30px" }}
+        sx={{
+          width: "30px",
+          minWidth: "30px",
+          color: theme.palette.secondary.main,
+        }}
         icon={<AddIcon />}
         onClick={newRoom}
       ></Tab>

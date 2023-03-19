@@ -96,6 +96,9 @@ const theme = createTheme({
           "& .MuiTabs-indicator": {
             backgroundColor: classes.colorAccent,
           },
+          "& .MuiTabs-scrollButtons": {
+            color: classes.colorAccent,
+          },
           "& .MuiTab-root.Mui-selected": {
             color: classes.colorAccent,
           },

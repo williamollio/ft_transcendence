@@ -25,6 +25,7 @@ import { useLocation } from "react-router-dom";
 import { UserSocket } from "../../classes/UserSocket.class";
 import { useQuery } from "@tanstack/react-query";
 import GetTextInputDialog from "./GetTextInputDialog";
+import { useTheme } from "@mui/material";
 
 interface Props {
   channelSocket: ChannelSocket;
@@ -32,6 +33,7 @@ interface Props {
 }
 
 export default function Chat(props: Props) {
+  const theme = useTheme();
   const { channelSocket, userSocket } = props;
   const [open, toggleOpen] = useState(false);
   const [inputChat, setInputChat] = useState<string>("");
@@ -342,7 +344,7 @@ export default function Chat(props: Props) {
         overflow: "auto",
         width: "100%",
         height: "100%",
-        bgcolor: "grey.300",
+        bgcolor: theme.palette.primary.main,
         marginBottom: "2rem",
       }}
     >
@@ -369,7 +371,7 @@ export default function Chat(props: Props) {
       <Box
         sx={{
           width: "300px",
-          height: "87.5%", // TODO : responsiveness to be adapted
+          height: "87.9%", // TODO : responsiveness to be adapted
         }}
       >
         <ChannelTabs
@@ -400,7 +402,7 @@ export default function Chat(props: Props) {
               disablePadding
               sx={{
                 color: "white",
-                bgcolor: "grey.700",
+                bgcolor: "grey.400",
                 width: "300px",
                 overflow: "auto",
                 height: "100%",
@@ -418,8 +420,6 @@ export default function Chat(props: Props) {
           ></AddChannelDialog>
           <Grid item>
             <TextField
-              variant="filled"
-              size="small"
               label="Chat"
               sx={{ width: "300px" }}
               value={inputChat}
