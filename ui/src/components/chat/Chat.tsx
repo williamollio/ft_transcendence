@@ -401,8 +401,8 @@ export default function Chat(props: Props) {
               dense
               disablePadding
               sx={{
-                color: "white",
-                bgcolor: "grey.400",
+                color: "black",
+                bgcolor: "grey.300",
                 width: "300px",
                 overflow: "auto",
                 height: "100%",

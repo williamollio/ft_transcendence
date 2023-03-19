@@ -105,6 +105,13 @@ const theme = createTheme({
         },
       },
     },
+    MuiTab: {
+      styleOverrides: {
+        root: {
+          fontFamily: "Soin",
+        },
+      },
+    },
   },
 });
 

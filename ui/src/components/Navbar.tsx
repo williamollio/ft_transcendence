@@ -117,9 +117,6 @@ export default function NavBar(): React.ReactElement {
                   key={`navbar-${tab.id}`}
                   label={tab.label}
                   value={tab.id}
-                  classes={{
-                    root: classes.tab,
-                  }}
                   onClick={() => {
                     navigateToSelectedTab(tab.id);
                   }}
@@ -150,7 +147,6 @@ const useStyles = makeStyles()(() => ({
   tab: {
     color: classes.colorSecondary,
     fontSize: "1rem",
-    fontFamily: "Soin",
     fontWeight: "bold",
     paddingLeft: "0",
     paddingBottom: "0rem",

@@ -266,6 +266,10 @@ export function ChannelTabs({
       value={typeof currentRoom !== "boolean" ? currentRoom.id : false}
       onChange={handleRoomChange}
       variant="scrollable"
+      centered={true}
+      TabIndicatorProps={{
+        style: { marginBottom: "3px"},
+      }}
     >
       {channelList.map((channel: chatRoom) => {
         return (
@@ -275,6 +279,8 @@ export function ChannelTabs({
               minWidth: "30px",
               width: "auto",
               maxWidth: "100px",
+              fontSize: "14px",
+              fontWeight: "medium",
             }}
             value={channel.id}
             key={channel.id}
