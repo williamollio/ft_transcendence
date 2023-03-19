@@ -81,17 +81,13 @@ export default function ListReceived(props: Props) {
           <ListItemButton
             sx={{
               minHeight: 48,
-              justifyContent: open ? "initial" : "center",
               px: 2.5,
             }}
           >
             <ListItemIcon
               onClick={triggerDrawerOpen}
               sx={{
-                minWidth: 0,
-                mr: open ? 3 : 0,
-                ml: !open ? 8 : 0,
-                justifyContent: "center",
+                marginLeft: -1,
               }}
             >
               <StyledAvatarBadge
@@ -124,7 +120,7 @@ export default function ListReceived(props: Props) {
               onClick={() => cancelRequestReceived(user.id)}
               sx={{
                 opacity: open ? 1 : 0,
-                color: "red",
+                color: "lightcoral",
                 width: "7px",
                 display: "flex",
                 justifyContent: "center",
