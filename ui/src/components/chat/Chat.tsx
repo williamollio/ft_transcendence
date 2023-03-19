@@ -346,6 +346,7 @@ export default function Chat(props: Props) {
         height: "100%",
         bgcolor: theme.palette.primary.main,
         marginBottom: "2rem",
+        boxShadow: "none",
       }}
     >
       <Collapse in={alert}>
