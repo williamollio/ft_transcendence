@@ -1,4 +1,4 @@
-import { ReactElement, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import ProfileView from "./views/Profile/ProfileView";
@@ -16,20 +16,38 @@ import classes from "./styles.module.scss";
 import { useImageStore } from "./store/users-store";
 import { PrivateRoute } from "./components/PrivateRoute";
 import { getIsAuthenticated, initAuthToken } from "./utils/auth-helper";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { UserSocket } from "./classes/UserSocket.class";
+import { ChannelSocket } from "./classes/ChannelSocket.class";
 import GameView from "./views/Game/GameView";
 import StatsView from "./views/Stats/StatsView";
 
 export default function App() {
   const [userSocket] = useState<UserSocket>(new UserSocket());
-  const [image, setImage] = useImageStore((state) => [
-    state.image,
-    state.setImage,
-  ]);
+  const [image, setImage] = useImageStore(
+    (state: { image: any; setImage: any }) => [state.image, state.setImage]
+  );
+  const [channelSocket] = useState<ChannelSocket>(new ChannelSocket());
   const imageUrl = image ? URL.createObjectURL(image) : "";
+  const [token, setToken] = useState<string>("");
 
-  const queryClient = new QueryClient();
+  // different method to initialize out sockets that makes them persistent over all views
+  React.useEffect(() => {
+    if (token !== "") {
+      if (userSocket.socket.connected === false) {
+        userSocket.socket.auth = { token: token };
+        userSocket.socket.connect();
+        userSocket.logIn();
+      }
+      if (channelSocket.socket.connected === false) {
+        channelSocket.socket.auth = { token: token };
+        channelSocket.socket.connect();
+      }
+    }
+    return () => {
+      if (userSocket.socket.connected) userSocket.socket.disconnect();
+      if (channelSocket.socket.connected) channelSocket.socket.disconnect();
+    };
+  }, [token, channelSocket, userSocket]);
 
   // removes the object URL after the component unmounts to prevent memory leaks
   React.useEffect(() => {
@@ -52,7 +70,10 @@ export default function App() {
   const RedirectWrapper = () => {
     initAuthToken();
     return (
-      <Navigate to={RoutePath.PROFILE} state={{ editMode: false }}></Navigate>
+      <Navigate
+        to={RoutePath.PROFILE}
+        state={{ creationMode: true }}
+      ></Navigate>
     );
   };
 
@@ -79,7 +100,8 @@ export default function App() {
       <Box
         display={"flex"}
         flexDirection={"column"}
-        minHeight={"100vh"}
+        height={"100vh"}
+        width={"100vw"}
         sx={{ backgroundColor: classes.colorSecondary }}
       >
         <ThemeProvider theme={theme}>
@@ -89,16 +111,14 @@ export default function App() {
             <Route
               path={RoutePath.REDIRECT}
               element={
-                <PrivateRoute>
-                  <RedirectWrapper />
-                </PrivateRoute>
+                <PrivateRoute children={<RedirectWrapper />}></PrivateRoute>
               }
             />
             <Route
               path={RoutePath.PROFILE}
               element={
                 <PrivateRoute>
-                  <ProfileView userSocket={userSocket} />
+                  <ProfileView userSocket={userSocket} setToken={setToken} />
                 </PrivateRoute>
               }
             />
@@ -106,33 +126,27 @@ export default function App() {
               path={RoutePath.CHAT}
               element={
                 <PrivateRoute>
-                  <QueryClientProvider client={queryClient}>
-                    <ChatView userSocket={userSocket} />
-                  </QueryClientProvider>
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path={RoutePath.SETUP2FA}
-              element={
-                <PrivateRoute>
-                  <Setup2FA />
+                  <ChatView
+                    userSocket={userSocket}
+                    channelSocket={channelSocket}
+                    setToken={setToken}
+                  />
                 </PrivateRoute>
               }
             />
             <Route
               path={RoutePath.GAME}
-              element={
-                <PrivateRoute>
-                  <GameView />
-                </PrivateRoute>
-              }
+              element={<PrivateRoute children={<GameView />}></PrivateRoute>}
+            />
+            <Route
+              path={RoutePath.SETUP2FA}
+              element={<PrivateRoute children={<Setup2FA />}></PrivateRoute>}
             />
             <Route
               path={RoutePath.STATS}
               element={
                 <PrivateRoute>
-                  <StatsView />
+                  <StatsView userSocket={userSocket} setToken={setToken} />
                 </PrivateRoute>
               }
             />

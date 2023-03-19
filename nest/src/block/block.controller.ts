@@ -3,9 +3,11 @@ import { Response } from 'express';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
 import { GetCurrentUserId } from 'src/decorators/getCurrentUserId.decorator';
 import { BlockService } from './block.service';
+import { ApiTags } from '@nestjs/swagger';
 
 @UseGuards(JwtGuard)
 @Controller('block')
+@ApiTags('user-block')
 export class BlockController {
   constructor(private blockService: BlockService) {}
 

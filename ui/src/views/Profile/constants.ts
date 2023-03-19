@@ -3,6 +3,8 @@ export const translationKeys = {
     login: "buttons.login",
     save: "buttons.save",
     cancel: "buttons.cancel",
+    sendRequest: "buttons.sendRequest",
+    submit: "buttons.submit",
   },
   updloadPicture: "updloadPicture",
   profile: "profile",

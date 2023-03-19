@@ -13,12 +13,14 @@ import { JwtGuard } from 'src/auth/guards/jwt.guard';
 import { GetCurrentUserId } from '../decorators/getCurrentUserId.decorator';
 import { ChannelService } from './channel.service';
 import { ModerateChannelDto } from './dto/moderateChannelUser.dto';
+import { ApiTags } from '@nestjs/swagger';
 
 // TODO: add channel entities
 
 // TODO: ADD GUARDS
 @UseGuards(JwtGuard)
 @Controller('channels')
+@ApiTags('channel')
 export class ChannelController {
   constructor(private channelService: ChannelService) {}
 

@@ -16,7 +16,7 @@ import {
   TableRow,
 } from "@mui/material";
 import { SyntheticEvent, useEffect, useState } from "react";
-import { channelUser, user } from "../../interfaces/chat.interfaces";
+import { channelUser, user } from "../../interfaces/chat.interface";
 import { chatRoom } from "../../classes/chatRoom.class";
 import ChannelInfoContext from "./ChannelInfoContext";
 import GetPasswordDialog from "./GetPasswordDialog";
@@ -64,7 +64,10 @@ export default function ChannelInfoDialog({
   const { data, isError, isLoading, refetch } = useQuery(
     ["channelUsers", channel?.id],
     () => ChannelService.fetchUsersOfChannel(channel?.id!),
-    { enabled: typeof channel?.id !== "undefined" }
+    {
+      enabled: typeof channel?.id !== "undefined" && channelInfoOpen === true,
+      refetchInterval: 5000,
+    }
   );
 
   useEffect(() => {
@@ -93,24 +96,21 @@ export default function ChannelInfoDialog({
   };
 
   useEffect(() => {
-    ["userConnected, userDisconnected"].forEach((element) => {
-      userSocket.socket?.on(element, () => {
+    if (channelSocket.socket.connected) {
+      channelSocket.registerListener("roomJoined", userJoinedListener);
+      channelSocket.registerListener("roomLeft", userLeftListener);
+      channelSocket.registerListener("roleUpdated", () => {
         refetch();
       });
-    });
-    channelSocket.registerListener("roomJoined", userJoinedListener);
-    channelSocket.registerListener("roomLeft", userLeftListener);
-    channelSocket.registerListener("roleUpdated", () => {
-      refetch();
-    });
+    }
     return () => {
-      channelSocket.removeListener("roomJoined", userJoinedListener);
-      channelSocket.removeListener("roomLeft", userLeftListener);
-      channelSocket.removeListener("roleUpdated");
-      userSocket.socket?.off("userConnected");
-      userSocket.socket?.off("userDisconnected");
+      if (channelSocket.socket.connected) {
+        channelSocket.removeListener("roomJoined", userJoinedListener);
+        channelSocket.removeListener("roomLeft", userLeftListener);
+        channelSocket.removeListener("roleUpdated");
+      }
     };
-  }, [channelSocket.socket]);
+  }, [channelSocket.socket, channelSocket.socket.connected]);
 
   const handleClose = () => {
     toggleChannelInfo(false);

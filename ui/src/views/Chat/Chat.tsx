@@ -12,7 +12,7 @@ import {
   TextField,
 } from "@mui/material";
 import { SyntheticEvent, useEffect, useRef, useState } from "react";
-import { messagesDto } from "../../interfaces/chat.interfaces";
+import { messagesDto } from "../../interfaces/chat.interface";
 import { accessTypes, chatRoom } from "../../classes/chatRoom.class";
 import AddChannelDialog from "../../components/chat/AddChannelDialog";
 import RoomContextMenu from "../../components/chat/RoomContextMenu";
@@ -234,41 +234,23 @@ export default function Chat(props: Props) {
   };
 
   useEffect(() => {
-    channelSocket.registerListener("incomingMessage", incomingMessageListener);
-    channelSocket.registerListener(
-      "messageRoomFailed",
-      messageRoomFailedListener
-    );
-    channelSocket.registerListener("roomLeft", roomLeftListener);
-    channelSocket.registerListener("roomJoined", roomJoinedListener);
-    channelSocket.registerListener("inviteSucceeded", inviteSucceededListener);
-    channelSocket.registerListener("banSucceeded", banSuccessListener);
-    channelSocket.registerListener("muteSucceeded", muteSuccessListener);
-    [
-      "inviteFailed",
-      "joinRoomError",
-      "joinRoomFailed",
-      "leaveRoomFailed",
-      "createRoomFailed",
-      "editRoomFailed",
-      "createRoomFailed",
-      "banFailed",
-      "muteFailed",
-      "updateRoleFailed",
-    ].forEach((element) => {
-      channelSocket.registerListener(element, failedListener);
-    });
-    return () => {
-      channelSocket.removeListener("banSucceeded", banSuccessListener);
-      channelSocket.removeListener("muteSucceeded", muteSuccessListener);
-      channelSocket.removeListener("incomingMessage", incomingMessageListener);
-      channelSocket.removeListener(
+    if (channelSocket.socket.connected) {
+      channelSocket.registerListener(
+        "incomingMessage",
+        incomingMessageListener
+      );
+      channelSocket.registerListener(
         "messageRoomFailed",
         messageRoomFailedListener
       );
-      channelSocket.removeListener("roomLeft", roomLeftListener);
-      channelSocket.removeListener("roomJoined", roomJoinedListener);
-      channelSocket.removeListener("inviteSucceeded", inviteSucceededListener);
+      channelSocket.registerListener("roomLeft", roomLeftListener);
+      channelSocket.registerListener("roomJoined", roomJoinedListener);
+      channelSocket.registerListener(
+        "inviteSucceeded",
+        inviteSucceededListener
+      );
+      channelSocket.registerListener("banSucceeded", banSuccessListener);
+      channelSocket.registerListener("muteSucceeded", muteSuccessListener);
       [
         "inviteFailed",
         "joinRoomError",
@@ -281,10 +263,49 @@ export default function Chat(props: Props) {
         "muteFailed",
         "updateRoleFailed",
       ].forEach((element) => {
-        channelSocket.removeListener(element, failedListener);
+        channelSocket.registerListener(element, failedListener);
       });
+    }
+    return () => {
+      if (channelSocket.socket.connected) {
+        channelSocket.removeListener("banSucceeded", banSuccessListener);
+        channelSocket.removeListener("muteSucceeded", muteSuccessListener);
+        channelSocket.removeListener(
+          "incomingMessage",
+          incomingMessageListener
+        );
+        channelSocket.removeListener(
+          "messageRoomFailed",
+          messageRoomFailedListener
+        );
+        channelSocket.removeListener("roomLeft", roomLeftListener);
+        channelSocket.removeListener("roomJoined", roomJoinedListener);
+        channelSocket.removeListener(
+          "inviteSucceeded",
+          inviteSucceededListener
+        );
+        [
+          "inviteFailed",
+          "joinRoomError",
+          "joinRoomFailed",
+          "leaveRoomFailed",
+          "createRoomFailed",
+          "editRoomFailed",
+          "createRoomFailed",
+          "banFailed",
+          "muteFailed",
+          "updateRoleFailed",
+        ].forEach((element) => {
+          channelSocket.removeListener(element, failedListener);
+        });
+      }
     };
-  }, [channelSocket.socket, currentRoom, blockedUsers]);
+  }, [
+    channelSocket.socket,
+    currentRoom,
+    blockedUsers,
+    channelSocket.socket.connected,
+  ]);
 
   const listMessages = messages
     ? messages.map((messagesDto: messagesDto, index) => {

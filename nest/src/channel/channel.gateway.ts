@@ -46,7 +46,7 @@ export class ChannelGateway {
 
   @SubscribeMessage('connect')
   handleConnection(@ConnectedSocket() clientSocket: Socket) {
-    if (
+	if (
       clientSocket.handshake.auth &&
       clientSocket.handshake.auth.token !== ''
     ) {

@@ -15,18 +15,15 @@ import {
 } from '@nestjs/common';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import {
   ApiBody,
   ApiConsumes,
-  ApiCreatedResponse,
   ApiOkResponse,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import { UserEntity } from './entities/user.entity';
-import { User } from '@prisma/client';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { Observable, of } from 'rxjs';
@@ -40,10 +37,17 @@ import {
 } from './utils/upload-utils';
 
 @Controller('users')
-@UseGuards(JwtGuard)
+// @UseGuards(JwtGuard) TODO : william set back
 @ApiTags('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
+
+  @Get('get-leaderboard')
+  @UseGuards(JwtGuard)
+  @ApiOkResponse({ type: UserEntity })
+  getLeaderboard(@Res() res: Response) {
+	return this.usersService.getLeaderboard(res);
+  }
 
   @Get()
   @ApiOkResponse({ type: UserEntity, isArray: true })
@@ -52,10 +56,8 @@ export class UsersController {
   }
 
   @Get(':id')
-  @UseGuards(JwtGuard)
   @ApiOkResponse({ type: UserEntity })
   public async findOne(@Param('id') id: string) {
-    // + operator casts to a number
     return this.usersService.findOne(id);
   }
 
@@ -63,7 +65,6 @@ export class UsersController {
   @UseGuards(JwtGuard)
   @ApiOkResponse({ type: UserEntity })
   public async findOneByName(@Param('name') name: string) {
-    // + operator casts to a number
     return this.usersService.findOneByName(name);
   }
 
@@ -154,4 +155,27 @@ export class UsersController {
       );
     }
   }
+
+  // Match controller
+  @Get('get-user-matches-stats/:id')
+  @UseGuards(JwtGuard)
+  @ApiOkResponse({ type: UserEntity })
+  getUserMatchesStats(
+	@Param('id') id: string,
+    @Res() res: Response,
+  ) {
+    return this.usersService.getUserMatchesStats(id, res);
+  }
+
+  @Get('get-user-match-history/:id')
+  @UseGuards(JwtGuard)
+  @ApiOkResponse({ type: UserEntity })
+  getUserMatchHistory(
+	@Param('id') id: string,
+    @Res() res: Response,
+  ) {
+    return this.usersService.getUserMatchHistory(id, res);
+  }
+
+  
 }

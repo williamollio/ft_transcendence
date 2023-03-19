@@ -15,6 +15,7 @@ import CustomTextField from "../../components/shared/CustomTextField/CustomTextF
 import { useForm, FieldValues } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { TextField } from "@mui/material";
+import MiniDrawer from "../../components/MiniDrawer/MiniDrawer";
 
 const CODE_LENGTH = 6; // number of input fields to render
 
@@ -97,6 +98,7 @@ export default function Setup2FA(): React.ReactElement {
   return (
     <>
       <Navbar />
+      <MiniDrawer />
       <Background>
         <ProfileCard>
           <CardContainer>
@@ -133,8 +135,9 @@ export default function Setup2FA(): React.ReactElement {
               </Box>
               <Box className={classes.buttonsWrapper}>
                 <Button
+                  variant="contained"
                   className={classes.iconButton}
-                  variant="outlined"
+                  color="primary"
                   onClick={handleSubmit(onSubmitPhone)}
                 >
                   {t(translationKeys.buttons.save)}
@@ -158,10 +161,11 @@ export default function Setup2FA(): React.ReactElement {
                 <Button
                   id="submit-button"
                   className={classes.iconButton}
-                  variant="outlined"
+                  variant="contained"
+                  color="primary"
                   onClick={onSubmitCode}
                 >
-                  {t(translationKeys.buttons.save)}
+                  {t(translationKeys.buttons.submit)}
                 </Button>
                 <Button
                   className={classes.iconButton}

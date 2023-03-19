@@ -5,7 +5,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import CreateForm from "./CreateChannelForm";
 import JoinForm from "./JoinChannelForm";
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
-import { CRDialogValue } from "../../interfaces/chat.interfaces";
+import { CRDialogValue } from "../../interfaces/chat.interface";
 
 export default function AddChannelDialog({
   open,

@@ -14,12 +14,11 @@ model User {
     id                      String          @id @default(cuid())
     intraId                 String          @unique()
     name                    String          @unique
-    friends                 User[]          @relation("friends")
-    friendsRelation         User[]          @relation("friends") // stores the many-to-many relation
     createdAt               DateTime        @default(now())
     updatedAt               DateTime        @updatedAt
     filename                String?
     refreshToken            String?
+    creationMode            Boolean         @default(true)
     status                  UserStatus      @default(OFFLINE)
     messagesSent            Message[]       @relation("messageSender")
     userOnChannels          ChannelUser[]   @relation("userOnChannel")
@@ -28,8 +27,32 @@ model User {
     channelBlockedRequester BlockedUser[]   @relation("channelBlockedRequester")
     channelBlockedTarget    BlockedUser[]   @relation("channelBlockedTarget")
     invites                 Channel[]       @relation("inviteOnChannel")
+    friendsRequester        Friendship[]    @relation("requester")
+    friendsAddressee        Friendship[]    @relation("addressee")
+
+        // Game shit
+    playerOneMatch                Match[]           @relation("playerOne")
+    playerTwoMatch                Match[]           @relation("playerTwo")
+    eloScore                      Int               @default(1000)
 
     @@map("users")
+}
+
+model Match {
+  gameId    String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  p1s Int
+  p2s Int
+
+  playerOneId String
+  playerOne   User   @relation("playerOne", fields: [playerOneId], references: [id], onDelete: Cascade)
+  playerTwoId String
+  playerTwo   User   @relation("playerTwo", fields: [playerTwoId], references: [id], onDelete: Cascade)
+
+  // @@id([playerOneId, playerTwoId, createdAt])
+  // @@unique(fields: [playerOneId, playerTwoId, createdAt], name: "gameId")
 }
 
 model Channel {
@@ -111,6 +134,21 @@ model BlockedUser {
     @@map("blocked")
 }
 
+model Friendship {
+    requesterId String
+    requester   User   @relation("requester", fields: [requesterId], references: [id], onDelete: Cascade)
+    addresseeId String
+    addressee   User   @relation("addressee", fields: [addresseeId], references: [id], onDelete: Cascade)
+
+    status    FriendshipStatus @default(NONE)
+    createdAt DateTime         @default(now())
+    updatedAt DateTime         @updatedAt
+
+    @@id([requesterId, addresseeId])
+    @@unique(fields: [requesterId, addresseeId], name: "friendshipId")
+    @@map("friendships")
+}
+
 enum ChannelType {
     PUBLIC
     PRIVATE
@@ -133,4 +171,10 @@ enum UserStatus {
 enum ChannelActionType {
     BAN
     MUTE
+}
+
+enum FriendshipStatus {
+    REQUESTED
+    ACCEPTED
+    NONE
 }

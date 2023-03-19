@@ -1,16 +1,12 @@
-export interface Friends {
-  id: number;
-}
-export interface UserCreation {
+export interface User {
+  id: string;
   name: string;
-  friends?: Friends[];
+  filename?: string;
+  status?: UserStatus;
 }
 
-export interface User {
-  id: number;
-  name: string;
-  createdAt: string;
-  updatedAt: string;
-  filename?: string;
-  friends?: User[];
+export enum UserStatus {
+  OFFLINE = "OFFLINE",
+  ONLINE = "ONLINE",
+  PLAYING = "PLAYING",
 }
