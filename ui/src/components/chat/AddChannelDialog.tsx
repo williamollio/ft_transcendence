@@ -113,8 +113,18 @@ export default function AddChannelDialog({
           </Alert>
         </Collapse>
         <Tabs value={formSelection} onChange={handleFormSelection}>
-          <Tab key={0} value={0} label="Join"></Tab>
-          <Tab key={1} value={1} label="Create"></Tab>
+          <Tab
+            sx={{ fontSize: "14px", fontWeight: "bold" }}
+            key={0}
+            value={0}
+            label="Join"
+          ></Tab>
+          <Tab
+            sx={{ fontSize: "14px", fontWeight: "bold" }}
+            key={1}
+            value={1}
+            label="Create"
+          ></Tab>
         </Tabs>
         <form onSubmit={handleFormSubmit}>
           {formSelection === 0 ? (

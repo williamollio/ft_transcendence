@@ -65,12 +65,12 @@ export default function CreateForm({
                 }
                 label="name"
                 type="text"
+                InputLabelProps={{ shrink: true }}
               />
             </Grid>
             <Grid item>
               <Select
                 size="small"
-                label="access"
                 type="string"
                 variant="outlined"
                 value={dialogValue.access}
@@ -96,6 +96,7 @@ export default function CreateForm({
                 label="password"
                 type="password"
                 variant="outlined"
+                InputLabelProps={{ shrink: true }}
               />
             </Grid>
           </Grid>

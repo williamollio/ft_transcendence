@@ -51,6 +51,7 @@ export default function JoinForm({
                 }
                 label="id"
                 type="text"
+                InputLabelProps={{ shrink: true }}
               />
             </Grid>
             <Grid item>
@@ -67,6 +68,7 @@ export default function JoinForm({
                 label="password"
                 type="password"
                 variant="outlined"
+                InputLabelProps={{ shrink: true }}
               />
             </Grid>
           </Grid>
