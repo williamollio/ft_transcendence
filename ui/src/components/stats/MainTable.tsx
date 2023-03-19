@@ -7,7 +7,6 @@ import TableToolbar from "./TableToolbar";
 import { makeStyles } from "tss-react/mui";
 import classes from "../../styles.module.scss";
 
-
 interface Props {
   query: {
     data: any;
@@ -69,12 +68,7 @@ export default function MainTalbe(props: Props) {
     <Box className={classes.boxStyle}>
       <Paper className={classes.paperStyle}>
         <TableToolbar filter={filter} />
-        <TableContainer
-          className={classes.colorScheme}
-          sx={{
-            maxHeight: "600px",
-          }}
-        >
+        <TableContainer className={classes.tableCont}>
           <Table className={classes.colorScheme} stickyHeader>
             <LeaderboardTableHead />
             <TableBody>
@@ -99,13 +93,20 @@ const useStyles = makeStyles()(() => ({
     color: classes.colorPrimary,
     WebkitTextFillColor: classes.colorSecondary,
   },
+  tableCont: {
+    backgroundColor: classes.colorPrimary,
+    color: classes.colorPrimary,
+    WebkitTextFillColor: classes.colorSecondary,
+    maxHeight: "88%",
+    overflow: "auto",
+  },
   boxStyle: {
     width: "97%",
     height: "97%",
   },
   paperStyle: {
     width: "100%",
-	height: "100%",
+    height: "100%",
     mb: 2,
     overflow: "hidden",
     backgroundColor: classes.colorPrimary,

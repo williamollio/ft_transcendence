@@ -1,7 +1,7 @@
 import { accessTypes } from "../classes/chatRoom.class";
 
 export interface messagesDto {
-  message?: string;
+  message?: string | null;
   room?: string;
 }
 
@@ -29,6 +29,7 @@ export interface DBChannelElement
 	name: string,
 	type: accessTypes,
 	users: channelUser[],
+	messages: Array<{content: string}>;
 }
 
 export interface DBChannelUserListElement

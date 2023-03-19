@@ -25,6 +25,8 @@ import { useLocation } from "react-router-dom";
 import { UserSocket } from "../../classes/UserSocket.class";
 import { useQuery } from "@tanstack/react-query";
 import GetTextInputDialog from "../../components/chat/GetTextInputDialog";
+import { useTranslation } from "react-i18next";
+import { translationKeys } from "./constants";
 
 interface Props {
   channelSocket: ChannelSocket;
@@ -57,6 +59,7 @@ export default function Chat(props: Props) {
   });
   const scrollRef = useRef<HTMLLIElement | null>(null);
   const location = useLocation();
+  const { t } = useTranslation();
 
   const {
     data: blockedUsers,
@@ -70,7 +73,7 @@ export default function Chat(props: Props) {
 
   useEffect(() => {
     if (location && location.state && location.state.id) {
-      channelSocket.createDm(location.state.id); // not sure if that's how it's done
+      channelSocket.createDm(location.state.id);
     }
   }, [location]);
 
@@ -164,7 +167,7 @@ export default function Chat(props: Props) {
     if (index >= 0) {
       ChannelService.getUserName(data.userId).then((res) => {
         channelSocket.channels[index].messages.push({
-          message: `${res.data.name} left the channel`,
+          message: `${res.data.name} ${t(translationKeys.userLeft)}`,
           room: data.channelId,
         });
         updateMessages(channelSocket.channels[index], data.channelId);
@@ -179,7 +182,7 @@ export default function Chat(props: Props) {
     if (index >= 0) {
       ChannelService.getUserName(data.userId).then((res) => {
         channelSocket.channels[index].messages.push({
-          message: `${res.data.name} joined the channel`,
+          message: `${res.data.name} ${t(translationKeys.userJoined)}`,
           room: data.channelId,
         });
         updateMessages(channelSocket.channels[index], data.channelId);
@@ -221,7 +224,7 @@ export default function Chat(props: Props) {
       );
       if (mutedChannel) {
         mutedChannel.messages.push({
-          message: "You have been muted for 30 seconds",
+          message: t(translationKeys.muted),
         });
         updateMessages(mutedChannel, result.channelActionOnChannelId);
       }
@@ -468,7 +471,7 @@ export default function Chat(props: Props) {
                     toggleInvited(false);
                     setRoomInvite({ id: "", type: "PRIVATE", name: "" });
                   }}
-                  dialogContent={"This channel requires a password"}
+                  dialogContent={t(translationKeys.passwordReq)!}
                   label={"password"}
                   type={"password"}
                 ></GetTextInputDialog>

@@ -10,11 +10,7 @@ import { chatRoom } from "../../classes/chatRoom.class";
 import AddIcon from "@mui/icons-material/Add";
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { useQuery } from "@tanstack/react-query";
-import {
-  channelUser,
-  DBChannelElement,
-  messagesDto,
-} from "../../interfaces/chat.interface";
+import { channelUser, DBChannelElement } from "../../interfaces/chat.interface";
 import ChannelService from "../../services/channel.service";
 
 export function ChannelTabs({
@@ -89,7 +85,19 @@ export function ChannelTabs({
               id: element.id,
               access: element.type,
               users: new Array<channelUser>(),
-              messages: new Array<messagesDto>(),
+              messages: element.messages.map((message: { content: string }) => {
+                if (
+                  message.content.startsWith(`[${channelSocket.user.name}]`)
+                ) {
+                  return {
+                    message: message.content.replace(
+                      `[${channelSocket.user.name}]`,
+                      `[You]`
+                    ),
+                  };
+                }
+                return { message: message.content };
+              }),
             });
             channelSocket.channels = newList;
             updateChannelList();
@@ -105,7 +113,23 @@ export function ChannelTabs({
                   id: element.id,
                   access: element.type,
                   users: new Array<channelUser>(),
-                  messages: new Array<messagesDto>(),
+                  messages: element.messages.map(
+                    (message: { content: string }) => {
+                      if (
+                        message.content.startsWith(
+                          `[${channelSocket.user.name}]`
+                        )
+                      ) {
+                        return {
+                          message: message.content.replace(
+                            `[${channelSocket.user.name}]`,
+                            `[You]`
+                          ),
+                        };
+                      }
+                      return { message: message.content };
+                    }
+                  ),
                 });
               }
               channelSocket.channels = newList;
@@ -260,7 +284,9 @@ export function ChannelTabs({
 
   return (
     <Tabs
-      sx={{ width: "300px" }}
+      sx={{
+        width: "300px",
+      }}
       value={typeof currentRoom !== "boolean" ? currentRoom.id : false}
       onChange={handleRoomChange}
       variant="scrollable"
@@ -271,8 +297,10 @@ export function ChannelTabs({
             sx={{
               color: "white",
               minWidth: "30px",
-              width: "auto",
               maxWidth: "100px",
+              overflow: "hidden",
+              whiteSpace: "nowrap",
+              textOverflow: "ellipsis",
             }}
             value={channel.id}
             key={channel.id}

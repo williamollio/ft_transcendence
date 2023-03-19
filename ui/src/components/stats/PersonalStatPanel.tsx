@@ -7,16 +7,20 @@ import { useEffect, useState } from "react";
 import { playerStats } from "../../interfaces/stats.interface";
 import { makeStyles } from "tss-react/mui";
 import classes from "../../styles.module.scss";
+import { useTranslation } from "react-i18next";
+import { translationKeys } from "../../views/Stats/constants";
 
 interface Props {
   playerId: string;
   lr: boolean;
-  title: "General" | "Ranked";
+  type: "General" | "Ranked";
+  title: string;
 }
 
 export default function PersonalStatPanel(props: Props) {
   const { classes } = useStyles();
-  const { lr, title, playerId } = props;
+  const { lr, title, playerId, type } = props;
+  const { t } = useTranslation();
 
   const { data, isLoading, isError, isRefetching } = useQuery(
     ["personalStats"],
@@ -66,12 +70,12 @@ export default function PersonalStatPanel(props: Props) {
             </Grid>
           </Grid>
           <Divider />
-          {title === "Ranked" ? (
+          {type === "Ranked" ? (
             <>
               <TwoStatsComponent
                 bottomBorder={false}
-                leftTitle="Current Rating"
-                rightTitle="Leaderboard Rank"
+                leftTitle={t(translationKeys.currRating)}
+                rightTitle={t(translationKeys.leaderboardRank)}
                 leftValue={playerStats.currentRating}
                 rightValue={playerStats.rank}
               ></TwoStatsComponent>
@@ -79,17 +83,17 @@ export default function PersonalStatPanel(props: Props) {
           ) : (
             <>
               <TwoStatsComponent
-                leftTitle="Games Won"
-                rightTitle="Games Lost"
+                leftTitle={t(translationKeys.gamesWon)}
+                rightTitle={t(translationKeys.gamesLost)}
                 leftValue={playerStats.gamesWon}
                 rightValue={playerStats.gamesLost}
               ></TwoStatsComponent>
               <SingleStatComponent
-                title="Total Games"
+                title={t(translationKeys.totalGames)}
                 value={playerStats.gamesWon + playerStats.gamesLost}
               ></SingleStatComponent>
               <SingleStatComponent
-                title="Win %"
+                title={t(translationKeys.winPerc)}
                 value={
                   (playerStats.gamesWon /
                     (playerStats.gamesWon + playerStats.gamesLost)) *
