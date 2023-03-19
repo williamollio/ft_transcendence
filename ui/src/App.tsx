@@ -40,6 +40,7 @@ export default function App() {
       }
       if (channelSocket.socket.connected === false) {
         channelSocket.socket.auth = { token: token };
+		channelSocket.initializeName(token);
         channelSocket.socket.connect();
       }
     }
