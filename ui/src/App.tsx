@@ -137,7 +137,16 @@ export default function App() {
             />
             <Route
               path={RoutePath.GAME}
-              element={<PrivateRoute children={<GameView />}></PrivateRoute>}
+              element={
+                <PrivateRoute
+                  children={
+                    <GameView
+                      userSocket={userSocket}
+                      channelSocket={channelSocket}
+                    />
+                  }
+                ></PrivateRoute>
+              }
             />
             <Route
               path={RoutePath.SETUP2FA}
@@ -147,7 +156,11 @@ export default function App() {
               path={RoutePath.STATS}
               element={
                 <PrivateRoute>
-                  <StatsView userSocket={userSocket} setToken={setToken} />
+                  <StatsView
+                    userSocket={userSocket}
+                    channelSocket={channelSocket}
+                    setToken={setToken}
+                  />
                 </PrivateRoute>
               }
             />

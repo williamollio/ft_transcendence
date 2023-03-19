@@ -4,6 +4,9 @@ import { Typography } from "@mui/material";
 import { translationKeys } from "./constants";
 import { useTranslation } from "react-i18next";
 import LeftDrawer from "../../components/LeftDrawer/LeftDrawer";
+import RightDrawer from "../../components/RightDrawer/RightDrawer";
+import { UserSocket } from "../../classes/UserSocket.class";
+import { ChannelSocket } from "../../classes/ChannelSocket.class";
 // import { makeStyles } from "tss-react/mui";
 import {
   Background,
@@ -13,13 +16,19 @@ import {
   ContentWrapper,
 } from "../../styles/MuiStyles";
 
-export default function GameView(): React.ReactElement {
+interface Props {
+  userSocket: UserSocket;
+  channelSocket: ChannelSocket;
+}
+export default function GameView(props: Props): React.ReactElement {
+  const { userSocket, channelSocket } = props;
   const { t } = useTranslation();
   //   const { classes } = useStyles();
   return (
     <>
       <Navbar />
       <LeftDrawer />
+      <RightDrawer channelSocket={channelSocket} userSocket={userSocket} />
       <Background>
         <ProfileCard>
           <CardContainer>
