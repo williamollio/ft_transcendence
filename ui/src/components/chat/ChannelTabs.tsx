@@ -266,7 +266,6 @@ export function ChannelTabs({
       value={typeof currentRoom !== "boolean" ? currentRoom.id : false}
       onChange={handleRoomChange}
       variant="scrollable"
-      centered={true}
       TabIndicatorProps={{
         style: { marginBottom: "3px"},
       }}
