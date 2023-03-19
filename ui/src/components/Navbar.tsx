@@ -1,4 +1,4 @@
-import { Tab, Tabs, AppBar } from "@mui/material";
+import { Tab, Tabs, AppBar, Theme } from "@mui/material";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { idTabs } from "../interfaces/tab.interface";
@@ -12,7 +12,7 @@ import PictureMenu from "./PictureMenu";
 import { Cookie, getTokenData } from "../utils/auth-helper";
 import { fetchProfilePicture } from "../utils/picture-helper";
 import { useDrawersStore } from "../store/drawers-store";
-import { useTheme } from "@emotion/react";
+import { useTheme } from "@mui/material";
 
 export const navbarHeight = "4rem";
 
@@ -83,7 +83,6 @@ export default function NavBar(): React.ReactElement {
       <AppBar className={classes.menuBar}>
         <Box
           className={classes.picture}
-          zIndex={"1"}
           sx={{
             left: isOpen ? 230 : 55,
             transition: (theme) =>
@@ -131,7 +130,7 @@ export default function NavBar(): React.ReactElement {
   );
 }
 
-const useStyles = makeStyles()(() => ({
+const useStyles = makeStyles()((theme: Theme) => ({
   menuBar: {
     height: navbarHeight,
     width: "100%",
@@ -141,6 +140,7 @@ const useStyles = makeStyles()(() => ({
     flexWrap: "wrap",
   },
   picture: {
+    zIndex: theme.zIndex.appBar + 1,
     position: "absolute",
     top: 0,
   },
