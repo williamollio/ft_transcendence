@@ -421,7 +421,7 @@ export default function Chat(props: Props) {
           <Grid item>
             <TextField
               label="Chat"
-              sx={{ width: "300px" }}
+              sx={{ width: "300px", marginTop: "-1px" }}
               value={inputChat}
               onChange={handleChange}
               onKeyDown={handleSubmit}
