@@ -9,7 +9,6 @@ import {
 import { User } from "../../../interfaces/user.interface";
 import React from "react";
 import { fetchProfilePicture } from "../../../utils/picture-helper";
-import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
 import friendshipsService from "../../../services/friendships.service";
 import { StyledAvatarBadge } from "../AvatarBadge/StyledAvatarBadge";
@@ -22,7 +21,7 @@ interface Props {
   triggerDrawerOpen: () => void;
   showErrorToast: (error?: AxiosError) => void;
 }
-export default function ListReceived(props: Props) {
+export default function ListRequested(props: Props) {
   const { userId, open, users, triggerDrawerOpen, showErrorToast } = props;
 
   const [profilePictures, setProfilePictures] = React.useState<{
@@ -52,18 +51,7 @@ export default function ListReceived(props: Props) {
     return URL.createObjectURL(image);
   }
 
-  async function acceptRequestReceived(friendId: string) {
-    const responseAccept = await friendshipsService.patchAccept(
-      userId,
-      friendId
-    );
-    const isSuccess = !responseAccept?.error;
-    if (!isSuccess) {
-      showErrorToast(responseAccept.error);
-    }
-  }
-
-  async function cancelRequestReceived(friendId: string) {
+  async function cancelRequestSent(friendId: string) {
     const responseDelete = await friendshipsService.deleteRequest(
       userId,
       friendId
@@ -81,17 +69,13 @@ export default function ListReceived(props: Props) {
           <ListItemButton
             sx={{
               minHeight: 48,
-              justifyContent: open ? "initial" : "center",
               px: 2.5,
             }}
           >
             <ListItemIcon
               onClick={triggerDrawerOpen}
               sx={{
-                minWidth: 0,
-                mr: open ? 3 : 0,
-                ml: !open ? 8 : 0,
-                justifyContent: "center",
+                marginLeft: -1,
               }}
             >
               <StyledAvatarBadge
@@ -103,28 +87,12 @@ export default function ListReceived(props: Props) {
                 <Avatar key={user.id} src={profilePictures[user.id]} />
               </StyledAvatarBadge>
             </ListItemIcon>
-            <ListItemText
-              primary={user.name}
-              sx={{ opacity: open ? 1 : 0 }}
-              onClick={triggerDrawerOpen}
-            />
+            <ListItemText primary={user.name} sx={{ opacity: open ? 1 : 0 }} />
             <ListItemButton
-              onClick={() => acceptRequestReceived(user.id)}
+              onClick={() => cancelRequestSent(user.id)}
               sx={{
                 opacity: open ? 1 : 0,
-                color: "limegreen",
-                width: "7px",
-                display: "flex",
-                justifyContent: "center",
-              }}
-            >
-              <CheckIcon />
-            </ListItemButton>
-            <ListItemButton
-              onClick={() => cancelRequestReceived(user.id)}
-              sx={{
-                opacity: open ? 1 : 0,
-                color: "red",
+                color: "lightcoral",
                 width: "7px",
                 display: "flex",
                 justifyContent: "center",

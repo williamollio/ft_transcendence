@@ -7,6 +7,9 @@ import {
   DialogActions,
   Button,
 } from "@mui/material";
+import { makeStyles } from "tss-react/mui";
+import { translationKeys } from "./constants";
+import { useTranslation } from "react-i18next";
 
 export default function JoinForm({
   dialogJoinValue,
@@ -17,6 +20,8 @@ export default function JoinForm({
   setDialogJoinValue: any;
   handleClose: any;
 }) {
+  const { classes } = useStyles();
+  const { t } = useTranslation();
   return (
     <Grid container>
       <Grid item>
@@ -46,6 +51,7 @@ export default function JoinForm({
                 }
                 label="id"
                 type="text"
+                InputLabelProps={{ shrink: true }}
               />
             </Grid>
             <Grid item>
@@ -62,6 +68,7 @@ export default function JoinForm({
                 label="password"
                 type="password"
                 variant="outlined"
+                InputLabelProps={{ shrink: true }}
               />
             </Grid>
           </Grid>
@@ -69,10 +76,30 @@ export default function JoinForm({
       </Grid>
       <Grid item>
         <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
-          <Button type="submit">Join</Button>
+          <Button
+            type="submit"
+            className={classes.iconButton}
+            variant="contained"
+            color="primary"
+          >
+            {t(translationKeys.buttons.join)}
+          </Button>
+          <Button
+            onClick={handleClose}
+            className={classes.iconButton}
+            variant="outlined"
+          >
+            {t(translationKeys.buttons.cancel)}
+          </Button>
         </DialogActions>
       </Grid>
     </Grid>
   );
 }
+
+const useStyles = makeStyles()(() => ({
+  iconButton: {
+    height: "30%",
+    width: "30%",
+  },
+}));

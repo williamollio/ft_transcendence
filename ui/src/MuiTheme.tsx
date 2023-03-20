@@ -9,6 +9,7 @@ const theme = createTheme({
     },
     secondary: {
       main: classes.colorAccent,
+      light: classes.colorSecondaryLight,
     },
   },
   typography: {
@@ -86,6 +87,28 @@ const theme = createTheme({
           paddingLeft: "3rem",
           paddingRight: "3rem",
           marginTop: "0.5rem",
+        },
+      },
+    },
+    MuiTabs: {
+      styleOverrides: {
+        root: {
+          "& .MuiTabs-indicator": {
+            backgroundColor: classes.colorAccent,
+          },
+          "& .MuiTabs-scrollButtons": {
+            color: classes.colorAccent,
+          },
+          "& .MuiTab-root.Mui-selected": {
+            color: classes.colorAccent,
+          },
+        },
+      },
+    },
+    MuiTab: {
+      styleOverrides: {
+        root: {
+          fontFamily: "Soin",
         },
       },
     },

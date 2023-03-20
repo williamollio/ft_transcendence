@@ -4,7 +4,7 @@ import { Response } from "../../services/common/resolve";
 import Box from "@mui/material/Box";
 import MuiDrawer from "@mui/material/Drawer";
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
-import { Divider, Typography } from "@mui/material";
+import { Divider, IconButton, Toolbar, Typography } from "@mui/material";
 import { User } from "../../interfaces/user.interface";
 import { Cookie, getTokenData } from "../../utils/auth-helper";
 import friendshipsService from "../../services/friendships.service";
@@ -17,8 +17,14 @@ import { ToastType } from "../../context/toast";
 import { TranscendanceStateActionType } from "../../context/transcendance-reducer";
 import { translationKeys } from "./constants";
 import { useTranslation } from "react-i18next";
+import MenuIcon from "@mui/icons-material/Menu";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import { useDrawersStore } from "../../store/drawers-store";
+import { navbarHeight } from "../Navbar";
 
 const drawerWidth = 240;
+const drawerWidthClosed = "4rem";
 
 const openedMixin = (theme: Theme): CSSObject => ({
   width: drawerWidth,
@@ -35,10 +41,7 @@ const closedMixin = (theme: Theme): CSSObject => ({
     duration: theme.transitions.duration.leavingScreen,
   }),
   overflowX: "hidden",
-  width: `calc(${theme.spacing(7)} + 1px)`,
-  [theme.breakpoints.up("sm")]: {
-    width: `calc(${theme.spacing(8)} + 1px)`,
-  },
+  width: drawerWidthClosed,
 });
 
 interface AppBarProps extends MuiAppBarProps {
@@ -52,6 +55,8 @@ const Drawer = styled(MuiDrawer, {
   flexShrink: 0,
   whiteSpace: "nowrap",
   boxSizing: "border-box",
+  border: "none",
+  backgroundColor: theme.palette.primary.light,
   ...(open && {
     ...openedMixin(theme),
     "& .MuiDrawer-paper": openedMixin(theme),
@@ -62,15 +67,52 @@ const Drawer = styled(MuiDrawer, {
   }),
 }));
 
+const AppBar = styled(MuiAppBar, {
+  shouldForwardProp: (prop) => prop !== "open",
+})<AppBarProps>(({ theme, open }) => ({
+  zIndex: theme.zIndex.drawer + 1,
+  transition: theme.transitions.create(["width", "margin"], {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen,
+  }),
+  width: `calc(${drawerWidthClosed} + 1px)`,
+  height: navbarHeight,
+  right: "auto",
+  border: "none",
+  boxShadow: "none",
+  ...(open && {
+    marginLeft: -drawerWidth,
+    zIndex: -1,
+    transition: theme.transitions.create(["width", "margin"], {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  }),
+}));
+
+const DrawerHeader = styled("div")(({ theme }) => ({
+  border: "none",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "flex-end",
+  padding: theme.spacing(0, 1),
+  ...theme.mixins.toolbar,
+}));
+
 export default function MiniDrawer() {
   const { t } = useTranslation();
   const theme = useTheme();
-  const [open, setOpen] = React.useState(false);
   const [friends, setFriends] = React.useState<User[]>([]);
   const [requests, setRequests] = React.useState<User[]>([]);
   const [requestsReceived, setRequestsReceived] = React.useState<User[]>([]);
   const [userId, setUserId] = React.useState<string>("");
   const { dispatchTranscendanceState } = React.useContext(TranscendanceContext);
+  const [open, setOpen] = useDrawersStore(
+    (state: { isLeftOpen: any; setIsLeftOpen: any }) => [
+      state.isLeftOpen,
+      state.setIsLeftOpen,
+    ]
+  );
 
   React.useEffect(() => {
     let token = localStorage.getItem(Cookie.TOKEN);
@@ -137,12 +179,60 @@ export default function MiniDrawer() {
 
   return (
     <Box sx={{ display: "flex" }}>
-      <Drawer variant="permanent" open={open}>
+      <AppBar position="fixed" open={open}>
+        <Toolbar>
+          <Box
+            display={"flex"}
+            alignContent={"center"}
+            justifyContent={"center"}
+            width="100%"
+            height="100%"
+          >
+            <IconButton
+              onClick={triggerDrawerOpen}
+              sx={{
+                ...(open && { display: "none" }),
+              }}
+            >
+              <MenuIcon
+                sx={{
+                  fill: theme.palette.secondary.main,
+                  width: "35px",
+                  height: "35px",
+                }}
+              />
+            </IconButton>
+          </Box>
+        </Toolbar>
+      </AppBar>
+      <Drawer
+        variant="permanent"
+        open={open}
+        sx={{
+          "& .MuiDrawer-paper": {
+            backgroundColor: theme.palette.secondary.light,
+          },
+        }}
+      >
+        <DrawerHeader>
+          <IconButton onClick={triggerDrawerOpen} color={"secondary"}>
+            {theme.direction === "rtl" ? (
+              <ChevronRightIcon />
+            ) : (
+              <ChevronLeftIcon />
+            )}
+          </IconButton>
+        </DrawerHeader>
+        <Divider
+          variant="middle"
+          sx={{
+            marginBottom: "2.5rem",
+          }}
+        />
         <Box
           display={"flex"}
           justifyContent="center"
           width={"calc(64px + 1px)"}
-          mt="2.5rem"
         >
           <Typography
             fontSize="11px"
