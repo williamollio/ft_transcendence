@@ -12,6 +12,7 @@ import {
   TitleWrapper,
   ContentWrapper,
 } from "../../styles/MuiStyles";
+import GameBoard from "../../components/game/GameBoard";
 
 export default function GameView(): React.ReactElement {
   const { t } = useTranslation();
@@ -34,7 +35,7 @@ export default function GameView(): React.ReactElement {
               </Typography>
             </TitleWrapper>
             <ContentWrapper>
-              <Typography></Typography>
+				<GameBoard />
             </ContentWrapper>
           </CardContainer>
         </ProfileCard>

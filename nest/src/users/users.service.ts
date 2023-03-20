@@ -197,10 +197,10 @@ export class UsersService {
 
 
     // Game shit 
-    async getUserMatches(userId: string) {
+    async getUserMatches(userName: string) {
       const matches = await this.prisma.user.findUnique({
         where: {
-          id: userId,
+          name: userName,
         },
         select: {
           playerOneMatch: {},
@@ -224,9 +224,9 @@ export class UsersService {
       return null;
     }
   
-    async getUserMatchesStats(userId: string, res: Response) {
-      const user = await this.findOneFromuserName(userId);
-      const ranking = await this.getUserRanking(userId);
+    async getUserMatchesStats(userName: string, res: Response) {
+      const user = await this.findOneFromuserName(userName);
+      const ranking = await this.getUserRanking(userName);
       if (user && ranking) {
         const stats: Stat = {
           numberOfWin: 0,
@@ -235,7 +235,7 @@ export class UsersService {
           eloScore: user.eloScore,
         };
   
-        const matchesList = await this.getUserMatches(userId);
+        const matchesList = await this.getUserMatches(userName);
         if (matchesList) {
           for (const match of matchesList) {
             if (
@@ -250,10 +250,10 @@ export class UsersService {
       }
     }
 
-    async findOneFromuserName(userId: string): Promise<User | null> {
+    async findOneFromuserName(userName: string): Promise<User | null> {
       return await this.prisma.user.findUnique({
         where: {
-          id: userId,
+          name: userName,
         },
       });
     }
@@ -267,7 +267,7 @@ export class UsersService {
       return user;
     }
   
-    async getUserRanking(userId: string) {
+    async getUserRanking(userName: string) {
       let userRank = '';
   
       const users = await this.prisma.user.findMany({
@@ -276,7 +276,7 @@ export class UsersService {
         },
       });
       for (let i = 0; i < users.length; i++) {
-        if (users[i].id == userId) {
+        if (users[i].name == userName) {
           const rank = i + 1;
           userRank = rank.toString() + '/' + users.length.toString();
 
@@ -289,10 +289,10 @@ export class UsersService {
     // still have to implement the services for the history and the leaderboard
     // game won / game lost / points ???
 
-    async getUserMatchHistory(userId: string, res: Response) {
-      const matchesList = await this.getUserMatches(userId);
+    async getUserMatchHistory(userNickname: string, res: Response) {
+      const matchesList = await this.getUserMatches(userNickname);
       const matchHistory: MatchHistory[] = [];
-      const currentUser = await this.findOneFromuserName(userId);
+      const currentUser = await this.findOneFromuserName(userNickname);
       let opponent: User | null;
       let matchWon: boolean;
       let score: string;
@@ -348,8 +348,8 @@ export class UsersService {
           },
         });
         return res.status(200).send(leaderboard);
-	} catch (error) {
-		throw new ForbiddenException(error);
+      } catch (error) {
+        throw new ForbiddenException(error);
       }
     }
 }
