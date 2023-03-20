@@ -53,8 +53,6 @@ export class AuthController {
 
     this.setCookieTokens(tokens, response);
 
-    // TODO: create 2fa code
-
     response.redirect(`${process.env.PATH_TO_FRONTEND}/redirect`);
   }
 
