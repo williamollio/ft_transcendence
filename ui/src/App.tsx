@@ -48,16 +48,6 @@ export default function App() {
     };
   }, [token, channelSocket, userSocket]);
 
-  React.useEffect(() => {
-    let gotToken = localStorage.getItem(Cookie.TOKEN);
-    if (gotToken) {
-      if (channelSocket.socket.connected === false) {
-        setToken("Bearer " + gotToken);
-      }
-      channelSocket.initializeName(gotToken);
-    }
-  }, []);
-
   // removes the object URL after the component unmounts to prevent memory leaks
   React.useEffect(() => {
     return () => {
