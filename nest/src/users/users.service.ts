@@ -110,11 +110,12 @@ export class UsersService {
     }
   }
 
-  public async set2FA(userId: string, enabled: boolean) {
+  public async set2FA(userId: string, secret: string | null) {
     await this.prisma.user.update({
       where: { id: userId },
       data: {
-        secondFactorEnabled: enabled,
+        secondFactorSecret: secret,
+        secondFactorEnabled: !!secret,
       },
     });
   }

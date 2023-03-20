@@ -12,6 +12,8 @@ import { Intra42User } from '../users/interface/intra42-user.interface';
 import * as process from 'process';
 import * as argon2 from 'argon2';
 import { CreateUserDto } from '../users/dto/create-user.dto';
+import { authenticator } from 'otplib';
+import { toDataURL } from 'qrcode';
 
 @Injectable()
 export class AuthService {
@@ -107,13 +109,16 @@ export class AuthService {
     return tokens;
   }
 
-  async enable2FA(userId: string) {
-    await this.userService.set2FA(userId, true);
-    // TODO: generate secret
+  async enable2FA(userId: string): Promise<string> {
+    const secret = authenticator.generateSecret();
+    const otpAuthUrl = authenticator.keyuri(userId, 'TODO', secret);
+    await this.userService.set2FA(userId, secret);
+
+    return toDataURL(otpAuthUrl);
   }
 
   async disable2FA(userId: string) {
-    await this.userService.set2FA(userId, false);
+    await this.userService.set2FA(userId, null);
   }
 
   async validateSecondFactor(userId: string) {
