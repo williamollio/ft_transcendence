@@ -31,6 +31,7 @@ model User {
     friendsAddressee        Friendship[]    @relation("addressee")
     secondFactorEnabled     Boolean         @default(false)
     secondFactorLogged      Boolean         @default(false)
+    secondFactorSecret      String?
     secondFactorCode        String?
 
         // Game shit
