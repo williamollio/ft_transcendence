@@ -10,6 +10,9 @@ import {
   TitleWrapper,
   ContentWrapper,
 } from "../../styles/MuiStyles";
+import authService from "../../services/auth.service";
+import { RoutePath } from "../../interfaces/router.interface";
+import {useNavigate} from "react-router-dom";
 
 const CODE_LENGTH = 6; // number of input fields to render
 
@@ -23,6 +26,7 @@ export default function Login2FAView(): ReactElement {
   const [currentIndex, setCurrentIndex] = React.useState<number>(0);
   const inputRefs = useRef<any>([]);
   const [isFocused, setIsFocused] = React.useState<boolean>(false);
+  const navigate = useNavigate();
 
   const handleInputChange = (index: number, value: string) => {
     setCurrentIndex(index);
@@ -54,15 +58,12 @@ export default function Login2FAView(): ReactElement {
   }, [input, isFocused]);
 
   async function handleSubmit() {
-    console.log("send input array " + input);
-    // TODO: New strategy!
-    //          - mhahnFr
-    /*let response = await AuthService.getAuthURI(); // <- Will be changed later on.
-    if (!response?.error) {
+    const response = await authService.sendSecondFactor(input);
+    if (!response.error) {
       navigate(RoutePath.PROFILE);
     } else {
       navigate(RoutePath.LOGIN);
-    }*/
+    }
   }
 
   const OTPInputField = ({ index }: { index: number }) => {
