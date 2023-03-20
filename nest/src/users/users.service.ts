@@ -120,6 +120,13 @@ export class UsersService {
     });
   }
 
+  public async set2FALogged(userId: string, logged: boolean) {
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { secondFactorLogged: logged },
+    });
+  }
+
   public async update(userId: string, updateUserDto: UpdateUserDto) {
     try {
       const User = await this.prisma.user.update({

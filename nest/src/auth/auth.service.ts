@@ -121,17 +121,24 @@ export class AuthService {
     await this.userService.set2FA(userId, null);
   }
 
-  async validateSecondFactor(userId: string) {
+  async validateSecondFactor(userId: string, code: string) {
     const user = await this.userService.findOne(userId);
-    if (!user || !user.secondFactorEnabled || !user.secondFactorCode) {
+    if (!user || !user.secondFactorEnabled || !user.secondFactorSecret) {
       throw new UnauthorizedException('Log in!');
     }
-    // TODO: Check codes...
+
+    if (
+      !authenticator.verify({ token: code, secret: user.secondFactorSecret })
+    ) {
+      throw new UnauthorizedException('Wrong code!');
+    }
+    await this.userService.set2FALogged(userId, true);
   }
 
   async logout(userId: string) {
     const user = await this.userService.findOne(userId);
     if (!user) throw new UnauthorizedException('Unauthorized');
+    await this.userService.set2FALogged(userId, false);
     await this.userService.updateRefreshToken(user.id, '');
   }
 }

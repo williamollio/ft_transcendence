@@ -18,7 +18,7 @@ import { Intra42User } from '../users/interface/intra42-user.interface';
 import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
 import { JwtGuard } from './guards/jwt.guard';
 import { CreateUserDto } from '../users/dto/create-user.dto';
-import {FullAuthGuard} from "./guards/full-auth.guard";
+import { FullAuthGuard } from './guards/full-auth.guard';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -107,7 +107,7 @@ export class AuthController {
   @Post('2fa/validate')
   @UseGuards(JwtGuard)
   async validate2FA(@Req() request: any) {
-    await this.authService.validateSecondFactor(request.user.id);
+    await this.authService.validateSecondFactor(request.user.id, request.body);
     return HttpStatus.OK;
   }
 }

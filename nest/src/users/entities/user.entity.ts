@@ -75,4 +75,7 @@ export class UserEntity implements User {
 
   @ApiProperty()
   secondFactorCode: string | null;
+
+  @ApiProperty()
+  secondFactorSecret: string | null;
 }
