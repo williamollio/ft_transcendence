@@ -1,6 +1,7 @@
 import { Box, Paper } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 import { GameLoop } from "../../classes/GameLoop.class";
+import { positionalData } from "../../classes/positionalData.class";
 import Ball from "./Ball";
 import Player from "./Player";
 
@@ -55,7 +56,8 @@ export default function GameBoard(props: Props) {
         <Box sx={{ backgroundColor: "blue", height: "50%", width: "100%" }} />
         <Player
           lr={true}
-          yPos={gameLoop.positionalData.playerLeftY}
+          yStart={gameLoop.positionalData.playerLeftYStart}
+          yPos={gameLoop.positionalData.playerLeftYOffset}
           posRef={
             boardRef.current
               ? boardRef.current
@@ -64,7 +66,8 @@ export default function GameBoard(props: Props) {
         ></Player>
         <Player
           lr={false}
-          yPos={gameLoop.positionalData.playerRightY}
+          yStart={gameLoop.positionalData.playerRightYStart}
+          yPos={gameLoop.positionalData.playerRightYOffset}
           posRef={
             boardRef.current
               ? boardRef.current
@@ -72,7 +75,8 @@ export default function GameBoard(props: Props) {
           }
         ></Player>
         <Ball
-          ballPos={gameLoop.positionalData.ballPos}
+          ballStart={gameLoop.positionalData.ballPosStart}
+          ballPos={gameLoop.positionalData.ballOffset}
           posRef={
             boardRef.current
               ? boardRef.current

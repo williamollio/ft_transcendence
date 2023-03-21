@@ -1,10 +1,42 @@
 import { Socket } from "socket.io-client";
 import { initSocket } from "../services/initSocket.service";
+import { GameMode } from "../../../nest/src/game/entities/game.entity";
 
 export class GameSocket {
-	socket: Socket;
+  socket: Socket;
 
-	constructor(){
-		this.socket = initSocket("http://localhost:4444", null);
-	}
+  constructor() {
+    this.socket = initSocket("http://localhost:4444", null);
+  }
+
+  leaveGame = () => {
+    this.socket.emit("leaveGame");
+  };
+
+  rejoin = () => {
+    this.socket.emit("reJoin");
+  };
+
+  refuseInvite = (challengerId: string) => {
+    this.socket.emit("refuseInvite", challengerId);
+  };
+
+  inviteToGame = (mode: string, opponentId: string) => {
+    this.socket.emit("createInvitationGame", {
+      mode: mode,
+      opponent: opponentId,
+    });
+  };
+
+  joinGame = (mode: string) => {
+	this.socket.emit("joinGame", {mode: mode});
+  };
+
+  joinAsSpectator = (playerId: string) => {
+	this.socket.emit("watchGame", {playerId: playerId});
+  }
+
+  leaveAsSpectator = () => {
+	this.socket.emit("leaveWatch");
+  }
 }

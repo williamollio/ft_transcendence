@@ -11,11 +11,11 @@ export interface user {
 }
 
 export interface channelUser {
-	id: string,
-	name: string,
-	status: "OFFLINE" | "ONLINE" | "PLAYING";
-	role?: "USER" | "ADMIN" | "OWNER";
-};
+  id: string;
+  name: string;
+  status: "OFFLINE" | "ONLINE" | "PLAYING";
+  role?: "USER" | "ADMIN" | "OWNER";
+}
 
 export interface CRDialogValue {
   key: string;
@@ -23,17 +23,27 @@ export interface CRDialogValue {
   password: string;
 }
 
-export interface DBChannelElement
-{
-	id: string,
-	name: string,
-	type: accessTypes,
-	users: channelUser[],
-	messages: Array<{content: string}>;
+export interface DBChannelElement {
+  id: string;
+  name: string;
+  type: accessTypes;
+  users: channelUser[];
+  messages: Array<{ content: string }>;
 }
 
-export interface DBChannelUserListElement
-{
-	id: string,
-	users: Array<any>,
+export interface DBChannelUserListElement {
+  id: string;
+  users: Array<any>;
 }
+
+export interface ChannelInfoContextMenu {
+  mouseX: number;
+  mouseY: number;
+  user: channelUser;
+}
+
+export enum GameMode {
+	CLASSIC = 'CLASSIC',
+	MAYHEM = 'MAYHEM',
+	HOCKEY = 'HOCKEY',
+  }

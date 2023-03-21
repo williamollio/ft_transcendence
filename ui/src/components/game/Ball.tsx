@@ -1,9 +1,11 @@
 import { Avatar } from "@mui/material";
 import { motion } from "framer-motion";
 import { makeStyles } from "tss-react/mui";
+import { ballPosition } from "../../interfaces/game.interface";
 
 interface Props {
-  ballPos: { x: number; y: number };
+  ballStart: ballPosition;
+  ballPos: ballPosition;
   posRef: { offsetLeft: number; offsetTop: number };
 }
 
@@ -37,7 +39,7 @@ export default function Ball(props: Props) {
 const useStyles = makeStyles<Props>()((_theme, props) => ({
   ball: {
     position: "absolute",
-    left: props.posRef.offsetLeft,
-    top: props.posRef.offsetTop,
+    left: props.posRef.offsetLeft + props.ballStart.x,
+    top: props.posRef.offsetTop + props.ballStart.y,
   },
 }));

@@ -48,7 +48,7 @@ export default function AddChannelDialog({
     setFormSelection(newValue);
   };
 
-  const handleClose = (e: any) => {
+  const handleClose = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (formSelection === 1)
       setDialogValue({ key: "", access: "PUBLIC", password: "" });
     else setDialogJoinValue({ id: "", password: "" });

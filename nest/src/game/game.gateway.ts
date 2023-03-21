@@ -12,14 +12,16 @@ import { Body, UseGuards } from '@nestjs/common';
 import { GetCurrentUserId } from 'src/decorators/getCurrentUserId.decorator';
 import { FrontendUser, GameMode } from './entities/game.entity';
 import * as msgpack from 'socket.io-msgpack-parser';
+import { JwtGuard } from 'src/auth/guards/jwt.guard';
 
 @WebSocketGateway(4444, {
   cors: {
     credentials: true,
+	origin: process.env.PATH_TO_FRONTEND,
   },
   parser: msgpack,
 })
-@UseGuards()
+@UseGuards(JwtGuard)
 export class GameGateway {
   @WebSocketServer()
   server: Server;
@@ -50,16 +52,16 @@ export class GameGateway {
 
   @SubscribeMessage('refuseInvite')
   refuseGameInvite(
-    @Body() challenger: FrontendUser,
+    @Body() challengerId: string,
     @ConnectedSocket() client: Socket,
   ) {
-    this.gameService.refuseInvite(client, challenger.id);
+    this.gameService.refuseInvite(client, challengerId);
   }
 
   @SubscribeMessage('createInvitationGame')
   createInvitationGame(
     @MessageBody('mode') mode: GameMode,
-    @MessageBody('opponent') playerTwoId: GameMode,
+    @MessageBody('opponent') playerTwoId: string,
     @ConnectedSocket() client: Socket,
     @GetCurrentUserId() playerOneId: string,
   ) {

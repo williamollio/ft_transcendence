@@ -1,17 +1,27 @@
-export class positionalData {
-  playerLeftY: number;
-  playerRightY: number;
-  ballPos: { x: number; y: number };
+import { ballPosition } from "../interfaces/game.interface";
 
+export class positionalData {
+  playerLeftYStart: number;
+  playerRightYStart: number;
+  ballPosStart: ballPosition;
+  
+  playerLeftYOffset: number;
+  playerRightYOffset: number;
+  ballOffset: ballPosition;
+  
   constructor() {
-	this.playerLeftY = 175;
-    this.playerRightY = 175;
-	this.ballPos = { x: 285, y: 210 };
+	this.playerLeftYStart = 175;
+    this.playerRightYStart = 175;
+	this.ballPosStart = { x: 285, y: 210 };
+
+	this.playerLeftYOffset = 0;
+	this.playerRightYOffset = 0;
+	this.ballOffset = {x: 0, y: 0};
   }
 
   resetPositions = () => {
-	this.playerLeftY = 185;
-    this.playerRightY = 185;
-	this.ballPos = { x: 285, y: 210 };
+	this.playerLeftYOffset = 0;
+	this.playerRightYOffset = 0;
+	this.ballOffset = {x: 0, y: 0};
   }
 }

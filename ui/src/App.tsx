@@ -28,7 +28,7 @@ export default function App() {
   const [gameSocket] = useState<GameSocket>(new GameSocket());
 
   const [token, setToken] = useState<boolean>(false);
-  
+
   const [image, setImage] = useImageStore(
     (state: { image: any; setImage: any }) => [state.image, state.setImage]
   );
@@ -36,21 +36,24 @@ export default function App() {
 
   // different method to initialize out sockets that makes them persistent over all views
   React.useEffect(() => {
-    let gotToken = localStorage.getItem(Cookie.TOKEN);
-    if (gotToken !== "") {
-      if (userSocket.socket.connected === false) {
-        userSocket.socket.auth = { token: gotToken };
-        userSocket.socket.connect();
-        userSocket.logIn();
-      }
-      if (channelSocket.socket.connected === false) {
-        channelSocket.socket.auth = { token: gotToken };
-        channelSocket.initializeName(gotToken);
-        channelSocket.socket.connect();
-      }
-      if (gameSocket.socket.connected === false) {
-        gameSocket.socket.auth = { token: gotToken };
-        gameSocket.socket.connect();
+    if (token) {
+      let gotToken = localStorage.getItem(Cookie.TOKEN);
+	  console.log(gotToken);
+      if (gotToken !== "") {
+        if (userSocket.socket.connected === false) {
+          userSocket.socket.auth = { token: gotToken };
+          userSocket.socket.connect();
+          userSocket.logIn();
+        }
+        if (channelSocket.socket.connected === false) {
+          channelSocket.socket.auth = { token: gotToken };
+          channelSocket.initializeName(gotToken);
+          channelSocket.socket.connect();
+        }
+        if (gameSocket.socket.connected === false) {
+          gameSocket.socket.auth = { token: gotToken };
+          gameSocket.socket.connect();
+        }
       }
     }
     return () => {
@@ -71,7 +74,6 @@ export default function App() {
 
   const AuthWrapper = (): ReactElement => {
     const isAuthenticated = getIsAuthenticated();
-    isAuthenticated ? setToken(true) : false;
     return isAuthenticated ? (
       <Navigate to={RoutePath.PROFILE} replace />
     ) : (
@@ -147,7 +149,11 @@ export default function App() {
             />
             <Route
               path={RoutePath.GAME}
-              element={<PrivateRoute children={<GameView />}></PrivateRoute>}
+              element={
+                <PrivateRoute
+                  children={<GameView gameSocket={gameSocket} />}
+                ></PrivateRoute>
+              }
             />
             <Route
               path={RoutePath.SETUP2FA}

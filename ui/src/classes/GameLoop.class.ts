@@ -23,14 +23,16 @@ export class GameLoop {
 
   resetPositions = () => {
     this.positionalData.resetPositions();
+	this.handleMovement();
+	this.setTicks(0);
   };
 
   handleMovement = () => {
     if (typeof this.keyPressed !== "boolean") {
       if (this.keyPressed.some(key => key === "ArrowUp")) {
-        this.positionalData.playerLeftY -= 4;
+        this.positionalData.playerLeftYOffset -= 4;
       } else if (this.keyPressed.some(key => key === "ArrowDown")) {
-        this.positionalData.playerLeftY += 4;
+        this.positionalData.playerLeftYOffset += 4;
       }
     }
   };

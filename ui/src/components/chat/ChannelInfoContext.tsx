@@ -1,35 +1,59 @@
-import { Menu, MenuItem } from "@mui/material";
+import {
+  Collapse,
+  Menu,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+} from "@mui/material";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { chatRoom } from "../../classes/chatRoom.class";
-import { channelUser } from "../../interfaces/chat.interface";
+import { GameSocket } from "../../classes/GameSocket.class";
+import {
+  GameMode,
+  ChannelInfoContextMenu,
+} from "../../interfaces/chat.interface";
 import ChannelService from "../../services/channel.service";
+import { translationKeys } from "../../views/Chat/constants";
 
-export default function ChannelInfoContext({
-  blockedUser,
-  refetchBlockedUsers,
-  setAlertMsg,
-  channel,
-  contextMenu,
-  setContextMenu,
-  channelSocket,
-}: {
+interface Props {
   blockedUser: Array<string>;
   refetchBlockedUsers: any;
   setAlertMsg: Dispatch<SetStateAction<string>>;
   channel: chatRoom | undefined;
-  contextMenu: {
-    mouseX: number;
-    mouseY: number;
-    user: channelUser;
-  } | null;
-  setContextMenu: any;
+  contextMenu: ChannelInfoContextMenu | null;
+  setContextMenu: Dispatch<SetStateAction<ChannelInfoContextMenu | null>>;
   channelSocket: ChannelSocket;
-}) {
-  //   const [openTime, toggleOpenTime] = useState<boolean>(false);
-  //   const [action, setAction] = useState<"kick" | "mute">("kick");
+  gameSocket: GameSocket;
+}
+
+export default function ChannelInfoContext(props: Props) {
+  const {
+    blockedUser,
+    refetchBlockedUsers,
+    setAlertMsg,
+    channel,
+    contextMenu,
+    setContextMenu,
+    channelSocket,
+    gameSocket,
+  } = props;
   const [blockStatus, setBlockStatus] = useState<"Block" | "Unblock">("Block");
   const [self, setSelf] = useState<boolean>(false);
+  const [gameModeCollapse, toggleGameModeCollapse] = useState<boolean>(false);
+  const { t } = useTranslation();
+
+  const {
+    formState: { errors },
+    register,
+    handleSubmit,
+    setValue,
+    control,
+  } = useForm({
+    mode: "onChange",
+  });
 
   useEffect(() => {
     if (contextMenu) {
@@ -69,11 +93,12 @@ export default function ChannelInfoContext({
     }
   };
 
-  const handleInviteGame = () => {
+  const handleInviteGame = (event: SelectChangeEvent) => {
     setAlertMsg("Failed to invite to play");
     handleContextClose();
     if (contextMenu && contextMenu.user && contextMenu.user.id) {
-      // setupGame with user.id
+      console.log(event.target.value);
+      gameSocket.inviteToGame(event.target.value, contextMenu.user.id);
     }
   };
 
@@ -82,11 +107,11 @@ export default function ChannelInfoContext({
     if (contextMenu && contextMenu.user && contextMenu.user.id) {
       if (blockStatus === "Block") {
         setAlertMsg("Failed to block User");
-        await ChannelService.blockUser(contextMenu.user.id)
+        await ChannelService.blockUser(contextMenu.user.id);
         refetchBlockedUsers();
       } else if (blockStatus === "Unblock") {
         setAlertMsg("Failed to unblock User");
-        await ChannelService.unblockUser(contextMenu.user.id)
+        await ChannelService.unblockUser(contextMenu.user.id);
         refetchBlockedUsers();
       }
     }
@@ -102,7 +127,6 @@ export default function ChannelInfoContext({
       contextMenu.user &&
       contextMenu.user.id
     ) {
-      //   setAction("mute");
       channelSocket.muteUser(channel.id, contextMenu.user.id);
     }
   };
@@ -117,7 +141,6 @@ export default function ChannelInfoContext({
       contextMenu.user &&
       contextMenu.user.id
     ) {
-      //   setAction("kick");
       channelSocket.banUser(channel.id, contextMenu.user.id);
     }
   };
@@ -136,6 +159,10 @@ export default function ChannelInfoContext({
     }
   };
 
+  const handleGameModeCollapse = () => {
+    toggleGameModeCollapse(!gameModeCollapse);
+  };
+
   return (
     <>
       <Menu
@@ -149,33 +176,45 @@ export default function ChannelInfoContext({
         }
       >
         <MenuItem disabled={self} onClick={handleDM}>
-          Whisper
+          {t(translationKeys.whisper)}
         </MenuItem>
         <MenuItem disabled={self} onClick={handlePromote}>
-          Promote
+          {t(translationKeys.promote)}
         </MenuItem>
         <MenuItem disabled={self} onClick={handleProfile}>
-          View Profile
+          {t(translationKeys.viewProfile)}
         </MenuItem>
-        <MenuItem disabled={self} onClick={handleInviteGame}>
-          Invite to Game
+        <MenuItem disabled={self} onClick={handleGameModeCollapse}>
+          {t(translationKeys.inviteToGame)}
+          <Collapse in={gameModeCollapse}>
+            <Select
+              label={t(translationKeys.gameMode)}
+              onChange={handleInviteGame}
+            >
+              <MenuItem value={GameMode.CLASSIC}>
+                {t(translationKeys.classic)}
+              </MenuItem>
+              <MenuItem value={GameMode.MAYHEM}>
+                {t(translationKeys.mayhem)}
+              </MenuItem>
+              <MenuItem value={GameMode.HOCKEY}>
+                {t(translationKeys.hockey)}
+              </MenuItem>
+            </Select>
+          </Collapse>
         </MenuItem>
         <MenuItem disabled={self} onClick={handleBlock}>
-          {blockStatus}
+          {blockStatus === "Block"
+            ? t(translationKeys.block)
+            : t(translationKeys.unblock)}
         </MenuItem>
         <MenuItem disabled={self} onClick={handleMute}>
-          Mute
+          {t(translationKeys.mute)}
         </MenuItem>
         <MenuItem disabled={self} onClick={handleKick}>
-          Ban
+          {t(translationKeys.ban)}
         </MenuItem>
       </Menu>
-      {/* <GetTimeDialog
-        open={openTime}
-        toggleOpen={toggleOpenTime}
-        user={contextMenu ? contextMenu.user : null}
-        action={action}
-      ></GetTimeDialog> */}
     </>
   );
 }
