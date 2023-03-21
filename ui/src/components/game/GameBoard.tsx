@@ -1,46 +1,44 @@
 import { Box, Paper } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
+import { GameLoop } from "../../classes/GameLoop.class";
 import Ball from "./Ball";
 import Player from "./Player";
 
-export default function GameBoard() {
-  const [playerLeftPos, setPlayerLeftPos] = useState<number>(185);
-  const [playerRightPos, setPlayerRightPos] = useState<number>(185);
-  const [ballPos, setBallPos] = useState<{ x: number; y: number }>({
-    x: 285,
-    y: 210,
-  });
+interface Props {
+  gameLoop: GameLoop;
+}
+
+export default function GameBoard(props: Props) {
+  const { gameLoop } = props;
 
   const boardRef = useRef<HTMLDivElement>(null);
 
-  const resetBoard = () => {
-    setPlayerLeftPos(185);
-    setPlayerRightPos(185);
-    setBallPos({ x: 0, y: 0 });
+  const playerMoveHandler = (event: KeyboardEvent) => {
+    if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+      event.preventDefault();
+      if (!gameLoop.keyPressed.some((element) => element === event.key))
+        gameLoop.keyPressed.push(event.key);
+    }
   };
 
-  const playerMoveHandler = (event: KeyboardEvent) => {
-    if (event.key === "ArrowUp") {
+  const playerStopHandler = (event: KeyboardEvent) => {
+    if (event.key === "ArrowUp" || event.key === "ArrowDown") {
       event.preventDefault();
-      if (boardRef && boardRef.current && playerLeftPos - 5 >= 100) {
-        console.log(playerLeftPos);
-        setPlayerLeftPos(playerLeftPos - 5);
-      }
-    } else if (event.key === "ArrowDown") {
-      event.preventDefault();
-      if (boardRef && boardRef.current && playerLeftPos + 5 <= 270) {
-        console.log(playerLeftPos);
-        setPlayerLeftPos(playerLeftPos + 5);
-      }
+      let index = gameLoop.keyPressed.findIndex(
+        (element) => element === event.key
+      );
+      if (index !== -1) gameLoop.keyPressed.splice(index, 1);
     }
   };
 
   useEffect(() => {
     document.addEventListener("keydown", playerMoveHandler);
+    document.addEventListener("keyup", playerStopHandler);
     return () => {
       document.removeEventListener("keydown", playerMoveHandler);
+      document.removeEventListener("keyup", playerStopHandler);
     };
-  }, [playerLeftPos]);
+  }, [gameLoop]);
 
   return (
     <>
@@ -54,10 +52,10 @@ export default function GameBoard() {
         }}
       >
         {/* <Box sx={{ backgroundColor: "black", height: "100%", width: "50%", opacity: 2}} /> */}
-        <Box sx={{ backgroundColor: "blue", height: "50%", width: "100%"}} />
+        <Box sx={{ backgroundColor: "blue", height: "50%", width: "100%" }} />
         <Player
           lr={true}
-          yPos={playerLeftPos}
+          yPos={gameLoop.positionalData.playerLeftY}
           posRef={
             boardRef.current
               ? boardRef.current
@@ -66,7 +64,7 @@ export default function GameBoard() {
         ></Player>
         <Player
           lr={false}
-          yPos={playerRightPos}
+          yPos={gameLoop.positionalData.playerRightY}
           posRef={
             boardRef.current
               ? boardRef.current
@@ -74,7 +72,7 @@ export default function GameBoard() {
           }
         ></Player>
         <Ball
-          ballPos={ballPos}
+          ballPos={gameLoop.positionalData.ballPos}
           posRef={
             boardRef.current
               ? boardRef.current

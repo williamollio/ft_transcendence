@@ -9,7 +9,7 @@ interface Props {
 }
 
 export default function Player(props: Props) {
-  const { yPos, lr, posRef } = props;
+  const { yPos, posRef } = props;
   const { classes } = useStyles(props);
 
   return (
@@ -37,7 +37,7 @@ export default function Player(props: Props) {
 const useStyles = makeStyles<Props>()((_theme, props) => ({
   player: {
     position: "absolute",
-    top: props.yPos,
+    top: props.posRef.offsetTop,
     ...(props.lr
       ? { left: 10 + props.posRef.offsetLeft }
       : { left: 570 + props.posRef.offsetLeft }),

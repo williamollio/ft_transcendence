@@ -1,4 +1,4 @@
-import { io, Socket } from "socket.io-client";
+import { Socket } from "socket.io-client";
 import { initSocket } from "../services/initSocket.service";
 import { accessTypes, chatRoom } from "./chatRoom.class";
 import { channelUser, messagesDto, user } from "../interfaces/chat.interface";

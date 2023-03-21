@@ -22,18 +22,17 @@ import PersonalStatPanel from "../../components/stats/PersonalStatPanel";
 
 interface Props {
   userSocket: UserSocket;
-  setToken: React.Dispatch<React.SetStateAction<string>>;
 }
 
 export default function StatsView(props: Props): React.ReactElement {
-  const { userSocket, setToken } = props;
+  const { userSocket } = props;
   const { t } = useTranslation();
   // const { classes } = useStyles();
 
-  const getUserId = (): {id: string} => {
+  const getUserId = (): { id: string } => {
     let token = localStorage.getItem(Cookie.TOKEN);
     if (token) return getTokenData(token);
-	return ({id: ""});
+    return { id: "" };
   };
 
   const [userId] = useState<string>(getUserId().id);
@@ -45,23 +44,28 @@ export default function StatsView(props: Props): React.ReactElement {
     isRefetching: boolean;
   } = useQuery(["playerList"], StatsService.fetchLeaderboard);
 
-  React.useEffect(() => {
-    if (userSocket.socket.connected === false) {
-      let gotToken = localStorage.getItem(Cookie.TOKEN);
-      if (gotToken) {
-        if (typeof userSocket.socket.auth === "object") {
-          setToken("Bearer " + gotToken);
-        }
-      }
-    } else userSocket.logIn();
-  }, []);
+  //   React.useEffect(() => {
+  //     if (userSocket.socket.connected === false) {
+  //       let gotToken = localStorage.getItem(Cookie.TOKEN);
+  //       if (gotToken) {
+  //         if (typeof userSocket.socket.auth === "object") {
+  //           setToken("Bearer " + gotToken);
+  //         }
+  //       }
+  //     } else userSocket.logIn();
+  //   }, []);
 
   return (
     <>
       <Navbar />
       <MiniDrawer />
       <Background>
-        <PersonalStatPanel playerId={userId} lr={true} type={"General"} title={t(translationKeys.general)}/>
+        <PersonalStatPanel
+          playerId={userId}
+          lr={true}
+          type={"General"}
+          title={t(translationKeys.general)}
+        />
         <ProfileCard>
           <CardContainer>
             <TitleWrapper>
@@ -79,7 +83,12 @@ export default function StatsView(props: Props): React.ReactElement {
             </ContentWrapper>
           </CardContainer>
         </ProfileCard>
-        <PersonalStatPanel playerId={userId} lr={false} type={"Ranked"} title={t(translationKeys.ranked)}/>
+        <PersonalStatPanel
+          playerId={userId}
+          lr={false}
+          type={"Ranked"}
+          title={t(translationKeys.ranked)}
+        />
       </Background>
     </>
   );

@@ -20,23 +20,22 @@ import MiniDrawer from "../../components/MiniDrawer/MiniDrawer";
 interface Props {
   userSocket: UserSocket;
   channelSocket: ChannelSocket;
-  setToken: React.Dispatch<React.SetStateAction<string>>;
 }
 
 export default function ChatView(props: Props): React.ReactElement {
-  const { userSocket, channelSocket, setToken } = props;
+  const { userSocket, channelSocket } = props;
   const { t } = useTranslation();
   // const { classes } = useStyles();
 
-  React.useEffect(() => {
-    let gotToken = localStorage.getItem(Cookie.TOKEN);
-    if (gotToken) {
-      if (channelSocket.socket.connected === false) {
-        setToken("Bearer " + gotToken);
-      }
-      channelSocket.initializeName(gotToken);
-    }
-  }, []);
+  //   React.useEffect(() => {
+  //     let gotToken = localStorage.getItem(Cookie.TOKEN);
+  //     if (gotToken) {
+  //       if (channelSocket.socket.connected === false) {
+  //         setToken("Bearer " + gotToken);
+  //       }
+  //       channelSocket.initializeName(gotToken);
+  //     }
+  //   }, []);
 
   return (
     <>

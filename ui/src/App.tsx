@@ -15,40 +15,50 @@ import theme from "./MuiTheme";
 import classes from "./styles.module.scss";
 import { useImageStore } from "./store/users-store";
 import { PrivateRoute } from "./components/PrivateRoute";
-import { getIsAuthenticated, initAuthToken } from "./utils/auth-helper";
+import { Cookie, getIsAuthenticated, initAuthToken } from "./utils/auth-helper";
 import { UserSocket } from "./classes/UserSocket.class";
 import { ChannelSocket } from "./classes/ChannelSocket.class";
 import GameView from "./views/Game/GameView";
 import StatsView from "./views/Stats/StatsView";
+import { GameSocket } from "./classes/GameSocket.class";
 
 export default function App() {
   const [userSocket] = useState<UserSocket>(new UserSocket());
+  const [channelSocket] = useState<ChannelSocket>(new ChannelSocket());
+  const [gameSocket] = useState<GameSocket>(new GameSocket());
+
+  const [token, setToken] = useState<boolean>(false);
+  
   const [image, setImage] = useImageStore(
     (state: { image: any; setImage: any }) => [state.image, state.setImage]
   );
-  const [channelSocket] = useState<ChannelSocket>(new ChannelSocket());
   const imageUrl = image ? URL.createObjectURL(image) : "";
-  const [token, setToken] = useState<string>("");
 
   // different method to initialize out sockets that makes them persistent over all views
   React.useEffect(() => {
-    if (token !== "") {
+    let gotToken = localStorage.getItem(Cookie.TOKEN);
+    if (gotToken !== "") {
       if (userSocket.socket.connected === false) {
-        userSocket.socket.auth = { token: token };
+        userSocket.socket.auth = { token: gotToken };
         userSocket.socket.connect();
         userSocket.logIn();
       }
       if (channelSocket.socket.connected === false) {
-        channelSocket.socket.auth = { token: token };
-		channelSocket.initializeName(token);
+        channelSocket.socket.auth = { token: gotToken };
+        channelSocket.initializeName(gotToken);
         channelSocket.socket.connect();
+      }
+      if (gameSocket.socket.connected === false) {
+        gameSocket.socket.auth = { token: gotToken };
+        gameSocket.socket.connect();
       }
     }
     return () => {
       if (userSocket.socket.connected) userSocket.socket.disconnect();
       if (channelSocket.socket.connected) channelSocket.socket.disconnect();
+      if (gameSocket.socket.connected) gameSocket.socket.disconnect();
     };
-  }, [token, channelSocket, userSocket]);
+  }, [token, channelSocket, userSocket, gameSocket]);
 
   // removes the object URL after the component unmounts to prevent memory leaks
   React.useEffect(() => {
@@ -61,6 +71,7 @@ export default function App() {
 
   const AuthWrapper = (): ReactElement => {
     const isAuthenticated = getIsAuthenticated();
+    isAuthenticated ? setToken(true) : false;
     return isAuthenticated ? (
       <Navigate to={RoutePath.PROFILE} replace />
     ) : (
@@ -119,7 +130,7 @@ export default function App() {
               path={RoutePath.PROFILE}
               element={
                 <PrivateRoute>
-                  <ProfileView userSocket={userSocket} setToken={setToken} />
+                  <ProfileView userSocket={userSocket} />
                 </PrivateRoute>
               }
             />
@@ -130,7 +141,6 @@ export default function App() {
                   <ChatView
                     userSocket={userSocket}
                     channelSocket={channelSocket}
-                    setToken={setToken}
                   />
                 </PrivateRoute>
               }
@@ -147,7 +157,7 @@ export default function App() {
               path={RoutePath.STATS}
               element={
                 <PrivateRoute>
-                  <StatsView userSocket={userSocket} setToken={setToken} />
+                  <StatsView userSocket={userSocket} />
                 </PrivateRoute>
               }
             />
