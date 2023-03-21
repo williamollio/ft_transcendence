@@ -34,17 +34,20 @@ import { Controller, FieldValues, useForm } from "react-hook-form";
 import CustomMultiSelect from "../../components/shared/CustomMultiSelect/CustomMultiselect";
 import CustomTextField from "../../components/shared/CustomTextField/CustomTextField";
 import { Cookie, getTokenData } from "../../utils/auth-helper";
-import MiniDrawer from "../../components/MiniDrawer/MiniDrawer";
+import LeftDrawer from "../../components/LeftDrawer/LeftDrawer";
 import friendshipsService from "../../services/friendships.service";
 import { UserSocket } from "../../classes/UserSocket.class";
+import RightDrawer from "../../components/RightDrawer/RightDrawer";
+import { ChannelSocket } from "../../classes/ChannelSocket.class";
 
 interface Props {
   userSocket: UserSocket;
+  channelSocket: ChannelSocket;
   setToken: React.Dispatch<React.SetStateAction<string>>;
 }
 
 export default function ProfileView(props: Props): React.ReactElement {
-  const { userSocket, setToken } = props;
+  const { userSocket, channelSocket, setToken } = props;
   const { t } = useTranslation();
   const { classes } = useStyles();
   const navigate = useNavigate();
@@ -206,7 +209,8 @@ export default function ProfileView(props: Props): React.ReactElement {
   return (
     <>
       <Navbar />
-      <MiniDrawer />
+      <LeftDrawer />
+      <RightDrawer channelSocket={channelSocket} userSocket={userSocket} />
       <Background>
         <ProfileCard>
           <CardContainer>

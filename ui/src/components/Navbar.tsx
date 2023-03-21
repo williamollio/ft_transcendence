@@ -1,4 +1,4 @@
-import { Tab, Tabs, AppBar } from "@mui/material";
+import { Tab, Tabs, AppBar, Theme } from "@mui/material";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { idTabs } from "../interfaces/tab.interface";
@@ -9,19 +9,29 @@ import classes from "../styles.module.scss";
 import { useImageStore } from "../store/users-store";
 import Box from "@mui/material/Box";
 import PictureMenu from "./PictureMenu";
-import { Cookie, getTokenData, initAuthToken } from "../utils/auth-helper";
+import { Cookie, getTokenData } from "../utils/auth-helper";
 import { fetchProfilePicture } from "../utils/picture-helper";
+import { useDrawersStore } from "../store/drawers-store";
+import { useTheme } from "@mui/material";
+
+export const navbarHeight = "4rem";
 
 export default function NavBar(): React.ReactElement {
+  const theme = useTheme();
   const state = useLocation().state;
   const navigate = useNavigate();
   const { classes } = useStyles();
   const [userId, setUserId] = useState<string>("");
-
   const [image, setImage] = useImageStore((state) => [
     state.image,
     state.setImage,
   ]);
+  const [isOpen, setIsOpen] = useDrawersStore(
+    (state: { isLeftOpen: any; setIsLeftOpen: any }) => [
+      state.isLeftOpen,
+      state.setIsLeftOpen,
+    ]
+  );
 
   React.useEffect(() => {
     let token = localStorage.getItem(Cookie.TOKEN);
@@ -72,6 +82,19 @@ export default function NavBar(): React.ReactElement {
     <>
       <AppBar className={classes.menuBar}>
         <Box
+          className={classes.picture}
+          sx={{
+            left: isOpen ? 230 : 55,
+            transition: (theme) =>
+              theme.transitions.create("left", {
+                easing: theme.transitions.easing.sharp,
+                duration: theme.transitions.duration.leavingScreen,
+              }),
+          }}
+        >
+          <PictureMenu image={image} />
+        </Box>
+        <Box
           sx={{
             width: "100%",
             height: "100%",
@@ -79,11 +102,8 @@ export default function NavBar(): React.ReactElement {
             justifyContent: "center",
           }}
         >
-          <Box sx={{ width: "5%" }}></Box>
           <Tabs
             value={selectedTabId}
-            indicatorColor="secondary"
-            textColor="secondary"
             sx={{ width: "90%" }}
             centered={true}
             TabIndicatorProps={{
@@ -96,9 +116,6 @@ export default function NavBar(): React.ReactElement {
                   key={`navbar-${tab.id}`}
                   label={tab.label}
                   value={tab.id}
-                  classes={{
-                    root: classes.tab,
-                  }}
                   onClick={() => {
                     navigateToSelectedTab(tab.id);
                   }}
@@ -107,26 +124,29 @@ export default function NavBar(): React.ReactElement {
               );
             })}
           </Tabs>
-          <PictureMenu image={image} />
         </Box>
       </AppBar>
     </>
   );
 }
 
-const useStyles = makeStyles()(() => ({
+const useStyles = makeStyles()((theme: Theme) => ({
   menuBar: {
-    height: "4rem",
+    height: navbarHeight,
     width: "100%",
     backgroundColor: classes.colorPrimary,
     display: "flex",
     alignItems: "center",
     flexWrap: "wrap",
   },
+  picture: {
+    zIndex: theme.zIndex.appBar + 1,
+    position: "absolute",
+    top: 0,
+  },
   tab: {
     color: classes.colorSecondary,
     fontSize: "1rem",
-    fontFamily: "Soin",
     fontWeight: "bold",
     paddingLeft: "0",
     paddingBottom: "0rem",

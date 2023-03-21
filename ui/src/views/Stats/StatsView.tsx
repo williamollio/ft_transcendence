@@ -5,7 +5,7 @@ import Navbar from "../../components/Navbar";
 import React from "react";
 import { translationKeys } from "./constants";
 import { useTranslation } from "react-i18next";
-import MiniDrawer from "../../components/MiniDrawer/MiniDrawer";
+import LeftDrawer from "../../components/LeftDrawer/LeftDrawer";
 // import { makeStyles } from "tss-react/mui";
 import {
   Background,
@@ -19,21 +19,24 @@ import MainTable from "../../components/stats/MainTable";
 import StatsService from "../../services/stats.service";
 import { useQuery } from "@tanstack/react-query";
 import PersonalStatPanel from "../../components/stats/PersonalStatPanel";
+import RightDrawer from "../../components/RightDrawer/RightDrawer";
+import { ChannelSocket } from "../../classes/ChannelSocket.class";
 
 interface Props {
   userSocket: UserSocket;
+  channelSocket: ChannelSocket;
   setToken: React.Dispatch<React.SetStateAction<string>>;
 }
 
 export default function StatsView(props: Props): React.ReactElement {
-  const { userSocket, setToken } = props;
+  const { userSocket, channelSocket, setToken } = props;
   const { t } = useTranslation();
   // const { classes } = useStyles();
 
-  const getUserId = (): {id: string} => {
+  const getUserId = (): { id: string } => {
     let token = localStorage.getItem(Cookie.TOKEN);
     if (token) return getTokenData(token);
-	return ({id: ""});
+    return { id: "" };
   };
 
   const [userId] = useState<string>(getUserId().id);
@@ -59,9 +62,10 @@ export default function StatsView(props: Props): React.ReactElement {
   return (
     <>
       <Navbar />
-      <MiniDrawer />
+      <LeftDrawer />
+      <RightDrawer channelSocket={channelSocket} userSocket={userSocket} />
       <Background>
-        <PersonalStatPanel playerId={userId} lr={true} title={"General"}/>
+        <PersonalStatPanel playerId={userId} lr={true} title={"General"} />
         <ProfileCard>
           <CardContainer>
             <TitleWrapper>
@@ -79,7 +83,7 @@ export default function StatsView(props: Props): React.ReactElement {
             </ContentWrapper>
           </CardContainer>
         </ProfileCard>
-        <PersonalStatPanel playerId={userId} lr={false} title={"Ranked"}/>
+        <PersonalStatPanel playerId={userId} lr={false} title={"Ranked"} />
       </Background>
     </>
   );

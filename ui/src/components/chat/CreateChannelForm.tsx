@@ -11,6 +11,9 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import { CRDialogValue } from "../../interfaces/chat.interface";
+import { makeStyles } from "tss-react/mui";
+import { translationKeys } from "./constants";
+import { useTranslation } from "react-i18next";
 
 export default function CreateForm({
   dialogValue,
@@ -21,6 +24,8 @@ export default function CreateForm({
   setDialogValue: any;
   handleClose: any;
 }) {
+  const { classes } = useStyles();
+  const { t } = useTranslation();
   const [pwDisable, setPwDisable] = useState<boolean>(true);
 
   const handleAccessChange = (e: any) => {
@@ -60,12 +65,12 @@ export default function CreateForm({
                 }
                 label="name"
                 type="text"
+                InputLabelProps={{ shrink: true }}
               />
             </Grid>
             <Grid item>
               <Select
                 size="small"
-                label="access"
                 type="string"
                 variant="outlined"
                 value={dialogValue.access}
@@ -91,6 +96,7 @@ export default function CreateForm({
                 label="password"
                 type="password"
                 variant="outlined"
+                InputLabelProps={{ shrink: true }}
               />
             </Grid>
           </Grid>
@@ -98,10 +104,30 @@ export default function CreateForm({
       </Grid>
       <Grid item>
         <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
-          <Button type="submit">Add</Button>
+          <Button
+            type="submit"
+            className={classes.iconButton}
+            variant="contained"
+            color="primary"
+          >
+            {t(translationKeys.buttons.add)}
+          </Button>
+          <Button
+            onClick={handleClose}
+            className={classes.iconButton}
+            variant="outlined"
+          >
+            {t(translationKeys.buttons.cancel)}
+          </Button>
         </DialogActions>
       </Grid>
     </Grid>
   );
 }
+
+const useStyles = makeStyles()(() => ({
+  iconButton: {
+    height: "30%",
+    width: "30%",
+  },
+}));

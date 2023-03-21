@@ -1,6 +1,8 @@
 {
   "buttons": {
     "save": "Save",
+    "add": "Add",
+    "join": "Join",
     "login42": "Login 42 API",
     "cancel": "Cancel",
     "submit": "Submit",
@@ -9,7 +11,6 @@
   "loginToken": "Enter token",
   "or": "or",
   "game": "Game",
-  "chat": "Chat",
   "stats": "Statistics",
   "login2fa": "Two-Factor Authentication",
   "setup2fa": "Two-Factor Authentication",

@@ -14,6 +14,7 @@ import friendshipsService from "../../../services/friendships.service";
 import CloseIcon from "@mui/icons-material/Close";
 import { StyledAvatarBadge } from "../AvatarBadge/StyledAvatarBadge";
 import { AxiosError } from "axios";
+import { useTheme } from "@mui/material";
 
 interface Props {
   userId: string;
@@ -23,6 +24,7 @@ interface Props {
   showErrorToast: (error?: AxiosError) => void;
 }
 export default function ListFriends(props: Props) {
+  const theme = useTheme();
   const { userId, open, users, triggerDrawerOpen, showErrorToast } = props;
 
   const [profilePictures, setProfilePictures] = React.useState<{
@@ -73,22 +75,21 @@ export default function ListFriends(props: Props) {
           <ListItemButton
             sx={{
               minHeight: 48,
-              justifyContent: open ? "initial" : "center",
               px: 2.5,
             }}
           >
             <ListItemIcon
               onClick={triggerDrawerOpen}
               sx={{
-                minWidth: 0,
-                mr: open ? 3 : 0,
-                ml: !open ? 8 : 0,
-                justifyContent: "center",
+                marginLeft: -1,
               }}
             >
               <StyledAvatarBadge
                 overlap="circular"
-                anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                anchorOrigin={{
+                  vertical: "bottom",
+                  horizontal: "right",
+                }}
                 variant="dot"
                 status={user.status}
               >
@@ -104,8 +105,8 @@ export default function ListFriends(props: Props) {
               onClick={createDmChat}
               sx={{
                 opacity: open ? 1 : 0,
-                color: "dodgerblue",
                 width: "7px",
+                color: theme.palette.secondary.main,
                 display: "flex",
                 justifyContent: "center",
               }}
@@ -116,7 +117,7 @@ export default function ListFriends(props: Props) {
               onClick={() => deleteFriendship(user.id)}
               sx={{
                 opacity: open ? 1 : 0,
-                color: "red",
+                color: "lightcoral",
                 width: "7px",
                 display: "flex",
                 justifyContent: "center",
