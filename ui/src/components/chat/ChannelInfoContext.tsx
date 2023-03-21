@@ -1,12 +1,5 @@
-import {
-  Collapse,
-  Menu,
-  MenuItem,
-  Select,
-  SelectChangeEvent,
-} from "@mui/material";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { Menu, MenuItem, Select, SelectChangeEvent } from "@mui/material";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { chatRoom } from "../../classes/chatRoom.class";
@@ -42,18 +35,10 @@ export default function ChannelInfoContext(props: Props) {
   } = props;
   const [blockStatus, setBlockStatus] = useState<"Block" | "Unblock">("Block");
   const [self, setSelf] = useState<boolean>(false);
-  const [gameModeCollapse, toggleGameModeCollapse] = useState<boolean>(false);
+  const [gameModeSelect, setGameModeSelect] = useState<string>(
+    GameMode.CLASSIC
+  );
   const { t } = useTranslation();
-
-  const {
-    formState: { errors },
-    register,
-    handleSubmit,
-    setValue,
-    control,
-  } = useForm({
-    mode: "onChange",
-  });
 
   useEffect(() => {
     if (contextMenu) {
@@ -93,12 +78,11 @@ export default function ChannelInfoContext(props: Props) {
     }
   };
 
-  const handleInviteGame = (event: SelectChangeEvent) => {
+  const handleInviteGame = (_event: React.MouseEvent<HTMLLIElement>) => {
     setAlertMsg("Failed to invite to play");
     handleContextClose();
     if (contextMenu && contextMenu.user && contextMenu.user.id) {
-      console.log(event.target.value);
-      gameSocket.inviteToGame(event.target.value, contextMenu.user.id);
+      gameSocket.inviteToGame(gameModeSelect, contextMenu.user.id);
     }
   };
 
@@ -159,8 +143,8 @@ export default function ChannelInfoContext(props: Props) {
     }
   };
 
-  const handleGameModeCollapse = () => {
-    toggleGameModeCollapse(!gameModeCollapse);
+  const handleGameModeChange = (event: SelectChangeEvent) => {
+    setGameModeSelect(event.target.value);
   };
 
   return (
@@ -184,25 +168,26 @@ export default function ChannelInfoContext(props: Props) {
         <MenuItem disabled={self} onClick={handleProfile}>
           {t(translationKeys.viewProfile)}
         </MenuItem>
-        <MenuItem disabled={self} onClick={handleGameModeCollapse}>
+        <MenuItem disabled={self} onClick={handleInviteGame}>
           {t(translationKeys.inviteToGame)}
-          <Collapse in={gameModeCollapse}>
-            <Select
-              label={t(translationKeys.gameMode)}
-              onChange={handleInviteGame}
-            >
-              <MenuItem value={GameMode.CLASSIC}>
-                {t(translationKeys.classic)}
-              </MenuItem>
-              <MenuItem value={GameMode.MAYHEM}>
-                {t(translationKeys.mayhem)}
-              </MenuItem>
-              <MenuItem value={GameMode.HOCKEY}>
-                {t(translationKeys.hockey)}
-              </MenuItem>
-            </Select>
-          </Collapse>
         </MenuItem>
+        <Select
+          sx={{ width: "100%" }}
+          size="small"
+          onChange={handleGameModeChange}
+		  placeholder={t(translationKeys.gameMode) as string}
+          value={gameModeSelect}
+        >
+          <MenuItem value={GameMode.CLASSIC}>
+            {t(translationKeys.classic)}
+          </MenuItem>
+          <MenuItem value={GameMode.MAYHEM}>
+            {t(translationKeys.mayhem)}
+          </MenuItem>
+          <MenuItem value={GameMode.HOCKEY}>
+            {t(translationKeys.hockey)}
+          </MenuItem>
+        </Select>
         <MenuItem disabled={self} onClick={handleBlock}>
           {blockStatus === "Block"
             ? t(translationKeys.block)

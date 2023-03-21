@@ -1,22 +1,15 @@
 import { Menu, MenuItem } from "@mui/material";
 import { Dispatch, SetStateAction, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { chatRoom } from "../../classes/chatRoom.class";
+import { GameSocket } from "../../classes/GameSocket.class";
 import { UserSocket } from "../../classes/UserSocket.class";
+import { translationKeys } from "../../views/Chat/constants";
 import ChannelInfoDialog from "./ChannelInfoDialog";
 import GetIdDialog from "./GetIdDialog";
 
-export default function RoomContextMenu({
-  blockedUser,
-  refetchBlockedUsers,
-  userSocket,
-  setNewChannel,
-  contextMenu,
-  setContextMenu,
-  channelSocket,
-  setAlertMsg,
-  toggleAlert,
-}: {
+interface Props {
   blockedUser: Array<string>;
   refetchBlockedUsers: any;
   userSocket: UserSocket;
@@ -26,22 +19,36 @@ export default function RoomContextMenu({
   channelSocket: ChannelSocket;
   setAlertMsg: Dispatch<SetStateAction<string>>;
   toggleAlert: Dispatch<SetStateAction<boolean>>;
-}) {
-  const [channelInfoOpen, toggleChannelInfo] = useState(false);
+  gameSocket: GameSocket;
+}
 
+export default function RoomContextMenu(props: Props) {
+  const {
+    blockedUser,
+    refetchBlockedUsers,
+    userSocket,
+    setNewChannel,
+    contextMenu,
+    setContextMenu,
+    channelSocket,
+    setAlertMsg,
+    toggleAlert,
+    gameSocket,
+  } = props;
+  const { t } = useTranslation();
+
+  const [channelInfoOpen, toggleChannelInfo] = useState(false);
   const [contextChannel, setContextChannel] = useState<chatRoom | undefined>(
     undefined
   );
-
   const [openId, toggleOpenId] = useState<boolean>(false);
-
   const handleContextClose = () => {
     setContextMenu(null);
   };
 
   const removeRoom = () => {
     toggleAlert(false);
-    setAlertMsg("Failed to remove channel");
+    setAlertMsg(t(translationKeys.removeRoomFail) as string);
     if (contextMenu) {
       let index = channelSocket.channels.findIndex(
         (element: chatRoom) => element.id === contextMenu.channel.id
@@ -83,9 +90,11 @@ export default function RoomContextMenu({
             : undefined
         }
       >
-        <MenuItem onClick={removeRoom}>Remove</MenuItem>
-        <MenuItem onClick={handleChannelInfoOpen}>Channel Info</MenuItem>
-        <MenuItem onClick={handleInvite}>Invite</MenuItem>
+        <MenuItem onClick={removeRoom}>{t(translationKeys.remove)}</MenuItem>
+        <MenuItem onClick={handleChannelInfoOpen}>
+          {t(translationKeys.channelInfo)}
+        </MenuItem>
+        <MenuItem onClick={handleInvite}>{t(translationKeys.invite)}</MenuItem>
       </Menu>
       <ChannelInfoDialog
         blockedUser={blockedUser}
@@ -98,6 +107,7 @@ export default function RoomContextMenu({
         toggleChannelInfo={toggleChannelInfo}
         channel={contextChannel}
         channelSocket={channelSocket}
+        gameSocket={gameSocket}
       ></ChannelInfoDialog>
       <GetIdDialog
         setAlertMsg={setAlertMsg}

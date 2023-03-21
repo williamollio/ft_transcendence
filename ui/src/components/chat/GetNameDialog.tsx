@@ -1,19 +1,21 @@
 import { Dialog, DialogContent, TextField } from "@mui/material";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { chatRoom } from "../../classes/chatRoom.class";
+import { translationKeys } from "../../views/Chat/constants";
 
-export default function GetNameDialog({
-  open,
-  toggleOpen,
-  channel,
-  channelSocket,
-}: {
+interface Props {
   open: boolean;
   toggleOpen: any;
   channel: chatRoom | undefined;
   channelSocket: ChannelSocket;
-}) {
+}
+
+export default function GetNameDialog(props: Props) {
+  const { open, toggleOpen, channel, channelSocket } = props;
+  const { t } = useTranslation();
+
   const [input, setInput] = useState<string>("");
   const [nameInput, setNameInput] = useState<string>("");
 
@@ -54,15 +56,15 @@ export default function GetNameDialog({
 
   return (
     <Dialog open={open} onClose={handleClose} onKeyDown={handleSubmit}>
-      <DialogContent>Enter new Name of the channel</DialogContent>
+      <DialogContent>{t(translationKeys.newNameOfChannel)}</DialogContent>
       <TextField
-        label="New name"
+        label={t(translationKeys.newName)}
         type="string"
         value={nameInput}
         onChange={handleNameChange}
       ></TextField>
       <TextField
-        label="Password"
+        label={t(translationKeys.password)}
         type="password"
         value={input}
         onChange={handleChange}

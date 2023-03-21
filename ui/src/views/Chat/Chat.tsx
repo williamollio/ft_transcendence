@@ -27,14 +27,16 @@ import { useQuery } from "@tanstack/react-query";
 import GetTextInputDialog from "../../components/chat/GetTextInputDialog";
 import { useTranslation } from "react-i18next";
 import { translationKeys } from "./constants";
+import { GameSocket } from "../../classes/GameSocket.class";
 
 interface Props {
   channelSocket: ChannelSocket;
   userSocket: UserSocket;
+  gameSocket: GameSocket;
 }
 
 export default function Chat(props: Props) {
-  const { channelSocket, userSocket } = props;
+  const { channelSocket, userSocket, gameSocket } = props;
   const [open, toggleOpen] = useState(false);
   const [inputChat, setInputChat] = useState<string>("");
   const [messages, setMessages] = useState<Array<messagesDto>>([]);
@@ -85,7 +87,7 @@ export default function Chat(props: Props) {
     if (e.key === "Enter") {
       if (currentRoom && typeof currentRoom !== "boolean" && inputChat.trim()) {
         currentRoom.messages.push({
-          message: "[You]: " + inputChat,
+          message: `[${t(translationKeys.you)}]: ` + inputChat,
           room: currentRoom.id,
         });
         channelSocket.messageRoom({
@@ -99,7 +101,7 @@ export default function Chat(props: Props) {
   };
 
   const handleInviteSubmit = (e?: SyntheticEvent) => {
-    setAlertMsg("Failed to join channel");
+    setAlertMsg(t(translationKeys.joinChannelFail) as string);
     if (e) {
       e.preventDefault();
     } else {
@@ -156,7 +158,7 @@ export default function Chat(props: Props) {
   };
 
   const messageRoomFailedListener = () => {
-    setAlertMsg("Failed to send message");
+    setAlertMsg(t(translationKeys.messageSendFail) as string);
     toggleAlert(true);
   };
 
@@ -397,6 +399,7 @@ export default function Chat(props: Props) {
               channelSocket={channelSocket}
               setAlertMsg={setAlertMsg}
               toggleAlert={toggleAlert}
+              gameSocket={gameSocket}
             ></RoomContextMenu>
             <Divider></Divider>
             <Grid container>
@@ -427,7 +430,7 @@ export default function Chat(props: Props) {
                 <TextField
                   variant="filled"
                   size="small"
-                  label="Chat"
+                  label={t(translationKeys.chat)}
                   sx={{ width: "300px" }}
                   value={inputChat}
                   onChange={handleChange}
@@ -472,13 +475,14 @@ export default function Chat(props: Props) {
                     setRoomInvite({ id: "", type: "PRIVATE", name: "" });
                   }}
                   dialogContent={t(translationKeys.passwordReq)!}
-                  label={"password"}
-                  type={"password"}
+                  label={t(translationKeys.password)}
+                  type="password"
                 ></GetTextInputDialog>
               </>
             }
           >
-            Invite to: {roomInvite.name}
+            {t(translationKeys.inviteTo)}
+            {roomInvite.name}
           </Alert>
         </Collapse>
       </Paper>

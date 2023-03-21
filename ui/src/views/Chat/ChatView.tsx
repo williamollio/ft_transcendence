@@ -15,14 +15,16 @@ import {
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { UserSocket } from "../../classes/UserSocket.class";
 import MiniDrawer from "../../components/MiniDrawer/MiniDrawer";
+import { GameSocket } from "../../classes/GameSocket.class";
 
 interface Props {
   userSocket: UserSocket;
   channelSocket: ChannelSocket;
+  gameSocket: GameSocket;
 }
 
 export default function ChatView(props: Props): React.ReactElement {
-  const { userSocket, channelSocket } = props;
+  const { userSocket, channelSocket, gameSocket } = props;
   const { t } = useTranslation();
   // const { classes } = useStyles();
 
@@ -32,7 +34,7 @@ export default function ChatView(props: Props): React.ReactElement {
       <MiniDrawer />
       <Background>
         <ProfileCard>
-          <Chat channelSocket={channelSocket} userSocket={userSocket} />
+          <Chat channelSocket={channelSocket} userSocket={userSocket} gameSocket={gameSocket}/>
           <CardContainer>
             <TitleWrapper>
               <Typography

@@ -5,7 +5,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import CreateForm from "./CreateChannelForm";
 import JoinForm from "./JoinChannelForm";
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
-import { CRDialogValue } from "../../interfaces/chat.interface";
+import { CRDialogValue, JoinDialogValue } from "../../interfaces/chat.interface";
 import { useTranslation } from "react-i18next";
 import { translationKeys } from "../../views/Chat/constants";
 import ChannelService from "../../services/channel.service";
@@ -21,23 +21,20 @@ interface Props {
 export default function AddChannelDialog(props: Props) {
   const { open, toggleOpen, channelSocket, toggleAlert, setAlertMsg } = props;
   const { t } = useTranslation();
-  const [formSelection, setFormSelection] = useState<number>(0);
 
-  const [dialogJoinValue, setDialogJoinValue] = useState({
+  const [formSelection, setFormSelection] = useState<number>(0);
+  const [dialogJoinValue, setDialogJoinValue] = useState<JoinDialogValue>({
     name: "",
     password: "",
   });
-
   const [dialogValue, setDialogValue] = useState<CRDialogValue>({
     key: "",
     access: "PUBLIC",
     password: "",
   });
-
   const [alert, setAlert] = useState<string>(
     t(translationKeys.channelNameEmpty) as string
   );
-
   const [alertOpen, setAlertOpen] = useState<boolean>(false);
 
   useEffect(() => {

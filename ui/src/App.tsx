@@ -146,6 +146,7 @@ export default function App() {
                   <ChatView
                     userSocket={userSocket}
                     channelSocket={channelSocket}
+					gameSocket={gameSocket}
                   />
                 </PrivateRoute>
               }

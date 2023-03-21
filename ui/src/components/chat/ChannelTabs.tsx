@@ -12,16 +12,10 @@ import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { useQuery } from "@tanstack/react-query";
 import { channelUser, DBChannelElement } from "../../interfaces/chat.interface";
 import ChannelService from "../../services/channel.service";
+import { translationKeys } from "../../views/Chat/constants";
+import { useTranslation } from "react-i18next";
 
-export function ChannelTabs({
-  currentRoom,
-  setContextMenu,
-  contextMenu,
-  toggleAlert,
-  toggleOpen,
-  channelSocket,
-  setNewChannel,
-}: {
+interface Props {
   currentRoom: chatRoom | boolean;
   setContextMenu: Dispatch<
     SetStateAction<{
@@ -39,7 +33,20 @@ export function ChannelTabs({
   toggleOpen: Dispatch<SetStateAction<boolean>>;
   channelSocket: ChannelSocket;
   setNewChannel: (newChannel: chatRoom | boolean) => void;
-}) {
+}
+
+export function ChannelTabs(props: Props) {
+  const {
+    currentRoom,
+    setContextMenu,
+    contextMenu,
+    toggleAlert,
+    toggleOpen,
+    channelSocket,
+    setNewChannel,
+  } = props;
+  const { t } = useTranslation();
+
   const [channelQueryId, setChannelQueryId] = useState<string | undefined>(
     undefined
   );
@@ -92,7 +99,7 @@ export function ChannelTabs({
                   return {
                     message: message.content.replace(
                       `[${channelSocket.user.name}]`,
-                      `[You]`
+                      `[${t(translationKeys.you)}]`
                     ),
                   };
                 }
@@ -123,7 +130,7 @@ export function ChannelTabs({
                         return {
                           message: message.content.replace(
                             `[${channelSocket.user.name}]`,
-                            `[You]`
+                            `[${t(translationKeys.you)}]`
                           ),
                         };
                       }
@@ -172,7 +179,7 @@ export function ChannelTabs({
               (element) => element.id !== channelSocket.user.id
             )?.name;
             let channelIndex = channelSocket.channels.push(
-              new chatRoom(data.id, userName ? userName : "missing", data.type)
+              new chatRoom(data.id, userName ? userName : t(translationKeys.missing) as string, data.type)
             );
             channelSocket.channels.forEach((element) => {
               newList.push(element);
