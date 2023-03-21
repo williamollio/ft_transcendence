@@ -1,4 +1,4 @@
-import { ReactElement, useEffect, useState } from "react";
+import { ReactElement, useState } from "react";
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import ProfileView from "./views/Profile/ProfileView";
@@ -38,8 +38,8 @@ export default function App() {
   React.useEffect(() => {
     if (token) {
       let gotToken = localStorage.getItem(Cookie.TOKEN);
-	  console.log(gotToken);
       if (gotToken !== "") {
+        gotToken = "Bearer " + gotToken;
         if (userSocket.socket.connected === false) {
           userSocket.socket.auth = { token: gotToken };
           userSocket.socket.connect();
@@ -125,21 +125,24 @@ export default function App() {
             <Route
               path={RoutePath.REDIRECT}
               element={
-                <PrivateRoute children={<RedirectWrapper />}></PrivateRoute>
+                <PrivateRoute
+                  children={<RedirectWrapper />}
+                  setToken={setToken}
+                ></PrivateRoute>
               }
             />
             <Route
               path={RoutePath.PROFILE}
               element={
-                <PrivateRoute>
-                  <ProfileView userSocket={userSocket} />
+                <PrivateRoute setToken={setToken}>
+                  <ProfileView />
                 </PrivateRoute>
               }
             />
             <Route
               path={RoutePath.CHAT}
               element={
-                <PrivateRoute>
+                <PrivateRoute setToken={setToken}>
                   <ChatView
                     userSocket={userSocket}
                     channelSocket={channelSocket}
@@ -152,18 +155,24 @@ export default function App() {
               element={
                 <PrivateRoute
                   children={<GameView gameSocket={gameSocket} />}
+                  setToken={setToken}
                 ></PrivateRoute>
               }
             />
             <Route
               path={RoutePath.SETUP2FA}
-              element={<PrivateRoute children={<Setup2FA />}></PrivateRoute>}
+              element={
+                <PrivateRoute
+                  children={<Setup2FA />}
+                  setToken={setToken}
+                ></PrivateRoute>
+              }
             />
             <Route
               path={RoutePath.STATS}
               element={
-                <PrivateRoute>
-                  <StatsView userSocket={userSocket} />
+                <PrivateRoute setToken={setToken}>
+                  <StatsView />
                 </PrivateRoute>
               }
             />

@@ -6,24 +6,25 @@ import CreateForm from "./CreateChannelForm";
 import JoinForm from "./JoinChannelForm";
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { CRDialogValue } from "../../interfaces/chat.interface";
+import { useTranslation } from "react-i18next";
+import { translationKeys } from "../../views/Chat/constants";
+import ChannelService from "../../services/channel.service";
 
-export default function AddChannelDialog({
-  open,
-  toggleOpen,
-  channelSocket,
-  toggleAlert,
-  setAlertMsg,
-}: {
+interface Props {
   open: boolean;
   toggleOpen: any;
   channelSocket: ChannelSocket;
   toggleAlert: any;
   setAlertMsg: any;
-}) {
+}
+
+export default function AddChannelDialog(props: Props) {
+  const { open, toggleOpen, channelSocket, toggleAlert, setAlertMsg } = props;
+  const { t } = useTranslation();
   const [formSelection, setFormSelection] = useState<number>(0);
 
   const [dialogJoinValue, setDialogJoinValue] = useState({
-    id: "",
+    name: "",
     password: "",
   });
 
@@ -33,14 +34,17 @@ export default function AddChannelDialog({
     password: "",
   });
 
-  const [alert, setAlert] = useState<string>("Channel name can not be empty!");
+  const [alert, setAlert] = useState<string>(
+    t(translationKeys.channelNameEmpty) as string
+  );
 
   const [alertOpen, setAlertOpen] = useState<boolean>(false);
 
   useEffect(() => {
-    if (dialogValue.key === "") setAlert("Channel name can not be empty!");
+    if (dialogValue.key === "")
+      setAlert(t(translationKeys.channelNameEmpty) as string);
     else if (dialogValue.access === "PROTECTED" && dialogValue.password === "")
-      setAlert("Password can not be empty");
+      setAlert(t(translationKeys.passwordEmpty) as string);
     else setAlertOpen(false);
   }, [dialogValue]);
 
@@ -51,7 +55,7 @@ export default function AddChannelDialog({
   const handleClose = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (formSelection === 1)
       setDialogValue({ key: "", access: "PUBLIC", password: "" });
-    else setDialogJoinValue({ id: "", password: "" });
+    else setDialogJoinValue({ name: "", password: "" });
     toggleOpen(false);
   };
 
@@ -60,7 +64,7 @@ export default function AddChannelDialog({
     e.preventDefault();
     if (alertOpen === true) setAlertOpen(false);
     if (formSelection === 1) {
-      setAlertMsg("Failed to create channel");
+      setAlertMsg(t(translationKeys.createChannelFail) as string);
       if (dialogValue.key !== "") {
         if (dialogValue.access !== "PROTECTED" || dialogValue.password !== "") {
           if (dialogValue.access === "PROTECTED") {
@@ -79,12 +83,14 @@ export default function AddChannelDialog({
         } else setAlertOpen(true);
       } else setAlertOpen(true);
     } else {
-      setAlertMsg("Failed to join channel");
-      channelSocket.joinRoom(
-        dialogJoinValue.id,
-        dialogJoinValue.password !== "" ? dialogJoinValue.password : undefined
-      );
-      setDialogJoinValue({ id: "", password: "" });
+      setAlertMsg(t(translationKeys.joinChannelFail) as string);
+      ChannelService.getChannelByName(dialogJoinValue.name).then((resolve) => {
+        channelSocket.joinRoom(
+          resolve.id,
+          dialogJoinValue.password !== "" ? dialogJoinValue.password : undefined
+        );
+      });
+      setDialogJoinValue({ name: "", password: "" });
       toggleOpen(false);
     }
   };
@@ -113,8 +119,8 @@ export default function AddChannelDialog({
           </Alert>
         </Collapse>
         <Tabs value={formSelection} onChange={handleFormSelection}>
-          <Tab key={0} value={0} label="Join"></Tab>
-          <Tab key={1} value={1} label="Create"></Tab>
+          <Tab key={0} value={0} label={t(translationKeys.join)}></Tab>
+          <Tab key={1} value={1} label={t(translationKeys.create)}></Tab>
         </Tabs>
         <form onSubmit={handleFormSubmit}>
           {formSelection === 0 ? (

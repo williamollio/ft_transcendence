@@ -23,6 +23,11 @@ export interface CRDialogValue {
   password: string;
 }
 
+export interface JoinDialogValue {
+  name: string;
+  password: string;
+}
+
 export interface DBChannelElement {
   id: string;
   name: string;

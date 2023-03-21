@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useState } from "react";
+import React, { ChangeEvent, Dispatch, SetStateAction, useState } from "react";
 import { makeStyles } from "tss-react/mui";
 import Navbar from "../../components/Navbar";
 import {
@@ -36,14 +36,8 @@ import CustomTextField from "../../components/shared/CustomTextField/CustomTextF
 import { Cookie, getTokenData } from "../../utils/auth-helper";
 import MiniDrawer from "../../components/MiniDrawer/MiniDrawer";
 import friendshipsService from "../../services/friendships.service";
-import { UserSocket } from "../../classes/UserSocket.class";
 
-interface Props {
-  userSocket: UserSocket;
-}
-
-export default function ProfileView(props: Props): React.ReactElement {
-  const { userSocket } = props;
+export default function ProfileView(): React.ReactElement {
   const { t } = useTranslation();
   const { classes } = useStyles();
   const navigate = useNavigate();
@@ -68,17 +62,6 @@ export default function ProfileView(props: Props): React.ReactElement {
   } = useForm({
     mode: "onChange",
   });
-
-  //   React.useEffect(() => {
-  //     if (userSocket.socket.connected === false) {
-  //       let gotToken = localStorage.getItem(Cookie.TOKEN);
-  //       if (gotToken) {
-  //         if (typeof userSocket.socket.auth === "object") {
-  //           setToken("Bearer " + gotToken);
-  //         }
-  //       }
-  //     } else userSocket.logIn();
-  //   }, []);
 
   React.useEffect(() => {
     if (token === null) {

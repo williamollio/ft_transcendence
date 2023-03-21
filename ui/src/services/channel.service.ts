@@ -106,5 +106,12 @@ class ChannelService {
     const { data } = await axiosInstance.get(`${CHANNEL_PATH}/${id}`);
     return data;
   }
+
+  async getChannelByName(name: string) {
+    const { data } = await axiosInstance.get(
+      `${CHANNEL_PATH}/get-channel-by-name/${name}`
+    );
+    return data;
+  }
 }
 export default new ChannelService();

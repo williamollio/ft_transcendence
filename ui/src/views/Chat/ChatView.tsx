@@ -1,4 +1,4 @@
-import React from "react";
+import React, { SetStateAction } from "react";
 import Navbar from "../../components/Navbar";
 import { Typography } from "@mui/material";
 import { translationKeys } from "./constants";
@@ -12,7 +12,6 @@ import {
   TitleWrapper,
   ContentWrapper,
 } from "../../styles/MuiStyles";
-import { Cookie } from "../../utils/auth-helper";
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { UserSocket } from "../../classes/UserSocket.class";
 import MiniDrawer from "../../components/MiniDrawer/MiniDrawer";
@@ -26,16 +25,6 @@ export default function ChatView(props: Props): React.ReactElement {
   const { userSocket, channelSocket } = props;
   const { t } = useTranslation();
   // const { classes } = useStyles();
-
-  //   React.useEffect(() => {
-  //     let gotToken = localStorage.getItem(Cookie.TOKEN);
-  //     if (gotToken) {
-  //       if (channelSocket.socket.connected === false) {
-  //         setToken("Bearer " + gotToken);
-  //       }
-  //       channelSocket.initializeName(gotToken);
-  //     }
-  //   }, []);
 
   return (
     <>

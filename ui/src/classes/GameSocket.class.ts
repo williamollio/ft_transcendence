@@ -1,6 +1,5 @@
 import { Socket } from "socket.io-client";
 import { initSocket } from "../services/initSocket.service";
-import { GameMode } from "../../../nest/src/game/entities/game.entity";
 
 export class GameSocket {
   socket: Socket;

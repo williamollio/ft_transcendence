@@ -68,7 +68,7 @@ export class ChannelService {
         id: true,
         name: true,
         type: true,
-		messages: true,
+        messages: true,
       },
     });
     // Check if the channnel is of type DIRECT MESSAGE and change the name
@@ -94,6 +94,14 @@ export class ChannelService {
     return this.prisma.channel.findFirst({
       where: {
         id: channelId,
+      },
+    });
+  }
+
+  getChannelByName(channelName: string) {
+    return this.prisma.channel.findFirst({
+      where: {
+        name: channelName,
       },
     });
   }

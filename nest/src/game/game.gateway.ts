@@ -17,7 +17,7 @@ import { JwtGuard } from 'src/auth/guards/jwt.guard';
 @WebSocketGateway(4444, {
   cors: {
     credentials: true,
-	origin: process.env.PATH_TO_FRONTEND,
+    origin: process.env.PATH_TO_FRONTEND,
   },
   parser: msgpack,
 })
@@ -82,7 +82,6 @@ export class GameGateway {
   // ) {
   //   return this.gameService.leaveWatch(client, playerId);
   // }
-
 
   // spectating still under tests
   // @SubscribeMessage('watchGame')

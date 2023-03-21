@@ -28,4 +28,12 @@ export const translationKeys = {
   classic: "Classic",
   mayhem: "Mayhem",
   hockey: "Hockey",
+  joinChannelTitle: "Join existing channel",
+  joinChannelText: "Please enter the name and password of the channel you want to Join.",
+  join: "Join",
+  channelNameEmpty: "Channel name can not be empty!",
+  passwordEmpty: "Password can not be empty",
+  createChannelFail: "Failed to create channel",
+  joinChannelFail: "Failed to join channel",
+  create: "Create",
 };

@@ -1,6 +1,5 @@
 import { Typography } from "@mui/material";
 import { useState } from "react";
-import { UserSocket } from "../../classes/UserSocket.class";
 import Navbar from "../../components/Navbar";
 import React from "react";
 import { translationKeys } from "./constants";
@@ -20,12 +19,7 @@ import StatsService from "../../services/stats.service";
 import { useQuery } from "@tanstack/react-query";
 import PersonalStatPanel from "../../components/stats/PersonalStatPanel";
 
-interface Props {
-  userSocket: UserSocket;
-}
-
-export default function StatsView(props: Props): React.ReactElement {
-  const { userSocket } = props;
+export default function StatsView(): React.ReactElement {
   const { t } = useTranslation();
   // const { classes } = useStyles();
 
@@ -43,17 +37,6 @@ export default function StatsView(props: Props): React.ReactElement {
     isError: boolean;
     isRefetching: boolean;
   } = useQuery(["playerList"], StatsService.fetchLeaderboard);
-
-  //   React.useEffect(() => {
-  //     if (userSocket.socket.connected === false) {
-  //       let gotToken = localStorage.getItem(Cookie.TOKEN);
-  //       if (gotToken) {
-  //         if (typeof userSocket.socket.auth === "object") {
-  //           setToken("Bearer " + gotToken);
-  //         }
-  //       }
-  //     } else userSocket.logIn();
-  //   }, []);
 
   return (
     <>
