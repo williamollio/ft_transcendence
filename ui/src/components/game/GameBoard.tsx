@@ -1,16 +1,18 @@
 import { Box, Paper } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 import { GameLoop } from "../../classes/GameLoop.class";
+import { GameSocket } from "../../classes/GameSocket.class";
 import { positionalData } from "../../classes/positionalData.class";
 import Ball from "./Ball";
 import Player from "./Player";
 
 interface Props {
   gameLoop: GameLoop;
+  gameSocket: GameSocket;
 }
 
 export default function GameBoard(props: Props) {
-  const { gameLoop } = props;
+  const { gameLoop, gameSocket } = props;
 
   const boardRef = useRef<HTMLDivElement>(null);
 
@@ -32,14 +34,42 @@ export default function GameBoard(props: Props) {
     }
   };
 
+  const mutateGameStatusListener = (data: any) => {
+    console.log(data);
+  };
+
+  const inviteRefusedListener = (data: any) => {
+    console.log(data);
+  };
+
+  const invitedToGameListener = (data: any) => {
+    console.log(data);
+  };
+
+  const matchFinishedListener = (data: any) => {
+    console.log(data);
+  };
+
   useEffect(() => {
     document.addEventListener("keydown", playerMoveHandler);
     document.addEventListener("keyup", playerStopHandler);
+    if (gameSocket.socket.connected) {
+      gameSocket.socket.on("gameStatus", mutateGameStatusListener);
+      gameSocket.socket.on("inviteRefused", inviteRefusedListener);
+      gameSocket.socket.on("invitedToGame", invitedToGameListener);
+      gameSocket.socket.on("matchFinished", matchFinishedListener);
+    }
     return () => {
       document.removeEventListener("keydown", playerMoveHandler);
       document.removeEventListener("keyup", playerStopHandler);
+      if (gameSocket.socket.connected) {
+        gameSocket.socket.off("gameStatus", mutateGameStatusListener);
+        gameSocket.socket.off("inviteRefused", inviteRefusedListener);
+        gameSocket.socket.off("invitedToGame", invitedToGameListener);
+        gameSocket.socket.off("matchFinished", matchFinishedListener);
+      }
     };
-  }, [gameLoop]);
+  }, [gameLoop, gameSocket]);
 
   return (
     <>

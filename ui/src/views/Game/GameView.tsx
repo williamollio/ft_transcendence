@@ -30,6 +30,7 @@ export default function GameView(props: Props): React.ReactElement {
   // for testing
 
   const [gameLoop] = useState<GameLoop>(new GameLoop(setTickts));
+  const [inviteFade, toggleInvitefade] = useState<boolean>(false);
 
   return (
     <>
@@ -49,7 +50,7 @@ export default function GameView(props: Props): React.ReactElement {
               </Typography>
             </TitleWrapper>
             <ContentWrapper>
-              <GameBoard gameLoop={gameLoop} />
+              <GameBoard gameLoop={gameLoop} gameSocket={gameSocket}/>
             </ContentWrapper>
             {/* for testing */}
             <Button onClick={gameLoop.startLoop}>start</Button>

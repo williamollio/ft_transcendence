@@ -12,7 +12,7 @@ import {
   TextField,
 } from "@mui/material";
 import { SyntheticEvent, useEffect, useRef, useState } from "react";
-import { messagesDto } from "../../interfaces/chat.interface";
+import { messagesDto, failEvents } from "../../interfaces/chat.interface";
 import { accessTypes, chatRoom } from "../../classes/chatRoom.class";
 import AddChannelDialog from "../../components/chat/AddChannelDialog";
 import RoomContextMenu from "../../components/chat/RoomContextMenu";
@@ -256,18 +256,7 @@ export default function Chat(props: Props) {
       );
       channelSocket.registerListener("banSucceeded", banSuccessListener);
       channelSocket.registerListener("muteSucceeded", muteSuccessListener);
-      [
-        "inviteFailed",
-        "joinRoomError",
-        "joinRoomFailed",
-        "leaveRoomFailed",
-        "createRoomFailed",
-        "editRoomFailed",
-        "createRoomFailed",
-        "banFailed",
-        "muteFailed",
-        "updateRoleFailed",
-      ].forEach((element) => {
+      failEvents.forEach((element) => {
         channelSocket.registerListener(element, failedListener);
       });
     }
@@ -289,18 +278,7 @@ export default function Chat(props: Props) {
           "inviteSucceeded",
           inviteSucceededListener
         );
-        [
-          "inviteFailed",
-          "joinRoomError",
-          "joinRoomFailed",
-          "leaveRoomFailed",
-          "createRoomFailed",
-          "editRoomFailed",
-          "createRoomFailed",
-          "banFailed",
-          "muteFailed",
-          "updateRoleFailed",
-        ].forEach((element) => {
+        failEvents.forEach((element) => {
           channelSocket.removeListener(element, failedListener);
         });
       }

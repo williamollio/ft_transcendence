@@ -48,7 +48,20 @@ export interface ChannelInfoContextMenu {
 }
 
 export enum GameMode {
-	CLASSIC = 'CLASSIC',
-	MAYHEM = 'MAYHEM',
-	HOCKEY = 'HOCKEY',
-  }
+  CLASSIC = "CLASSIC",
+  MAYHEM = "MAYHEM",
+  HOCKEY = "HOCKEY",
+}
+
+export const failEvents = [
+  "inviteFailed",
+  "joinRoomError",
+  "joinRoomFailed",
+  "leaveRoomFailed",
+  "createRoomFailed",
+  "editRoomFailed",
+  "createRoomFailed",
+  "banFailed",
+  "muteFailed",
+  "updateRoleFailed",
+];
