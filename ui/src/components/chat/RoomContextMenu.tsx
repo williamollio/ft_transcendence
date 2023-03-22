@@ -5,7 +5,7 @@ import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { chatRoom } from "../../classes/chatRoom.class";
 import { GameSocket } from "../../classes/GameSocket.class";
 import { UserSocket } from "../../classes/UserSocket.class";
-import { translationKeys } from "../../views/Chat/constants";
+import { translationKeys } from "./constants";
 import ChannelInfoDialog from "./ChannelInfoDialog";
 import GetIdDialog from "./GetIdDialog";
 

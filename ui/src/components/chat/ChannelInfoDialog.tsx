@@ -26,7 +26,7 @@ import { useQuery } from "@tanstack/react-query";
 import { UserSocket } from "../../classes/UserSocket.class";
 import ChannelService from "../../services/channel.service";
 import { GameSocket } from "../../classes/GameSocket.class";
-import { translationKeys } from "../../views/Chat/constants";
+import { translationKeys } from "./constants";
 import { useTranslation } from "react-i18next";
 
 interface Props {

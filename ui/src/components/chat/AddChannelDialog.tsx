@@ -5,9 +5,12 @@ import CloseIcon from "@mui/icons-material/Close";
 import CreateForm from "./CreateChannelForm";
 import JoinForm from "./JoinChannelForm";
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
-import { CRDialogValue, JoinDialogValue } from "../../interfaces/chat.interface";
+import {
+  CRDialogValue,
+  JoinDialogValue,
+} from "../../interfaces/chat.interface";
 import { useTranslation } from "react-i18next";
-import { translationKeys } from "../../views/Chat/constants";
+import { translationKeys } from "./constants";
 import ChannelService from "../../services/channel.service";
 
 interface Props {
@@ -116,8 +119,18 @@ export default function AddChannelDialog(props: Props) {
           </Alert>
         </Collapse>
         <Tabs value={formSelection} onChange={handleFormSelection}>
-          <Tab key={0} value={0} label={t(translationKeys.join)}></Tab>
-          <Tab key={1} value={1} label={t(translationKeys.create)}></Tab>
+          <Tab
+            sx={{ fontSize: "14px", fontWeight: "bold" }}
+            key={0}
+            value={0}
+            label={t(translationKeys.join)}
+          ></Tab>
+          <Tab
+            sx={{ fontSize: "14px", fontWeight: "bold" }}
+            key={1}
+            value={1}
+            label={t(translationKeys.create)}
+          ></Tab>
         </Tabs>
         <form onSubmit={handleFormSubmit}>
           {formSelection === 0 ? (

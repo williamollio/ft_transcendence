@@ -1,11 +1,10 @@
-import { ReactElement, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import ProfileView from "./views/Profile/ProfileView";
 import Setup2FA from "./views/Profile/Setup2FA";
 import LoginView from "./views/Login/LoginView";
 import Login2FAView from "./views/Login/Login2FAView";
-import ChatView from "./views/Chat/ChatView";
 import { RoutePath } from "./interfaces/router.interface";
 import { TranscendanceContext } from "./context/transcendance-context";
 import { TranscendanceStateActionType } from "./context/transcendance-reducer";
@@ -126,8 +125,8 @@ export default function App() {
               path={RoutePath.REDIRECT}
               element={
                 <PrivateRoute
-                  children={<RedirectWrapper />}
                   setToken={setToken}
+                  children={<RedirectWrapper />}
                 ></PrivateRoute>
               }
             />
@@ -135,18 +134,9 @@ export default function App() {
               path={RoutePath.PROFILE}
               element={
                 <PrivateRoute setToken={setToken}>
-                  <ProfileView />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path={RoutePath.CHAT}
-              element={
-                <PrivateRoute setToken={setToken}>
-                  <ChatView
+                  <ProfileView
                     userSocket={userSocket}
                     channelSocket={channelSocket}
-					gameSocket={gameSocket}
                   />
                 </PrivateRoute>
               }
@@ -155,8 +145,14 @@ export default function App() {
               path={RoutePath.GAME}
               element={
                 <PrivateRoute
-                  children={<GameView gameSocket={gameSocket} />}
                   setToken={setToken}
+                  children={
+                    <GameView
+                      userSocket={userSocket}
+                      channelSocket={channelSocket}
+                      gameSocket={gameSocket}
+                    />
+                  }
                 ></PrivateRoute>
               }
             />
@@ -164,8 +160,8 @@ export default function App() {
               path={RoutePath.SETUP2FA}
               element={
                 <PrivateRoute
-                  children={<Setup2FA />}
                   setToken={setToken}
+                  children={<Setup2FA />}
                 ></PrivateRoute>
               }
             />
@@ -173,7 +169,10 @@ export default function App() {
               path={RoutePath.STATS}
               element={
                 <PrivateRoute setToken={setToken}>
-                  <StatsView />
+                  <StatsView
+                    userSocket={userSocket}
+                    channelSocket={channelSocket}
+                  />
                 </PrivateRoute>
               }
             />

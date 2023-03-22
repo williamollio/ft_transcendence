@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { chatRoom } from "../../classes/chatRoom.class";
 import ChannelService from "../../services/channel.service";
-import { translationKeys } from "../../views/Chat/constants";
+import { translationKeys } from "./constants";
 
 interface Props {
   setAlertMsg: Dispatch<SetStateAction<string>>;

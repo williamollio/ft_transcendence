@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { chatRoom } from "../../classes/chatRoom.class";
-import { translationKeys } from "../../views/Chat/constants";
+import { translationKeys } from "./constants";
 
 interface Props {
   open: boolean;
@@ -53,9 +53,7 @@ export default function GetPasswordDialog(props: Props) {
 
   return (
     <Dialog open={open} onClose={handleClose} onKeyDown={handleSubmit}>
-      <DialogContent>
-        {t(translationKeys.leavePasswordEmpty)}
-      </DialogContent>
+      <DialogContent>{t(translationKeys.leavePasswordEmpty)}</DialogContent>
       {channel && channel.access === "PROTECTED" ? (
         <TextField
           label={t(translationKeys.oldPassword)}

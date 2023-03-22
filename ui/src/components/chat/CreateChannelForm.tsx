@@ -9,14 +9,15 @@ import {
   DialogActions,
   Button,
 } from "@mui/material";
-import React, { Dispatch, SetStateAction, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useState } from "react";
 import { CRDialogValue } from "../../interfaces/chat.interface";
-import { translationKeys } from "../../views/Chat/constants";
+import { makeStyles } from "tss-react/mui";
+import { translationKeys } from "./constants";
+import { useTranslation } from "react-i18next";
 
 interface Props {
   dialogValue: CRDialogValue;
-  setDialogValue: Dispatch<SetStateAction<CRDialogValue>>;
+  setDialogValue: React.Dispatch<React.SetStateAction<CRDialogValue>>;
   handleClose: (e: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
@@ -24,6 +25,7 @@ export default function CreateForm(props: Props) {
   const { dialogValue, setDialogValue, handleClose } = props;
   const [pwDisable, setPwDisable] = useState<boolean>(true);
   const { t } = useTranslation();
+  const { classes } = useStyles();
 
   const handleAccessChange = (e: any) => {
     let tmpCR: CRDialogValue = { ...dialogValue, access: e.target.value };
@@ -62,6 +64,7 @@ export default function CreateForm(props: Props) {
                 }
                 label={t(translationKeys.name)}
                 type="text"
+                InputLabelProps={{ shrink: true }}
               />
             </Grid>
             <Grid item>
@@ -97,6 +100,7 @@ export default function CreateForm(props: Props) {
                 label={t(translationKeys.password)}
                 type="password"
                 variant="outlined"
+                InputLabelProps={{ shrink: true }}
               />
             </Grid>
           </Grid>
@@ -104,10 +108,30 @@ export default function CreateForm(props: Props) {
       </Grid>
       <Grid item>
         <DialogActions>
-          <Button onClick={handleClose}>{t(translationKeys.cancel)}</Button>
-          <Button type="submit">{t(translationKeys.add)}</Button>
+          <Button
+            type="submit"
+            className={classes.iconButton}
+            variant="contained"
+            color="primary"
+          >
+            {t(translationKeys.buttons.add)}
+          </Button>
+          <Button
+            onClick={handleClose}
+            className={classes.iconButton}
+            variant="outlined"
+          >
+            {t(translationKeys.buttons.cancel)}
+          </Button>
         </DialogActions>
       </Grid>
     </Grid>
   );
 }
+
+const useStyles = makeStyles()(() => ({
+  iconButton: {
+    height: "30%",
+    width: "30%",
+  },
+}));

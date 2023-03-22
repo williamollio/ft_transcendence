@@ -12,8 +12,9 @@ import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { useQuery } from "@tanstack/react-query";
 import { channelUser, DBChannelElement } from "../../interfaces/chat.interface";
 import ChannelService from "../../services/channel.service";
-import { translationKeys } from "../../views/Chat/constants";
+import { translationKeys } from "./constants";
 import { useTranslation } from "react-i18next";
+import { useTheme } from "@mui/material";
 
 interface Props {
   currentRoom: chatRoom | boolean;
@@ -50,6 +51,7 @@ export function ChannelTabs(props: Props) {
   const [channelQueryId, setChannelQueryId] = useState<string | undefined>(
     undefined
   );
+  const theme = useTheme();
 
   const [channelList, setChannelList] = useState<chatRoom[]>(
     channelSocket.channels
@@ -179,7 +181,11 @@ export function ChannelTabs(props: Props) {
               (element) => element.id !== channelSocket.user.id
             )?.name;
             let channelIndex = channelSocket.channels.push(
-              new chatRoom(data.id, userName ? userName : t(translationKeys.missing) as string, data.type)
+              new chatRoom(
+                data.id,
+                userName ? userName : (t(translationKeys.missing) as string),
+                data.type
+              )
             );
             channelSocket.channels.forEach((element) => {
               newList.push(element);
@@ -297,6 +303,9 @@ export function ChannelTabs(props: Props) {
       value={typeof currentRoom !== "boolean" ? currentRoom.id : false}
       onChange={handleRoomChange}
       variant="scrollable"
+      TabIndicatorProps={{
+        style: { marginBottom: "3px" },
+      }}
     >
       {channelList.map((channel: chatRoom) => {
         return (
@@ -325,7 +334,11 @@ export function ChannelTabs(props: Props) {
       })}
       <Tab
         key={"AddChannel"}
-        sx={{ width: "30px", minWidth: "30px" }}
+        sx={{
+          width: "30px",
+          minWidth: "30px",
+          color: theme.palette.secondary.main,
+        }}
         icon={<AddIcon />}
         onClick={newRoom}
       ></Tab>

@@ -15,7 +15,7 @@ import CustomTextField from "../../components/shared/CustomTextField/CustomTextF
 import { useForm, FieldValues } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { TextField } from "@mui/material";
-import MiniDrawer from "../../components/MiniDrawer/MiniDrawer";
+import LeftDrawer from "../../components/LeftDrawer/LeftDrawer";
 
 const CODE_LENGTH = 6; // number of input fields to render
 
@@ -98,7 +98,7 @@ export default function Setup2FA(): React.ReactElement {
   return (
     <>
       <Navbar />
-      <MiniDrawer />
+      <LeftDrawer />
       <Background>
         <ProfileCard>
           <CardContainer>

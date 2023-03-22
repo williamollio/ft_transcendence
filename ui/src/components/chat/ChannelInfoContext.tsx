@@ -9,7 +9,7 @@ import {
   ChannelInfoContextMenu,
 } from "../../interfaces/chat.interface";
 import ChannelService from "../../services/channel.service";
-import { translationKeys } from "../../views/Chat/constants";
+import { translationKeys } from "./constants";
 
 interface Props {
   blockedUser: Array<string>;
@@ -175,7 +175,7 @@ export default function ChannelInfoContext(props: Props) {
           sx={{ width: "100%" }}
           size="small"
           onChange={handleGameModeChange}
-		  placeholder={t(translationKeys.gameMode) as string}
+          placeholder={t(translationKeys.gameMode) as string}
           value={gameModeSelect}
         >
           <MenuItem value={GameMode.CLASSIC}>

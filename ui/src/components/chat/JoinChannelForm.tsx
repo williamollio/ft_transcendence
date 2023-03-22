@@ -8,9 +8,10 @@ import {
   Button,
 } from "@mui/material";
 import React from "react";
+import { makeStyles } from "tss-react/mui";
 import { useTranslation } from "react-i18next";
 import { JoinDialogValue } from "../../interfaces/chat.interface";
-import { translationKeys } from "../../views/Chat/constants";
+import { translationKeys } from "./constants";
 
 interface Props {
   dialogJoinValue: JoinDialogValue;
@@ -21,6 +22,7 @@ interface Props {
 export default function JoinForm(props: Props) {
   const { dialogJoinValue, setDialogJoinValue, handleClose } = props;
   const { t } = useTranslation();
+  const { classes } = useStyles();
 
   return (
     <Grid container>
@@ -31,7 +33,9 @@ export default function JoinForm(props: Props) {
         <DialogContent>
           <Grid container spacing="20px">
             <Grid item>
-              <DialogContentText>{t(translationKeys.joinChannelText)}</DialogContentText>
+              <DialogContentText>
+                {t(translationKeys.joinChannelText)}
+              </DialogContentText>
             </Grid>
             <Grid item>
               <TextField
@@ -48,6 +52,7 @@ export default function JoinForm(props: Props) {
                 }
                 label={t(translationKeys.name)}
                 type="text"
+                InputLabelProps={{ shrink: true }}
               />
             </Grid>
             <Grid item>
@@ -64,6 +69,7 @@ export default function JoinForm(props: Props) {
                 label={t(translationKeys.password)}
                 type="password"
                 variant="outlined"
+                InputLabelProps={{ shrink: true }}
               />
             </Grid>
           </Grid>
@@ -71,10 +77,30 @@ export default function JoinForm(props: Props) {
       </Grid>
       <Grid item>
         <DialogActions>
-          <Button onClick={handleClose}>{t(translationKeys.cancel)}</Button>
-          <Button type="submit">{t(translationKeys.join)}</Button>
+          <Button
+            type="submit"
+            className={classes.iconButton}
+            variant="contained"
+            color="primary"
+          >
+            {t(translationKeys.buttons.join)}
+          </Button>
+          <Button
+            onClick={handleClose}
+            className={classes.iconButton}
+            variant="outlined"
+          >
+            {t(translationKeys.buttons.cancel)}
+          </Button>
         </DialogActions>
       </Grid>
     </Grid>
   );
 }
+
+const useStyles = makeStyles()(() => ({
+  iconButton: {
+    height: "30%",
+    width: "30%",
+  },
+}));

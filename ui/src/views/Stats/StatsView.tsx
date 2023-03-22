@@ -1,10 +1,11 @@
 import { Typography } from "@mui/material";
 import { useState } from "react";
+import { UserSocket } from "../../classes/UserSocket.class";
 import Navbar from "../../components/Navbar";
 import React from "react";
 import { translationKeys } from "./constants";
 import { useTranslation } from "react-i18next";
-import MiniDrawer from "../../components/MiniDrawer/MiniDrawer";
+import LeftDrawer from "../../components/LeftDrawer/LeftDrawer";
 // import { makeStyles } from "tss-react/mui";
 import {
   Background,
@@ -18,8 +19,16 @@ import MainTable from "../../components/stats/MainTable";
 import StatsService from "../../services/stats.service";
 import { useQuery } from "@tanstack/react-query";
 import PersonalStatPanel from "../../components/stats/PersonalStatPanel";
+import RightDrawer from "../../components/RightDrawer/RightDrawer";
+import { ChannelSocket } from "../../classes/ChannelSocket.class";
 
-export default function StatsView(): React.ReactElement {
+interface Props {
+  userSocket: UserSocket;
+  channelSocket: ChannelSocket;
+}
+
+export default function StatsView(props: Props): React.ReactElement {
+  const { userSocket, channelSocket } = props;
   const { t } = useTranslation();
   // const { classes } = useStyles();
 
@@ -41,7 +50,8 @@ export default function StatsView(): React.ReactElement {
   return (
     <>
       <Navbar />
-      <MiniDrawer />
+      <LeftDrawer />
+      <RightDrawer channelSocket={channelSocket} userSocket={userSocket} />
       <Background>
         <PersonalStatPanel
           playerId={userId}

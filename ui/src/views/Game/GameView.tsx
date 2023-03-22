@@ -3,7 +3,10 @@ import Navbar from "../../components/Navbar";
 import { Button, Typography } from "@mui/material";
 import { translationKeys } from "./constants";
 import { useTranslation } from "react-i18next";
-import MiniDrawer from "../../components/MiniDrawer/MiniDrawer";
+import LeftDrawer from "../../components/LeftDrawer/LeftDrawer";
+import RightDrawer from "../../components/RightDrawer/RightDrawer";
+import { UserSocket } from "../../classes/UserSocket.class";
+import { ChannelSocket } from "../../classes/ChannelSocket.class";
 // import { makeStyles } from "tss-react/mui";
 import {
   Background,
@@ -18,10 +21,12 @@ import { GameSocket } from "../../classes/GameSocket.class";
 
 interface Props {
   gameSocket: GameSocket;
+  userSocket: UserSocket;
+  channelSocket: ChannelSocket;
 }
 
 export default function GameView(props: Props): React.ReactElement {
-  const { gameSocket } = props;
+  const { gameSocket, userSocket, channelSocket } = props;
   const { t } = useTranslation();
   //   const { classes } = useStyles();
 
@@ -35,7 +40,8 @@ export default function GameView(props: Props): React.ReactElement {
   return (
     <>
       <Navbar />
-      <MiniDrawer />
+      <LeftDrawer />
+      <RightDrawer channelSocket={channelSocket} userSocket={userSocket} />
       <Background>
         <ProfileCard>
           <CardContainer>
@@ -50,7 +56,7 @@ export default function GameView(props: Props): React.ReactElement {
               </Typography>
             </TitleWrapper>
             <ContentWrapper>
-              <GameBoard gameLoop={gameLoop} gameSocket={gameSocket}/>
+              <GameBoard gameLoop={gameLoop} gameSocket={gameSocket} />
             </ContentWrapper>
             {/* for testing */}
             <Button onClick={gameLoop.startLoop}>start</Button>
