@@ -36,15 +36,15 @@ export default function AddChannelDialog(props: Props) {
     password: "",
   });
   const [alert, setAlert] = useState<string>(
-    t(translationKeys.channelNameEmpty) as string
+    t(translationKeys.errorMessages.channelNameEmpty) as string
   );
   const [alertOpen, setAlertOpen] = useState<boolean>(false);
 
   useEffect(() => {
     if (dialogValue.key === "")
-      setAlert(t(translationKeys.channelNameEmpty) as string);
+      setAlert(t(translationKeys.errorMessages.channelNameEmpty) as string);
     else if (dialogValue.access === "PROTECTED" && dialogValue.password === "")
-      setAlert(t(translationKeys.passwordEmpty) as string);
+      setAlert(t(translationKeys.errorMessages.passwordEmpty) as string);
     else setAlertOpen(false);
   }, [dialogValue]);
 
@@ -64,7 +64,7 @@ export default function AddChannelDialog(props: Props) {
     e.preventDefault();
     if (alertOpen === true) setAlertOpen(false);
     if (formSelection === 1) {
-      setAlertMsg(t(translationKeys.createChannelFail) as string);
+    //   setAlertMsg(t(translationKeys.errorMessages.createChannelFail) as string);
       if (dialogValue.key !== "") {
         if (dialogValue.access !== "PROTECTED" || dialogValue.password !== "") {
           if (dialogValue.access === "PROTECTED") {
@@ -83,7 +83,7 @@ export default function AddChannelDialog(props: Props) {
         } else setAlertOpen(true);
       } else setAlertOpen(true);
     } else {
-      setAlertMsg(t(translationKeys.joinChannelFail) as string);
+    //   setAlertMsg(t(translationKeys.errorMessages.joinChannelFail) as string);
       ChannelService.getChannelByName(dialogJoinValue.name).then((resolve) => {
         channelSocket.joinRoom(
           resolve.id,

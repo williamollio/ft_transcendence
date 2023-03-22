@@ -24,6 +24,7 @@ export class GameLoop {
   resetPositions = () => {
     this.positionalData.resetPositions();
     this.handleMovement();
+	this.ticks = 0;
     this.setTicks(0);
   };
 

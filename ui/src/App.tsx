@@ -137,6 +137,7 @@ export default function App() {
                   <ProfileView
                     userSocket={userSocket}
                     channelSocket={channelSocket}
+                    gameSocket={gameSocket}
                   />
                 </PrivateRoute>
               }
@@ -172,6 +173,7 @@ export default function App() {
                   <StatsView
                     userSocket={userSocket}
                     channelSocket={channelSocket}
+                    gameSocket={gameSocket}
                   />
                 </PrivateRoute>
               }

@@ -12,6 +12,7 @@ import Chat from "../chat/Chat";
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { UserSocket } from "../../classes/UserSocket.class";
 import { navbarHeight } from "../Navbar";
+import { GameSocket } from "../../classes/GameSocket.class";
 
 const drawerWidth = 300;
 const drawerWidthClosed = "4rem";
@@ -53,10 +54,11 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 interface Props {
   channelSocket: ChannelSocket;
   userSocket: UserSocket;
+  gameSocket: GameSocket;
 }
 
 export default function RightDrawer(props: Props) {
-  const { channelSocket, userSocket } = props;
+  const { channelSocket, userSocket, gameSocket } = props;
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
 
@@ -120,7 +122,7 @@ export default function RightDrawer(props: Props) {
             marginBottom: "2.5rem",
           }}
         />
-        <Chat channelSocket={channelSocket} userSocket={userSocket} />
+        <Chat channelSocket={channelSocket} userSocket={userSocket} gameSocket={gameSocket}/>
       </Drawer>
     </Box>
   );

@@ -21,14 +21,16 @@ import { useQuery } from "@tanstack/react-query";
 import PersonalStatPanel from "../../components/stats/PersonalStatPanel";
 import RightDrawer from "../../components/RightDrawer/RightDrawer";
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
+import { GameSocket } from "../../classes/GameSocket.class";
 
 interface Props {
   userSocket: UserSocket;
   channelSocket: ChannelSocket;
+  gameSocket: GameSocket;
 }
 
 export default function StatsView(props: Props): React.ReactElement {
-  const { userSocket, channelSocket } = props;
+  const { userSocket, channelSocket, gameSocket } = props;
   const { t } = useTranslation();
   // const { classes } = useStyles();
 
@@ -51,7 +53,11 @@ export default function StatsView(props: Props): React.ReactElement {
     <>
       <Navbar />
       <LeftDrawer />
-      <RightDrawer channelSocket={channelSocket} userSocket={userSocket} />
+      <RightDrawer
+        channelSocket={channelSocket}
+        userSocket={userSocket}
+        gameSocket={gameSocket}
+      />
       <Background>
         <PersonalStatPanel
           playerId={userId}

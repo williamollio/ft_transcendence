@@ -60,7 +60,6 @@ export const failEvents = [
   "leaveRoomFailed",
   "createRoomFailed",
   "editRoomFailed",
-  "createRoomFailed",
   "banFailed",
   "muteFailed",
   "updateRoleFailed",

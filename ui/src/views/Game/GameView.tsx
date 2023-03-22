@@ -35,13 +35,12 @@ export default function GameView(props: Props): React.ReactElement {
   // for testing
 
   const [gameLoop] = useState<GameLoop>(new GameLoop(setTickts));
-  const [inviteFade, toggleInvitefade] = useState<boolean>(false);
 
   return (
     <>
       <Navbar />
       <LeftDrawer />
-      <RightDrawer channelSocket={channelSocket} userSocket={userSocket} />
+      <RightDrawer channelSocket={channelSocket} userSocket={userSocket} gameSocket={gameSocket}/>
       <Background>
         <ProfileCard>
           <CardContainer>
