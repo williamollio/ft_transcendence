@@ -3,6 +3,7 @@ export interface User {
   name: string;
   filename?: string;
   status?: UserStatus;
+  secondFactorEnabled?: boolean;
 }
 
 export enum UserStatus {

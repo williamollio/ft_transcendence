@@ -16,6 +16,13 @@ import { useForm, FieldValues } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { TextField } from "@mui/material";
 import LeftDrawer from "../../components/LeftDrawer/LeftDrawer";
+import { Cookie, getTokenData } from "../../utils/auth-helper";
+import { RoutePath } from "../../interfaces/router.interface";
+import usersService from "../../services/users.service";
+import { AxiosError } from "axios";
+import { ToastType } from "../../context/toast";
+import { TranscendanceStateActionType } from "../../context/transcendance-reducer";
+import { TranscendanceContext } from "../../context/transcendance-context";
 
 const CODE_LENGTH = 6; // number of input fields to render
 
@@ -33,17 +40,57 @@ export default function Setup2FA(): React.ReactElement {
   const [input, setInput] = React.useState<string[]>(
     Array(CODE_LENGTH).fill("")
   );
-
   const [currentIndex, setCurrentIndex] = React.useState<number>(0);
   const inputRefs = useRef<any>([]);
   const [isFocused, setIsFocused] = React.useState<boolean>(false);
-
+  const [userId, setUserId] = React.useState<string>("");
   const handleInputChange = (index: number, value: string) => {
     setCurrentIndex(index);
     const newInputs = [...input];
     newInputs[index] = value.replace(/[^0-9]/g, "").substr(0, 1);
     setInput(newInputs);
   };
+  const [token] = React.useState<string | null>(
+    localStorage.getItem(Cookie.TOKEN)
+  );
+  const { dispatchTranscendanceState } = React.useContext(TranscendanceContext);
+  const [is2faEnabled, setIs2faEnabled] = React.useState<boolean | undefined>(
+    undefined
+  );
+
+  React.useEffect(() => {
+    if (token === null) {
+      navigate(RoutePath.LOGIN);
+    } else {
+      setUserId(getTokenData(token).id);
+      if (userId) {
+        fetchCurrentUser();
+      }
+    }
+  }, [userId]);
+
+  function showErrorToast(error?: AxiosError) {
+    const message = (error?.response?.data as any).message as string;
+    dispatchTranscendanceState({
+      type: TranscendanceStateActionType.TOGGLE_TOAST,
+      toast: {
+        type: ToastType.ERROR,
+        title: "Error",
+        message: message,
+      },
+    });
+  }
+
+  async function fetchCurrentUser() {
+    const user = await usersService.getUser(userId);
+    const isSuccess = !user?.error;
+    if (!isSuccess) {
+      showErrorToast(user.error);
+      setIs2faEnabled(undefined);
+    } else {
+      setIs2faEnabled(user.data.secondFactorEnabled);
+    }
+  }
 
   React.useEffect(() => {
     const nextIndex = currentIndex + 1;
@@ -67,15 +114,15 @@ export default function Setup2FA(): React.ReactElement {
     }
   }, [input, isFocused]);
 
-  function onCancelPhone() {
+  function onCancelCode() {
     navigate(-1);
   }
-
-  function onCancelCode() {
-    console.log("to implement");
-  }
-  async function onSubmitPhone(data: FieldValues) {
-    console.log("data.phoneNumber " + data.phoneNumber);
+  async function trigger2fa() {
+    if (is2faEnabled) {
+      //disable
+    } else {
+      //enable
+    }
   }
 
   async function onSubmitCode() {
@@ -121,33 +168,22 @@ export default function Setup2FA(): React.ReactElement {
               >
                 {t(translationKeys.enterNumber)}
               </Typography>
-              <Box sx={{ width: "40%", marginTop: "50px" }}>
-                <CustomTextField
-                  label={"Phone number"}
-                  isRequired
-                  name="phoneNumber"
-                  rules={{
-                    required: true,
-                  }}
-                  error={errors.phoneNumber}
-                  register={register}
-                />
+              <Box sx={{ width: "40%", marginTop: "50px", height: "15%" }}>
+                {/* QR code */}
               </Box>
-              <Box className={classes.buttonsWrapper}>
+              <Box
+                sx={{ width: "92% !important" }}
+                className={classes.buttonsWrapper}
+              >
                 <Button
                   variant="contained"
                   className={classes.iconButton}
                   color="primary"
-                  onClick={handleSubmit(onSubmitPhone)}
+                  onClick={trigger2fa}
                 >
-                  {t(translationKeys.buttons.save)}
-                </Button>
-                <Button
-                  className={classes.iconButton}
-                  variant="outlined"
-                  onClick={onCancelPhone}
-                >
-                  {t(translationKeys.buttons.cancel)}
+                  {is2faEnabled
+                    ? t(translationKeys.buttons.enable)
+                    : t(translationKeys.buttons.disable)}
                 </Button>
               </Box>
               <Grid className={classes.inputWrapper}>

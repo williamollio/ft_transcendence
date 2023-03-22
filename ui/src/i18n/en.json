@@ -6,7 +6,9 @@
     "login42": "Login 42 API",
     "cancel": "Cancel",
     "submit": "Submit",
-    "sendRequest": "Request"
+    "sendRequest": "Request",
+    "enable": "Enable 2FA",
+    "disable": "Disable 2FA"
   },
   "loginToken": "Enter token",
   "or": "or",
