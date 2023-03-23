@@ -55,7 +55,7 @@ export default function GameView(props: Props): React.ReactElement {
               </Typography>
             </TitleWrapper>
             <ContentWrapper>
-              <GameBoard gameLoop={gameLoop} gameSocket={gameSocket} />
+              <GameBoard gameLoop={gameLoop} gameSocket={gameSocket}/>
             </ContentWrapper>
             {/* for testing */}
             <Button onClick={gameLoop.startLoop}>start</Button>

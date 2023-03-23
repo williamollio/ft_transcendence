@@ -1,9 +1,18 @@
 import { Menu, MenuItem, Select, SelectChangeEvent } from "@mui/material";
-import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
+import React, {
+  Dispatch,
+  SetStateAction,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { useTranslation } from "react-i18next";
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { chatRoom } from "../../classes/chatRoom.class";
 import { GameSocket } from "../../classes/GameSocket.class";
+import { ToastType } from "../../context/toast";
+import { TranscendanceContext } from "../../context/transcendance-context";
+import { TranscendanceStateActionType } from "../../context/transcendance-reducer";
 import {
   GameMode,
   ChannelInfoContextMenu,
@@ -39,6 +48,7 @@ export default function ChannelInfoContext(props: Props) {
     GameMode.CLASSIC
   );
   const { t } = useTranslation();
+  const toast = useContext(TranscendanceContext);
 
   useEffect(() => {
     if (contextMenu) {
@@ -91,12 +101,31 @@ export default function ChannelInfoContext(props: Props) {
     if (contextMenu && contextMenu.user && contextMenu.user.id) {
       if (blockStatus === "Block") {
         setAlertMsg("Failed to block User");
-        await ChannelService.blockUser(contextMenu.user.id);
+        let ret = await ChannelService.blockUser(contextMenu.user.id);
+        if (typeof ret === "string") {
+          toast.dispatchTranscendanceState({
+            type: TranscendanceStateActionType.TOGGLE_TOAST,
+            toast: {
+              type: ToastType.ERROR,
+              title: ret,
+              message: t(translationKeys.errorMessages.unblockFail) as string,
+            },
+          });
+        } else refetchBlockedUsers();
         refetchBlockedUsers();
       } else if (blockStatus === "Unblock") {
         setAlertMsg("Failed to unblock User");
-        await ChannelService.unblockUser(contextMenu.user.id);
-        refetchBlockedUsers();
+        let ret = await ChannelService.unblockUser(contextMenu.user.id);
+        if (typeof ret === "string") {
+          toast.dispatchTranscendanceState({
+            type: TranscendanceStateActionType.TOGGLE_TOAST,
+            toast: {
+              type: ToastType.ERROR,
+              title: ret,
+              message: t(translationKeys.errorMessages.unblockFail) as string,
+            },
+          });
+        } else refetchBlockedUsers();
       }
     }
   };

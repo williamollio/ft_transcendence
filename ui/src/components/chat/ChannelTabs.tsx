@@ -10,7 +10,11 @@ import { chatRoom } from "../../classes/chatRoom.class";
 import AddIcon from "@mui/icons-material/Add";
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { useQuery } from "@tanstack/react-query";
-import { channelUser, DBChannelElement } from "../../interfaces/chat.interface";
+import {
+  channelUser,
+  ContextMenu,
+  DBChannelElement,
+} from "../../interfaces/chat.interface";
 import ChannelService from "../../services/channel.service";
 import { translationKeys } from "./constants";
 import { useTranslation } from "react-i18next";
@@ -18,22 +22,13 @@ import { useTheme } from "@mui/material";
 
 interface Props {
   currentRoom: chatRoom | boolean;
-  setContextMenu: Dispatch<
-    SetStateAction<{
-      mouseX: number;
-      mouseY: number;
-      channel: chatRoom;
-    } | null>
-  >;
-  contextMenu: {
-    mouseX: number;
-    mouseY: number;
-    channel: chatRoom;
-  } | null;
+  setContextMenu: Dispatch<SetStateAction<ContextMenu | null>>;
+  contextMenu: ContextMenu | null;
   toggleAlert: Dispatch<SetStateAction<boolean>>;
   toggleOpen: Dispatch<SetStateAction<boolean>>;
   channelSocket: ChannelSocket;
   setNewChannel: (newChannel: chatRoom | boolean) => void;
+  blockedUsers: Array<any>;
 }
 
 export function ChannelTabs(props: Props) {
@@ -45,6 +40,7 @@ export function ChannelTabs(props: Props) {
     toggleOpen,
     channelSocket,
     setNewChannel,
+    blockedUsers,
   } = props;
   const { t } = useTranslation();
 
@@ -56,6 +52,17 @@ export function ChannelTabs(props: Props) {
   const [channelList, setChannelList] = useState<chatRoom[]>(
     channelSocket.channels
   );
+
+  const removeBlockedMessages = (
+    messages: { content: string; senderId: string }[]
+  ) => {
+    let newList = new Array<{ content: string; senderId: string }>();
+	messages.forEach((message) => {
+		if (!blockedUsers.some((user) => message.senderId === user))
+			newList.push(message);
+	})
+	return (newList);
+  };
 
   const updateChannelList = () => {
     const newList: Array<chatRoom> = [];
@@ -78,6 +85,7 @@ export function ChannelTabs(props: Props) {
     if (channelSocket.channels.length === 0) {
       if (
         joinedChannels &&
+        blockedUsers &&
         !joinedChannelsLoading &&
         !joinedChannelsError &&
         !isFetching
@@ -88,7 +96,7 @@ export function ChannelTabs(props: Props) {
           updateChannelList();
         }
         joinedChannels.forEach((element: DBChannelElement) => {
-			console.log(channelSocket.user);
+          element.messages = removeBlockedMessages(element.messages);
           if (element.type !== "DIRECTMESSAGE") {
             newList.push({
               key: element.name,
@@ -150,7 +158,13 @@ export function ChannelTabs(props: Props) {
         });
       }
     }
-  }, [joinedChannels, joinedChannelsLoading, joinedChannelsError, isFetching]);
+  }, [
+    joinedChannels,
+    blockedUsers,
+    joinedChannelsLoading,
+    joinedChannelsError,
+    isFetching,
+  ]);
 
   const { data, isLoading, isError, isRefetching, refetch } = useQuery(
     ["channels", channelQueryId],

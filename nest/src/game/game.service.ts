@@ -59,7 +59,7 @@ export class GameService {
     p2id: string,
     gameMode: GameMode,
   ) {
-    const opponentSocket = socketToUserId.getFromUserId(p2id);
+    const opponentSocket = socketToUserId.getFromUserId(p2id); // wrong kind of socket
     if (opponentSocket) {
       if (this.GameMap.getGame(p2id) !== null) {
         server
@@ -85,7 +85,8 @@ export class GameService {
 
         this.createGame(p1id, gameMode, p2id);
         await this.join(client, p1id, server, gameMode);
-        client.to(opponentSocket).emit('invitedToGame', challenger);
+		console.log("emitting");
+        server.to(opponentSocket).emit('invitedToGame', challenger);
         return 'gameJoined';
       } catch (error) {
         return 'inviteFailed';

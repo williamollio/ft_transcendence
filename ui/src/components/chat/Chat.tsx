@@ -1,23 +1,23 @@
 import {
-  Alert,
   Box,
-  Collapse,
   Divider,
   Grid,
-  IconButton,
   List,
   ListItem,
   ListItemText,
   Paper,
   TextField,
 } from "@mui/material";
-import { SyntheticEvent, useContext, useEffect, useRef, useState } from "react";
-import { messagesDto, failEvents } from "../../interfaces/chat.interface";
+import { useContext, useEffect, useRef, useState } from "react";
+import {
+  messagesDto,
+  failEvents,
+  ContextMenu,
+  RoomInvite,
+} from "../../interfaces/chat.interface";
 import { accessTypes, chatRoom } from "../../classes/chatRoom.class";
 import AddChannelDialog from "./AddChannelDialog";
 import RoomContextMenu from "./RoomContextMenu";
-import CloseIcon from "@mui/icons-material/Close";
-import CheckIcon from "@mui/icons-material/Check";
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { ChannelTabs } from "./ChannelTabs";
 import ChannelService from "../../services/channel.service";
@@ -44,23 +44,13 @@ export default function Chat(props: Props) {
   const theme = useTheme();
 
   const [open, toggleOpen] = useState(false);
-  //   const [inputChat, setInputChat] = useState<string>("");
   const [messages, setMessages] = useState<Array<messagesDto>>([]);
   const [currentRoom, setCurrentRoom] = useState<chatRoom | boolean>(false);
-  const [contextMenu, setContextMenu] = useState<{
-    mouseX: number;
-    mouseY: number;
-    channel: chatRoom;
-  } | null>(null);
-  const [alert, toggleAlert] = useState<boolean>(false);
-  const [alertMsg, setAlertMsg] = useState<string>("");
-  const [invited, toggleInvited] = useState<boolean>(false);
+  const [contextMenu, setContextMenu] = useState<ContextMenu | null>(null);
+  const [alert, toggleAlert] = useState<boolean>(false); // remove
+  const [alertMsg, setAlertMsg] = useState<string>(""); // remove
   const [invitePassword, toggleInvitePassword] = useState<boolean>(false);
-  const [roomInvite, setRoomInvite] = useState<{
-    id: string;
-    name: string;
-    type: accessTypes;
-  }>({
+  const [roomInvite, setRoomInvite] = useState<RoomInvite>({
     id: "",
     type: "PRIVATE",
     name: "",
@@ -86,10 +76,6 @@ export default function Chat(props: Props) {
       channelSocket.createDm(location.state.id); // TODO : william to implement
     }
   }, [location]);
-
-  //   const handleChange = (e: any) => {
-  //     setInputChat(e.target.value);
-  //   };
 
   const handleSubmit = async (e: any) => {
     if (e.key === "Enter") {
@@ -117,13 +103,11 @@ export default function Chat(props: Props) {
     type: accessTypes;
     name: string;
   }) => {
-    // setAlertMsg(t(translationKeys.errorMessages.joinChannelFail) as string);
     if (data.type === "PROTECTED") {
       setRoomInvite(data);
       toggleInvitePassword(true);
     } else {
       channelSocket.joinRoom(data.id);
-      //   toggleInvited(false);
       setRoomInvite({ id: "", type: "PRIVATE", name: "" });
     }
   };
@@ -222,7 +206,6 @@ export default function Chat(props: Props) {
           onRefuse: () => {},
         },
       });
-      //   toggleInvited(true);
     }
   };
 
@@ -260,7 +243,6 @@ export default function Chat(props: Props) {
       type: TranscendanceStateActionType.TOGGLE_TOAST,
       toast: { type: ToastType.ERROR, title: error, message: error },
     });
-    // toggleAlert(true);
   };
 
   useEffect(() => {
@@ -357,26 +339,6 @@ export default function Chat(props: Props) {
         boxShadow: "none",
       }}
     >
-      <Collapse in={alert}>
-        <Alert
-          sx={{ width: "auto" }}
-          severity="error"
-          action={
-            <IconButton
-              aria-label="close"
-              color="inherit"
-              size="small"
-              onClick={() => {
-                toggleAlert(false);
-              }}
-            >
-              <CloseIcon fontSize="inherit" />
-            </IconButton>
-          }
-        >
-          {alertMsg}
-        </Alert>
-      </Collapse>
       <Box
         sx={{
           width: "300px",
@@ -391,6 +353,7 @@ export default function Chat(props: Props) {
           toggleOpen={toggleOpen}
           channelSocket={channelSocket}
           setNewChannel={setNewChannel}
+		  blockedUsers={blockedUsers}
         />
         <RoomContextMenu
           blockedUser={blockedUsers}

@@ -1,4 +1,4 @@
-import { accessTypes } from "../classes/chatRoom.class";
+import { accessTypes, chatRoom } from "../classes/chatRoom.class";
 
 export interface messagesDto {
   message?: string | null;
@@ -33,7 +33,7 @@ export interface DBChannelElement {
   name: string;
   type: accessTypes;
   users: channelUser[];
-  messages: Array<{ content: string }>;
+  messages: Array<{ content: string, senderId: string }>;
 }
 
 export interface DBChannelUserListElement {
@@ -64,3 +64,15 @@ export const failEvents = [
   "muteFailed",
   "updateRoleFailed",
 ];
+
+export interface ContextMenu {
+  mouseX: number;
+  mouseY: number;
+  channel: chatRoom;
+}
+
+export interface RoomInvite {
+  id: string;
+  name: string;
+  type: accessTypes;
+}
