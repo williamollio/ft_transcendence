@@ -23,7 +23,6 @@ export class ChannelSocket {
     if (token) {
       if (this.user.id === "") {
         this.user = getTokenData(token);
-      } else {
         UserService.getUser(this.user.id).then((resolve) => {
           this.user.name = resolve.data.name;
         });

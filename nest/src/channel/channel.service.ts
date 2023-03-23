@@ -914,9 +914,8 @@ export class ChannelService {
     const userRole: { role: ChannelRole } | null =
       await this.getRoleOfUserChannel(userId, inviteDto.channelId);
     if (
-      inviteDto.type !== ChannelType.PUBLIC ||
-      !userRole ||
-      userRole.role === ChannelRole.USER
+      inviteDto.type !== ChannelType.PUBLIC &&
+      (!userRole || userRole.role === ChannelRole.USER)
     ) {
       return 'noEligibleRights';
     }

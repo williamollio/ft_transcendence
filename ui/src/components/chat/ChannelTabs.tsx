@@ -88,6 +88,7 @@ export function ChannelTabs(props: Props) {
           updateChannelList();
         }
         joinedChannels.forEach((element: DBChannelElement) => {
+			console.log(channelSocket.user);
           if (element.type !== "DIRECTMESSAGE") {
             newList.push({
               key: element.name,

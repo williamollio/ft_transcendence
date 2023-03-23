@@ -20,6 +20,7 @@ import { ChannelSocket } from "./classes/ChannelSocket.class";
 import GameView from "./views/Game/GameView";
 import StatsView from "./views/Stats/StatsView";
 import { GameSocket } from "./classes/GameSocket.class";
+import ToastDialog from "./context/toastDialog";
 
 export default function App() {
   const [userSocket] = useState<UserSocket>(new UserSocket());
@@ -102,14 +103,29 @@ export default function App() {
 
   return (
     <>
-      {transcendanceState.toast && (
-        <Toast
-          type={transcendanceState.toast?.type}
-          title={transcendanceState.toast?.title}
-          message={transcendanceState.toast?.message}
-          onClose={closeToast}
-        />
-      )}
+      {transcendanceState.toast &&
+        !transcendanceState.toast.onAccept &&
+        !transcendanceState.toast.onRefuse && (
+          <Toast
+            type={transcendanceState.toast?.type}
+            title={transcendanceState.toast?.title}
+            message={transcendanceState.toast?.message}
+            onClose={closeToast}
+          />
+        )}
+      {transcendanceState.toast &&
+        transcendanceState.toast.onAccept &&
+        transcendanceState.toast.onRefuse && (
+          <ToastDialog
+            type={transcendanceState.toast?.type}
+            title={transcendanceState.toast?.title}
+            message={transcendanceState.toast?.message}
+            onClose={closeToast}
+			autoClose={false}
+            onAccept={transcendanceState.toast?.onAccept}
+            onRefuse={transcendanceState.toast?.onRefuse}
+          />
+        )}
       <Box
         display={"flex"}
         flexDirection={"column"}

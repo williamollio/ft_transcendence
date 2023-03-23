@@ -112,18 +112,19 @@ export default function Chat(props: Props) {
     }
   };
 
-  const handleInviteSubmit = (e?: SyntheticEvent) => {
+  const handleInviteSubmit = (data: {
+    id: string;
+    type: accessTypes;
+    name: string;
+  }) => {
     // setAlertMsg(t(translationKeys.errorMessages.joinChannelFail) as string);
-    if (e) {
-      e.preventDefault();
+    if (data.type === "PROTECTED") {
+      setRoomInvite(data);
+      toggleInvitePassword(true);
     } else {
-      if (roomInvite.type === "PROTECTED") {
-        toggleInvitePassword(true);
-      } else {
-        channelSocket.joinRoom(roomInvite.id);
-        toggleInvited(false);
-        setRoomInvite({ id: "", type: "PRIVATE", name: "" });
-      }
+      channelSocket.joinRoom(data.id);
+      //   toggleInvited(false);
+      setRoomInvite({ id: "", type: "PRIVATE", name: "" });
     }
   };
 
@@ -211,8 +212,17 @@ export default function Chat(props: Props) {
     invited: string;
   }) => {
     if (data.invited === channelSocket.user.id) {
-      setRoomInvite(data);
-      toggleInvited(true);
+      toast.dispatchTranscendanceState({
+        type: TranscendanceStateActionType.TOGGLE_TOAST,
+        toast: {
+          type: ToastType.SUCCESS,
+          title: "Invited to Room",
+          message: t(translationKeys.inviteTo) as string,
+          onAccept: () => handleInviteSubmit(data),
+          onRefuse: () => {},
+        },
+      });
+      //   toggleInvited(true);
     }
   };
 
@@ -248,7 +258,7 @@ export default function Chat(props: Props) {
   const failedListener = (error: string, event: string) => {
     toast.dispatchTranscendanceState({
       type: TranscendanceStateActionType.TOGGLE_TOAST,
-      toast: { type: ToastType.ERROR, title: error, message: error},
+      toast: { type: ToastType.ERROR, title: error, message: error },
     });
     // toggleAlert(true);
   };
@@ -424,58 +434,22 @@ export default function Chat(props: Props) {
               size="small"
               label={t(translationKeys.chat)}
               sx={{ width: "300px", input: { color: "white" } }}
-              //   value={inputChat}
-              //   onChange={handleChange}
               onKeyDown={handleSubmit}
             />
           </Grid>
         </Grid>
       </Box>
-      <Collapse in={invited}>
-        <Alert
-          sx={{ width: "auto" }}
-          severity="success"
-          action={
-            <>
-              <IconButton
-                aria-label="Accept"
-                color="inherit"
-                size="small"
-                onMouseUp={(e) => handleInviteSubmit()}
-                onMouseDown={handleInviteSubmit}
-              >
-                <CheckIcon fontSize="inherit" />
-              </IconButton>
-              <IconButton
-                aria-label="Reject"
-                color="inherit"
-                size="small"
-                onClick={() => {
-                  toggleInvited(false);
-                  setRoomInvite({ id: "", type: "PRIVATE", name: "" });
-                }}
-              >
-                <CloseIcon fontSize="inherit" />
-              </IconButton>
-              <GetTextInputDialog
-                open={invitePassword}
-                toggleOpen={toggleInvitePassword}
-                handleSubmit={(input: string) => {
-                  channelSocket.joinRoom(roomInvite.id, input);
-                  toggleInvited(false);
-                  setRoomInvite({ id: "", type: "PRIVATE", name: "" });
-                }}
-                dialogContent={t(translationKeys.passwordReq)!}
-                label={t(translationKeys.password)}
-                type="password"
-              ></GetTextInputDialog>
-            </>
-          }
-        >
-          {t(translationKeys.inviteTo)}
-          {roomInvite.name}
-        </Alert>
-      </Collapse>
+      <GetTextInputDialog
+        open={invitePassword}
+        toggleOpen={toggleInvitePassword}
+        handleSubmit={(input: string) => {
+          channelSocket.joinRoom(roomInvite.id, input);
+          setRoomInvite({ id: "", type: "PRIVATE", name: "" });
+        }}
+        dialogContent={t(translationKeys.passwordReq)!}
+        label={t(translationKeys.password)}
+        type="password"
+      ></GetTextInputDialog>
     </Paper>
   );
 }
