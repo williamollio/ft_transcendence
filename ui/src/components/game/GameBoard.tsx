@@ -44,14 +44,21 @@ export default function GameBoard(props: Props) {
 
   const gameFinishListener = (data: any) => {
     gameLoop.stopLoop();
+    gameLoop.resetPositions();
   };
 
   const giListener = (data: any) => {
+	console.log(data);
     gameLoop.positionalData.ballOffset = { x: data.bx, y: data.by };
+    if (gameLoop.activePlayer === 1) {
+		gameLoop.positionalData.playerRightYOffset = data.p2y;
+	} else {
+		gameLoop.positionalData.playerLeftYOffset = data.p1y;
+    }
   };
 
   const gameJoinedListener = (data: any) => {
-    console.log(data);
+    gameLoop.activePlayer = data.playerNumber;
   };
 
   const mutateGameStatusListener = (data: any) => {
@@ -63,10 +70,6 @@ export default function GameBoard(props: Props) {
   };
 
   const invitedToGameListener = (data: any) => {
-    console.log(data);
-  };
-
-  const matchFinishedListener = (data: any) => {
     console.log(data);
   };
 
@@ -82,7 +85,6 @@ export default function GameBoard(props: Props) {
         gameSocket.socket.on("gameStatus", mutateGameStatusListener);
         gameSocket.socket.on("inviteRefused", inviteRefusedListener);
         gameSocket.socket.on("invitedToGame", invitedToGameListener);
-        gameSocket.socket.on("matchFinished", matchFinishedListener);
         return true;
       }
       return false;
@@ -99,7 +101,6 @@ export default function GameBoard(props: Props) {
           gameSocket.socket.off("gameStatus", mutateGameStatusListener);
           gameSocket.socket.off("inviteRefused", inviteRefusedListener);
           gameSocket.socket.off("invitedToGame", invitedToGameListener);
-          gameSocket.socket.off("matchFinished", matchFinishedListener);
           return true;
         }
         return false;
@@ -122,7 +123,6 @@ export default function GameBoard(props: Props) {
         <Box sx={{ backgroundColor: "blue", height: "50%", width: "100%" }} />
         <Player
           lr={true}
-          yStart={gameLoop.positionalData.playerLeftYStart}
           yPos={gameLoop.positionalData.playerLeftYOffset}
           posRef={
             boardRef.current
@@ -132,7 +132,6 @@ export default function GameBoard(props: Props) {
         ></Player>
         <Player
           lr={false}
-          yStart={gameLoop.positionalData.playerRightYStart}
           yPos={gameLoop.positionalData.playerRightYOffset}
           posRef={
             boardRef.current
@@ -141,7 +140,6 @@ export default function GameBoard(props: Props) {
           }
         ></Player>
         <Ball
-          ballStart={gameLoop.positionalData.ballPosStart}
           ballPos={gameLoop.positionalData.ballOffset}
           posRef={
             boardRef.current

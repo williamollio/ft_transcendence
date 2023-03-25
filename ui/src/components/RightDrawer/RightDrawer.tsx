@@ -94,7 +94,7 @@ export default function RightDrawer(props: Props) {
           </IconButton>
         </Box>
       </AppBar>
-      <Drawer
+      <Drawer 
         variant="persistent"
         open={open}
         anchor="right"

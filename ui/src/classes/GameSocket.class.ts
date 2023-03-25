@@ -9,6 +9,10 @@ export class GameSocket {
     this.socket = initSocket("http://localhost:4444", null);
   }
 
+  PP = (newPosition: number) => {
+	this.socket.volatile.emit("PP", newPosition);
+  }
+
   leaveGame = () => {
     this.socket.emit("leaveGame");
   };

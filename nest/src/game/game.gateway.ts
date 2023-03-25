@@ -43,7 +43,7 @@ export class GameGateway {
   }
 
   @SubscribeMessage('PP')
-  create(@MessageBody() encoded: Uint8Array, @GetCurrentUserId() id: string) {
+  create(@MessageBody() encoded: number, @GetCurrentUserId() id: string) {
     this.gameService.create(encoded, id);
   }
 

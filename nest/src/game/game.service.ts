@@ -143,10 +143,10 @@ export class GameService {
         if (game.status === Status.PAUSED) {
           this.mutateGameStatus(game, Status.PLAYING, server);
           this.deleteTimeout(game.gameRoomId);
-          this.addInterval(game.gameRoomId, userId, 16, server);
+          this.addInterval(game.gameRoomId, userId, 30, server);
         } else if (game.status === Status.PENDING && game.p2id === userId) {
           this.mutateGameStatus(game, Status.PLAYING, server);
-          this.addInterval(game.gameRoomId, userId, 16, server);
+          this.addInterval(game.gameRoomId, userId, 30, server);
         }
         if (game.p2id === userId) return { playerNumber: 2 };
         return { playerNumber: 1 };
@@ -157,7 +157,7 @@ export class GameService {
         server.to(game.gameRoomId).emit('gameStarting');
         await this.sleep(5000);
         this.mutateGameStatus(game, Status.PLAYING, server);
-        this.addInterval(game.gameRoomId, userId, 16, server);
+        this.addInterval(game.gameRoomId, userId, 30, server);
         return { playerNumber: 2 };
       }
       game = this.createGame(userId, mode);
@@ -252,9 +252,9 @@ export class GameService {
     }
   }
 
-  create(encoded: Uint8Array, userId: string) {
-    const decoded = this.playerInfo.decode(encoded).toJSON();
-    const y: number = decoded.yPos;
+  create(encoded: number, userId: string) {
+    // const decoded = this.playerInfo.decode(encoded).toJSON();
+    const y: number = encoded;//decoded.yPos;
     const game: Game | null = this.GameMap.getGame(userId);
     if (!game) return;
     if (game !== undefined) {

@@ -35,7 +35,7 @@ export default function GameView(props: Props): React.ReactElement {
   const [ticks, setTickts] = useState<number>(0);
   // for testing
 
-  const [gameLoop] = useState<GameLoop>(new GameLoop(setTickts));
+  const [gameLoop] = useState<GameLoop>(new GameLoop(setTickts, gameSocket));
 
   return (
     <>
