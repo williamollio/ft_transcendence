@@ -83,6 +83,17 @@ export default function Setup2FA(): React.ReactElement {
     });
   }
 
+  function showSuccessToast(message: void) {
+    dispatchTranscendanceState({
+      type: TranscendanceStateActionType.TOGGLE_TOAST,
+      toast: {
+        type: ToastType.SUCCESS,
+        title: "Success",
+        message: message as unknown as string,
+      },
+    });
+  }
+
   async function fetchCurrentUser() {
     const user = await usersService.getUser(userId);
     const isSuccess = !user?.error;
@@ -141,10 +152,12 @@ export default function Setup2FA(): React.ReactElement {
     }
     const responseSend2fa = await authService.sendSecondFactor(input);
     if (!responseSend2fa.error) {
-      navigate(-1);
+      showSuccessToast(responseSend2fa.data);
+      setQRCodeUrl("");
     } else {
       showErrorToast(responseSend2fa.error);
     }
+    setInput(Array(CODE_LENGTH).fill(""));
   }
 
   const OTPInputField = ({ index }: { index: number }) => {

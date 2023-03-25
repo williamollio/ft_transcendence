@@ -135,7 +135,7 @@ export class AuthService {
       return res.status(HttpStatus.FORBIDDEN).send('Wrong Code !');
     }
     await this.userService.set2FALogged(userId, true);
-    return res.status(HttpStatus.OK);
+    return res.status(HttpStatus.OK).send('2fa set successfully');
   }
 
   async logout(userId: string) {
