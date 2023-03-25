@@ -93,30 +93,40 @@ export class GameService {
     }
   }
 
-  // async leaveWatch(client: Socket, playerId: string) {
-  //   const game = this.GameMap.getGame(playerId);
-  //   if (game !== null) {
-  //     await client.leave(game.gameRoomId);
-  //   }
-  // }
-
-  // this is still under testing
-  // async watch(client: Socket, playerId: string, server: Server) {
-  //   const game = this.GameMap.getGame(playerId);
-  //   if (game !== null) {
-  //     await client.join(game.gameRoomId);
-  //     server.to(client.id).emit('gameStatus', {
-  //       gameId: game.gameRoomId,
-  //       status: game.status,
-  //       winner: '',
-  //       player1id: game.p1id,
-  //       player2id: game.p2id,
-  //       player1score: game.p1s,
-  //     });
-  //   }
-  //   if (playerId === game?.p1id) return { playerNumber: 1 };
-  //   return { playerNumber: 2 };
-  // }
+  async leaveWatch(client: Socket, playerId: string) {
+    const game = this.GameMap.getGame(playerId);
+    if (game !== null) {
+      await client.leave(game.gameRoomId);
+    }
+  }
+  /*
+  Spectating mode logic:
+  So basically the idea is that when a player joins a game, they are added to
+  the "players" array of the game object. The ids(pl1 and pl2 ids) are saved so basically watching
+  is simpling joining the the gameRoom fetching the Game object informations;
+  we are keeping the track of the player one and two so they are the only ones
+  that have direct access to the game object. The spectators are just watching
+  the game and they are not part of the game object. Even though they are part of
+  the gameRoom.
+  For more informations check the DoubleKeyMap class in the game entity, we have there
+  a Map<string, Game>() objet that is keeping track of the games and the players.
+  */
+  async watch(client: Socket, playerId: string, server: Server) {
+    const game = this.GameMap.getGame(playerId);
+    if (game !== null) {
+      await client.join(game.gameRoomId);
+      server.to(client.id).emit('gameStatus', {
+        gameId: game.gameRoomId,
+        status: game.status,
+        winner: '',
+        player1id: game.p1id,
+        player2id: game.p2id,
+        player1score: game.p1s,
+      });
+    }
+    if (playerId === game?.p1id) return { playerNumber: 1 };
+    return { playerNumber: 2 };
+  }
 
   async join(client: Socket, userId: string, server: Server, mode: GameMode) {
     let game: Game | null;

@@ -101,7 +101,12 @@ export class DoubleKeyMap {
     }
     return null;
   }
-
+  /*
+  So, this code is defining a function called matchPlayer that takes in
+  a parameter called player2Id, which is a string that represents the ID
+  of the second player in a game. The purpose of this function is to match
+  up two players in a game.
+  */
   matchPlayer(player2Id: string) {
     for (const [_, game] of this.playerMap) {
       if (game.p2id === undefined && _) {
@@ -215,7 +220,6 @@ export class Game {
       speeds,
     } = this.gameConstants;
     
-    // buttom collision
     if (this.by + ballHeight >= relativeGameHeight) { // bottom collision
       this.by = relativeGameHeight - ballHeight;
       this.diry = -this.diry;
@@ -278,7 +282,7 @@ export class Game {
         }
       }
     }
-    // Reset
+
     const SCORE_LIMIT = 10;
 
     if (this.bx <= 0) {
