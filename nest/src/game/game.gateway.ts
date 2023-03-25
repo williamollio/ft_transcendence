@@ -49,7 +49,7 @@ export class GameGateway {
 
   @SubscribeMessage('disconnect')
   handleDisconnect(@ConnectedSocket() client: Socket) {
-	gameSocketToUserId.delete(client.id);
+    gameSocketToUserId.delete(client.id);
     const id = this.socketToId.get(client.id);
     if (id) this.gameService.pause(id, this.server);
   }
@@ -107,12 +107,19 @@ export class GameGateway {
   // }
 
   @SubscribeMessage('joinGame')
-  joinRoom(
+  async joinRoom(
     @MessageBody('mode') mode: GameMode,
     @ConnectedSocket() client: Socket,
     @GetCurrentUserId() id: string,
   ) {
     this.socketToId.set(client.id, id);
-    return this.gameService.join(client, id, this.server, mode);
+    const playerNumber = await this.gameService.join(
+      client,
+      id,
+      this.server,
+      mode,
+    );
+    if (playerNumber.playerNumber === 1)
+      this.server.to(client.id).emit('gameJoined', playerNumber);
   }
 }

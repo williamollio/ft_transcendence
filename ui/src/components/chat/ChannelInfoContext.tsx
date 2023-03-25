@@ -213,9 +213,6 @@ export default function ChannelInfoContext(props: Props) {
           <MenuItem value={GameMode.MAYHEM}>
             {t(translationKeys.mayhem)}
           </MenuItem>
-          <MenuItem value={GameMode.HOCKEY}>
-            {t(translationKeys.hockey)}
-          </MenuItem>
         </Select>
         <MenuItem disabled={self} onClick={handleBlock}>
           {blockStatus === "Block"

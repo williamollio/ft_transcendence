@@ -68,7 +68,6 @@ export class GameService {
             'inviteRefused',
             'Your opponent already has an invite pending, try again later',
           );
-		  console.log("TREST");
         return 'inviteFailed';
       }
       try {
@@ -129,6 +128,8 @@ export class GameService {
     return { playerNumber: 2 };
   }
 
+  sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
   async join(client: Socket, userId: string, server: Server, mode: GameMode) {
     let game: Game | null;
 
@@ -152,6 +153,9 @@ export class GameService {
       }
       if ((game = this.GameMap.matchPlayer(userId))) {
         await client.join(game.gameRoomId);
+        server.to(client.id).emit('gameJoined', { playerNumber: 2 });
+        server.to(game.gameRoomId).emit('gameStarting');
+        await this.sleep(5000);
         this.mutateGameStatus(game, Status.PLAYING, server);
         this.addInterval(game.gameRoomId, userId, 16, server);
         return { playerNumber: 2 };
@@ -191,7 +195,7 @@ export class GameService {
       if (game.status !== Status.PAUSED) this.deleteInterval(name);
       this.mutateGameStatus(game, Status.OVER, server);
       this.addWinningTimeout(5000, server, winnerId);
-      server.emit('matchFinished');
+      server.to(game.gameRoomId).emit('matchFinished');
     };
 
     const timeout = setTimeout(callback, milliseconds);
@@ -221,6 +225,7 @@ export class GameService {
       if (!game) return;
       void game.saveGameResults(this.prismaService);
       this.mutateGameStatus(game, Status.DONE, server);
+      server.to(game.gameRoomId).emit('matchFinished');
     };
 
     setTimeout(callback, milliseconds);
@@ -295,10 +300,10 @@ export class GameService {
     const callback = () => {
       const payload = this.moveBall(userId, server);
       if (!payload) return;
-      this.gameInfo.verify(payload);
-      const message = this.gameInfo.create(payload);
-      const encoded = this.gameInfo.encode(message).finish();
-      server.to(gameRoomId).volatile.timeout(5000).emit('GI', encoded);
+      //   this.gameInfo.verify(payload);
+      //   const message = this.gameInfo.create(payload);
+      //   const encoded = this.gameInfo.encode(message).finish();
+      server.to(gameRoomId).volatile.timeout(5000).emit('GI', payload);
     };
 
     const interval = setInterval(callback, milliseconds);

@@ -16,20 +16,23 @@ export default function Ball(props: Props) {
   return (
     <>
       {posRef.offsetLeft !== 0 && posRef.offsetTop != 0 ? (
-        <motion.div
-          animate={{ y: ballPos.y, x: ballPos.x }}
-          className={classes.ball}
-        >
-          <Avatar
-            src=""
-            sx={{
-              boxShadow: 5,
-              width: 30,
-              height: 30,
-            }}
-          />
-        </motion.div>
+        // <motion.div
+        //   animate={{ y: ballPos.y, x: ballPos.x }}
+        //   className={classes.ball}
+        // >
+        <Avatar
+          src=""
+          sx={{
+            position: "absolute",
+            left: props.ballPos.x + props.posRef.offsetLeft,
+            top: props.ballPos.y + props.posRef.offsetTop,
+            boxShadow: 5,
+            width: 30,
+            height: 30,
+          }}
+        />
       ) : (
+        // </motion.div>
         false
       )}
     </>
@@ -39,7 +42,7 @@ export default function Ball(props: Props) {
 const useStyles = makeStyles<Props>()((_theme, props) => ({
   ball: {
     position: "absolute",
-    left: props.posRef.offsetLeft + props.ballStart.x,
-    top: props.posRef.offsetTop + props.ballStart.y,
+    left: props.ballPos.x + props.posRef.offsetLeft,
+    top: props.ballPos.y + props.posRef.offsetTop,
   },
 }));

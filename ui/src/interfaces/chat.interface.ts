@@ -50,7 +50,6 @@ export interface ChannelInfoContextMenu {
 export enum GameMode {
   CLASSIC = "CLASSIC",
   MAYHEM = "MAYHEM",
-  HOCKEY = "HOCKEY",
 }
 
 export const failEvents = [

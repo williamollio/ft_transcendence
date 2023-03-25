@@ -26,6 +26,7 @@
     "form-data": "^4.0.0",
     "framer-motion": "^10.6.1",
     "i18next": "^22.4.6",
+    "protobufjs": "^7.2.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.42.1",

@@ -16,12 +16,12 @@ export class positionalData {
 
 	this.playerLeftYOffset = 0;
 	this.playerRightYOffset = 0;
-	this.ballOffset = {x: 0, y: 0};
+	this.ballOffset = {x: 285, y: 210};
   }
 
   resetPositions = () => {
 	this.playerLeftYOffset = 0;
 	this.playerRightYOffset = 0;
-	this.ballOffset = {x: 0, y: 0};
+	this.ballOffset = {x: 285, y: 210};
   }
 }

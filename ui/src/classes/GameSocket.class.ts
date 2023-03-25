@@ -1,4 +1,5 @@
 import { Socket } from "socket.io-client";
+import { GameMode } from "../interfaces/chat.interface";
 import { initSocket } from "../services/initSocket.service";
 
 export class GameSocket {
@@ -27,7 +28,7 @@ export class GameSocket {
     });
   };
 
-  joinGame = (mode: string) => {
+  joinGame = (mode: GameMode) => {
 	this.socket.emit("joinGame", {mode: mode});
   };
 

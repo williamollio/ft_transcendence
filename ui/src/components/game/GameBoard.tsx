@@ -1,11 +1,12 @@
 import { Box, Paper } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
+import { GameInfo } from "../../classes/GameInfo.class";
 import { GameLoop } from "../../classes/GameLoop.class";
 import { GameSocket } from "../../classes/GameSocket.class";
-import { positionalData } from "../../classes/positionalData.class";
 import { listenerWrapper } from "../../services/initSocket.service";
 import Ball from "./Ball";
 import Player from "./Player";
+import * as jspb from "protobufjs";
 
 interface Props {
   gameLoop: GameLoop;
@@ -14,6 +15,8 @@ interface Props {
 
 export default function GameBoard(props: Props) {
   const { gameLoop, gameSocket } = props;
+
+  const gameInfo = new GameInfo();
 
   const boardRef = useRef<HTMLDivElement>(null);
 
@@ -33,6 +36,22 @@ export default function GameBoard(props: Props) {
       );
       if (index !== -1) gameLoop.keyPressed.splice(index, 1);
     }
+  };
+
+  const gameStartingListener = (data: any) => {
+    gameLoop.startLoop();
+  };
+
+  const gameFinishListener = (data: any) => {
+    gameLoop.stopLoop();
+  };
+
+  const giListener = (data: any) => {
+    gameLoop.positionalData.ballOffset = { x: data.bx, y: data.by };
+  };
+
+  const gameJoinedListener = (data: any) => {
+    console.log(data);
   };
 
   const mutateGameStatusListener = (data: any) => {
@@ -56,6 +75,10 @@ export default function GameBoard(props: Props) {
     document.addEventListener("keyup", playerStopHandler);
     listenerWrapper(() => {
       if (gameSocket.socket.connected) {
+        gameSocket.socket.on("matchFinished", gameFinishListener);
+        gameSocket.socket.on("gameStarting", gameStartingListener);
+        gameSocket.socket.on("GI", giListener);
+        gameSocket.socket.on("gameJoined", gameJoinedListener);
         gameSocket.socket.on("gameStatus", mutateGameStatusListener);
         gameSocket.socket.on("inviteRefused", inviteRefusedListener);
         gameSocket.socket.on("invitedToGame", invitedToGameListener);
@@ -69,6 +92,10 @@ export default function GameBoard(props: Props) {
       document.removeEventListener("keyup", playerStopHandler);
       listenerWrapper(() => {
         if (gameSocket.socket.connected) {
+          gameSocket.socket.off("matchFinished", gameFinishListener);
+          gameSocket.socket.off("gameStarting", gameStartingListener);
+          gameSocket.socket.off("GI", giListener);
+          gameSocket.socket.off("gameJoined", gameJoinedListener);
           gameSocket.socket.off("gameStatus", mutateGameStatusListener);
           gameSocket.socket.off("inviteRefused", inviteRefusedListener);
           gameSocket.socket.off("invitedToGame", invitedToGameListener);

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Navbar from "../../components/Navbar";
-import { Button, Typography } from "@mui/material";
+import { Button, Grid, Typography } from "@mui/material";
 import { translationKeys } from "./constants";
 import { useTranslation } from "react-i18next";
 import LeftDrawer from "../../components/LeftDrawer/LeftDrawer";
@@ -18,6 +18,7 @@ import {
 import GameBoard from "../../components/game/GameBoard";
 import { GameLoop } from "../../classes/GameLoop.class";
 import { GameSocket } from "../../classes/GameSocket.class";
+import { GameMode } from "../../interfaces/chat.interface";
 
 interface Props {
   gameSocket: GameSocket;
@@ -40,7 +41,11 @@ export default function GameView(props: Props): React.ReactElement {
     <>
       <Navbar />
       <LeftDrawer />
-      <RightDrawer channelSocket={channelSocket} userSocket={userSocket} gameSocket={gameSocket}/>
+      <RightDrawer
+        channelSocket={channelSocket}
+        userSocket={userSocket}
+        gameSocket={gameSocket}
+      />
       <Background>
         <ProfileCard>
           <CardContainer>
@@ -55,13 +60,43 @@ export default function GameView(props: Props): React.ReactElement {
               </Typography>
             </TitleWrapper>
             <ContentWrapper>
-              <GameBoard gameLoop={gameLoop} gameSocket={gameSocket}/>
+              <GameBoard gameLoop={gameLoop} gameSocket={gameSocket} />
             </ContentWrapper>
             {/* for testing */}
-            <Button onClick={gameLoop.startLoop}>start</Button>
-            <Button onClick={gameLoop.stopLoop}>stop</Button>
-            <Button onClick={gameLoop.resetPositions}>reset</Button>
-            <>{ticks}</>
+            <Grid container direction="row">
+              <Grid item width={100}>
+                <Button sx={{width: 70}} onClick={gameLoop.startLoop}>
+                  start
+                </Button>
+              </Grid>
+              <Grid item width={100}>
+                <Button sx={{width: 70}} onClick={gameLoop.stopLoop}>
+                  stop
+                </Button>
+              </Grid>
+              <Grid item width={100}>
+                <Button sx={{width: 70}} onClick={gameLoop.resetPositions}>
+                  reset
+                </Button>
+              </Grid>
+              <Grid item width={100}>
+                <Button sx={{width: 70}}
+                  onClick={() => gameSocket.joinGame(GameMode.CLASSIC)}
+                >
+                  queue Up (mode: Classic)
+                </Button>
+              </Grid>
+              <Grid item width={100}>
+                <Button sx={{width: 70}}
+                  onClick={() => gameSocket.joinGame(GameMode.MAYHEM)}
+                >
+                  queue Up (mode: Mayhem)
+                </Button>
+              </Grid>
+              <Grid item width={100}>
+                <>{ticks}</>
+              </Grid>
+            </Grid>
             {/* for testing */}
           </CardContainer>
         </ProfileCard>

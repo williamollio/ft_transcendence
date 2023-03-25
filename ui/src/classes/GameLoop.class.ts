@@ -22,6 +22,7 @@ export class GameLoop {
   }
 
   resetPositions = () => {
+	this.stopLoop();
     this.positionalData.resetPositions();
     this.handleMovement();
 	this.ticks = 0;
@@ -47,10 +48,12 @@ export class GameLoop {
   };
 
   startLoop = async () => {
+	console.log("starting");
     this.interval = setInterval(this.updateGame, 30);
   };
 
   stopLoop = () => {
+	console.log("stopping");
     if (this.interval !== null) clearInterval(this.interval);
   };
 }
