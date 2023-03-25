@@ -13,6 +13,8 @@ import { GetCurrentUserId } from 'src/decorators/getCurrentUserId.decorator';
 import { FrontendUser, GameMode } from './entities/game.entity';
 import * as msgpack from 'socket.io-msgpack-parser';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
+import { gameSocketToUserId } from './socketToUserIdStorage.service';
+import { JwtUser } from 'src/users/interface/jwt-user.interface';
 
 @WebSocketGateway(4444, {
   cors: {
@@ -28,6 +30,17 @@ export class GameGateway {
   socketToId = new Map<string, string>();
 
   constructor(private readonly gameService: GameService) {}
+
+  @SubscribeMessage('connect')
+  handleConnection(@ConnectedSocket() clientSocket: Socket) {
+    if (clientSocket.handshake.auth) {
+      const base64Payload = clientSocket.handshake.auth.token.split('.')[1];
+      const payloadBuffer = Buffer.from(base64Payload, 'base64');
+      const user: JwtUser = JSON.parse(payloadBuffer.toString()) as JwtUser;
+      gameSocketToUserId.set(clientSocket.id, String(user.id));
+      clientSocket.emit('userConnected');
+    }
+  }
 
   @SubscribeMessage('PP')
   create(@MessageBody() encoded: Uint8Array, @GetCurrentUserId() id: string) {

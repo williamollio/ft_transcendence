@@ -70,7 +70,8 @@ export class UserGateway {
       clientSocket.broadcast.emit('userDisconnected');
     }
   }
-  // GAme gateway
+
+  // Game gateway
   @SubscribeMessage('joinGame')
   userInGame(
     @ConnectedSocket() clientSocket: Socket,
