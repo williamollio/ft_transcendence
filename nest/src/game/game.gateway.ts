@@ -56,6 +56,36 @@ export class GameGateway {
     this.gameService.refuseInvite(client, challenger.id);
   }
 
+  
+  @SubscribeMessage('leaveWatch')
+  leaveWatchGame(
+    @MessageBody('playerId') playerId: string,
+    @ConnectedSocket() client: Socket,
+  ) {
+    return this.gameService.leaveWatch(client, playerId);
+  }
+
+
+  // spectating still under tests
+  @SubscribeMessage('watchGame')
+  watchGame(
+    @MessageBody('playerId') playerId: string,
+    @ConnectedSocket() client: Socket,
+  ) {
+    return this.gameService.watch(client, playerId, this.server);
+  }
+    
+  @SubscribeMessage('joinGame')
+  joinRoom(
+    @MessageBody('mode') mode: GameMode,
+    @ConnectedSocket() client: Socket,
+    @GetCurrentUserId() id: string,
+    @MessageBody('inviteGameId') inviteGameId?: string,
+  ) {
+      this.socketToId.set(client.id, id);
+      return this.gameService.join(client, id, this.server, mode, inviteGameId);
+  }
+  
   @SubscribeMessage('createInvitationGame')
   createInvitationGame(
     @MessageBody('mode') mode: GameMode,
@@ -63,41 +93,13 @@ export class GameGateway {
     @ConnectedSocket() client: Socket,
     @GetCurrentUserId() playerOneId: string,
   ) {
-    this.socketToId.set(client.id, playerOneId);
-    return this.gameService.createInvitationGame(
-      client,
-      this.server,
-      playerOneId,
-      playerTwoId,
-      mode,
-    );
-  }
-
-  // @SubscribeMessage('leaveWatch')
-  // leaveWatchGame(
-  //   @MessageBody('playerId') playerId: string,
-  //   @ConnectedSocket() client: Socket,
-  // ) {
-  //   return this.gameService.leaveWatch(client, playerId);
-  // }
-
-
-  // spectating still under tests
-  // @SubscribeMessage('watchGame')
-  // watchGame(
-  //   @MessageBody('playerId') playerId: string,
-  //   @ConnectedSocket() client: Socket,
-  // ) {
-  //   return this.gameService.watch(client, playerId, this.server);
-  // }
-
-  @SubscribeMessage('joinGame')
-  joinRoom(
-    @MessageBody('mode') mode: GameMode,
-    @ConnectedSocket() client: Socket,
-    @GetCurrentUserId() id: string,
-  ) {
-    this.socketToId.set(client.id, id);
-    return this.gameService.join(client, id, this.server, mode);
+      this.socketToId.set(client.id, playerOneId);
+      return this.gameService.createInvitationGame(
+        client,
+        this.server,
+        playerOneId,
+        playerTwoId,
+        mode,
+      );
   }
 }
