@@ -14,11 +14,17 @@ import theme from "./MuiTheme";
 import classes from "./styles.module.scss";
 import { useImageStore } from "./store/users-store";
 import { PrivateRoute } from "./components/PrivateRoute";
-import { Cookie, getIsAuthenticated, initAuthToken } from "./utils/auth-helper";
+import {
+  Cookie,
+  getIsAuthenticated,
+  getTokenData,
+  initAuthToken,
+} from "./utils/auth-helper";
 import { UserSocket } from "./classes/UserSocket.class";
 import { ChannelSocket } from "./classes/ChannelSocket.class";
 import GameView from "./views/Game/GameView";
 import StatsView from "./views/Stats/StatsView";
+import usersService from "./services/users.service";
 
 export default function App() {
   const [userSocket] = useState<UserSocket>(new UserSocket());
@@ -68,12 +74,7 @@ export default function App() {
 
   const RedirectWrapper = () => {
     initAuthToken();
-    return (
-      <Navigate
-        to={RoutePath.PROFILE}
-        state={{ creationMode: true }}
-      ></Navigate>
-    );
+    return <Navigate to={RoutePath.PROFILE} />;
   };
 
   function closeToast() {

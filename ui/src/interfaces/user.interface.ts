@@ -4,6 +4,7 @@ export interface User {
   filename?: string;
   status?: UserStatus;
   secondFactorEnabled?: boolean;
+  secondFactorLogged?: boolean;
 }
 
 export enum UserStatus {
