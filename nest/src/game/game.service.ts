@@ -5,7 +5,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { Socket } from 'socket.io';
 import { Status, Game, DoubleKeyMap, GameMode } from './entities/game.entity';
 import { Root } from 'protobufjs';
-import { socketToUserId } from 'src/users/socketToUserIdStorage.service';
+import { gameSocketToUserId } from './socketToUserIdStorage.service';
 
 @Injectable()
 export class GameService {
@@ -37,7 +37,7 @@ export class GameService {
   }
 
   refuseInvite(client: Socket, userId: string) {
-    const challengerSocket = socketToUserId.getFromUserId(userId);
+    const challengerSocket = gameSocketToUserId.getFromUserId(userId);
     if (challengerSocket) {
       if (this.GameMap.getGame(userId)) {
         client.to(challengerSocket).emit('inviteRefused', 'invite refused');
@@ -59,7 +59,7 @@ export class GameService {
     p2id: string,
     gameMode: GameMode,
   ) {
-    const opponentSocket = socketToUserId.getFromUserId(p2id); // wrong kind of socket
+    const opponentSocket = gameSocketToUserId.getFromUserId(p2id);
     if (opponentSocket) {
       if (this.GameMap.getGame(p2id) !== null) {
         server
@@ -68,6 +68,7 @@ export class GameService {
             'inviteRefused',
             'Your opponent already has an invite pending, try again later',
           );
+		  console.log("TREST");
         return 'inviteFailed';
       }
       try {
@@ -85,7 +86,6 @@ export class GameService {
 
         this.createGame(p1id, gameMode, p2id);
         await this.join(client, p1id, server, gameMode);
-		console.log("emitting");
         server.to(opponentSocket).emit('invitedToGame', challenger);
         return 'gameJoined';
       } catch (error) {

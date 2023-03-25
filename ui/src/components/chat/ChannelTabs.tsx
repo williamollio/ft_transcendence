@@ -19,6 +19,7 @@ import ChannelService from "../../services/channel.service";
 import { translationKeys } from "./constants";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "@mui/material";
+import { listenerWrapper } from "../../services/initSocket.service";
 
 interface Props {
   currentRoom: chatRoom | boolean;
@@ -57,11 +58,11 @@ export function ChannelTabs(props: Props) {
     messages: { content: string; senderId: string }[]
   ) => {
     let newList = new Array<{ content: string; senderId: string }>();
-	messages.forEach((message) => {
-		if (!blockedUsers.some((user) => message.senderId === user))
-			newList.push(message);
-	})
-	return (newList);
+    messages.forEach((message) => {
+      if (!blockedUsers.some((user) => message.senderId === user))
+        newList.push(message);
+    });
+    return newList;
   };
 
   const updateChannelList = () => {
@@ -271,19 +272,27 @@ export function ChannelTabs(props: Props) {
   };
 
   useEffect(() => {
-    if (channelSocket.socket.connected) {
-      channelSocket.registerListener("roomLeft", roomLeftListener);
-      channelSocket.registerListener("roomCreated", roomCreatedListener);
-      channelSocket.registerListener("roomJoined", roomJoinedListener);
-      channelSocket.registerListener("roomEdited", roomEditedListener);
-    }
-    return () => {
+    listenerWrapper(() => {
       if (channelSocket.socket.connected) {
-        channelSocket.removeListener("roomLeft", roomLeftListener);
-        channelSocket.removeListener("roomCreated", roomCreatedListener);
-        channelSocket.removeListener("roomJoined", roomJoinedListener);
-        channelSocket.removeListener("roomEdited", roomEditedListener);
+        channelSocket.registerListener("roomLeft", roomLeftListener);
+        channelSocket.registerListener("roomCreated", roomCreatedListener);
+        channelSocket.registerListener("roomJoined", roomJoinedListener);
+        channelSocket.registerListener("roomEdited", roomEditedListener);
+        return true;
       }
+	  return false;
+    });
+    return () => {
+      listenerWrapper(() => {
+        if (channelSocket.socket.connected) {
+          channelSocket.removeListener("roomLeft", roomLeftListener);
+          channelSocket.removeListener("roomCreated", roomCreatedListener);
+          channelSocket.removeListener("roomJoined", roomJoinedListener);
+          channelSocket.removeListener("roomEdited", roomEditedListener);
+          return true;
+        }
+		return false;
+      });
     };
   }, [channelSocket.socket, channelSocket.socket.connected]);
 

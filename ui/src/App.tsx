@@ -121,7 +121,7 @@ export default function App() {
             title={transcendanceState.toast?.title}
             message={transcendanceState.toast?.message}
             onClose={closeToast}
-			autoClose={false}
+            autoClose={false}
             onAccept={transcendanceState.toast?.onAccept}
             onRefuse={transcendanceState.toast?.onRefuse}
           />

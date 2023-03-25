@@ -48,7 +48,7 @@ export default function RoomContextMenu(props: Props) {
 
   const removeRoom = () => {
     toggleAlert(false);
-    setAlertMsg(t(translationKeys.removeRoomFail) as string);
+    setAlertMsg(t(translationKeys.errorMessages.leaveRoomFailed) as string);
     if (contextMenu) {
       let index = channelSocket.channels.findIndex(
         (element: chatRoom) => element.id === contextMenu.channel.id

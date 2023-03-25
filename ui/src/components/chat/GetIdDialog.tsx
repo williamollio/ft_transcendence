@@ -31,7 +31,7 @@ export default function GetIdDialog(props: Props) {
 
   const handleSubmit = (e: any) => {
     if (e.key === "Enter") {
-      setAlertMsg(t(translationKeys.inviteFailed) as string);
+      setAlertMsg(t(translationKeys.errorMessages.inviteFailed) as string);
       ChannelService.getUserByName(input)
         .then((resolve) => {
           channelSocket.inviteToChannel(channel, resolve.data.id);

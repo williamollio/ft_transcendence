@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { GameLoop } from "../../classes/GameLoop.class";
 import { GameSocket } from "../../classes/GameSocket.class";
 import { positionalData } from "../../classes/positionalData.class";
+import { listenerWrapper } from "../../services/initSocket.service";
 import Ball from "./Ball";
 import Player from "./Player";
 
@@ -53,21 +54,29 @@ export default function GameBoard(props: Props) {
   useEffect(() => {
     document.addEventListener("keydown", playerMoveHandler);
     document.addEventListener("keyup", playerStopHandler);
-    if (gameSocket.socket.connected) {
-      gameSocket.socket.on("gameStatus", mutateGameStatusListener);
-      gameSocket.socket.on("inviteRefused", inviteRefusedListener);
-      gameSocket.socket.on("invitedToGame", invitedToGameListener);
-      gameSocket.socket.on("matchFinished", matchFinishedListener);
-    }
+    listenerWrapper(() => {
+      if (gameSocket.socket.connected) {
+        gameSocket.socket.on("gameStatus", mutateGameStatusListener);
+        gameSocket.socket.on("inviteRefused", inviteRefusedListener);
+        gameSocket.socket.on("invitedToGame", invitedToGameListener);
+        gameSocket.socket.on("matchFinished", matchFinishedListener);
+        return true;
+      }
+      return false;
+    });
     return () => {
       document.removeEventListener("keydown", playerMoveHandler);
       document.removeEventListener("keyup", playerStopHandler);
-      if (gameSocket.socket.connected) {
-        gameSocket.socket.off("gameStatus", mutateGameStatusListener);
-        gameSocket.socket.off("inviteRefused", inviteRefusedListener);
-        gameSocket.socket.off("invitedToGame", invitedToGameListener);
-        gameSocket.socket.off("matchFinished", matchFinishedListener);
-      }
+      listenerWrapper(() => {
+        if (gameSocket.socket.connected) {
+          gameSocket.socket.off("gameStatus", mutateGameStatusListener);
+          gameSocket.socket.off("inviteRefused", inviteRefusedListener);
+          gameSocket.socket.off("invitedToGame", invitedToGameListener);
+          gameSocket.socket.off("matchFinished", matchFinishedListener);
+          return true;
+        }
+        return false;
+      });
     };
   }, [gameLoop, gameSocket]);
 

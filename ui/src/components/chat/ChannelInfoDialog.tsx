@@ -28,6 +28,7 @@ import ChannelService from "../../services/channel.service";
 import { GameSocket } from "../../classes/GameSocket.class";
 import { translationKeys } from "./constants";
 import { useTranslation } from "react-i18next";
+import { listenerWrapper } from "../../services/initSocket.service";
 
 interface Props {
   blockedUser: Array<string>;
@@ -102,19 +103,27 @@ export default function ChannelInfoDialog(props: Props) {
   };
 
   useEffect(() => {
-    if (channelSocket.socket.connected) {
-      channelSocket.registerListener("roomJoined", userJoinedListener);
-      channelSocket.registerListener("roomLeft", userLeftListener);
-      channelSocket.registerListener("roleUpdated", () => {
-        refetch();
-      });
-    }
-    return () => {
+    listenerWrapper(() => {
       if (channelSocket.socket.connected) {
-        channelSocket.removeListener("roomJoined", userJoinedListener);
-        channelSocket.removeListener("roomLeft", userLeftListener);
-        channelSocket.removeListener("roleUpdated");
+        channelSocket.registerListener("roomJoined", userJoinedListener);
+        channelSocket.registerListener("roomLeft", userLeftListener);
+        channelSocket.registerListener("roleUpdated", () => {
+          refetch();
+        });
+        return true;
       }
+	  return false;
+    });
+    return () => {
+      listenerWrapper(() => {
+        if (channelSocket.socket.connected) {
+          channelSocket.removeListener("roomJoined", userJoinedListener);
+          channelSocket.removeListener("roomLeft", userLeftListener);
+          channelSocket.removeListener("roleUpdated");
+          return true;
+        }
+		return false;
+      });
     };
   }, [channelSocket.socket, channelSocket.socket.connected]);
 
@@ -156,13 +165,13 @@ export default function ChannelInfoDialog(props: Props) {
   });
 
   const handlePasswordChange = (e?: SyntheticEvent) => {
-    setAlertMsg(t(translationKeys.passwordChangeFail));
+    setAlertMsg(t(translationKeys.errorMessages.editRoomFailed));
     e ? e.preventDefault() : false;
     toggleOpenPassword(true);
   };
 
   const handleNameChange = (e?: SyntheticEvent) => {
-    setAlertMsg(t(translationKeys.nameChangeFail));
+    setAlertMsg(t(translationKeys.errorMessages.editRoomFailed));
     e ? e.preventDefault() : false;
     toggleOpenName(true);
   };

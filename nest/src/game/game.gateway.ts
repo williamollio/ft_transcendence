@@ -49,6 +49,7 @@ export class GameGateway {
 
   @SubscribeMessage('disconnect')
   handleDisconnect(@ConnectedSocket() client: Socket) {
+	gameSocketToUserId.delete(client.id);
     const id = this.socketToId.get(client.id);
     if (id) this.gameService.pause(id, this.server);
   }

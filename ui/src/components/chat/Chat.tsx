@@ -32,6 +32,7 @@ import { useTheme } from "@mui/material";
 import { TranscendanceContext } from "../../context/transcendance-context";
 import { TranscendanceStateActionType } from "../../context/transcendance-reducer";
 import { ToastType } from "../../context/toast";
+import { listenerWrapper } from "../../services/initSocket.service";
 
 interface Props {
   channelSocket: ChannelSocket;
@@ -246,58 +247,61 @@ export default function Chat(props: Props) {
   };
 
   useEffect(() => {
-    if (channelSocket.socket.connected) {
-      channelSocket.registerListener(
-        "incomingMessage",
-        incomingMessageListener
-      );
-      channelSocket.registerListener(
-        "messageRoomFailed",
-        messageRoomFailedListener
-      );
-      channelSocket.registerListener("roomLeft", roomLeftListener);
-      channelSocket.registerListener("roomJoined", roomJoinedListener);
-      channelSocket.registerListener(
-        "inviteSucceeded",
-        inviteSucceededListener
-      );
-      channelSocket.registerListener("banSucceeded", banSuccessListener);
-      channelSocket.registerListener("muteSucceeded", muteSuccessListener);
-      failEvents.forEach((element) => {
-        channelSocket.registerListener(element, (error) =>
-          failedListener(error, element)
-        );
-      });
-    }
-    return () => {
+    listenerWrapper(() => {
       if (channelSocket.socket.connected) {
-        channelSocket.removeListener("banSucceeded", banSuccessListener);
-        channelSocket.removeListener("muteSucceeded", muteSuccessListener);
-        channelSocket.removeListener(
+        channelSocket.registerListener(
           "incomingMessage",
           incomingMessageListener
         );
-        channelSocket.removeListener(
+        channelSocket.registerListener(
           "messageRoomFailed",
           messageRoomFailedListener
         );
-        channelSocket.removeListener("roomLeft", roomLeftListener);
-        channelSocket.removeListener("roomJoined", roomJoinedListener);
-        channelSocket.removeListener(
+        channelSocket.registerListener("roomLeft", roomLeftListener);
+        channelSocket.registerListener("roomJoined", roomJoinedListener);
+        channelSocket.registerListener(
           "inviteSucceeded",
           inviteSucceededListener
         );
+        channelSocket.registerListener("banSucceeded", banSuccessListener);
+        channelSocket.registerListener("muteSucceeded", muteSuccessListener);
         failEvents.forEach((element) => {
-          channelSocket.removeListener(element, failedListener);
+          channelSocket.registerListener(element, (error) =>
+            failedListener(error, element)
+          );
         });
+        return true;
       }
+      return false;
+    });
+    return () => {
+      listenerWrapper(() => {
+        if (channelSocket.socket.connected) {
+          channelSocket.removeListener("banSucceeded", banSuccessListener);
+          channelSocket.removeListener("muteSucceeded", muteSuccessListener);
+          channelSocket.removeListener(
+            "incomingMessage",
+            incomingMessageListener
+          );
+          channelSocket.removeListener(
+            "messageRoomFailed",
+            messageRoomFailedListener
+          );
+          channelSocket.removeListener("roomLeft", roomLeftListener);
+          channelSocket.removeListener("roomJoined", roomJoinedListener);
+          channelSocket.removeListener(
+            "inviteSucceeded",
+            inviteSucceededListener
+          );
+          failEvents.forEach((element) => {
+            channelSocket.removeListener(element, failedListener);
+          });
+          return true;
+        }
+        return false;
+      });
     };
-  }, [
-    channelSocket.socket,
-    currentRoom,
-    blockedUsers,
-    channelSocket.socket.connected,
-  ]);
+  }, [channelSocket, currentRoom, blockedUsers]);
 
   const listMessages = messages
     ? messages.map((messagesDto: messagesDto, index) => {
@@ -353,7 +357,7 @@ export default function Chat(props: Props) {
           toggleOpen={toggleOpen}
           channelSocket={channelSocket}
           setNewChannel={setNewChannel}
-		  blockedUsers={blockedUsers}
+          blockedUsers={blockedUsers}
         />
         <RoomContextMenu
           blockedUser={blockedUsers}

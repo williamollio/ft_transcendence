@@ -810,7 +810,7 @@ export class ChannelService {
   //     throw new Error('passwordIncorrect');
   //   }
   // }
-  
+
   async handlePasswords(dto: EditChannelDto, channelId: string) {
     /* Get the channel password to verify if the dto's current password is right */
     const channel = await this.prisma.channel.findFirst({
@@ -821,7 +821,7 @@ export class ChannelService {
         passwordHash: true,
       },
     });
-  
+
     if (channel?.passwordHash && !dto.passwordHash) {
       /* There is already a password and no new password provided,
       we shouldn't remove the pwd in db */
@@ -835,12 +835,12 @@ export class ChannelService {
       /* There is no new password for a Protected type channel */
       throw new Error('passwordIncorrect');
     }
-  
-    if (dto.currentPasswordHash && channel?.passwordHash) {
-      if (!await argon.verify(channel.passwordHash, dto.currentPasswordHash)) {
-        throw new Error('currentPasswordIncorrect');
-      }
-    }
+
+    //     if (dto.currentPasswordHash && channel?.passwordHash) {
+    //       if (!await argon.verify(channel.passwordHash, dto.currentPasswordHash)) {
+    //         throw new Error('currentPasswordIncorrect');
+    //       }
+    //     }
   }
 
   async editChannelByIdWS(
