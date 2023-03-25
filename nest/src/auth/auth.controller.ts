@@ -109,7 +109,7 @@ export class AuthController {
     return await this.authService.validateSecondFactor(
       res,
       request.user.id,
-      request.body,
+      request.body.code,
     );
   }
 }

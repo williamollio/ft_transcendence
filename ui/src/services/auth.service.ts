@@ -11,13 +11,14 @@ class AuthService {
   }
 
   async sendSecondFactor(code: string[]): Promise<Response<void>> {
-    let c = "";
-    for (const codePart in code) {
-      c.concat(codePart);
-    }
+    const newString: string = code
+      .map((value) => {
+        return value;
+      })
+      .join("");
     return resolve<void>(
       axiosInstance
-        .post(`${getBaseUrl()}auth/2fa/validate`, c)
+        .post(`${getBaseUrl()}auth/2fa/validate`, { code: newString })
         .then((res: AxiosResponse) => res.data)
     );
   }
