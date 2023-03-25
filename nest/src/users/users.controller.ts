@@ -12,6 +12,7 @@ import {
   UploadedFile,
   Res,
   UseGuards,
+  ForbiddenException,
 } from '@nestjs/common';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
 import { UsersService } from './users.service';
@@ -24,6 +25,7 @@ import {
   ApiOkResponse,
   ApiResponse,
   ApiTags,
+  ApiOperation,
 } from '@nestjs/swagger';
 import { UserEntity } from './entities/user.entity';
 import { User } from '@prisma/client';
@@ -38,6 +40,7 @@ import {
   imageFileFilter,
   maxSizeLimit,
 } from './utils/upload-utils';
+import { LeaderboardEntity } from './entities/leaderboard.entity';
 
 @Controller('users')
 @ApiTags('users')
@@ -47,6 +50,7 @@ export class UsersController {
   @Get()
   @ApiOkResponse({ type: UserEntity, isArray: true })
   public async findAll(@Res() res: Response) {
+    console.log('findAll');
     return this.usersService.findAll(res);
   }
 
@@ -170,19 +174,25 @@ export class UsersController {
   }
 
   @Post('get-user-match-history')
-  @UseGuards(JwtGuard)
+  // @UseGuards(JwtGuard)
   @ApiOkResponse({ type: UserEntity })
   getUserMatchHistory(
     @Res() res: Response,
-    @Body() target: { userNickname: string },
+    @Body() target: { userName: string },
   ) {
-    return this.usersService.getUserMatchHistory(target.userNickname, res);
+    return this.usersService.getUserMatchHistory(target.userName, res);
   }
 
+  // @Get('get-leaderboard')
+  // @UseGuards(JwtGuard)
+  // getLeaderboard(@Res() res: Response) {
+  //   return this.usersService.getLeaderboard(res);
+  // }
   @Get('get-leaderboard')
-  @UseGuards(JwtGuard)
-  @ApiOkResponse({ type: UserEntity })
-  getLeaderBoard(@Res() res: Response) {
-    return this.usersService.getLeaderboard(res);
-  }
+  // @UseGuards(JwtGuard)
+  // @ApiOkResponse({ type: LeaderboardEntity, isArray: true })
+  public async getLeaderboard(@Res() res: Response){
+    console.log("get-leaderboard");
+    return this.usersService.getLeaderboard();
+  }  
 }

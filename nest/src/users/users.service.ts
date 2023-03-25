@@ -373,7 +373,7 @@ export class UsersService {
       return res.status(500).send();
     }
   
-    async getLeaderboard(res: Response) {
+    async getLeaderboard() {
       try {
         const leaderboard = await this.prisma.user.findMany({
           orderBy: {
@@ -386,7 +386,7 @@ export class UsersService {
             eloScore: true,
           },
         });
-        return res.status(200).send(leaderboard);
+        return leaderboard;
       } catch (error) {
         throw new ForbiddenException(error);
       }
