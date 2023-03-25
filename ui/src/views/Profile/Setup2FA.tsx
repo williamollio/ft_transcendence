@@ -1,6 +1,6 @@
 import React, { useRef } from "react";
 import Navbar from "../../components/Navbar";
-import { Box, Button, Grid, Typography } from "@mui/material";
+import { Box, Button, CircularProgress, Grid, Typography } from "@mui/material";
 import { translationKeys } from "./constants";
 import { useTranslation } from "react-i18next";
 import { makeStyles } from "tss-react/mui";
@@ -11,8 +11,6 @@ import {
   TitleWrapper,
   ContentWrapper,
 } from "../../styles/MuiStyles";
-import CustomTextField from "../../components/shared/CustomTextField/CustomTextField";
-import { useForm, FieldValues } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { TextField } from "@mui/material";
 import LeftDrawer from "../../components/LeftDrawer/LeftDrawer";
@@ -31,13 +29,6 @@ export default function Setup2FA(): React.ReactElement {
   const navigate = useNavigate();
   const [QRCodeUrl, setQRCodeUrl] = React.useState<string>("");
   const { t } = useTranslation();
-  const {
-    formState: { errors },
-    register,
-    handleSubmit,
-  } = useForm({
-    mode: "onChange",
-  });
   const { classes } = useStyles();
   const [input, setInput] = React.useState<string[]>(
     Array(CODE_LENGTH).fill("")
@@ -213,16 +204,20 @@ export default function Setup2FA(): React.ReactElement {
                 sx={{ width: "92% !important" }}
                 className={classes.buttonsWrapper}
               >
-                <Button
-                  variant="contained"
-                  className={classes.iconButton}
-                  color="primary"
-                  onClick={trigger2fa}
-                >
-                  {is2faEnabled
-                    ? t(translationKeys.buttons.disable)
-                    : t(translationKeys.buttons.enable)}
-                </Button>
+                {is2faEnabled === undefined ? (
+                  <CircularProgress size={24} />
+                ) : (
+                  <Button
+                    variant="contained"
+                    className={classes.iconButton}
+                    color="primary"
+                    onClick={trigger2fa}
+                  >
+                    {is2faEnabled
+                      ? t(translationKeys.buttons.disable)
+                      : t(translationKeys.buttons.enable)}
+                  </Button>
+                )}
               </Box>
               <Grid className={classes.inputWrapper}>
                 {Array(CODE_LENGTH)
