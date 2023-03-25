@@ -23,11 +23,13 @@ import { AxiosError } from "axios";
 import { ToastType } from "../../context/toast";
 import { TranscendanceStateActionType } from "../../context/transcendance-reducer";
 import { TranscendanceContext } from "../../context/transcendance-context";
+import authService from "../../services/auth.service";
 
 const CODE_LENGTH = 6; // number of input fields to render
 
 export default function Setup2FA(): React.ReactElement {
   const navigate = useNavigate();
+  const [QRCodeUrl, setQRCodeUrl] = React.useState<string>("");
   const { t } = useTranslation();
   const {
     formState: { errors },
@@ -119,9 +121,12 @@ export default function Setup2FA(): React.ReactElement {
   }
   async function trigger2fa() {
     if (is2faEnabled) {
-      //disable
+      await authService.disableSecondFactor();
     } else {
-      //enable
+      const responseQRCodeUrl = await authService.activateSecondFactor();
+      if (responseQRCodeUrl.data !== "") {
+        setQRCodeUrl(responseQRCodeUrl.data);
+      }
     }
   }
 
@@ -168,8 +173,15 @@ export default function Setup2FA(): React.ReactElement {
               >
                 {t(translationKeys.enterNumber)}
               </Typography>
-              <Box sx={{ width: "40%", marginTop: "50px", height: "15%" }}>
-                {/* QR code */}
+              <Box
+                sx={{
+                  minWidth: "40%",
+                  marginTop: "20px",
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+              >
+                {QRCodeUrl && <img src={QRCodeUrl} />}
               </Box>
               <Box
                 sx={{ width: "92% !important" }}
@@ -182,8 +194,8 @@ export default function Setup2FA(): React.ReactElement {
                   onClick={trigger2fa}
                 >
                   {is2faEnabled
-                    ? t(translationKeys.buttons.enable)
-                    : t(translationKeys.buttons.disable)}
+                    ? t(translationKeys.buttons.disable)
+                    : t(translationKeys.buttons.enable)}
                 </Button>
               </Box>
               <Grid className={classes.inputWrapper}>
