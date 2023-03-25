@@ -785,17 +785,43 @@ export class ChannelService {
     }
   }
 
+  // async handlePasswords(dto: EditChannelDto, channelId: string) {
+  //   /* Get the channel password to verify if the dto's current password is right */
+  //   const channel: { passwordHash: string | null } | null =
+  //     await this.prisma.channel.findFirst({
+  //       where: {
+  //         id: channelId,
+  //       },
+  //       select: {
+  //         passwordHash: true,
+  //       },
+  //     });
+  //   if (channel?.passwordHash && !dto.passwordHash) {
+  //     /* There is already a password and no new password provided,
+  //     we shouldn't remove the pwd in db */
+  //     delete dto.passwordHash;
+  //   } else if (dto.passwordHash) {
+  //     /* There is a new password provided, we hash it for the db */
+  //     dto.passwordHash = await argon.hash(dto.passwordHash, {
+  //       type: argon.argon2id,
+  //     });
+  //   } else {
+  //     /* There is no new password for a Protected type channel */
+  //     throw new Error('passwordIncorrect');
+  //   }
+  // }
+  
   async handlePasswords(dto: EditChannelDto, channelId: string) {
     /* Get the channel password to verify if the dto's current password is right */
-    const channel: { passwordHash: string | null } | null =
-      await this.prisma.channel.findFirst({
-        where: {
-          id: channelId,
-        },
-        select: {
-          passwordHash: true,
-        },
-      });
+    const channel = await this.prisma.channel.findFirst({
+      where: {
+        id: channelId,
+      },
+      select: {
+        passwordHash: true,
+      },
+    });
+  
     if (channel?.passwordHash && !dto.passwordHash) {
       /* There is already a password and no new password provided,
       we shouldn't remove the pwd in db */
@@ -808,6 +834,12 @@ export class ChannelService {
     } else {
       /* There is no new password for a Protected type channel */
       throw new Error('passwordIncorrect');
+    }
+  
+    if (dto.currentPasswordHash && channel?.passwordHash) {
+      if (!await argon.verify(channel.passwordHash, dto.currentPasswordHash)) {
+        throw new Error('currentPasswordIncorrect');
+      }
     }
   }
 
