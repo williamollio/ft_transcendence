@@ -72,7 +72,7 @@ export default function Setup2FA(): React.ReactElement {
   }, [userId]);
 
   function showErrorToast(error?: AxiosError) {
-    const message = (error?.response?.data as any).message as string;
+    const message = error?.response?.data as any;
     dispatchTranscendanceState({
       type: TranscendanceStateActionType.TOGGLE_TOAST,
       toast: {
@@ -120,18 +120,28 @@ export default function Setup2FA(): React.ReactElement {
     navigate(-1);
   }
   async function trigger2fa() {
+    let response;
     if (is2faEnabled) {
-      await authService.disableSecondFactor();
+      response = await authService.disableSecondFactor();
     } else {
-      const responseQRCodeUrl = await authService.activateSecondFactor();
-      if (responseQRCodeUrl.data !== "") {
-        setQRCodeUrl(responseQRCodeUrl.data);
+      response = await authService.activateSecondFactor();
+      if (response.data !== "") {
+        setQRCodeUrl(response.data);
       }
+    }
+    setIs2faEnabled(!is2faEnabled);
+    if (response.error) {
+      showErrorToast(response.error);
     }
   }
 
   async function onSubmitCode() {
-    console.log("input " + input);
+    const responseSend2fa = await authService.sendSecondFactor(input);
+    if (!responseSend2fa.error) {
+      navigate(-1);
+    } else {
+      showErrorToast(responseSend2fa.error);
+    }
   }
 
   const OTPInputField = ({ index }: { index: number }) => {

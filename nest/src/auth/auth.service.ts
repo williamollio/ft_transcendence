@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ForbiddenException,
+  HttpStatus,
   Injectable,
   InternalServerErrorException,
   UnauthorizedException,
@@ -14,6 +15,7 @@ import * as argon2 from 'argon2';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { authenticator } from 'otplib';
 import { toDataURL } from 'qrcode';
+import { Response } from 'express';
 
 @Injectable()
 export class AuthService {
@@ -121,18 +123,19 @@ export class AuthService {
     await this.userService.set2FA(userId, null);
   }
 
-  async validateSecondFactor(userId: string, code: string) {
+  async validateSecondFactor(res: Response, userId: string, code: string) {
     const user = await this.userService.findOne(userId);
     if (!user || !user.secondFactorEnabled || !user.secondFactorSecret) {
-      throw new UnauthorizedException('Log in!');
+      return res.status(HttpStatus.UNAUTHORIZED);
     }
 
     if (
       !authenticator.verify({ token: code, secret: user.secondFactorSecret })
     ) {
-      throw new UnauthorizedException('Wrong code!');
+      return res.status(HttpStatus.FORBIDDEN).send('Wrong Code !');
     }
     await this.userService.set2FALogged(userId, true);
+    return res.status(HttpStatus.OK);
   }
 
   async logout(userId: string) {
