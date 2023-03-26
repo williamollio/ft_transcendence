@@ -14,22 +14,10 @@ export const AuthCheck: FC<AuthCheckProps> = ({
   children,
 }) => {
   if (isUserAuthorized) {
-    if (is2faRequired) {
-      return <Navigate to={RoutePath.LOGIN_2FA} replace />;
-    } else {
-      return children;
-    }
+    return children;
+  } else if (is2faRequired) {
+    return <Navigate to={RoutePath.LOGIN_2FA} replace />;
   } else {
     return <Navigate to={RoutePath.LOGIN} replace />;
   }
 };
-
-// return isUserAuthorized ? (
-//     children ? (
-//       is2faRequired
-//     ) : (
-//       <Navigate to={RoutePath.LOGIN_2FA} replace />
-//     )
-//   ) : (
-//     <Navigate to={RoutePath.LOGIN} replace />
-//   );
