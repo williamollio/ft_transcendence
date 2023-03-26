@@ -10,7 +10,7 @@ export class GameSocket {
   }
 
   PP = (newPosition: number) => {
-	this.socket.volatile.emit("PP", newPosition);
+	this.socket.volatile.emit("PP", newPosition + 50);
   }
 
   leaveGame = () => {
@@ -25,7 +25,7 @@ export class GameSocket {
     this.socket.emit("refuseInvite", challengerId);
   };
 
-  inviteToGame = (mode: string, opponentId: string) => {
+  inviteToGame = (mode: GameMode, opponentId: string) => {
     this.socket.emit("createInvitationGame", {
       mode: mode,
       opponent: opponentId,

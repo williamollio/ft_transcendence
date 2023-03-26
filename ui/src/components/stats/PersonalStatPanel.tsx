@@ -95,9 +95,9 @@ export default function PersonalStatPanel(props: Props) {
               <SingleStatComponent
                 title={t(translationKeys.winPerc)}
                 value={
-                  (playerStats.gamesWon /
+                  ((playerStats.gamesWon /
                     (playerStats.gamesWon + playerStats.gamesLost)) *
-                  100
+                  100).toPrecision(3)
                 }
                 postfix="%"
               ></SingleStatComponent>

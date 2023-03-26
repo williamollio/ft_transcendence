@@ -68,6 +68,7 @@ export class GameLoop {
         ? this.positionalData.playerLeftYOffset
         : this.positionalData.playerRightYOffset
     );
+	console.log(this.positionalData);
   };
 
   startLoop = async () => {

@@ -48,7 +48,7 @@ export class UsersController {
   @Get('get-leaderboard')
   @UseGuards(JwtGuard)
   @ApiOkResponse({ type: UserEntity })
-  getLeaderboard(@Res() res: Response) {
+  getLeaderboard() {
 	return this.usersService.getLeaderboard();
   }
 

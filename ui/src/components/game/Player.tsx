@@ -25,8 +25,8 @@ export default function Player(props: Props) {
                   backgroundColor: "black",
                 }
               : false),
-            width: "20px",
-            height: "100px",
+            width: 20,
+            height: 100,
           }}
         />
       ) : (
