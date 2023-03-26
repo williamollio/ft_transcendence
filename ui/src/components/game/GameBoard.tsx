@@ -1,6 +1,5 @@
 import { Box, Paper } from "@mui/material";
-import { useEffect, useRef, useState } from "react";
-import { GameInfo } from "../../classes/GameInfo.class";
+import { useEffect, useRef } from "react";
 import { GameLoop } from "../../classes/GameLoop.class";
 import { GameSocket } from "../../classes/GameSocket.class";
 import { listenerWrapper } from "../../services/initSocket.service";
@@ -15,8 +14,6 @@ interface Props {
 
 export default function GameBoard(props: Props) {
   const { gameLoop, gameSocket } = props;
-
-  const gameInfo = new GameInfo();
 
   const boardRef = useRef<HTMLDivElement>(null);
 
@@ -48,12 +45,11 @@ export default function GameBoard(props: Props) {
   };
 
   const giListener = (data: any) => {
-	console.log(data);
-    gameLoop.positionalData.ballOffset = { x: data.bx, y: data.by };
+    gameLoop.positionalData.ballOffset = { x: data.bx -15, y: data.by - 15 };
     if (gameLoop.activePlayer === 1) {
-		gameLoop.positionalData.playerRightYOffset = data.p2y;
+		gameLoop.positionalData.playerRightYOffset = data.p2y - 50;
 	} else {
-		gameLoop.positionalData.playerLeftYOffset = data.p1y;
+		gameLoop.positionalData.playerLeftYOffset = data.p1y - 50;
     }
   };
 

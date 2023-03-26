@@ -339,7 +339,7 @@ export class Game {
       this.diry = this.diry * -1;
     }
     if (
-      this.bx + this.gameConstants.ballHeight / 2 ==
+      this.bx - this.gameConstants.ballHeight / 2 ==
       this.gameConstants.player1PaddlePosX
     ) {
       if (
