@@ -12,7 +12,11 @@ import {
 } from "../../styles/MuiStyles";
 import authService from "../../services/auth.service";
 import { RoutePath } from "../../interfaces/router.interface";
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { TranscendanceContext } from "../../context/transcendance-context";
+import { AxiosError } from "axios";
+import { ToastType } from "../../context/toast";
+import { TranscendanceStateActionType } from "../../context/transcendance-reducer";
 
 const CODE_LENGTH = 6; // number of input fields to render
 
@@ -22,7 +26,7 @@ export default function Login2FAView(): ReactElement {
   const [input, setInput] = React.useState<string[]>(
     Array(CODE_LENGTH).fill("")
   );
-
+  const { dispatchTranscendanceState } = React.useContext(TranscendanceContext);
   const [currentIndex, setCurrentIndex] = React.useState<number>(0);
   const inputRefs = useRef<any>([]);
   const [isFocused, setIsFocused] = React.useState<boolean>(false);
@@ -62,8 +66,20 @@ export default function Login2FAView(): ReactElement {
     if (!response.error) {
       navigate(RoutePath.PROFILE);
     } else {
-      navigate(RoutePath.LOGIN);
+      showErrorToast(response.error);
     }
+  }
+
+  function showErrorToast(error?: AxiosError) {
+    const message = error?.response?.data as any;
+    dispatchTranscendanceState({
+      type: TranscendanceStateActionType.TOGGLE_TOAST,
+      toast: {
+        type: ToastType.ERROR,
+        title: "Error",
+        message: message,
+      },
+    });
   }
 
   const OTPInputField = ({ index }: { index: number }) => {
