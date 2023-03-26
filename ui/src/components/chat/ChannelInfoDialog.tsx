@@ -15,7 +15,7 @@ import {
   TableHead,
   TableRow,
 } from "@mui/material";
-import { SyntheticEvent, useEffect, useState } from "react";
+import React, { SyntheticEvent, useEffect, useState } from "react";
 import { channelUser, user } from "../../interfaces/chat.interface";
 import { chatRoom } from "../../classes/chatRoom.class";
 import ChannelInfoContext from "./ChannelInfoContext";
@@ -34,11 +34,11 @@ interface Props {
   blockedUser: Array<string>;
   refetchBlockedUsers: any;
   userSocket: UserSocket;
-  toggleError: any;
+  toggleError: React.Dispatch<React.SetStateAction<boolean>>;
   setAlertMsg: any;
-  setNewChannel: any;
+  setNewChannel: React.Dispatch<React.SetStateAction<chatRoom>>;
   channelInfoOpen: boolean;
-  toggleChannelInfo: any;
+  toggleChannelInfo: React.Dispatch<React.SetStateAction<boolean>>;
   channel: chatRoom | undefined;
   channelSocket: ChannelSocket;
   gameSocket: GameSocket;
@@ -112,7 +112,7 @@ export default function ChannelInfoDialog(props: Props) {
         });
         return true;
       }
-	  return false;
+      return false;
     });
     return () => {
       listenerWrapper(() => {
@@ -122,7 +122,7 @@ export default function ChannelInfoDialog(props: Props) {
           channelSocket.removeListener("roleUpdated");
           return true;
         }
-		return false;
+        return false;
       });
     };
   }, [channelSocket.socket, channelSocket.socket.connected]);
@@ -244,6 +244,7 @@ export default function ChannelInfoDialog(props: Props) {
               </Table>
             </TableContainer>
             <ChannelInfoContext
+              toggleChannelInfo={toggleChannelInfo}
               blockedUser={blockedUser}
               refetchBlockedUsers={refetchBlockedUsers}
               setAlertMsg={setAlertMsg}

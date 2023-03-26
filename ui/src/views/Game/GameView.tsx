@@ -94,6 +94,20 @@ export default function GameView(props: Props): React.ReactElement {
                 </Button>
               </Grid>
               <Grid item width={100}>
+                <Button sx={{width: 70}}
+                  onClick={() => gameSocket.joinAsSpectator("clfiqolxb0000obayrxl47r5s")}
+                >
+                  watch game
+                </Button>
+              </Grid>
+              <Grid item width={100}>
+                <Button sx={{width: 70}}
+                  onClick={() => gameSocket.leaveAsSpectator()}
+                >
+                  leave watch game
+                </Button>
+              </Grid>
+              <Grid item width={100}>
                 <>{ticks}</>
               </Grid>
             </Grid>

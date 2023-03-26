@@ -327,15 +327,15 @@ export class Game {
 
   moveBall(gameService: GameService, server: Server) {
     if (
-      this.by + this.gameConstants.ballHeight >=
+      this.by + this.gameConstants.ballHeight / 2 >=
       this.gameConstants.relativeGameHeight
     ) {
       this.by =
         this.gameConstants.relativeGameHeight - this.gameConstants.ballHeight;
       this.diry = this.diry * -1;
     }
-    if (this.by <= 0) {
-      this.by = 0;
+    if (this.by - this.gameConstants.ballHeight / 2 <= 0) {
+      this.by = 0 + this.gameConstants.ballHeight / 2;
       this.diry = this.diry * -1;
     }
     if (
@@ -345,7 +345,7 @@ export class Game {
       if (
         this.by + this.gameConstants.ballHeight / 2 >=
           this.p1y - this.paddleSize / 2 - 3 &&
-        this.by + this.gameConstants.ballHeight / 2 <=
+        this.by - this.gameConstants.ballHeight / 2 <=
           this.p1y + this.paddleSize / 2 + 3
       ) {
         switch (this.mode) {
@@ -386,7 +386,7 @@ export class Game {
       if (
         this.by + this.gameConstants.ballHeight / 2 >=
           this.p2y - this.paddleSize / 2 &&
-        this.by + this.gameConstants.ballHeight / 2 <=
+        this.by - this.gameConstants.ballHeight / 2 <=
           this.p2y + this.paddleSize / 2
       ) {
         switch (this.mode) {

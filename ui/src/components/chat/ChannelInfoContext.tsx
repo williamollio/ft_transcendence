@@ -21,6 +21,7 @@ import ChannelService from "../../services/channel.service";
 import { translationKeys } from "./constants";
 
 interface Props {
+  toggleChannelInfo: React.Dispatch<React.SetStateAction<boolean>>;
   blockedUser: Array<string>;
   refetchBlockedUsers: any;
   setAlertMsg: Dispatch<SetStateAction<string>>;
@@ -33,6 +34,7 @@ interface Props {
 
 export default function ChannelInfoContext(props: Props) {
   const {
+    toggleChannelInfo,
     blockedUser,
     refetchBlockedUsers,
     setAlertMsg,
@@ -44,7 +46,7 @@ export default function ChannelInfoContext(props: Props) {
   } = props;
   const [blockStatus, setBlockStatus] = useState<"Block" | "Unblock">("Block");
   const [self, setSelf] = useState<boolean>(false);
-  const [gameModeSelect, setGameModeSelect] = useState<string>(
+  const [gameModeSelect, setGameModeSelect] = useState<GameMode>(
     GameMode.CLASSIC
   );
   const { t } = useTranslation();
@@ -78,6 +80,7 @@ export default function ChannelInfoContext(props: Props) {
     if (contextMenu && contextMenu.user) {
       channelSocket.createDm(contextMenu.user);
     }
+	toggleChannelInfo(false);
   };
 
   const handleProfile = () => {
@@ -86,6 +89,7 @@ export default function ChannelInfoContext(props: Props) {
     if (contextMenu && contextMenu.user && contextMenu.user.id) {
       // checkout profile with user.id
     }
+    toggleChannelInfo(false);
   };
 
   const handleInviteGame = (_event: React.MouseEvent<HTMLLIElement>) => {
@@ -94,6 +98,7 @@ export default function ChannelInfoContext(props: Props) {
     if (contextMenu && contextMenu.user && contextMenu.user.id) {
       gameSocket.inviteToGame(gameModeSelect, contextMenu.user.id);
     }
+    toggleChannelInfo(false);
   };
 
   const handleBlock = async () => {
@@ -173,7 +178,7 @@ export default function ChannelInfoContext(props: Props) {
   };
 
   const handleGameModeChange = (event: SelectChangeEvent) => {
-    setGameModeSelect(event.target.value);
+    setGameModeSelect(event.target.value as GameMode);
   };
 
   return (

@@ -21,7 +21,7 @@ export class GameLoop {
     this.positionalData = new positionalData();
     this.keyPressed = [];
     this.gameSocket = gameSocket;
-    this.activePlayer = 1;
+    this.activePlayer = 0;
 
     // for testing
     this.ticks = 0;
@@ -43,7 +43,7 @@ export class GameLoop {
         if (this.positionalData.playerLeftYOffset - 5 > 0) {
           if (this.activePlayer === 1) {
             this.positionalData.playerLeftYOffset -= 5;
-          } else {
+          } else if (this.activePlayer === 2){
             this.positionalData.playerRightYOffset -= 5;
           }
         }
@@ -51,7 +51,7 @@ export class GameLoop {
         if (this.positionalData.playerLeftYOffset + 5 <= 350) {
           if (this.activePlayer === 1) {
             this.positionalData.playerLeftYOffset += 5;
-          } else {
+          } else if (this.activePlayer === 2){
             this.positionalData.playerRightYOffset += 5;
           }
         }
@@ -68,16 +68,18 @@ export class GameLoop {
         ? this.positionalData.playerLeftYOffset
         : this.positionalData.playerRightYOffset
     );
-	console.log(this.positionalData);
   };
 
   startLoop = async () => {
     console.log("starting");
-    this.interval = setInterval(this.updateGame, 30);
+    if (!this.interval) this.interval = setInterval(this.updateGame, 30);
   };
 
   stopLoop = () => {
     console.log("stopping");
-    if (this.interval !== null) clearInterval(this.interval);
+    if (this.interval !== null) {
+      clearInterval(this.interval);
+      this.interval = null;
+    }
   };
 }

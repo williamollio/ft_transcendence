@@ -69,7 +69,7 @@ export default function RightDrawer(props: Props) {
   const handleDrawerClose = () => {
     setOpen(false);
   };
-
+  
   return (
     <Box sx={{ display: "flex" }}>
       <AppBar position="fixed" open={open}>

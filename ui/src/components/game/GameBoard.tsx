@@ -1,11 +1,16 @@
 import { Box, Paper } from "@mui/material";
-import { useEffect, useRef } from "react";
+import { t } from "i18next";
+import { useContext, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { GameLoop } from "../../classes/GameLoop.class";
 import { GameSocket } from "../../classes/GameSocket.class";
+import { ToastType } from "../../context/toast";
+import { TranscendanceContext } from "../../context/transcendance-context";
+import { TranscendanceStateActionType } from "../../context/transcendance-reducer";
 import { listenerWrapper } from "../../services/initSocket.service";
+import { translationKeys } from "../../views/Game/constants";
 import Ball from "./Ball";
 import Player from "./Player";
-import * as jspb from "protobufjs";
 
 interface Props {
   gameLoop: GameLoop;
@@ -14,6 +19,8 @@ interface Props {
 
 export default function GameBoard(props: Props) {
   const { gameLoop, gameSocket } = props;
+  const { t } = useTranslation();
+  const toast = useContext(TranscendanceContext);
 
   const boardRef = useRef<HTMLDivElement>(null);
 
@@ -37,6 +44,7 @@ export default function GameBoard(props: Props) {
 
   const gameStartingListener = (data: any) => {
     gameLoop.startLoop();
+    console.log("starting received");
   };
 
   const gameFinishListener = (data: any) => {
@@ -45,20 +53,26 @@ export default function GameBoard(props: Props) {
   };
 
   const giListener = (data: any) => {
-    gameLoop.positionalData.ballOffset = { x: data.bx -15, y: data.by - 15 };
+    gameLoop.positionalData.ballOffset = { x: data.bx - 15, y: data.by - 15 };
     if (gameLoop.activePlayer === 1) {
-		gameLoop.positionalData.playerRightYOffset = data.p2y - 50;
-	} else {
-		gameLoop.positionalData.playerLeftYOffset = data.p1y - 50;
+      gameLoop.positionalData.playerRightYOffset = data.p2y - 50;
+    } else if (gameLoop.activePlayer === 2) {
+      gameLoop.positionalData.playerLeftYOffset = data.p1y - 50;
+    } else {
+      console.log(data);
+      gameLoop.positionalData.playerRightYOffset = data.p2y - 50;
+      gameLoop.positionalData.playerLeftYOffset = data.p1y - 50;
     }
   };
 
   const gameJoinedListener = (data: any) => {
     gameLoop.activePlayer = data.playerNumber;
+    console.log(data);
   };
 
   const mutateGameStatusListener = (data: any) => {
     console.log(data);
+    if (data.status === "PLAYING") gameLoop.startLoop();
   };
 
   const inviteRefusedListener = (data: any) => {
@@ -66,7 +80,18 @@ export default function GameBoard(props: Props) {
   };
 
   const invitedToGameListener = (data: any) => {
-    console.log(data);
+    toast.dispatchTranscendanceState({
+      type: TranscendanceStateActionType.TOGGLE_TOAST,
+      toast: {
+        type: ToastType.SUCCESS,
+        title: "Invited to Game",
+        message: (data.initiatingUser.name +
+          t(translationKeys.inviteTo)) as string,
+        onAccept: () =>
+          gameSocket.joinGame(data.game.mode, data.initiatingUser.id),
+        onRefuse: () => gameSocket.refuseInvite(data.initiatingUser.id),
+      },
+    });
   };
 
   useEffect(() => {

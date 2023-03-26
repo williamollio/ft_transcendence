@@ -32,8 +32,8 @@ export class GameSocket {
     });
   };
 
-  joinGame = (mode: GameMode) => {
-	this.socket.emit("joinGame", {mode: mode});
+  joinGame = (mode: GameMode, inviteGameId?: string) => {
+	this.socket.emit("joinGame", {mode: mode, inviteGameId: inviteGameId});
   };
 
   joinAsSpectator = (playerId: string) => {

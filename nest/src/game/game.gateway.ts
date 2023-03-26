@@ -72,6 +72,48 @@ export class GameGateway {
     this.gameService.refuseInvite(client, challengerId);
   }
 
+  @SubscribeMessage('leaveWatch')
+  leaveWatchGame(
+    @MessageBody('playerId') playerId: string,
+    @ConnectedSocket() client: Socket,
+  ) {
+    return this.gameService.leaveWatch(client, playerId);
+  }
+
+  // spectating still under tests
+  @SubscribeMessage('watchGame')
+  async watchGame(
+    @MessageBody('playerId') playerId: string,
+    @ConnectedSocket() client: Socket,
+  ) {
+    const playerNumber = await this.gameService.watch(
+      client,
+      playerId,
+      this.server,
+    );
+	this.server.to(client.id).emit("gameJoined", playerNumber);
+    return playerNumber;
+  }
+
+  @SubscribeMessage('joinGame')
+  async joinRoom(
+    @MessageBody('mode') mode: GameMode,
+    @ConnectedSocket() client: Socket,
+    @GetCurrentUserId() id: string,
+    @MessageBody('inviteGameId') inviteGameId?: string,
+  ) {
+    this.socketToId.set(client.id, id);
+    const playerNumber = await this.gameService.join(
+      client,
+      id,
+      this.server,
+      mode,
+      inviteGameId,
+    );
+    if (playerNumber.playerNumber === 1)
+      this.server.emit('gameJoined', playerNumber);
+  }
+
   @SubscribeMessage('createInvitationGame')
   createInvitationGame(
     @MessageBody('mode') mode: GameMode,
@@ -87,38 +129,5 @@ export class GameGateway {
       playerTwoId,
       mode,
     );
-  }
-
-  @SubscribeMessage('leaveWatch')
-  leaveWatchGame(
-    @MessageBody('playerId') playerId: string,
-    @ConnectedSocket() client: Socket,
-  ) {
-    return this.gameService.leaveWatch(client, playerId);
-  }
-
-  @SubscribeMessage('watchGame')
-  watchGame(
-    @MessageBody('playerId') playerId: string,
-    @ConnectedSocket() client: Socket,
-  ) {
-    return this.gameService.watch(client, playerId, this.server);
-  }
-
-  @SubscribeMessage('joinGame')
-  async joinRoom(
-    @MessageBody('mode') mode: GameMode,
-    @ConnectedSocket() client: Socket,
-    @GetCurrentUserId() id: string,
-  ) {
-    this.socketToId.set(client.id, id);
-    const playerNumber = await this.gameService.join(
-      client,
-      id,
-      this.server,
-      mode,
-    );
-    if (playerNumber.playerNumber === 1)
-      this.server.to(client.id).emit('gameJoined', playerNumber);
   }
 }
