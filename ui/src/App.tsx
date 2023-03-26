@@ -13,7 +13,7 @@ import { Box, ThemeProvider } from "@mui/material";
 import theme from "./MuiTheme";
 import classes from "./styles.module.scss";
 import { useImageStore } from "./store/users-store";
-import { PrivateRoute } from "./components/PrivateRoute";
+import { PrivateRoute } from "./components/Protection/PrivateRoute";
 import {
   Cookie,
   getIsAuthenticated,

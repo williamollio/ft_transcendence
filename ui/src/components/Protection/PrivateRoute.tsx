@@ -3,11 +3,10 @@ import {
   getIsAuthenticated,
   getTokenData,
   initAuthToken,
-} from "../utils/auth-helper";
-import { Navigate } from "react-router-dom";
-import { RoutePath } from "../interfaces/router.interface";
-import usersService from "../services/users.service";
-import { User } from "../interfaces/user.interface";
+} from "../../utils/auth-helper";
+import usersService from "../../services/users.service";
+import { User } from "../../interfaces/user.interface";
+import { AuthCheck } from "./AuthCheck";
 
 export const PrivateRoute: FC<{ children: React.ReactElement }> = ({
   children,
@@ -35,13 +34,12 @@ export const PrivateRoute: FC<{ children: React.ReactElement }> = ({
     setUser(responseUser.data);
   }
 
-  return isUserAuthorized ? (
-    children ? (
-      is2faRequired
-    ) : (
-      <Navigate to={RoutePath.LOGIN_2FA} replace />
-    )
-  ) : (
-    <Navigate to={RoutePath.LOGIN} replace />
+  return (
+    <AuthCheck
+      isUserAuthorized={isUserAuthorized}
+      is2faRequired={is2faRequired}
+    >
+      {children}
+    </AuthCheck>
   );
 };
