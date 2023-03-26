@@ -84,6 +84,14 @@ export class UsersService {
   public async findOne(id: string) {
     return this.prisma.user.findUnique({
       where: { id },
+      select: {
+        id: true,
+        name: true,
+        filename: true,
+        status: true,
+        secondFactorEnabled: true,
+        secondFactorLogged: true,
+      },
     });
   }
 
