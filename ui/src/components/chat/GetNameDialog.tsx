@@ -56,15 +56,15 @@ export default function GetNameDialog(props: Props) {
 
   return (
     <Dialog open={open} onClose={handleClose} onKeyDown={handleSubmit}>
-      <DialogContent>{t(translationKeys.newNameOfChannel)}</DialogContent>
+      <DialogContent>{t(translationKeys.roomContext.newNameOfChannel)}</DialogContent>
       <TextField
-        label={t(translationKeys.newName)}
+        label={t(translationKeys.roomContext.newName)}
         type="string"
         value={nameInput}
         onChange={handleNameChange}
       ></TextField>
       <TextField
-        label={t(translationKeys.password)}
+        label={t(translationKeys.createInfo.password)}
         type="password"
         value={input}
         onChange={handleChange}

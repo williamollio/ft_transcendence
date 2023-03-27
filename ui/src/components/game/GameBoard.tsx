@@ -1,5 +1,4 @@
 import { Box, Paper } from "@mui/material";
-import { t } from "i18next";
 import { useContext, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { GameLoop } from "../../classes/GameLoop.class";
@@ -7,6 +6,7 @@ import { GameSocket } from "../../classes/GameSocket.class";
 import { ToastType } from "../../context/toast";
 import { TranscendanceContext } from "../../context/transcendance-context";
 import { TranscendanceStateActionType } from "../../context/transcendance-reducer";
+import { GameMode } from "../../interfaces/chat.interface";
 import { listenerWrapper } from "../../services/initSocket.service";
 import { translationKeys } from "../../views/Game/constants";
 import Ball from "./Ball";
@@ -67,11 +67,9 @@ export default function GameBoard(props: Props) {
 
   const gameJoinedListener = (data: any) => {
     gameLoop.activePlayer = data.playerNumber;
-    console.log(data);
   };
 
   const mutateGameStatusListener = (data: any) => {
-    console.log(data);
     if (data.status === "PLAYING") gameLoop.startLoop();
   };
 
@@ -84,9 +82,13 @@ export default function GameBoard(props: Props) {
       type: TranscendanceStateActionType.TOGGLE_TOAST,
       toast: {
         type: ToastType.SUCCESS,
-        title: "Invited to Game",
-        message: (data.initiatingUser.name +
-          t(translationKeys.inviteTo)) as string,
+        title: t(translationKeys.gameInvite) as string,
+        message:
+          ((data.initiatingUser.name + t(translationKeys.inviteTo)) as string) +
+            data.game.mode ===
+          GameMode.CLASSIC
+            ? "Classic"
+            : "Mayhem",
         onAccept: () =>
           gameSocket.joinGame(data.game.mode, data.initiatingUser.id),
         onRefuse: () => gameSocket.refuseInvite(data.initiatingUser.id),

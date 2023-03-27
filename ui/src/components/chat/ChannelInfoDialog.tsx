@@ -3,7 +3,6 @@ import {
   Button,
   Dialog,
   DialogActions,
-  DialogContent,
   DialogTitle,
   Divider,
   Grid,
@@ -34,8 +33,6 @@ interface Props {
   blockedUser: Array<string>;
   refetchBlockedUsers: any;
   userSocket: UserSocket;
-  toggleError: React.Dispatch<React.SetStateAction<boolean>>;
-  setAlertMsg: any;
   setNewChannel: React.Dispatch<React.SetStateAction<chatRoom>>;
   channelInfoOpen: boolean;
   toggleChannelInfo: React.Dispatch<React.SetStateAction<boolean>>;
@@ -48,8 +45,6 @@ export default function ChannelInfoDialog(props: Props) {
   const {
     blockedUser,
     refetchBlockedUsers,
-    userSocket,
-    setAlertMsg,
     channelInfoOpen,
     toggleChannelInfo,
     channel,
@@ -94,11 +89,11 @@ export default function ChannelInfoDialog(props: Props) {
     }
   }, [data, isLoading, isError]);
 
-  const userJoinedListener = (userId: string, channelId: string) => {
+  const userJoinedListener = (userId: string, _channelId: string) => {
     if (userId !== channelSocket.user.id) refetch();
   };
 
-  const userLeftListener = (userId: string, channelId: string) => {
+  const userLeftListener = (userId: string, _channelId: string) => {
     if (userId !== channelSocket.user.id) refetch();
   };
 
@@ -165,13 +160,11 @@ export default function ChannelInfoDialog(props: Props) {
   });
 
   const handlePasswordChange = (e?: SyntheticEvent) => {
-    setAlertMsg(t(translationKeys.errorMessages.editRoomFailed));
     e ? e.preventDefault() : false;
     toggleOpenPassword(true);
   };
 
   const handleNameChange = (e?: SyntheticEvent) => {
-    setAlertMsg(t(translationKeys.errorMessages.editRoomFailed));
     e ? e.preventDefault() : false;
     toggleOpenName(true);
   };
@@ -192,7 +185,7 @@ export default function ChannelInfoDialog(props: Props) {
     >
       <Grid container direction="column">
         <Grid item>
-          <DialogTitle>{t(translationKeys.channelInfo)}</DialogTitle>
+          <DialogTitle>{t(translationKeys.roomContext.channelInfo)}</DialogTitle>
         </Grid>
         <Divider></Divider>
         <Grid item>
@@ -204,7 +197,7 @@ export default function ChannelInfoDialog(props: Props) {
                   onMouseUp={(e) => handlePasswordChange()}
                   onMouseDown={handlePasswordChange}
                 >
-                  {t(translationKeys.changePassword)}
+                  {t(translationKeys.roomContext.changePassword)}
                 </Button>
               </DialogActions>
             </Grid>
@@ -215,7 +208,7 @@ export default function ChannelInfoDialog(props: Props) {
                   onMouseUp={(e) => handleNameChange()}
                   onMouseDown={handleNameChange}
                 >
-                  {t(translationKeys.changeName)}
+                  {t(translationKeys.roomContext.changeName)}
                 </Button>
               </DialogActions>
             </Grid>
@@ -235,8 +228,8 @@ export default function ChannelInfoDialog(props: Props) {
               <Table size="small">
                 <TableHead>
                   <TableRow>
-                    <TableCell>{t(translationKeys.name)}</TableCell>
-                    <TableCell>{t(translationKeys.status)}</TableCell>
+                    <TableCell>{t(translationKeys.createInfo.name)}</TableCell>
+                    <TableCell>{t(translationKeys.roomContext.status)}</TableCell>
                     <TableCell></TableCell>
                   </TableRow>
                 </TableHead>
@@ -247,7 +240,6 @@ export default function ChannelInfoDialog(props: Props) {
               toggleChannelInfo={toggleChannelInfo}
               blockedUser={blockedUser}
               refetchBlockedUsers={refetchBlockedUsers}
-              setAlertMsg={setAlertMsg}
               channel={channel}
               contextMenu={contextMenu}
               setContextMenu={setContextMenu}

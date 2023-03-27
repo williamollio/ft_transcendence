@@ -24,7 +24,6 @@ interface Props {
   toggleChannelInfo: React.Dispatch<React.SetStateAction<boolean>>;
   blockedUser: Array<string>;
   refetchBlockedUsers: any;
-  setAlertMsg: Dispatch<SetStateAction<string>>;
   channel: chatRoom | undefined;
   contextMenu: ChannelInfoContextMenu | null;
   setContextMenu: Dispatch<SetStateAction<ChannelInfoContextMenu | null>>;
@@ -37,7 +36,6 @@ export default function ChannelInfoContext(props: Props) {
     toggleChannelInfo,
     blockedUser,
     refetchBlockedUsers,
-    setAlertMsg,
     channel,
     contextMenu,
     setContextMenu,
@@ -75,7 +73,6 @@ export default function ChannelInfoContext(props: Props) {
   };
 
   const handleDM = () => {
-    setAlertMsg("Failed to set up directmessaging");
     handleContextClose();
     if (contextMenu && contextMenu.user) {
       channelSocket.createDm(contextMenu.user);
@@ -84,7 +81,6 @@ export default function ChannelInfoContext(props: Props) {
   };
 
   const handleProfile = () => {
-    setAlertMsg("Failed to access profile");
     handleContextClose();
     if (contextMenu && contextMenu.user && contextMenu.user.id) {
       // checkout profile with user.id
@@ -93,7 +89,6 @@ export default function ChannelInfoContext(props: Props) {
   };
 
   const handleInviteGame = (_event: React.MouseEvent<HTMLLIElement>) => {
-    setAlertMsg("Failed to invite to play");
     handleContextClose();
     if (contextMenu && contextMenu.user && contextMenu.user.id) {
       gameSocket.inviteToGame(gameModeSelect, contextMenu.user.id);
@@ -105,7 +100,6 @@ export default function ChannelInfoContext(props: Props) {
     handleContextClose();
     if (contextMenu && contextMenu.user && contextMenu.user.id) {
       if (blockStatus === "Block") {
-        setAlertMsg("Failed to block User");
         let ret = await ChannelService.blockUser(contextMenu.user.id);
         if (typeof ret === "string") {
           toast.dispatchTranscendanceState({
@@ -119,7 +113,6 @@ export default function ChannelInfoContext(props: Props) {
         } else refetchBlockedUsers();
         refetchBlockedUsers();
       } else if (blockStatus === "Unblock") {
-        setAlertMsg("Failed to unblock User");
         let ret = await ChannelService.unblockUser(contextMenu.user.id);
         if (typeof ret === "string") {
           toast.dispatchTranscendanceState({
@@ -136,7 +129,6 @@ export default function ChannelInfoContext(props: Props) {
   };
 
   const handleMute = () => {
-    setAlertMsg("Failed to mute user");
     handleContextClose();
     if (
       channel &&
@@ -150,7 +142,6 @@ export default function ChannelInfoContext(props: Props) {
   };
 
   const handleKick = () => {
-    setAlertMsg("Failed to ban user");
     handleContextClose();
     if (
       channel &&
@@ -165,7 +156,6 @@ export default function ChannelInfoContext(props: Props) {
 
   const handlePromote = () => {
     handleContextClose();
-    setAlertMsg("Failed to promote user");
     if (
       channel &&
       channel.id &&
@@ -194,41 +184,41 @@ export default function ChannelInfoContext(props: Props) {
         }
       >
         <MenuItem disabled={self} onClick={handleDM}>
-          {t(translationKeys.whisper)}
+          {t(translationKeys.buttons.whisper)}
         </MenuItem>
         <MenuItem disabled={self} onClick={handlePromote}>
-          {t(translationKeys.promote)}
+          {t(translationKeys.buttons.promote)}
         </MenuItem>
         <MenuItem disabled={self} onClick={handleProfile}>
-          {t(translationKeys.viewProfile)}
+          {t(translationKeys.buttons.viewProfile)}
         </MenuItem>
         <MenuItem disabled={self} onClick={handleInviteGame}>
-          {t(translationKeys.inviteToGame)}
+          {t(translationKeys.buttons.inviteToGame)}
         </MenuItem>
         <Select
           sx={{ width: "100%" }}
           size="small"
           onChange={handleGameModeChange}
-          placeholder={t(translationKeys.gameMode) as string}
+          placeholder={t(translationKeys.buttons.gameMode) as string}
           value={gameModeSelect}
         >
           <MenuItem value={GameMode.CLASSIC}>
-            {t(translationKeys.classic)}
+            {t(translationKeys.invite.classic)}
           </MenuItem>
           <MenuItem value={GameMode.MAYHEM}>
-            {t(translationKeys.mayhem)}
+            {t(translationKeys.invite.mayhem)}
           </MenuItem>
         </Select>
         <MenuItem disabled={self} onClick={handleBlock}>
           {blockStatus === "Block"
-            ? t(translationKeys.block)
-            : t(translationKeys.unblock)}
+            ? t(translationKeys.buttons.block)
+            : t(translationKeys.buttons.unblock)}
         </MenuItem>
         <MenuItem disabled={self} onClick={handleMute}>
-          {t(translationKeys.mute)}
+          {t(translationKeys.buttons.mute)}
         </MenuItem>
         <MenuItem disabled={self} onClick={handleKick}>
-          {t(translationKeys.ban)}
+          {t(translationKeys.buttons.ban)}
         </MenuItem>
       </Menu>
     </>

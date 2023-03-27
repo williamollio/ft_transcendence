@@ -9,10 +9,10 @@ export class UserSocket {
 }
 
   logIn = () => {
-    this.socket?.emit("connectUser");
+    this.socket.emit("connectUser");
   };
 
   logOut = () => {
-    this.socket?.disconnect();
+    this.socket.disconnect();
   };
 }

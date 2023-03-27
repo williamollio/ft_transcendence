@@ -17,12 +17,10 @@ interface Props {
   open: boolean;
   toggleOpen: any;
   channelSocket: ChannelSocket;
-  toggleAlert: any;
-  setAlertMsg: any;
 }
 
 export default function AddChannelDialog(props: Props) {
-  const { open, toggleOpen, channelSocket, toggleAlert, setAlertMsg } = props;
+  const { open, toggleOpen, channelSocket } = props;
   const { t } = useTranslation();
 
   const [formSelection, setFormSelection] = useState<number>(0);
@@ -60,11 +58,9 @@ export default function AddChannelDialog(props: Props) {
   };
 
   const handleFormSubmit = (e: any) => {
-    toggleAlert(false);
     e.preventDefault();
     if (alertOpen === true) setAlertOpen(false);
     if (formSelection === 1) {
-    //   setAlertMsg(t(translationKeys.errorMessages.createChannelFail) as string);
       if (dialogValue.key !== "") {
         if (dialogValue.access !== "PROTECTED" || dialogValue.password !== "") {
           if (dialogValue.access === "PROTECTED") {
@@ -83,7 +79,6 @@ export default function AddChannelDialog(props: Props) {
         } else setAlertOpen(true);
       } else setAlertOpen(true);
     } else {
-    //   setAlertMsg(t(translationKeys.errorMessages.joinChannelFail) as string);
       ChannelService.getChannelByName(dialogJoinValue.name).then((resolve) => {
         channelSocket.joinRoom(
           resolve.id,
@@ -123,13 +118,13 @@ export default function AddChannelDialog(props: Props) {
             sx={{ fontSize: "14px", fontWeight: "bold" }}
             key={0}
             value={0}
-            label={t(translationKeys.join)}
+            label={t(translationKeys.buttons.join)}
           ></Tab>
           <Tab
             sx={{ fontSize: "14px", fontWeight: "bold" }}
             key={1}
             value={1}
-            label={t(translationKeys.create)}
+            label={t(translationKeys.buttons.create)}
           ></Tab>
         </Tabs>
         <form onSubmit={handleFormSubmit}>

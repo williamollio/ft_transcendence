@@ -47,8 +47,6 @@ export default function RoomContextMenu(props: Props) {
   };
 
   const removeRoom = () => {
-    toggleAlert(false);
-    setAlertMsg(t(translationKeys.errorMessages.leaveRoomFailed) as string);
     if (contextMenu) {
       let index = channelSocket.channels.findIndex(
         (element: chatRoom) => element.id === contextMenu.channel.id
@@ -56,14 +54,13 @@ export default function RoomContextMenu(props: Props) {
       if (index >= 0) {
         channelSocket.deleteRoom(contextMenu.channel);
       }
-    } else toggleAlert(true);
+    }
     handleContextClose();
   };
 
   const handleChannelInfoOpen = () => {
     if (contextMenu) {
       setContextChannel(contextMenu.channel);
-      toggleAlert(false);
       toggleChannelInfo(true);
       handleContextClose();
     }
@@ -72,7 +69,6 @@ export default function RoomContextMenu(props: Props) {
   const handleInvite = () => {
     if (contextMenu) {
       setContextChannel(contextMenu.channel);
-      toggleAlert(false);
       toggleOpenId(true);
       handleContextClose();
     }
@@ -90,18 +86,16 @@ export default function RoomContextMenu(props: Props) {
             : undefined
         }
       >
-        <MenuItem onClick={removeRoom}>{t(translationKeys.remove)}</MenuItem>
+        <MenuItem onClick={removeRoom}>{t(translationKeys.roomContext.remove)}</MenuItem>
         <MenuItem onClick={handleChannelInfoOpen}>
-          {t(translationKeys.channelInfo)}
+          {t(translationKeys.roomContext.channelInfo)}
         </MenuItem>
-        <MenuItem onClick={handleInvite}>{t(translationKeys.invite)}</MenuItem>
+        <MenuItem onClick={handleInvite}>{t(translationKeys.roomContext.invite)}</MenuItem>
       </Menu>
       <ChannelInfoDialog
         blockedUser={blockedUser}
         refetchBlockedUsers={refetchBlockedUsers}
         userSocket={userSocket}
-        toggleError={toggleAlert}
-        setAlertMsg={setAlertMsg}
         setNewChannel={setNewChannel}
         channelInfoOpen={channelInfoOpen}
         toggleChannelInfo={toggleChannelInfo}
@@ -110,7 +104,6 @@ export default function RoomContextMenu(props: Props) {
         gameSocket={gameSocket}
       ></ChannelInfoDialog>
       <GetIdDialog
-        setAlertMsg={setAlertMsg}
         channelSocket={channelSocket}
         open={openId}
         toggleOpen={toggleOpenId}

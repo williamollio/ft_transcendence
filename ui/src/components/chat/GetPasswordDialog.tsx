@@ -53,10 +53,10 @@ export default function GetPasswordDialog(props: Props) {
 
   return (
     <Dialog open={open} onClose={handleClose} onKeyDown={handleSubmit}>
-      <DialogContent>{t(translationKeys.leavePasswordEmpty)}</DialogContent>
+      <DialogContent>{t(translationKeys.roomContext.leavePasswordEmpty)}</DialogContent>
       {channel && channel.access === "PROTECTED" ? (
         <TextField
-          label={t(translationKeys.oldPassword)}
+          label={t(translationKeys.roomContext.oldPassword)}
           type="password"
           value={oldInput}
           onChange={handleOldChange}
@@ -65,7 +65,7 @@ export default function GetPasswordDialog(props: Props) {
         false
       )}
       <TextField
-        label={t(translationKeys.password)}
+        label={t(translationKeys.createInfo.password)}
         type="password"
         value={input}
         onChange={handleChange}

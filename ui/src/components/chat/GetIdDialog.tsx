@@ -7,7 +7,6 @@ import ChannelService from "../../services/channel.service";
 import { translationKeys } from "./constants";
 
 interface Props {
-  setAlertMsg: Dispatch<SetStateAction<string>>;
   open: boolean;
   toggleOpen: any;
   channel: chatRoom | undefined;
@@ -15,7 +14,7 @@ interface Props {
 }
 
 export default function GetIdDialog(props: Props) {
-  const { setAlertMsg, open, toggleOpen, channel, channelSocket } = props;
+  const {  open, toggleOpen, channel, channelSocket } = props;
   const { t } = useTranslation();
 
   const [input, setInput] = useState<string>("");
@@ -31,7 +30,6 @@ export default function GetIdDialog(props: Props) {
 
   const handleSubmit = (e: any) => {
     if (e.key === "Enter") {
-      setAlertMsg(t(translationKeys.errorMessages.inviteFailed) as string);
       ChannelService.getUserByName(input)
         .then((resolve) => {
           channelSocket.inviteToChannel(channel, resolve.data.id);
@@ -46,7 +44,7 @@ export default function GetIdDialog(props: Props) {
   return (
     <Dialog open={open} onClose={handleClose}>
       <TextField
-        label={t(translationKeys.userName)}
+        label={t(translationKeys.invite.userName)}
         value={input}
         onChange={handleChange}
         onKeyDown={handleSubmit}

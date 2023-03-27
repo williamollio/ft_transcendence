@@ -39,14 +39,14 @@ export default function CreateForm(props: Props) {
   return (
     <Grid container>
       <Grid item>
-        <DialogTitle>{t(translationKeys.createChannelTitle)}</DialogTitle>
+        <DialogTitle>{t(translationKeys.createInfo.createChannelTitle)}</DialogTitle>
       </Grid>
       <Grid item>
         <DialogContent>
           <Grid container spacing="20px">
             <Grid item>
               <DialogContentText>
-                {t(translationKeys.createChannelText)}
+                {t(translationKeys.createInfo.createChannelText)}
               </DialogContentText>
             </Grid>
             <Grid item>
@@ -62,7 +62,7 @@ export default function CreateForm(props: Props) {
                     key: event.target.value,
                   })
                 }
-                label={t(translationKeys.name)}
+                label={t(translationKeys.createInfo.name)}
                 type="text"
                 InputLabelProps={{ shrink: true }}
               />
@@ -70,18 +70,18 @@ export default function CreateForm(props: Props) {
             <Grid item>
               <Select
                 size="small"
-                label={t(translationKeys.access)}
+                label={t(translationKeys.createInfo.access)}
                 type="string"
                 variant="outlined"
                 value={dialogValue.access}
                 onChange={handleAccessChange}
               >
-                <MenuItem value="PUBLIC">{t(translationKeys.public)}</MenuItem>
+                <MenuItem value="PUBLIC">{t(translationKeys.createInfo.public)}</MenuItem>
                 <MenuItem value="PRIVATE">
-                  {t(translationKeys.private)}
+                  {t(translationKeys.createInfo.private)}
                 </MenuItem>
                 <MenuItem value="PROTECTED">
-                  {t(translationKeys.protected)}
+                  {t(translationKeys.createInfo.protected)}
                 </MenuItem>
               </Select>
             </Grid>
@@ -97,7 +97,7 @@ export default function CreateForm(props: Props) {
                     password: event.target.value,
                   })
                 }
-                label={t(translationKeys.password)}
+                label={t(translationKeys.createInfo.password)}
                 type="password"
                 variant="outlined"
                 InputLabelProps={{ shrink: true }}

@@ -27,14 +27,14 @@ export default function JoinForm(props: Props) {
   return (
     <Grid container>
       <Grid item>
-        <DialogTitle>{t(translationKeys.joinChannelTitle)}</DialogTitle>
+        <DialogTitle>{t(translationKeys.createInfo.joinChannelTitle)}</DialogTitle>
       </Grid>
       <Grid item>
         <DialogContent>
           <Grid container spacing="20px">
             <Grid item>
               <DialogContentText>
-                {t(translationKeys.joinChannelText)}
+                {t(translationKeys.createInfo.joinChannelText)}
               </DialogContentText>
             </Grid>
             <Grid item>
@@ -50,7 +50,7 @@ export default function JoinForm(props: Props) {
                     name: event.target.value,
                   })
                 }
-                label={t(translationKeys.name)}
+                label={t(translationKeys.createInfo.name)}
                 type="text"
                 InputLabelProps={{ shrink: true }}
               />
@@ -66,7 +66,7 @@ export default function JoinForm(props: Props) {
                     password: event.target.value,
                   })
                 }
-                label={t(translationKeys.password)}
+                label={t(translationKeys.createInfo.password)}
                 type="password"
                 variant="outlined"
                 InputLabelProps={{ shrink: true }}

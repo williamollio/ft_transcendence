@@ -25,7 +25,6 @@ interface Props {
   currentRoom: chatRoom | boolean;
   setContextMenu: Dispatch<SetStateAction<ContextMenu | null>>;
   contextMenu: ContextMenu | null;
-  toggleAlert: Dispatch<SetStateAction<boolean>>;
   toggleOpen: Dispatch<SetStateAction<boolean>>;
   channelSocket: ChannelSocket;
   setNewChannel: (newChannel: chatRoom | boolean) => void;
@@ -37,7 +36,6 @@ export function ChannelTabs(props: Props) {
     currentRoom,
     setContextMenu,
     contextMenu,
-    toggleAlert,
     toggleOpen,
     channelSocket,
     setNewChannel,
@@ -111,7 +109,7 @@ export function ChannelTabs(props: Props) {
                   return {
                     message: message.content.replace(
                       `[${channelSocket.user.name}]`,
-                      `[${t(translationKeys.you)}]`
+                      `[${t(translationKeys.chatInfo.you)}]`
                     ),
                   };
                 }
@@ -142,7 +140,7 @@ export function ChannelTabs(props: Props) {
                         return {
                           message: message.content.replace(
                             `[${channelSocket.user.name}]`,
-                            `[${t(translationKeys.you)}]`
+                            `[${t(translationKeys.chatInfo.you)}]`
                           ),
                         };
                       }
@@ -199,7 +197,7 @@ export function ChannelTabs(props: Props) {
             let channelIndex = channelSocket.channels.push(
               new chatRoom(
                 data.id,
-                userName ? userName : (t(translationKeys.missing) as string),
+                userName ? userName : (t(translationKeys.chatInfo.missing) as string),
                 data.type
               )
             );
@@ -221,10 +219,6 @@ export function ChannelTabs(props: Props) {
           setNewChannel(channelSocket.channels[channelIndex - 1]);
         }
       }
-      localStorage.setItem(
-        "joinedChannels" + channelSocket.user.id,
-        JSON.stringify(channelSocket.channels)
-      );
       setChannelQueryId(undefined);
     }
   }, [data, isLoading, isError, isRefetching]);
@@ -296,7 +290,7 @@ export function ChannelTabs(props: Props) {
     };
   }, [channelSocket.socket, channelSocket.socket.connected]);
 
-  const handleRoomChange = (event: SyntheticEvent, newValue: chatRoom) => {
+  const handleRoomChange = (_event: SyntheticEvent, newValue: chatRoom) => {
     setNewChannel(newValue);
   };
 
@@ -314,7 +308,6 @@ export function ChannelTabs(props: Props) {
   };
 
   const newRoom = () => {
-    toggleAlert(false);
     setNewChannel(currentRoom);
     toggleOpen(true);
   };

@@ -86,7 +86,7 @@ export default function Chat(props: Props) {
         e.target.value.trim()
       ) {
         currentRoom.messages.push({
-          message: `[${t(translationKeys.you)}]: ` + e.target.value,
+          message: `[${t(translationKeys.chatInfo.you)}]: ` + e.target.value,
           room: currentRoom.id,
         });
         channelSocket.messageRoom({
@@ -167,7 +167,7 @@ export default function Chat(props: Props) {
     if (index >= 0) {
       ChannelService.getUserName(data.userId).then((res) => {
         channelSocket.channels[index].messages.push({
-          message: `${res.data.name} ${t(translationKeys.userLeft)}`,
+          message: `${res.data.name} ${t(translationKeys.chatInfo.userLeft)}`,
           room: data.channelId,
         });
         updateMessages(channelSocket.channels[index], data.channelId);
@@ -182,7 +182,7 @@ export default function Chat(props: Props) {
     if (index >= 0) {
       ChannelService.getUserName(data.userId).then((res) => {
         channelSocket.channels[index].messages.push({
-          message: `${res.data.name} ${t(translationKeys.userJoined)}`,
+          message: `${res.data.name} ${t(translationKeys.chatInfo.userJoined)}`,
           room: data.channelId,
         });
         updateMessages(channelSocket.channels[index], data.channelId);
@@ -201,8 +201,8 @@ export default function Chat(props: Props) {
         type: TranscendanceStateActionType.TOGGLE_TOAST,
         toast: {
           type: ToastType.SUCCESS,
-          title: "Invited to Room",
-          message: t(translationKeys.inviteTo) as string,
+          title: t(translationKeys.invite.roomInvite) as string,
+          message: t(translationKeys.invite.inviteTo) as string,
           onAccept: () => handleInviteSubmit(data),
           onRefuse: () => {},
         },
@@ -232,7 +232,7 @@ export default function Chat(props: Props) {
       );
       if (mutedChannel) {
         mutedChannel.messages.push({
-          message: t(translationKeys.muted),
+          message: t(translationKeys.chatInfo.muted),
         });
         updateMessages(mutedChannel, result.channelActionOnChannelId);
       }
@@ -353,7 +353,6 @@ export default function Chat(props: Props) {
           currentRoom={currentRoom}
           setContextMenu={setContextMenu}
           contextMenu={contextMenu}
-          toggleAlert={toggleAlert}
           toggleOpen={toggleOpen}
           channelSocket={channelSocket}
           setNewChannel={setNewChannel}
@@ -392,8 +391,6 @@ export default function Chat(props: Props) {
             open={open}
             toggleOpen={toggleOpen}
             channelSocket={channelSocket}
-            setAlertMsg={setAlertMsg}
-            toggleAlert={toggleAlert}
           ></AddChannelDialog>
           <Grid item alignSelf={"flex-end"}>
             <TextField
@@ -413,8 +410,8 @@ export default function Chat(props: Props) {
           channelSocket.joinRoom(roomInvite.id, input);
           setRoomInvite({ id: "", type: "PRIVATE", name: "" });
         }}
-        dialogContent={t(translationKeys.passwordReq)!}
-        label={t(translationKeys.password)}
+        dialogContent={t(translationKeys.chatInfo.passwordReq)!}
+        label={t(translationKeys.createInfo.password)}
         type="password"
       ></GetTextInputDialog>
     </Paper>
