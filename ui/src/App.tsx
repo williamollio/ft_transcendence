@@ -1,4 +1,4 @@
-import { ReactElement, useEffect, useState } from "react";
+import { ReactElement, useState } from "react";
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import ProfileView from "./views/Profile/ProfileView";
@@ -14,17 +14,11 @@ import theme from "./MuiTheme";
 import classes from "./styles.module.scss";
 import { useImageStore } from "./store/users-store";
 import { PrivateRoute } from "./components/Protection/PrivateRoute";
-import {
-  Cookie,
-  getIsAuthenticated,
-  getTokenData,
-  initAuthToken,
-} from "./utils/auth-helper";
+import { getIsAuthenticated, initAuthToken } from "./utils/auth-helper";
 import { UserSocket } from "./classes/UserSocket.class";
 import { ChannelSocket } from "./classes/ChannelSocket.class";
 import GameView from "./views/Game/GameView";
 import StatsView from "./views/Stats/StatsView";
-import usersService from "./services/users.service";
 
 export default function App() {
   const [userSocket] = useState<UserSocket>(new UserSocket());

@@ -1,14 +1,10 @@
 import React, { FC } from "react";
-import {
-  Cookie,
-  getIsAuthenticated,
-  getTokenData,
-  initAuthToken,
-} from "../../utils/auth-helper";
+import { Cookie, getTokenData, initAuthToken } from "../../utils/auth-helper";
 import usersService from "../../services/users.service";
 import { User } from "../../interfaces/user.interface";
 import { AuthCheck } from "./AuthCheck";
 import { CircularProgress } from "@mui/material";
+import { RoutePath } from "../../interfaces/router.interface";
 
 export const PrivateRoute: FC<{ children: React.ReactElement }> = ({
   children,
@@ -26,7 +22,12 @@ export const PrivateRoute: FC<{ children: React.ReactElement }> = ({
     React.useState<boolean>(false);
 
   React.useEffect(() => {
-    const token = localStorage.getItem(Cookie.TOKEN);
+    let token;
+    if (window.location.pathname === RoutePath.REDIRECT) {
+      token = initAuthToken();
+    } else {
+      token = localStorage.getItem(Cookie.TOKEN);
+    }
     if (token) {
       const userId = getTokenData(token).id;
       fetchCurrentUser(userId);
