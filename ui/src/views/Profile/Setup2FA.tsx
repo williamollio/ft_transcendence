@@ -138,7 +138,7 @@ export default function Setup2FA(): React.ReactElement {
   }
 
   async function onSubmitCode() {
-    if (!QRCodeUrl) {
+    if (QRCodeUrl === "") {
       return;
     }
     const responseSend2fa = await authService.sendSecondFactor(input);
@@ -150,6 +150,11 @@ export default function Setup2FA(): React.ReactElement {
     }
     setInput(Array(CODE_LENGTH).fill(""));
   }
+
+  const isQRCode = () => {
+    if (QRCodeUrl != "") return true;
+    return false;
+  };
 
   const OTPInputField = ({ index }: { index: number }) => {
     return (
@@ -212,6 +217,7 @@ export default function Setup2FA(): React.ReactElement {
                     className={classes.iconButton}
                     color="primary"
                     onClick={trigger2fa}
+                    disabled={isQRCode()}
                   >
                     {is2faEnabled
                       ? t(translationKeys.buttons.disable)
