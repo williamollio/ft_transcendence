@@ -97,7 +97,7 @@ export class AuthController {
   }
 
   @Post('2fa/disable')
-  @UseGuards(JwtGuard) // TODO : FullAuthGuard
+  @UseGuards(FullAuthGuard)
   async disable2FA(@Req() request: any) {
     await this.authService.disable2FA(request.user.id);
     return HttpStatus.OK;
