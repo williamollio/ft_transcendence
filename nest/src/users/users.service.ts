@@ -86,6 +86,9 @@ export class UsersService {
       where: { id },
       select: {
         id: true,
+        intraId: true,
+        secondFactorSecret: true,
+        refreshToken: true,
         name: true,
         filename: true,
         status: true,
