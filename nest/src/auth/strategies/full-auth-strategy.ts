@@ -2,11 +2,11 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-jwt';
 import { UsersService } from '../../users/users.service';
-import process from 'process';
+import * as process from 'process';
 import { JwtPayload, JwtStrategy } from './jwt.strategy';
 
 @Injectable()
-export class FullAuthStrategy extends PassportStrategy(Strategy, 'jwt-2fa') {
+export class FullAuthStrategy extends PassportStrategy(Strategy, 'jwt2fa') {
   constructor(private userService: UsersService) {
     super({
       ignoreExpiration: false,
