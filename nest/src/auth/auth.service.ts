@@ -82,6 +82,8 @@ export class AuthService {
       await argon2.hash(tokens.refreshToken),
     );
 
+    await this.userService.set2FALogged(foundUser.id, false);
+
     return tokens;
   }
 
