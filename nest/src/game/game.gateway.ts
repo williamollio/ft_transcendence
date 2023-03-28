@@ -112,22 +112,26 @@ export class GameGateway {
     );
     if (playerNumber.playerNumber === 1)
       this.server.emit('gameJoined', playerNumber);
+	return playerNumber;
   }
 
   @SubscribeMessage('createInvitationGame')
-  createInvitationGame(
+  async createInvitationGame(
     @MessageBody('mode') mode: GameMode,
     @MessageBody('opponent') playerTwoId: string,
     @ConnectedSocket() client: Socket,
     @GetCurrentUserId() playerOneId: string,
   ) {
     this.socketToId.set(client.id, playerOneId);
-    return this.gameService.createInvitationGame(
+    const returnMessage = await this.gameService.createInvitationGame(
       client,
       this.server,
       playerOneId,
       playerTwoId,
       mode,
     );
+	if (returnMessage === "gameJoined")
+      this.server.emit('gameJoined', {playerNumber: 1});
+	return returnMessage;
   }
 }

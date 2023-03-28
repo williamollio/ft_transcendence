@@ -77,7 +77,7 @@ export default function ChannelInfoContext(props: Props) {
     if (contextMenu && contextMenu.user) {
       channelSocket.createDm(contextMenu.user);
     }
-	toggleChannelInfo(false);
+    toggleChannelInfo(false);
   };
 
   const handleProfile = () => {

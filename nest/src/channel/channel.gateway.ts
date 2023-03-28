@@ -89,7 +89,7 @@ export class ChannelGateway {
     const targetSockets: Array<string> = [];
     targetSockets.push(clientSocket.id);
     dto = {
-      ...dto,
+      ...dto, name: dto.name.trim()
     };
     let channel: Channel | string | null;
     if (dto.type === ChannelType.DIRECTMESSAGE) {

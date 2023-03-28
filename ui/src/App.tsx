@@ -103,29 +103,17 @@ export default function App() {
 
   return (
     <>
-      {transcendanceState.toast &&
-        !transcendanceState.toast.onAccept &&
-        !transcendanceState.toast.onRefuse && (
-          <Toast
-            type={transcendanceState.toast?.type}
-            title={transcendanceState.toast?.title}
-            message={transcendanceState.toast?.message}
-            onClose={closeToast}
-          />
-        )}
-      {transcendanceState.toast &&
-        transcendanceState.toast.onAccept &&
-        transcendanceState.toast.onRefuse && (
-          <ToastDialog
-            type={transcendanceState.toast?.type}
-            title={transcendanceState.toast?.title}
-            message={transcendanceState.toast?.message}
-            onClose={closeToast}
-            autoClose={false}
-            onAccept={transcendanceState.toast?.onAccept}
-            onRefuse={transcendanceState.toast?.onRefuse}
-          />
-        )}
+      {transcendanceState.toast && (
+        <Toast
+          type={transcendanceState.toast?.type}
+          title={transcendanceState.toast?.title}
+          message={transcendanceState.toast?.message}
+		  autoClose={transcendanceState.toast?.autoClose}
+          onClose={closeToast}
+          onAccept={transcendanceState.toast?.onAccept}
+          onRefuse={transcendanceState.toast?.onRefuse}
+        />
+      )}
       <Box
         display={"flex"}
         flexDirection={"column"}

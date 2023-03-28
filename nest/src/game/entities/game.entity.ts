@@ -192,7 +192,8 @@ export class Game {
     paddleSize: number,
   ): boolean {
     const isColliding =
-      ballX === paddleX &&
+      (ballX + ballHeight / 2 === paddleX ||
+        ballX - ballHeight / 2 === paddleX) &&
       ballY + ballHeight >= paddleY - paddleSize / 2 &&
       ballY <= paddleY + paddleSize / 2;
     return isColliding;
@@ -208,259 +209,132 @@ export class Game {
     this.diry = generateRandomNumber(MIN_RANDOM_Y_SPEED, MAX_RANDOM_Y_SPEED);
   }
 
-  //   moveBall(gameService: GameService, server: Server) {
-  //     const {
-  //       relativeGameWidth,
-  //       relativeGameHeight,
-  //       player1PaddlePosX,
-  //       player2PaddlePosX,
-  //       ballHeight,
-  //       maxSpeed,
-  //       speeds,
-  //     } = this.gameConstants;
-
-  //     if (this.by + ballHeight >= relativeGameHeight) { // bottom collision
-  //       this.by = relativeGameHeight - ballHeight;
-  //       this.diry = -this.diry;
-  //     } else if (this.by <= 0) { // top collision
-  //       this.by = 0;
-  //       this.diry = -this.diry;
-  //     }
-  //     // player paddle collision
-  //     if (this.detectPaddleCollision(this.bx, this.by, player1PaddlePosX, this.p1y, this.paddleSize, ballHeight)) {
-  //       switch (this.mode) {
-  //         case GameMode.MAYHEM: {
-  //           if (this.dirx > 0) {
-  //             if (this.gameConstants.speed < maxSpeed) {
-  //               this.gameConstants.speed = 5;
-  //               this.dirx = speeds[5];
-  //             }
-  //           } else {
-  //             this.dirx = this.dirx * -1;
-  //             if (this.gameConstants.speed < maxSpeed) {
-  //               this.dirx = speeds[this.gameConstants.speed++];
-  //             }
-  //           }
-  //           this.diry = (this.by - this.p1y) / 2;
-  //           break;
-  //         }
-  //         case GameMode.CLASSIC: {
-  //           this.dirx = this.dirx * -1;
-  //           if (this.gameConstants.speed < maxSpeed) {
-  //             this.dirx = speeds[this.gameConstants.speed++];
-  //           }
-  //           this.diry = (this.by - this.p1y) / 2;
-  //           break;
-  //         }
-  //       }
-  //     }
-  //     else if (this.detectPaddleCollision(this.bx, this.by, player2PaddlePosX, this.p2y, this.paddleSize, ballHeight)) {
-  //       switch (this.mode) {
-  //         case GameMode.MAYHEM: {
-  //           if (this.dirx < 0) {
-  //             if (this.gameConstants.speed < maxSpeed) {
-  //               this.gameConstants.speed = 5;
-  //               this.dirx = -speeds[5];
-  //             }
-  //           } else {
-  //             this.dirx = this.dirx * -1;
-  //             if (this.gameConstants.speed < maxSpeed) {
-  //               this.dirx = -speeds[this.gameConstants.speed++];
-  //             }
-  //           }
-  //           this.diry = this.by - this.p2y;
-  //           break;
-  //         }
-  //         case GameMode.CLASSIC: {
-  //           this.dirx = this.dirx * -1;
-  //           if (this.gameConstants.speed < maxSpeed) {
-  //             this.dirx = -speeds[this.gameConstants.speed++];
-  //           }
-  //           this.diry = this.by - this.p2y;
-  //           break;
-  //         }
-  //       }
-  //     }
-
-  //     const SCORE_LIMIT = 10;
-
-  //     if (this.bx <= 0) {
-  //       this.p2s += 1;
-  //       if (this.p2s >= SCORE_LIMIT) {
-  //         gameService.winGame(this, server);
-  //       }
-  //       switch (this.mode) {
-  //         case GameMode.CLASSIC: {
-  //           this.resetBallForClassicMode();
-  //           break;
-  //         }
-  //         case GameMode.MAYHEM: {
-  //           this.bx = 0;
-  //           this.dirx = speeds[(this.gameConstants.speed = 1)];
-  //           break;
-  //         }
-  //       }
-  //     }
-
-  //     if (this.bx >= relativeGameWidth) {
-  //       this.p1s += 1;
-  //       if (this.p1s >= SCORE_LIMIT) {
-  //         gameService.winGame(this, server);
-  //       }
-  //       switch (this.mode) {
-  //         case GameMode.CLASSIC: {
-  //           this.resetBallForClassicMode();
-  //           break;
-  //         }
-  //         case GameMode.MAYHEM: {
-  //           this.bx = relativeGameWidth;
-  //           this.dirx = -speeds[(this.gameConstants.speed = 1)];
-  //           break;
-  //         }
-  //       }
-  //     }
-
-  //     this.bx += this.dirx;
-  //     this.by += this.diry;
-  //     return this;
-  //   }
-
   moveBall(gameService: GameService, server: Server) {
-    if (
-      this.by + this.gameConstants.ballHeight / 2 >=
-      this.gameConstants.relativeGameHeight
-    ) {
-      this.by =
-        this.gameConstants.relativeGameHeight - this.gameConstants.ballHeight;
-      this.diry = this.diry * -1;
+    const {
+      relativeGameWidth,
+      relativeGameHeight,
+      player1PaddlePosX,
+      player2PaddlePosX,
+      ballHeight,
+      maxSpeed,
+      speeds,
+    } = this.gameConstants;
+
+    if (this.by + ballHeight >= relativeGameHeight) {
+      // bottom collision
+      this.by = relativeGameHeight - ballHeight;
+      this.diry = -this.diry;
+    } else if (this.by <= 0) {
+      // top collision
+      this.by = 0;
+      this.diry = -this.diry;
     }
-    if (this.by - this.gameConstants.ballHeight / 2 <= 0) {
-      this.by = 0 + this.gameConstants.ballHeight / 2;
-      this.diry = this.diry * -1;
-    }
+    // player paddle collision
     if (
-      this.bx - this.gameConstants.ballHeight / 2 ==
-      this.gameConstants.player1PaddlePosX
+      this.detectPaddleCollision(
+        this.bx,
+        this.by,
+        ballHeight,
+        player1PaddlePosX,
+        this.p1y,
+        this.paddleSize,
+      )
     ) {
-      if (
-        this.by + this.gameConstants.ballHeight / 2 >=
-          this.p1y - this.paddleSize / 2 - 3 &&
-        this.by - this.gameConstants.ballHeight / 2 <=
-          this.p1y + this.paddleSize / 2 + 3
-      ) {
-        switch (this.mode) {
-          case GameMode.MAYHEM: {
-            if (this.dirx > 0) {
-              if (this.gameConstants.speed < this.gameConstants.maxSpeed) {
-                this.gameConstants.speed = 5;
-                this.dirx = this.gameConstants.speeds[5];
-              }
-            } else {
-              this.dirx = this.dirx * -1;
-              if (this.gameConstants.speed < this.gameConstants.maxSpeed) {
-                // this.dirx += this.gameConstants.speedIncrease;
-                this.dirx =
-                  this.gameConstants.speeds[this.gameConstants.speed++];
-              }
+      switch (this.mode) {
+        case GameMode.MAYHEM: {
+          if (this.dirx > 0) {
+            if (this.gameConstants.speed < maxSpeed) {
+              this.gameConstants.speed = 5;
+              this.dirx = speeds[5];
             }
-            break;
-          }
-          case GameMode.CLASSIC: {
+          } else {
             this.dirx = this.dirx * -1;
-            // if (this.gameConstants.speed < this.gameConstants.maxSpeed) {
-            // this.dirx += this.gameConstants.speedIncrease;
-            // this.dirx = this.gameConstants.speeds[this.gameConstants.speed++];
-            // }
-            break;
+            if (this.gameConstants.speed < maxSpeed) {
+              this.dirx = speeds[this.gameConstants.speed++];
+            }
           }
+          this.diry = (this.by - this.p1y) / 2;
+          break;
         }
-        // this number stays magic because it actually is magic
-        this.diry = (this.by - this.p1y) / 2;
+        case GameMode.CLASSIC: {
+          this.dirx = this.dirx * -1;
+          if (this.gameConstants.speed < maxSpeed) {
+            this.dirx = speeds[this.gameConstants.speed++];
+          }
+          this.diry = (this.by - this.p1y) / 2;
+          break;
+        }
+      }
+    } else if (
+      this.detectPaddleCollision(
+        this.bx,
+        this.by,
+        ballHeight,
+        player2PaddlePosX,
+        this.p2y,
+        this.paddleSize,
+      )
+    ) {
+      switch (this.mode) {
+        case GameMode.MAYHEM: {
+          if (this.dirx < 0) {
+            if (this.gameConstants.speed < maxSpeed) {
+              this.gameConstants.speed = 5;
+              this.dirx = -speeds[5];
+            }
+          } else {
+            this.dirx = this.dirx * -1;
+            if (this.gameConstants.speed < maxSpeed) {
+              this.dirx = -speeds[this.gameConstants.speed++];
+            }
+          }
+          this.diry = this.by - this.p2y;
+          break;
+        }
+        case GameMode.CLASSIC: {
+          this.dirx = this.dirx * -1;
+          if (this.gameConstants.speed < maxSpeed) {
+            this.dirx = -speeds[this.gameConstants.speed++];
+          }
+          this.diry = this.by - this.p2y;
+          break;
+        }
       }
     }
 
-    if (
-      this.bx + this.gameConstants.ballHeight / 2 ==
-      this.gameConstants.player2PaddlePosX
-    ) {
-      if (
-        this.by + this.gameConstants.ballHeight / 2 >=
-          this.p2y - this.paddleSize / 2 &&
-        this.by - this.gameConstants.ballHeight / 2 <=
-          this.p2y + this.paddleSize / 2
-      ) {
-        switch (this.mode) {
-          case GameMode.MAYHEM: {
-            if (this.dirx < 0) {
-              if (this.gameConstants.speed < this.gameConstants.maxSpeed) {
-                this.gameConstants.speed = 5;
-                this.dirx = -this.gameConstants.speeds[5];
-              }
-            } else {
-              this.dirx = this.dirx * -1;
-              if (this.gameConstants.speed < this.gameConstants.maxSpeed) {
-                // this.dirx -= this.gameConstants.speedIncrease;
-                this.dirx =
-                  -this.gameConstants.speeds[this.gameConstants.speed++];
-              }
-            }
-            break;
-          }
-          case GameMode.CLASSIC: {
-            this.dirx = this.dirx * -1;
-            // if (this.gameConstants.speed < this.gameConstants.maxSpeed) {
-            //   // this.dirx -= this.gameConstants.speedIncrease;
-            //   this.dirx =
-            //     -this.gameConstants.speeds[this.gameConstants.speed++];
-            // }
-            break;
-          }
-        }
-        this.diry = this.by - this.p2y;
-      }
-    }
+    const SCORE_LIMIT = 10;
 
     if (this.bx <= 0) {
       this.p2s += 1;
-      if (this.p2s >= 10) {
+      if (this.p2s >= SCORE_LIMIT) {
         gameService.winGame(this, server);
       }
       switch (this.mode) {
         case GameMode.CLASSIC: {
-          this.dirx = this.gameConstants.speeds[(this.gameConstants.speed = 0)];
-          this.bx = this.gameConstants.relativeMiddleX;
-          this.by = this.gameConstants.relativeMiddleY;
-          this.diry = generateRandomNumber(-20, 20);
+          this.resetBallForClassicMode();
           break;
         }
-
         case GameMode.MAYHEM: {
           this.bx = 0;
-          this.dirx = this.gameConstants.speeds[(this.gameConstants.speed = 1)];
+          this.dirx = speeds[(this.gameConstants.speed = 1)];
           break;
         }
       }
     }
 
-    if (this.bx >= this.gameConstants.relativeGameWidth) {
+    if (this.bx >= relativeGameWidth) {
       this.p1s += 1;
-      if (this.p1s >= 10) {
+      if (this.p1s >= SCORE_LIMIT) {
         gameService.winGame(this, server);
       }
       switch (this.mode) {
         case GameMode.CLASSIC: {
-          // this.dirx = -this.gameConstants.initialSpeed;
-          this.dirx =
-            -this.gameConstants.speeds[(this.gameConstants.speed = 0)];
-          this.bx = this.gameConstants.relativeMiddleX;
-          this.by = this.gameConstants.relativeMiddleY;
-          this.diry = generateRandomNumber(-20, 20);
+          this.resetBallForClassicMode();
           break;
         }
         case GameMode.MAYHEM: {
-          this.bx = this.gameConstants.relativeGameWidth;
-          this.dirx =
-            -this.gameConstants.speeds[(this.gameConstants.speed = 1)];
+          this.bx = relativeGameWidth;
+          this.dirx = -speeds[(this.gameConstants.speed = 1)];
           break;
         }
       }

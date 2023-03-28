@@ -48,8 +48,6 @@ export default function Chat(props: Props) {
   const [messages, setMessages] = useState<Array<messagesDto>>([]);
   const [currentRoom, setCurrentRoom] = useState<chatRoom | boolean>(false);
   const [contextMenu, setContextMenu] = useState<ContextMenu | null>(null);
-  const [alert, toggleAlert] = useState<boolean>(false); // remove
-  const [alertMsg, setAlertMsg] = useState<string>(""); // remove
   const [invitePassword, toggleInvitePassword] = useState<boolean>(false);
   const [roomInvite, setRoomInvite] = useState<RoomInvite>({
     id: "",
@@ -155,11 +153,6 @@ export default function Chat(props: Props) {
     }
   };
 
-  const messageRoomFailedListener = () => {
-    setAlertMsg(t(translationKeys.errorMessages.messageSendFail) as string);
-    toggleAlert(true);
-  };
-
   const roomLeftListener = (data: { userId: string; channelId: string }) => {
     let index = channelSocket.channels.findIndex(
       (element) => element.id === data.channelId
@@ -200,7 +193,7 @@ export default function Chat(props: Props) {
       toast.dispatchTranscendanceState({
         type: TranscendanceStateActionType.TOGGLE_TOAST,
         toast: {
-          type: ToastType.SUCCESS,
+          type: ToastType.INVITE,
           title: t(translationKeys.invite.roomInvite) as string,
           message: t(translationKeys.invite.inviteTo) as string,
           onAccept: () => handleInviteSubmit(data),
@@ -253,10 +246,6 @@ export default function Chat(props: Props) {
           "incomingMessage",
           incomingMessageListener
         );
-        channelSocket.registerListener(
-          "messageRoomFailed",
-          messageRoomFailedListener
-        );
         channelSocket.registerListener("roomLeft", roomLeftListener);
         channelSocket.registerListener("roomJoined", roomJoinedListener);
         channelSocket.registerListener(
@@ -282,10 +271,6 @@ export default function Chat(props: Props) {
           channelSocket.removeListener(
             "incomingMessage",
             incomingMessageListener
-          );
-          channelSocket.removeListener(
-            "messageRoomFailed",
-            messageRoomFailedListener
           );
           channelSocket.removeListener("roomLeft", roomLeftListener);
           channelSocket.removeListener("roomJoined", roomJoinedListener);
@@ -366,8 +351,6 @@ export default function Chat(props: Props) {
           contextMenu={contextMenu}
           setContextMenu={setContextMenu}
           channelSocket={channelSocket}
-          setAlertMsg={setAlertMsg}
-          toggleAlert={toggleAlert}
           gameSocket={gameSocket}
         ></RoomContextMenu>
         <Divider></Divider>

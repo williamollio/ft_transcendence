@@ -17,8 +17,6 @@ interface Props {
   contextMenu: { mouseX: number; mouseY: number; channel: chatRoom } | null;
   setContextMenu: any;
   channelSocket: ChannelSocket;
-  setAlertMsg: Dispatch<SetStateAction<string>>;
-  toggleAlert: Dispatch<SetStateAction<boolean>>;
   gameSocket: GameSocket;
 }
 
@@ -31,8 +29,6 @@ export default function RoomContextMenu(props: Props) {
     contextMenu,
     setContextMenu,
     channelSocket,
-    setAlertMsg,
-    toggleAlert,
     gameSocket,
   } = props;
   const { t } = useTranslation();

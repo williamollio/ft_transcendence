@@ -81,14 +81,15 @@ export default function GameBoard(props: Props) {
     toast.dispatchTranscendanceState({
       type: TranscendanceStateActionType.TOGGLE_TOAST,
       toast: {
-        type: ToastType.SUCCESS,
+        type: ToastType.INVITE,
         title: t(translationKeys.gameInvite) as string,
         message:
-          ((data.initiatingUser.name + t(translationKeys.inviteTo)) as string) +
-            data.game.mode ===
-          GameMode.CLASSIC
+          `${data.initiatingUser.name} ${t(translationKeys.inviteTo) as string}
+            ${data.game.mode ===
+          "CLASSIC"
             ? "Classic"
-            : "Mayhem",
+            : "Mayhem"}`,
+        autoClose: false,
         onAccept: () =>
           gameSocket.joinGame(data.game.mode, data.initiatingUser.id),
         onRefuse: () => gameSocket.refuseInvite(data.initiatingUser.id),

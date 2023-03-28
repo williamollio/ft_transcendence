@@ -1,9 +1,13 @@
 import React from "react";
 import { makeStyles } from "tss-react/mui";
 import classNames from "classnames";
+import { IconButton } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
+import CheckIcon from "@mui/icons-material/Check";
 
 export enum ToastType {
   SUCCESS = "SUCCESS",
+  INVITE = "INVITE",
   WARNING = "WARNING",
   ERROR = "ERROR",
 }
@@ -14,15 +18,25 @@ interface Props {
   message?: string;
   autoClose?: boolean;
   onClose: () => void;
+  onAccept?: () => void;
+  onRefuse?: () => void;
 }
 
 const TOAST_TIMEOUT = 4000;
 
 export default function Toast(props: Props): React.ReactElement {
-  const { type, title, message, autoClose = true, onClose } = props;
+  const {
+    type,
+    title,
+    message,
+    autoClose = true,
+    onClose,
+    onRefuse,
+    onAccept,
+  } = props;
   const { classes } = useStyles();
 
-  const isSuccess = type === ToastType.SUCCESS;
+  const isSuccess = type === ToastType.SUCCESS || ToastType.INVITE;
   const isWarning = type === ToastType.WARNING;
   const isError = type === ToastType.ERROR;
 
@@ -47,6 +61,34 @@ export default function Toast(props: Props): React.ReactElement {
         <div>
           <h3 className={classes.text}>{title}</h3>
           <p className={classes.text}>{message}</p>
+          {type === ToastType.INVITE ? (
+            <div>
+              <IconButton
+                aria-label="Accept"
+                color="inherit"
+                size="small"
+                onClick={() => {
+                  onClose();
+                  onAccept ? onAccept() : false;
+                }}
+              >
+                <CheckIcon fontSize="inherit" />
+              </IconButton>
+              <IconButton
+                aria-label="Reject"
+                color="inherit"
+                size="small"
+                onClick={() => {
+                  onClose();
+                  onRefuse ? onRefuse() : false;
+                }}
+              >
+                <CloseIcon fontSize="inherit" />
+              </IconButton>
+            </div>
+          ) : (
+            false
+          )}
         </div>
       </div>
     </div>
@@ -58,7 +100,7 @@ const useStyles = makeStyles()(() => ({
     position: "fixed",
     right: "0.85rem",
     zIndex: "9999999",
-	background : "grey"
+    background: "grey",
   },
 
   toastBox: {

@@ -62,6 +62,7 @@ export const failEvents = [
   "banFailed",
   "muteFailed",
   "updateRoleFailed",
+  "messageRoomFailed",
 ];
 
 export interface ContextMenu {
