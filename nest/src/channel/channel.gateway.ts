@@ -46,7 +46,7 @@ export class ChannelGateway {
 
   @SubscribeMessage('connect')
   handleConnection(@ConnectedSocket() clientSocket: Socket) {
-	if (
+    if (
       clientSocket.handshake.auth &&
       clientSocket.handshake.auth.token !== ''
     ) {
@@ -89,7 +89,8 @@ export class ChannelGateway {
     const targetSockets: Array<string> = [];
     targetSockets.push(clientSocket.id);
     dto = {
-      ...dto, name: dto.name.trim()
+      ...dto,
+      name: dto.name.trim(),
     };
     let channel: Channel | string | null;
     if (dto.type === ChannelType.DIRECTMESSAGE) {
