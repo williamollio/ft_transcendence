@@ -14,7 +14,7 @@ interface Props {
 }
 
 export default function GetIdDialog(props: Props) {
-  const {  open, toggleOpen, channel, channelSocket } = props;
+  const { open, toggleOpen, channel, channelSocket } = props;
   const { t } = useTranslation();
 
   const [input, setInput] = useState<string>("");

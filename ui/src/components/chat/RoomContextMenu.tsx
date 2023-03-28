@@ -82,11 +82,15 @@ export default function RoomContextMenu(props: Props) {
             : undefined
         }
       >
-        <MenuItem onClick={removeRoom}>{t(translationKeys.roomContext.remove)}</MenuItem>
+        <MenuItem onClick={removeRoom}>
+          {t(translationKeys.roomContext.remove)}
+        </MenuItem>
         <MenuItem onClick={handleChannelInfoOpen}>
           {t(translationKeys.roomContext.channelInfo)}
         </MenuItem>
-        <MenuItem onClick={handleInvite}>{t(translationKeys.roomContext.invite)}</MenuItem>
+        <MenuItem onClick={handleInvite}>
+          {t(translationKeys.roomContext.invite)}
+        </MenuItem>
       </Menu>
       <ChannelInfoDialog
         blockedUser={blockedUser}

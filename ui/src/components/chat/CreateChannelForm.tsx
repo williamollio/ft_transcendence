@@ -39,7 +39,9 @@ export default function CreateForm(props: Props) {
   return (
     <Grid container>
       <Grid item>
-        <DialogTitle>{t(translationKeys.createInfo.createChannelTitle)}</DialogTitle>
+        <DialogTitle>
+          {t(translationKeys.createInfo.createChannelTitle)}
+        </DialogTitle>
       </Grid>
       <Grid item>
         <DialogContent>
@@ -76,7 +78,9 @@ export default function CreateForm(props: Props) {
                 value={dialogValue.access}
                 onChange={handleAccessChange}
               >
-                <MenuItem value="PUBLIC">{t(translationKeys.createInfo.public)}</MenuItem>
+                <MenuItem value="PUBLIC">
+                  {t(translationKeys.createInfo.public)}
+                </MenuItem>
                 <MenuItem value="PRIVATE">
                   {t(translationKeys.createInfo.private)}
                 </MenuItem>

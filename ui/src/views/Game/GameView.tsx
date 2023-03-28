@@ -65,43 +65,49 @@ export default function GameView(props: Props): React.ReactElement {
             {/* for testing */}
             <Grid container direction="row">
               <Grid item width={100}>
-                <Button sx={{width: 70}} onClick={gameLoop.startLoop}>
+                <Button sx={{ width: 70 }} onClick={gameLoop.startLoop}>
                   start
                 </Button>
               </Grid>
               <Grid item width={100}>
-                <Button sx={{width: 70}} onClick={gameLoop.stopLoop}>
+                <Button sx={{ width: 70 }} onClick={gameLoop.stopLoop}>
                   stop
                 </Button>
               </Grid>
               <Grid item width={100}>
-                <Button sx={{width: 70}} onClick={gameLoop.resetPositions}>
+                <Button sx={{ width: 70 }} onClick={gameLoop.resetPositions}>
                   reset
                 </Button>
               </Grid>
               <Grid item width={100}>
-                <Button sx={{width: 70}}
+                <Button
+                  sx={{ width: 70 }}
                   onClick={() => gameSocket.joinGame(GameMode.CLASSIC)}
                 >
                   queue Up (mode: Classic)
                 </Button>
               </Grid>
               <Grid item width={100}>
-                <Button sx={{width: 70}}
+                <Button
+                  sx={{ width: 70 }}
                   onClick={() => gameSocket.joinGame(GameMode.MAYHEM)}
                 >
                   queue Up (mode: Mayhem)
                 </Button>
               </Grid>
               <Grid item width={100}>
-                <Button sx={{width: 70}}
-                  onClick={() => gameSocket.joinAsSpectator("clfiqolxb0000obayrxl47r5s")}
+                <Button
+                  sx={{ width: 70 }}
+                  onClick={() =>
+                    gameSocket.joinAsSpectator("clfiqolxb0000obayrxl47r5s")
+                  }
                 >
                   watch game
                 </Button>
               </Grid>
               <Grid item width={100}>
-                <Button sx={{width: 70}}
+                <Button
+                  sx={{ width: 70 }}
                   onClick={() => gameSocket.leaveAsSpectator()}
                 >
                   leave watch game

@@ -79,7 +79,7 @@ export enum GameMode {
   MAYHEM = 'MAYHEM',
 }
 const generateRandomNumber = (min: number, max: number) => {
-  return 5; //Math.floor(Math.random() * (max - min + 1)) + min;
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
 export class DoubleKeyMap {
@@ -162,7 +162,7 @@ export class Game {
     ballHeight: 30,
     maxSpeed: 0,
     speed: 0,
-    speeds: [5], //[7, 8, 10, 12, 14, 15, 20],
+    speeds: [7, 8, 10, 12, 14, 15, 20],
   };
   gameRoomId: string;
   p1id: string | undefined = undefined;

@@ -185,7 +185,9 @@ export default function ChannelInfoDialog(props: Props) {
     >
       <Grid container direction="column">
         <Grid item>
-          <DialogTitle>{t(translationKeys.roomContext.channelInfo)}</DialogTitle>
+          <DialogTitle>
+            {t(translationKeys.roomContext.channelInfo)}
+          </DialogTitle>
         </Grid>
         <Divider></Divider>
         <Grid item>
@@ -229,7 +231,9 @@ export default function ChannelInfoDialog(props: Props) {
                 <TableHead>
                   <TableRow>
                     <TableCell>{t(translationKeys.createInfo.name)}</TableCell>
-                    <TableCell>{t(translationKeys.roomContext.status)}</TableCell>
+                    <TableCell>
+                      {t(translationKeys.roomContext.status)}
+                    </TableCell>
                     <TableCell></TableCell>
                   </TableRow>
                 </TableHead>

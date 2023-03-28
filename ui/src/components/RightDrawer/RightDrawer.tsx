@@ -69,7 +69,7 @@ export default function RightDrawer(props: Props) {
   const handleDrawerClose = () => {
     setOpen(false);
   };
-  
+
   return (
     <Box sx={{ display: "flex" }}>
       <AppBar position="fixed" open={open}>
@@ -94,7 +94,7 @@ export default function RightDrawer(props: Props) {
           </IconButton>
         </Box>
       </AppBar>
-      <Drawer 
+      <Drawer
         variant="persistent"
         open={open}
         anchor="right"
@@ -122,7 +122,11 @@ export default function RightDrawer(props: Props) {
             marginBottom: "2.5rem",
           }}
         />
-        <Chat channelSocket={channelSocket} userSocket={userSocket} gameSocket={gameSocket}/>
+        <Chat
+          channelSocket={channelSocket}
+          userSocket={userSocket}
+          gameSocket={gameSocket}
+        />
       </Drawer>
     </Box>
   );

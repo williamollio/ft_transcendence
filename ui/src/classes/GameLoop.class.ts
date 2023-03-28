@@ -43,7 +43,7 @@ export class GameLoop {
         if (this.positionalData.playerLeftYOffset - 5 > 0) {
           if (this.activePlayer === 1) {
             this.positionalData.playerLeftYOffset -= 5;
-          } else if (this.activePlayer === 2){
+          } else if (this.activePlayer === 2) {
             this.positionalData.playerRightYOffset -= 5;
           }
         }
@@ -51,7 +51,7 @@ export class GameLoop {
         if (this.positionalData.playerLeftYOffset + 5 <= 350) {
           if (this.activePlayer === 1) {
             this.positionalData.playerLeftYOffset += 5;
-          } else if (this.activePlayer === 2){
+          } else if (this.activePlayer === 2) {
             this.positionalData.playerRightYOffset += 5;
           }
         }

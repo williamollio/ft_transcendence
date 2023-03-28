@@ -6,7 +6,7 @@ export class UserSocket {
 
   constructor() {
     this.socket = initSocket("http://localhost:8888", null);
-}
+  }
 
   logIn = () => {
     this.socket.emit("connectUser");

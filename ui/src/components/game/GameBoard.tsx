@@ -83,12 +83,10 @@ export default function GameBoard(props: Props) {
       toast: {
         type: ToastType.INVITE,
         title: t(translationKeys.gameInvite) as string,
-        message:
-          `${data.initiatingUser.name} ${t(translationKeys.inviteTo) as string}
-            ${data.game.mode ===
-          "CLASSIC"
-            ? "Classic"
-            : "Mayhem"}`,
+        message: `${data.initiatingUser.name} ${
+          t(translationKeys.inviteTo) as string
+        }
+            ${data.game.mode === "CLASSIC" ? "Classic" : "Mayhem"}`,
         autoClose: false,
         onAccept: () =>
           gameSocket.joinGame(data.game.mode, data.initiatingUser.id),

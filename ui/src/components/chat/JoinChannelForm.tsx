@@ -27,7 +27,9 @@ export default function JoinForm(props: Props) {
   return (
     <Grid container>
       <Grid item>
-        <DialogTitle>{t(translationKeys.createInfo.joinChannelTitle)}</DialogTitle>
+        <DialogTitle>
+          {t(translationKeys.createInfo.joinChannelTitle)}
+        </DialogTitle>
       </Grid>
       <Grid item>
         <DialogContent>

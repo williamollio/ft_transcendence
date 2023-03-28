@@ -91,7 +91,7 @@ export class GameGateway {
       playerId,
       this.server,
     );
-	this.server.to(client.id).emit("gameJoined", playerNumber);
+    this.server.to(client.id).emit('gameJoined', playerNumber);
     return playerNumber;
   }
 
@@ -112,7 +112,7 @@ export class GameGateway {
     );
     if (playerNumber.playerNumber === 1)
       this.server.emit('gameJoined', playerNumber);
-	return playerNumber;
+    return playerNumber;
   }
 
   @SubscribeMessage('createInvitationGame')
@@ -130,8 +130,8 @@ export class GameGateway {
       playerTwoId,
       mode,
     );
-	if (returnMessage === "gameJoined")
-      this.server.emit('gameJoined', {playerNumber: 1});
-	return returnMessage;
+    if (returnMessage === 'gameJoined')
+      this.server.emit('gameJoined', { playerNumber: 1 });
+    return returnMessage;
   }
 }

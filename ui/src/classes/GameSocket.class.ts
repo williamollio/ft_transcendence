@@ -10,8 +10,8 @@ export class GameSocket {
   }
 
   PP = (newPosition: number) => {
-	this.socket.volatile.emit("PP", newPosition + 50);
-  }
+    this.socket.volatile.emit("PP", newPosition + 50);
+  };
 
   leaveGame = () => {
     this.socket.emit("leaveGame");
@@ -33,14 +33,14 @@ export class GameSocket {
   };
 
   joinGame = (mode: GameMode, inviteGameId?: string) => {
-	this.socket.emit("joinGame", {mode: mode, inviteGameId: inviteGameId});
+    this.socket.emit("joinGame", { mode: mode, inviteGameId: inviteGameId });
   };
 
   joinAsSpectator = (playerId: string) => {
-	this.socket.emit("watchGame", {playerId: playerId});
-  }
+    this.socket.emit("watchGame", { playerId: playerId });
+  };
 
   leaveAsSpectator = () => {
-	this.socket.emit("leaveWatch");
-  }
+    this.socket.emit("leaveWatch");
+  };
 }

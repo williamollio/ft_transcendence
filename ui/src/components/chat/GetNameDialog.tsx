@@ -56,7 +56,9 @@ export default function GetNameDialog(props: Props) {
 
   return (
     <Dialog open={open} onClose={handleClose} onKeyDown={handleSubmit}>
-      <DialogContent>{t(translationKeys.roomContext.newNameOfChannel)}</DialogContent>
+      <DialogContent>
+        {t(translationKeys.roomContext.newNameOfChannel)}
+      </DialogContent>
       <TextField
         label={t(translationKeys.roomContext.newName)}
         type="string"

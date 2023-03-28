@@ -20,7 +20,6 @@ import { ChannelSocket } from "./classes/ChannelSocket.class";
 import GameView from "./views/Game/GameView";
 import StatsView from "./views/Stats/StatsView";
 import { GameSocket } from "./classes/GameSocket.class";
-import ToastDialog from "./context/toastDialog";
 
 export default function App() {
   const [userSocket] = useState<UserSocket>(new UserSocket());
@@ -108,7 +107,7 @@ export default function App() {
           type={transcendanceState.toast?.type}
           title={transcendanceState.toast?.title}
           message={transcendanceState.toast?.message}
-		  autoClose={transcendanceState.toast?.autoClose}
+          autoClose={transcendanceState.toast?.autoClose}
           onClose={closeToast}
           onAccept={transcendanceState.toast?.onAccept}
           onRefuse={transcendanceState.toast?.onRefuse}

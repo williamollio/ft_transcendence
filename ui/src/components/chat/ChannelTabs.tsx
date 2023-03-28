@@ -197,7 +197,9 @@ export function ChannelTabs(props: Props) {
             let channelIndex = channelSocket.channels.push(
               new chatRoom(
                 data.id,
-                userName ? userName : (t(translationKeys.chatInfo.missing) as string),
+                userName
+                  ? userName
+                  : (t(translationKeys.chatInfo.missing) as string),
                 data.type
               )
             );
@@ -274,7 +276,7 @@ export function ChannelTabs(props: Props) {
         channelSocket.registerListener("roomEdited", roomEditedListener);
         return true;
       }
-	  return false;
+      return false;
     });
     return () => {
       listenerWrapper(() => {
@@ -285,7 +287,7 @@ export function ChannelTabs(props: Props) {
           channelSocket.removeListener("roomEdited", roomEditedListener);
           return true;
         }
-		return false;
+        return false;
       });
     };
   }, [channelSocket.socket, channelSocket.socket.connected]);

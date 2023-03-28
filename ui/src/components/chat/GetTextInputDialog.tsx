@@ -36,7 +36,7 @@ export default function GetTextInputDialog(props: Props) {
       onKeyDown={(event: KeyboardEvent<HTMLDivElement>) => {
         if (event.key === "Enter") {
           handleSubmit(input);
-		  setInput("");
+          setInput("");
           handleClose();
         }
       }}
