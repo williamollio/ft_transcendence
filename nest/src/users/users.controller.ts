@@ -49,7 +49,7 @@ export class UsersController {
   @UseGuards(JwtGuard)
   @ApiOkResponse({ type: UserEntity })
   getLeaderboard() {
-	return this.usersService.getLeaderboard();
+    return this.usersService.getLeaderboard();
   }
 
   @Get()
@@ -164,22 +164,14 @@ export class UsersController {
   @Get('get-user-matches-stats/:id')
   @UseGuards(JwtGuard)
   @ApiOkResponse({ type: UserEntity })
-  getUserMatchesStats(
-	@Param('id') id: string,
-    @Res() res: Response,
-  ) {
+  getUserMatchesStats(@Param('id') id: string, @Res() res: Response) {
     return this.usersService.getUserMatchesStats(id, res);
   }
 
   @Get('get-user-match-history/:id')
   @UseGuards(JwtGuard)
   @ApiOkResponse({ type: UserEntity })
-  getUserMatchHistory(
-	@Param('id') id: string,
-    @Res() res: Response,
-  ) {
+  getUserMatchHistory(@Param('id') id: string, @Res() res: Response) {
     return this.usersService.getUserMatchHistory(id, res);
   }
-
-  
 }
