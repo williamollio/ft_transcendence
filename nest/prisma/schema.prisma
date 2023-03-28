@@ -32,7 +32,6 @@ model User {
     secondFactorEnabled     Boolean         @default(false)
     secondFactorLogged      Boolean         @default(false)
     secondFactorSecret      String?
-    secondFactorCode        String?
 
         // Game shit
     playerOneMatch                Match[]           @relation("playerOne")
