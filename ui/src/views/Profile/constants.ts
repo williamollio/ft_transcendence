@@ -5,6 +5,8 @@ export const translationKeys = {
     cancel: "buttons.cancel",
     sendRequest: "buttons.sendRequest",
     submit: "buttons.submit",
+    enable: "buttons.enable",
+    disable: "buttons.disable",
   },
   updloadPicture: "updloadPicture",
   profile: "profile",

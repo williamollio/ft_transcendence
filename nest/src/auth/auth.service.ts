@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ForbiddenException,
+  HttpStatus,
   Injectable,
   InternalServerErrorException,
   UnauthorizedException,
@@ -12,6 +13,9 @@ import { Intra42User } from '../users/interface/intra42-user.interface';
 import * as process from 'process';
 import * as argon2 from 'argon2';
 import { CreateUserDto } from '../users/dto/create-user.dto';
+import { authenticator } from 'otplib';
+import { toDataURL } from 'qrcode';
+import { Response } from 'express';
 
 @Injectable()
 export class AuthService {
@@ -78,6 +82,8 @@ export class AuthService {
       await argon2.hash(tokens.refreshToken),
     );
 
+    await this.userService.set2FALogged(foundUser.id, false);
+
     return tokens;
   }
 
@@ -107,9 +113,37 @@ export class AuthService {
     return tokens;
   }
 
+  async enable2FA(userId: string): Promise<string> {
+    const secret = authenticator.generateSecret();
+    const otpAuthUrl = authenticator.keyuri(userId, 'TODO', secret);
+    await this.userService.set2FA(userId, secret);
+
+    return toDataURL(otpAuthUrl);
+  }
+
+  async disable2FA(userId: string) {
+    await this.userService.set2FA(userId, null);
+  }
+
+  async validateSecondFactor(res: Response, userId: string, code: string) {
+    const user = await this.userService.findOne(userId);
+    if (!user || !user.secondFactorEnabled || !user.secondFactorSecret) {
+      return res.status(HttpStatus.UNAUTHORIZED);
+    }
+
+    if (
+      !authenticator.verify({ token: code, secret: user.secondFactorSecret })
+    ) {
+      return res.status(HttpStatus.FORBIDDEN).send('Wrong Code !');
+    }
+    await this.userService.set2FALogged(userId, true);
+    return res.status(HttpStatus.OK).send('2fa set successfully');
+  }
+
   async logout(userId: string) {
     const user = await this.userService.findOne(userId);
     if (!user) throw new UnauthorizedException('Unauthorized');
+    await this.userService.set2FALogged(userId, false);
     await this.userService.updateRefreshToken(user.id, '');
   }
 }

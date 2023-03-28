@@ -29,6 +29,9 @@ model User {
     invites                 Channel[]       @relation("inviteOnChannel")
     friendsRequester        Friendship[]    @relation("requester")
     friendsAddressee        Friendship[]    @relation("addressee")
+    secondFactorEnabled     Boolean         @default(false)
+    secondFactorLogged      Boolean         @default(false)
+    secondFactorSecret      String?
 
         // Game shit
     playerOneMatch                Match[]           @relation("playerOne")
