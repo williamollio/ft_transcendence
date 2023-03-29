@@ -30,7 +30,7 @@ export default function MatchHistory(props: Props) {
       data.forEach((element: MatchHistoryDto) => {
         newList.push({
           player1: {
-            id: element.id,
+            id: element.currentUserId,
             score: element.p1Score,
             image: element.imageCurrentUser,
           },
@@ -50,15 +50,13 @@ export default function MatchHistory(props: Props) {
   return (
     <Collapse in={openView}>
       <Box>
-        <TableContainer>
-          <Table>
-            <TableBody>
-              {matchHistory.map((element, index) => (
-                <Match match={element} key={index} findName={findName} />
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+        <Table>
+          <TableBody>
+            {matchHistory.map((element, index) => (
+              <Match match={element} key={index} findName={findName} />
+            ))}
+          </TableBody>
+        </Table>
       </Box>
     </Collapse>
   );

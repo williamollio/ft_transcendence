@@ -1,19 +1,21 @@
 import { Dialog, DialogContent, TextField } from "@mui/material";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { chatRoom } from "../../classes/chatRoom.class";
+import { translationKeys } from "./constants";
 
-export default function GetPasswordDialog({
-  open,
-  toggleOpen,
-  channel,
-  channelSocket,
-}: {
+interface Props {
   open: boolean;
   toggleOpen: any;
   channel: chatRoom | undefined;
   channelSocket: ChannelSocket;
-}) {
+}
+
+export default function GetPasswordDialog(props: Props) {
+  const { open, toggleOpen, channel, channelSocket } = props;
+  const { t } = useTranslation();
+
   const [input, setInput] = useState<string>("");
   const [oldInput, setOldInput] = useState<string>("");
 
@@ -52,11 +54,11 @@ export default function GetPasswordDialog({
   return (
     <Dialog open={open} onClose={handleClose} onKeyDown={handleSubmit}>
       <DialogContent>
-        Leave Password empty to remove Password protection
+        {t(translationKeys.roomContext.leavePasswordEmpty)}
       </DialogContent>
       {channel && channel.access === "PROTECTED" ? (
         <TextField
-          label="Old Password"
+          label={t(translationKeys.roomContext.oldPassword)}
           type="password"
           value={oldInput}
           onChange={handleOldChange}
@@ -65,7 +67,7 @@ export default function GetPasswordDialog({
         false
       )}
       <TextField
-        label="Password"
+        label={t(translationKeys.createInfo.password)}
         type="password"
         value={input}
         onChange={handleChange}

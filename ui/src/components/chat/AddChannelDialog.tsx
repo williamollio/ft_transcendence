@@ -5,42 +5,44 @@ import CloseIcon from "@mui/icons-material/Close";
 import CreateForm from "./CreateChannelForm";
 import JoinForm from "./JoinChannelForm";
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
-import { CRDialogValue } from "../../interfaces/chat.interface";
+import {
+  CRDialogValue,
+  JoinDialogValue,
+} from "../../interfaces/chat.interface";
+import { useTranslation } from "react-i18next";
+import { translationKeys } from "./constants";
+import ChannelService from "../../services/channel.service";
 
-export default function AddChannelDialog({
-  open,
-  toggleOpen,
-  channelSocket,
-  toggleAlert,
-  setAlertMsg,
-}: {
+interface Props {
   open: boolean;
   toggleOpen: any;
   channelSocket: ChannelSocket;
-  toggleAlert: any;
-  setAlertMsg: any;
-}) {
-  const [formSelection, setFormSelection] = useState<number>(0);
+}
 
-  const [dialogJoinValue, setDialogJoinValue] = useState({
-    id: "",
+export default function AddChannelDialog(props: Props) {
+  const { open, toggleOpen, channelSocket } = props;
+  const { t } = useTranslation();
+
+  const [formSelection, setFormSelection] = useState<number>(0);
+  const [dialogJoinValue, setDialogJoinValue] = useState<JoinDialogValue>({
+    name: "",
     password: "",
   });
-
   const [dialogValue, setDialogValue] = useState<CRDialogValue>({
     key: "",
     access: "PUBLIC",
     password: "",
   });
-
-  const [alert, setAlert] = useState<string>("Channel name can not be empty!");
-
+  const [alert, setAlert] = useState<string>(
+    t(translationKeys.errorMessages.channelNameEmpty) as string
+  );
   const [alertOpen, setAlertOpen] = useState<boolean>(false);
 
   useEffect(() => {
-    if (dialogValue.key === "") setAlert("Channel name can not be empty!");
+    if (dialogValue.key === "")
+      setAlert(t(translationKeys.errorMessages.channelNameEmpty) as string);
     else if (dialogValue.access === "PROTECTED" && dialogValue.password === "")
-      setAlert("Password can not be empty");
+      setAlert(t(translationKeys.errorMessages.passwordEmpty) as string);
     else setAlertOpen(false);
   }, [dialogValue]);
 
@@ -48,19 +50,17 @@ export default function AddChannelDialog({
     setFormSelection(newValue);
   };
 
-  const handleClose = (e: any) => {
+  const handleClose = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (formSelection === 1)
       setDialogValue({ key: "", access: "PUBLIC", password: "" });
-    else setDialogJoinValue({ id: "", password: "" });
+    else setDialogJoinValue({ name: "", password: "" });
     toggleOpen(false);
   };
 
   const handleFormSubmit = (e: any) => {
-    toggleAlert(false);
     e.preventDefault();
     if (alertOpen === true) setAlertOpen(false);
     if (formSelection === 1) {
-      setAlertMsg("Failed to create channel");
       if (dialogValue.key !== "") {
         if (dialogValue.access !== "PROTECTED" || dialogValue.password !== "") {
           if (dialogValue.access === "PROTECTED") {
@@ -79,12 +79,14 @@ export default function AddChannelDialog({
         } else setAlertOpen(true);
       } else setAlertOpen(true);
     } else {
-      setAlertMsg("Failed to join channel");
-      channelSocket.joinRoom(
-        dialogJoinValue.id,
-        dialogJoinValue.password !== "" ? dialogJoinValue.password : undefined
-      );
-      setDialogJoinValue({ id: "", password: "" });
+      ChannelService.getChannelByName(dialogJoinValue.name).then((resolve) => {
+        console.log(resolve);
+        channelSocket.joinRoom(
+          resolve.id,
+          dialogJoinValue.password !== "" ? dialogJoinValue.password : undefined
+        );
+      });
+      setDialogJoinValue({ name: "", password: "" });
       toggleOpen(false);
     }
   };
@@ -117,13 +119,13 @@ export default function AddChannelDialog({
             sx={{ fontSize: "14px", fontWeight: "bold" }}
             key={0}
             value={0}
-            label="Join"
+            label={t(translationKeys.buttons.join)}
           ></Tab>
           <Tab
             sx={{ fontSize: "14px", fontWeight: "bold" }}
             key={1}
             value={1}
-            label="Create"
+            label={t(translationKeys.buttons.create)}
           ></Tab>
         </Tabs>
         <form onSubmit={handleFormSubmit}>

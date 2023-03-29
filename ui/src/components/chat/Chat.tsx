@@ -1,64 +1,64 @@
 import {
-  Alert,
   Box,
-  Collapse,
   Divider,
   Grid,
-  IconButton,
   List,
   ListItem,
   ListItemText,
   Paper,
   TextField,
 } from "@mui/material";
-import { SyntheticEvent, useEffect, useRef, useState } from "react";
-import { messagesDto } from "../../interfaces/chat.interface";
+import { useContext, useEffect, useRef, useState } from "react";
+import {
+  messagesDto,
+  failEvents,
+  ContextMenu,
+  RoomInvite,
+} from "../../interfaces/chat.interface";
 import { accessTypes, chatRoom } from "../../classes/chatRoom.class";
 import AddChannelDialog from "./AddChannelDialog";
 import RoomContextMenu from "./RoomContextMenu";
-import CloseIcon from "@mui/icons-material/Close";
-import CheckIcon from "@mui/icons-material/Check";
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { ChannelTabs } from "./ChannelTabs";
 import ChannelService from "../../services/channel.service";
 import { useLocation } from "react-router-dom";
 import { UserSocket } from "../../classes/UserSocket.class";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
+import { translationKeys } from "./constants";
+import { GameSocket } from "../../classes/GameSocket.class";
 import GetTextInputDialog from "./GetTextInputDialog";
 import { useTheme } from "@mui/material";
+import { TranscendanceContext } from "../../context/transcendance-context";
+import { TranscendanceStateActionType } from "../../context/transcendance-reducer";
+import { ToastType } from "../../context/toast";
+import { listenerWrapper } from "../../services/initSocket.service";
 
 interface Props {
   channelSocket: ChannelSocket;
   userSocket: UserSocket;
+  gameSocket: GameSocket;
 }
 
 export default function Chat(props: Props) {
+  const { channelSocket, userSocket, gameSocket } = props;
   const theme = useTheme();
-  const { channelSocket, userSocket } = props;
+
   const [open, toggleOpen] = useState(false);
-  const [inputChat, setInputChat] = useState<string>("");
   const [messages, setMessages] = useState<Array<messagesDto>>([]);
   const [currentRoom, setCurrentRoom] = useState<chatRoom | boolean>(false);
-  const [contextMenu, setContextMenu] = useState<{
-    mouseX: number;
-    mouseY: number;
-    channel: chatRoom;
-  } | null>(null);
-  const [alert, toggleAlert] = useState<boolean>(false);
-  const [alertMsg, setAlertMsg] = useState<string>("");
-  const [invited, toggleInvited] = useState<boolean>(false);
+  const [contextMenu, setContextMenu] = useState<ContextMenu | null>(null);
   const [invitePassword, toggleInvitePassword] = useState<boolean>(false);
-  const [roomInvite, setRoomInvite] = useState<{
-    id: string;
-    name: string;
-    type: accessTypes;
-  }>({
+  const [roomInvite, setRoomInvite] = useState<RoomInvite>({
     id: "",
     type: "PRIVATE",
     name: "",
   });
   const scrollRef = useRef<HTMLLIElement | null>(null);
   const location = useLocation();
+  const { t } = useTranslation();
+
+  const toast = useContext(TranscendanceContext);
 
   const {
     data: blockedUsers,
@@ -76,39 +76,38 @@ export default function Chat(props: Props) {
     }
   }, [location]);
 
-  const handleChange = (e: any) => {
-    setInputChat(e.target.value);
-  };
-
   const handleSubmit = async (e: any) => {
     if (e.key === "Enter") {
-      if (currentRoom && typeof currentRoom !== "boolean" && inputChat.trim()) {
+      if (
+        currentRoom &&
+        typeof currentRoom !== "boolean" &&
+        e.target.value.trim()
+      ) {
         currentRoom.messages.push({
-          message: "[You]: " + inputChat,
+          message: `[${t(translationKeys.chatInfo.you)}]: ` + e.target.value,
           room: currentRoom.id,
         });
         channelSocket.messageRoom({
-          message: "[" + channelSocket.user.name + "]: " + inputChat,
+          message: "[" + channelSocket.user.name + "]: " + e.target.value,
           room: currentRoom.id,
         });
         updateMessages(currentRoom, undefined);
       }
-      setInputChat("");
+      e.target.value = "";
     }
   };
 
-  const handleInviteSubmit = (e?: SyntheticEvent) => {
-    setAlertMsg("Failed to join channel");
-    if (e) {
-      e.preventDefault();
+  const handleInviteSubmit = (data: {
+    id: string;
+    type: accessTypes;
+    name: string;
+  }) => {
+    if (data.type === "PROTECTED") {
+      setRoomInvite(data);
+      toggleInvitePassword(true);
     } else {
-      if (roomInvite.type === "PROTECTED") {
-        toggleInvitePassword(true);
-      } else {
-        channelSocket.joinRoom(roomInvite.id);
-        toggleInvited(false);
-        setRoomInvite({ id: "", type: "PRIVATE", name: "" });
-      }
+      channelSocket.joinRoom(data.id);
+      setRoomInvite({ id: "", type: "PRIVATE", name: "" });
     }
   };
 
@@ -154,11 +153,6 @@ export default function Chat(props: Props) {
     }
   };
 
-  const messageRoomFailedListener = () => {
-    setAlertMsg("Failed to send message");
-    toggleAlert(true);
-  };
-
   const roomLeftListener = (data: { userId: string; channelId: string }) => {
     let index = channelSocket.channels.findIndex(
       (element) => element.id === data.channelId
@@ -166,7 +160,7 @@ export default function Chat(props: Props) {
     if (index >= 0) {
       ChannelService.getUserName(data.userId).then((res) => {
         channelSocket.channels[index].messages.push({
-          message: `${res.data.name} left the channel`,
+          message: `${res.data.name} ${t(translationKeys.chatInfo.userLeft)}`,
           room: data.channelId,
         });
         updateMessages(channelSocket.channels[index], data.channelId);
@@ -181,7 +175,7 @@ export default function Chat(props: Props) {
     if (index >= 0) {
       ChannelService.getUserName(data.userId).then((res) => {
         channelSocket.channels[index].messages.push({
-          message: `${res.data.name} joined the channel`,
+          message: `${res.data.name} ${t(translationKeys.chatInfo.userJoined)}`,
           room: data.channelId,
         });
         updateMessages(channelSocket.channels[index], data.channelId);
@@ -196,8 +190,17 @@ export default function Chat(props: Props) {
     invited: string;
   }) => {
     if (data.invited === channelSocket.user.id) {
-      setRoomInvite(data);
-      toggleInvited(true);
+      toast.dispatchTranscendanceState({
+        type: TranscendanceStateActionType.TOGGLE_TOAST,
+        toast: {
+          type: ToastType.INVITE,
+          title: t(translationKeys.invite.roomInvite) as string,
+          message: `${t(translationKeys.invite.inviteTo) as string} ${data.name}`,
+		  autoClose: false,
+          onAccept: () => handleInviteSubmit(data),
+          onRefuse: () => {},
+        },
+      });
     }
   };
 
@@ -223,91 +226,68 @@ export default function Chat(props: Props) {
       );
       if (mutedChannel) {
         mutedChannel.messages.push({
-          message: "You have been muted for 30 seconds",
+          message: t(translationKeys.chatInfo.muted),
         });
         updateMessages(mutedChannel, result.channelActionOnChannelId);
       }
     }
   };
 
-  const failedListener = (error: string) => {
-    console.log(error);
-    toggleAlert(true);
+  const failedListener = (error: string, event: string) => {
+    toast.dispatchTranscendanceState({
+      type: TranscendanceStateActionType.TOGGLE_TOAST,
+      toast: { type: ToastType.ERROR, title: error, message: error },
+    });
   };
 
   useEffect(() => {
-    if (channelSocket.socket.connected) {
-      channelSocket.registerListener(
-        "incomingMessage",
-        incomingMessageListener
-      );
-      channelSocket.registerListener(
-        "messageRoomFailed",
-        messageRoomFailedListener
-      );
-      channelSocket.registerListener("roomLeft", roomLeftListener);
-      channelSocket.registerListener("roomJoined", roomJoinedListener);
-      channelSocket.registerListener(
-        "inviteSucceeded",
-        inviteSucceededListener
-      );
-      channelSocket.registerListener("banSucceeded", banSuccessListener);
-      channelSocket.registerListener("muteSucceeded", muteSuccessListener);
-      [
-        "inviteFailed",
-        "joinRoomError",
-        "joinRoomFailed",
-        "leaveRoomFailed",
-        "createRoomFailed",
-        "editRoomFailed",
-        "createRoomFailed",
-        "banFailed",
-        "muteFailed",
-        "updateRoleFailed",
-      ].forEach((element) => {
-        channelSocket.registerListener(element, failedListener);
-      });
-    }
-    return () => {
+    listenerWrapper(() => {
       if (channelSocket.socket.connected) {
-        channelSocket.removeListener("banSucceeded", banSuccessListener);
-        channelSocket.removeListener("muteSucceeded", muteSuccessListener);
-        channelSocket.removeListener(
+        channelSocket.registerListener(
           "incomingMessage",
           incomingMessageListener
         );
-        channelSocket.removeListener(
-          "messageRoomFailed",
-          messageRoomFailedListener
-        );
-        channelSocket.removeListener("roomLeft", roomLeftListener);
-        channelSocket.removeListener("roomJoined", roomJoinedListener);
-        channelSocket.removeListener(
+        channelSocket.registerListener("roomLeft", roomLeftListener);
+        channelSocket.registerListener("roomJoined", roomJoinedListener);
+        channelSocket.registerListener(
           "inviteSucceeded",
           inviteSucceededListener
         );
-        [
-          "inviteFailed",
-          "joinRoomError",
-          "joinRoomFailed",
-          "leaveRoomFailed",
-          "createRoomFailed",
-          "editRoomFailed",
-          "createRoomFailed",
-          "banFailed",
-          "muteFailed",
-          "updateRoleFailed",
-        ].forEach((element) => {
-          channelSocket.removeListener(element, failedListener);
+        channelSocket.registerListener("banSucceeded", banSuccessListener);
+        channelSocket.registerListener("muteSucceeded", muteSuccessListener);
+        failEvents.forEach((element) => {
+          channelSocket.registerListener(element, (error) =>
+            failedListener(error, element)
+          );
         });
+        return true;
       }
+      return false;
+    });
+    return () => {
+      listenerWrapper(() => {
+        if (channelSocket.socket.connected) {
+          channelSocket.removeListener("banSucceeded", banSuccessListener);
+          channelSocket.removeListener("muteSucceeded", muteSuccessListener);
+          channelSocket.removeListener(
+            "incomingMessage",
+            incomingMessageListener
+          );
+          channelSocket.removeListener("roomLeft", roomLeftListener);
+          channelSocket.removeListener("roomJoined", roomJoinedListener);
+          channelSocket.removeListener(
+            "inviteSucceeded",
+            inviteSucceededListener
+          );
+          failEvents.forEach((element) => {
+            channelSocket.removeListener(element, failedListener);
+          });
+          return true;
+        }
+        return false;
+      });
     };
-  }, [
-    channelSocket.socket,
-    currentRoom,
-    blockedUsers,
-    channelSocket.socket.connected,
-  ]);
+  }, [channelSocket, currentRoom, blockedUsers]);
 
   const listMessages = messages
     ? messages.map((messagesDto: messagesDto, index) => {
@@ -349,26 +329,6 @@ export default function Chat(props: Props) {
         boxShadow: "none",
       }}
     >
-      <Collapse in={alert}>
-        <Alert
-          sx={{ width: "auto" }}
-          severity="error"
-          action={
-            <IconButton
-              aria-label="close"
-              color="inherit"
-              size="small"
-              onClick={() => {
-                toggleAlert(false);
-              }}
-            >
-              <CloseIcon fontSize="inherit" />
-            </IconButton>
-          }
-        >
-          {alertMsg}
-        </Alert>
-      </Collapse>
       <Box
         sx={{
           width: "300px",
@@ -379,10 +339,10 @@ export default function Chat(props: Props) {
           currentRoom={currentRoom}
           setContextMenu={setContextMenu}
           contextMenu={contextMenu}
-          toggleAlert={toggleAlert}
           toggleOpen={toggleOpen}
           channelSocket={channelSocket}
           setNewChannel={setNewChannel}
+          blockedUsers={blockedUsers}
         />
         <RoomContextMenu
           blockedUser={blockedUsers}
@@ -392,12 +352,11 @@ export default function Chat(props: Props) {
           contextMenu={contextMenu}
           setContextMenu={setContextMenu}
           channelSocket={channelSocket}
-          setAlertMsg={setAlertMsg}
-          toggleAlert={toggleAlert}
+          gameSocket={gameSocket}
         ></RoomContextMenu>
         <Divider></Divider>
-        <Grid container height="100%">
-          <Grid item height="100%">
+        <Grid container maxWidth="100%" height="100%" flexDirection="column">
+          <Grid item flexGrow={1} sx={{ maxHeight: "90%" }}>
             <List
               dense
               disablePadding
@@ -416,64 +375,29 @@ export default function Chat(props: Props) {
             open={open}
             toggleOpen={toggleOpen}
             channelSocket={channelSocket}
-            setAlertMsg={setAlertMsg}
-            toggleAlert={toggleAlert}
           ></AddChannelDialog>
-          <Grid item>
+          <Grid item alignSelf={"flex-end"}>
             <TextField
-              label="Chat"
-              sx={{ width: "300px", marginTop: "-1px" }}
-              value={inputChat}
-              onChange={handleChange}
+              variant="filled"
+              size="small"
+              label={t(translationKeys.chat)}
+              sx={{ width: "300px", input: { color: "white" } }}
               onKeyDown={handleSubmit}
             />
           </Grid>
         </Grid>
       </Box>
-      <Collapse in={invited}>
-        <Alert
-          sx={{ width: "auto" }}
-          severity="success"
-          action={
-            <>
-              <IconButton
-                aria-label="Accept"
-                color="inherit"
-                size="small"
-                onMouseUp={(e) => handleInviteSubmit()}
-                onMouseDown={handleInviteSubmit}
-              >
-                <CheckIcon fontSize="inherit" />
-              </IconButton>
-              <IconButton
-                aria-label="Reject"
-                color="inherit"
-                size="small"
-                onClick={() => {
-                  toggleInvited(false);
-                  setRoomInvite({ id: "", type: "PRIVATE", name: "" });
-                }}
-              >
-                <CloseIcon fontSize="inherit" />
-              </IconButton>
-              <GetTextInputDialog
-                open={invitePassword}
-                toggleOpen={toggleInvitePassword}
-                handleSubmit={(input: string) => {
-                  channelSocket.joinRoom(roomInvite.id, input);
-                  toggleInvited(false);
-                  setRoomInvite({ id: "", type: "PRIVATE", name: "" });
-                }}
-                dialogContent={"This channel requires a password"}
-                label={"password"}
-                type={"password"}
-              ></GetTextInputDialog>
-            </>
-          }
-        >
-          Invite to: {roomInvite.name}
-        </Alert>
-      </Collapse>
+      <GetTextInputDialog
+        open={invitePassword}
+        toggleOpen={toggleInvitePassword}
+        handleSubmit={(input: string) => {
+          channelSocket.joinRoom(roomInvite.id, input);
+          setRoomInvite({ id: "", type: "PRIVATE", name: "" });
+        }}
+        dialogContent={t(translationKeys.chatInfo.passwordReq)!}
+        label={t(translationKeys.createInfo.password)}
+        type="password"
+      ></GetTextInputDialog>
     </Paper>
   );
 }

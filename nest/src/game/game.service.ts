@@ -5,7 +5,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { Socket } from 'socket.io';
 import { Status, Game, DoubleKeyMap, GameMode } from './entities/game.entity';
 import { Root } from 'protobufjs';
-import { socketToUserId } from 'src/users/socketToUserIdStorage.service';
+import { gameSocketToUserId } from './socketToUserIdStorage.service';
 
 @Injectable()
 export class GameService {
@@ -37,7 +37,7 @@ export class GameService {
   }
 
   refuseInvite(client: Socket, userId: string) {
-    const challengerSocket = socketToUserId.getFromUserId(userId);
+    const challengerSocket = gameSocketToUserId.getFromUserId(userId);
     if (challengerSocket) {
       if (this.GameMap.getGame(userId)) {
         client.to(challengerSocket).emit('inviteRefused', 'invite refused');
@@ -52,102 +52,199 @@ export class GameService {
     }
   }
 
-  async createInvitationGame(
-    client: Socket,
-    server: Server,
-    p1id: string,
-    p2id: string,
-    gameMode: GameMode,
-  ) {
-    const opponentSocket = socketToUserId.getFromUserId(p2id);
-    if (opponentSocket) {
-      if (this.GameMap.getGame(p2id) !== null) {
-        server
-          .to(client.id)
-          .emit(
-            'inviteRefused',
-            'Your opponent already has an invite pending, try again later',
-          );
-        return 'inviteFailed';
-      }
-      try {
-        const challenger = await this.prismaService.user.findUnique({
-          where: {
-            id: p1id,
-          },
-          select: {
-            id: true,
-            name: true,
-            eloScore: true,
-            status: true,
-          },
-        });
+  // async createInvitationGame(
+  //   client: Socket,
+  //   server: Server,
+  //   p1id: string,
+  //   p2id: string,
+  //   gameMode: GameMode,
+  // ) {
+  //   const opponentSocket = socketToUserId.getFromUserId(p2id);
+  //   if (opponentSocket) {
+  //     if (this.GameMap.getGame(p2id) !== null) {
+  //       server
+  //         .to(client.id)
+  //         .emit(
+  //           'inviteRefused',
+  //           'Your opponent already has an invite pending, try again later',
+  //         );
+  //       return 'inviteFailed';
+  //     }
+  //     try {
+  //       const challenger = await this.prismaService.user.findUnique({
+  //         where: {
+  //           id: p1id,
+  //         },
+  //         select: {
+  //           id: true,
+  //           name: true,
+  //           eloScore: true,
+  //           status: true,
+  //         },
+  //       });
 
-        this.createGame(p1id, gameMode, p2id);
-        await this.join(client, p1id, server, gameMode);
-        client.to(opponentSocket).emit('invitedToGame', challenger);
-        return 'gameJoined';
-      } catch (error) {
-        return 'inviteFailed';
+  //       this.createGame(p1id, gameMode, p2id);
+  //       await this.join(client, p1id, server, gameMode);
+  //       client.to(opponentSocket).emit('invitedToGame', challenger);
+  //       return 'gameJoined';
+  //     } catch (error) {
+  //       return 'inviteFailed';
+  //     }
+  //   }
+  // }
+
+  async leaveWatch(client: Socket, playerId: string) {
+    const game = this.GameMap.getGame(playerId);
+    if (game !== null) {
+      await client.leave(game.gameRoomId);
+    }
+  }
+  /*
+  Spectating mode logic:
+  So basically the idea is that when a player joins a game, they are added to
+  the "players" array of the game object. The ids(pl1 and pl2 ids) are saved so basically watching
+  is simpling joining the the gameRoom fetching the Game object informations;
+  we are keeping the track of the player one and two so they are the only ones
+  that have direct access to the game object. The spectators are just watching
+  the game and they are not part of the game object. Even though they are part of
+  the gameRoom.
+  For more informations check the DoubleKeyMap class in the game entity, we have there
+  a Map<string, Game>() objet that is keeping track of the games and the players.
+  */
+  async watch(client: Socket, playerId: string, server: Server) {
+    const game = this.GameMap.getGame(playerId);
+    if (game !== null) {
+      await client.join(game.gameRoomId);
+      server.to(client.id).emit('gameStatus', {
+        gameId: game.gameRoomId,
+        status: game.status,
+        winner: '',
+        player1id: game.p1id,
+        player2id: game.p2id,
+        player1score: game.p1s,
+      });
+    }
+    // if (playerId === game?.p1id) return { playerNumber: 1 };
+    return { playerNumber: 0 };
+  }
+
+  sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+  async join(
+    client: Socket,
+    userId: string,
+    server: Server,
+    mode: GameMode,
+    inviteGameId?: string,
+  ) {
+    let game: Game | null;
+
+    if (inviteGameId) {
+      // Joining an invite-based game
+      const inviteGame = this.GameMap.getGame(inviteGameId);
+      if (!inviteGame) {
+        throw new Error('Invalid game invitation');
+      }
+      if (inviteGame.p2id !== userId) {
+        throw new Error('Game is already full');
+      }
+      game = inviteGame;
+      game.p2id = userId;
+      await client.join(game.gameRoomId);
+      server.to(client.id).emit('gameJoined', { playerNumber: 2 });
+      server.to(game.gameRoomId).emit('gameStarting');
+      await this.sleep(5000);
+      this.mutateGameStatus(game, Status.PLAYING, server);
+      this.addInterval(game.gameRoomId, userId, 16, server);
+      return { playerNumber: 2 };
+    } else {
+      // Joining a random game
+      if (this.GameMap.size === 0) {
+        game = this.createGame(userId, mode);
+        await client.join(game.gameRoomId);
+        return { playerNumber: 1 };
+      } else {
+        if ((game = this.GameMap.rejoinGame(userId)) != null) {
+          await client.join(game.gameRoomId);
+          if (game.status === Status.PAUSED) {
+            this.mutateGameStatus(game, Status.PLAYING, server);
+            this.deleteTimeout(game.gameRoomId);
+            this.addInterval(game.gameRoomId, userId, 16, server);
+          } else if (game.status === Status.PENDING && game.p2id === userId) {
+            this.mutateGameStatus(game, Status.PLAYING, server);
+            this.addInterval(game.gameRoomId, userId, 16, server);
+          }
+          if (game.p2id === userId) return { playerNumber: 2 };
+          return { playerNumber: 1 };
+        }
+        if ((game = this.GameMap.matchPlayer(userId))) {
+          await client.join(game.gameRoomId);
+          server.to(client.id).emit('gameJoined', { playerNumber: 2 });
+          server.to(game.gameRoomId).emit('gameStarting');
+          await this.sleep(5000);
+          this.mutateGameStatus(game, Status.PLAYING, server);
+          this.addInterval(game.gameRoomId, userId, 16, server);
+          return { playerNumber: 2 };
+        }
+        game = this.createGame(userId, mode);
+        await client.join(game.gameRoomId);
+        return { playerNumber: 1 };
       }
     }
   }
 
-  // async leaveWatch(client: Socket, playerId: string) {
-  //   const game = this.GameMap.getGame(playerId);
-  //   if (game !== null) {
-  //     await client.leave(game.gameRoomId);
-  //   }
-  // }
+  async createInvitationGame(
+    initiatingSocket: Socket,
+    server: Server,
+    initiatingUserId: string,
+    invitedUserId: string,
+    gameMode: GameMode,
+  ) {
+    // Check if the invited user is already in a game
+    if (this.GameMap.getGame(invitedUserId) !== null) {
+      initiatingSocket.emit(
+        'inviteRefused',
+        'Your opponent is already in a game.',
+      );
+      return 'inviteFailed';
+    }
+    // Retrieve the details of the initiating user from the database
+    let initiatingUser;
+    try {
+      initiatingUser = await this.prismaService.user.findUnique({
+        where: { id: initiatingUserId },
+        select: { id: true, name: true, eloScore: true, status: true },
+      });
+    } catch (error) {
+      console.error('Error retrieving user data:', error);
+      initiatingSocket.emit('inviteRefused', 'Failed to retrieve user data.');
+      return 'inviteFailed';
+    }
 
-  // this is still under testing
-  // async watch(client: Socket, playerId: string, server: Server) {
-  //   const game = this.GameMap.getGame(playerId);
-  //   if (game !== null) {
-  //     await client.join(game.gameRoomId);
-  //     server.to(client.id).emit('gameStatus', {
-  //       gameId: game.gameRoomId,
-  //       status: game.status,
-  //       winner: '',
-  //       player1id: game.p1id,
-  //       player2id: game.p2id,
-  //       player1score: game.p1s,
-  //     });
-  //   }
-  //   if (playerId === game?.p1id) return { playerNumber: 1 };
-  //   return { playerNumber: 2 };
-  // }
+    // Create a new game room and add the initiating user to it as player 1
+    const game = this.createGame(initiatingUserId, gameMode, invitedUserId);
+    await this.join(
+      initiatingSocket,
+      initiatingUserId,
+      server,
+      gameMode,
+      undefined,
+    );
 
-  async join(client: Socket, userId: string, server: Server, mode: GameMode) {
-    let game: Game | null;
-
-    if (this.GameMap.size === 0) {
-      game = this.createGame(userId, mode);
-      await client.join(game.gameRoomId);
-      return { playerNumber: 1 };
+    // Notify the invited user of the game invitation
+    const invitedUserSocket = gameSocketToUserId.getFromUserId(invitedUserId);
+    if (invitedUserSocket) {
+      server
+        .to(invitedUserSocket)
+        .emit('invitedToGame', { initiatingUser: initiatingUser, game: game });
+      return 'gameJoined';
     } else {
-      if ((game = this.GameMap.rejoinGame(userId)) != null) {
-        await client.join(game.gameRoomId);
-        if (game.status === Status.PAUSED) {
-          this.mutateGameStatus(game, Status.PLAYING, server);
-          this.deleteTimeout(game.gameRoomId);
-          this.addInterval(game.gameRoomId, userId, 16, server);
-        } else if (game.status === Status.PENDING && game.p2id === userId) {
-          this.mutateGameStatus(game, Status.PLAYING, server);
-          this.addInterval(game.gameRoomId, userId, 16, server);
-        }
-        if (game.p2id === userId) return { playerNumber: 2 };
-        return { playerNumber: 1 };
-      }
-      if ((game = this.GameMap.matchPlayer(userId))) {
-        await client.join(game.gameRoomId);
-        this.mutateGameStatus(game, Status.PLAYING, server);
-        this.addInterval(game.gameRoomId, userId, 16, server);
-        return { playerNumber: 2 };
-      }
-      game = this.createGame(userId, mode);
-      await client.join(game.gameRoomId);
-      return { playerNumber: 1 };
+      console.error(`Failed to retrieve socket for user ${invitedUserId}.`);
+      initiatingSocket.emit(
+        'inviteRefused',
+        'Failed to retrieve opponent data.',
+      );
+      return 'inviteFailed';
     }
   }
 
@@ -180,7 +277,7 @@ export class GameService {
       if (game.status !== Status.PAUSED) this.deleteInterval(name);
       this.mutateGameStatus(game, Status.OVER, server);
       this.addWinningTimeout(5000, server, winnerId);
-      server.emit('matchFinished');
+      server.to(game.gameRoomId).emit('matchFinished');
     };
 
     const timeout = setTimeout(callback, milliseconds);
@@ -210,6 +307,7 @@ export class GameService {
       if (!game) return;
       void game.saveGameResults(this.prismaService);
       this.mutateGameStatus(game, Status.DONE, server);
+      server.to(game.gameRoomId).emit('matchFinished');
     };
 
     setTimeout(callback, milliseconds);
@@ -236,9 +334,9 @@ export class GameService {
     }
   }
 
-  create(encoded: Uint8Array, userId: string) {
-    const decoded = this.playerInfo.decode(encoded).toJSON();
-    const y: number = decoded.yPos;
+  create(encoded: number, userId: string) {
+    // const decoded = this.playerInfo.decode(encoded).toJSON();
+    const y: number = encoded; //decoded.yPos;
     const game: Game | null = this.GameMap.getGame(userId);
     if (!game) return;
     if (game !== undefined) {
@@ -284,10 +382,10 @@ export class GameService {
     const callback = () => {
       const payload = this.moveBall(userId, server);
       if (!payload) return;
-      this.gameInfo.verify(payload);
-      const message = this.gameInfo.create(payload);
-      const encoded = this.gameInfo.encode(message).finish();
-      server.to(gameRoomId).volatile.timeout(5000).emit('GI', encoded);
+      //   this.gameInfo.verify(payload);
+      //   const message = this.gameInfo.create(payload);
+      //   const encoded = this.gameInfo.encode(message).finish();
+      server.to(gameRoomId).volatile.timeout(5000).emit('GI', payload);
     };
 
     const interval = setInterval(callback, milliseconds);

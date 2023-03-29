@@ -1,3 +1,17 @@
 export const translationKeys = {
   stats: "stats",
+  currRating: "Current Rating",
+  leaderboardRank: "Leaderboard Rank",
+  gamesWon: "Games Won",
+  gamesLost: "Games Lost",
+  totalGames: "Total Games",
+  winPerc: "Win %",
+  general: "General",
+  ranked: "Ranked",
+  rank: "Rank",
+  player: "Player",
+  rating: "Rating",
+  winLoss: "Win : Loss",
+  history: "Match History",
+  filter: "Filter",
 };

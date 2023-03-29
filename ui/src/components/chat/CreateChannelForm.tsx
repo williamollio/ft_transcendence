@@ -15,18 +15,17 @@ import { makeStyles } from "tss-react/mui";
 import { translationKeys } from "./constants";
 import { useTranslation } from "react-i18next";
 
-export default function CreateForm({
-  dialogValue,
-  setDialogValue,
-  handleClose,
-}: {
+interface Props {
   dialogValue: CRDialogValue;
-  setDialogValue: any;
-  handleClose: any;
-}) {
-  const { classes } = useStyles();
-  const { t } = useTranslation();
+  setDialogValue: React.Dispatch<React.SetStateAction<CRDialogValue>>;
+  handleClose: (e: React.MouseEvent<HTMLButtonElement>) => void;
+}
+
+export default function CreateForm(props: Props) {
+  const { dialogValue, setDialogValue, handleClose } = props;
   const [pwDisable, setPwDisable] = useState<boolean>(true);
+  const { t } = useTranslation();
+  const { classes } = useStyles();
 
   const handleAccessChange = (e: any) => {
     let tmpCR: CRDialogValue = { ...dialogValue, access: e.target.value };
@@ -40,14 +39,16 @@ export default function CreateForm({
   return (
     <Grid container>
       <Grid item>
-        <DialogTitle>Create new channel</DialogTitle>
+        <DialogTitle>
+          {t(translationKeys.createInfo.createChannelTitle)}
+        </DialogTitle>
       </Grid>
       <Grid item>
         <DialogContent>
           <Grid container spacing="20px">
             <Grid item>
               <DialogContentText>
-                Please enter channel name, accessibility and password.
+                {t(translationKeys.createInfo.createChannelText)}
               </DialogContentText>
             </Grid>
             <Grid item>
@@ -63,7 +64,7 @@ export default function CreateForm({
                     key: event.target.value,
                   })
                 }
-                label="name"
+                label={t(translationKeys.createInfo.name)}
                 type="text"
                 InputLabelProps={{ shrink: true }}
               />
@@ -71,14 +72,21 @@ export default function CreateForm({
             <Grid item>
               <Select
                 size="small"
+                label={t(translationKeys.createInfo.access)}
                 type="string"
                 variant="outlined"
                 value={dialogValue.access}
                 onChange={handleAccessChange}
               >
-                <MenuItem value="PUBLIC">public</MenuItem>
-                <MenuItem value="PRIVATE">private</MenuItem>
-                <MenuItem value="PROTECTED">protected</MenuItem>
+                <MenuItem value="PUBLIC">
+                  {t(translationKeys.createInfo.public)}
+                </MenuItem>
+                <MenuItem value="PRIVATE">
+                  {t(translationKeys.createInfo.private)}
+                </MenuItem>
+                <MenuItem value="PROTECTED">
+                  {t(translationKeys.createInfo.protected)}
+                </MenuItem>
               </Select>
             </Grid>
             <Grid item>
@@ -93,7 +101,7 @@ export default function CreateForm({
                     password: event.target.value,
                   })
                 }
-                label="password"
+                label={t(translationKeys.createInfo.password)}
                 type="password"
                 variant="outlined"
                 InputLabelProps={{ shrink: true }}

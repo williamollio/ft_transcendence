@@ -9,6 +9,7 @@ async function main() {
       id: 'user1',
       intraId: 'user1',
       name: 'william',
+      eloScore: 1200,
     },
   });
 
@@ -19,6 +20,7 @@ async function main() {
       id: 'user2',
       intraId: 'user2',
       name: 'manuel',
+      eloScore: 1100,
     },
   });
 
@@ -29,6 +31,7 @@ async function main() {
       id: 'user3',
       intraId: 'user3',
       name: 'tomas',
+      eloScore: 500,
     },
   });
 
@@ -39,6 +42,7 @@ async function main() {
       id: 'user4',
       intraId: 'user4',
       name: 'mouad',
+      eloScore: 1150,
     },
   });
 
@@ -122,6 +126,66 @@ async function main() {
     },
   });
 
+  const match1 = await prisma.match.upsert({
+    where: { gameId: 'match1' },
+    update: {},
+    create: {
+      gameId: 'match1',
+      playerOneId: 'user1',
+      playerTwoId: 'user2',
+      p1s: 10,
+      p2s: 9,
+    },
+  });
+
+  const match2 = await prisma.match.upsert({
+	where: { gameId: 'match2' },
+    update: {},
+    create: {
+      gameId: 'match2',
+      playerOneId: 'user2',
+      playerTwoId: 'user3',
+      p1s: 8,
+      p2s: 10,
+    },
+  });
+
+  const match3 = await prisma.match.upsert({
+	where: { gameId: 'match3' },
+    update: {},
+    create: {
+      gameId: 'match3',
+      playerOneId: 'user3',
+      playerTwoId: 'user4',
+      p1s: 10,
+      p2s: 5,
+    },
+  });
+
+  const match4 = await prisma.match.upsert({
+	where: { gameId: 'match4' },
+    update: {},
+    create: {
+      gameId: 'match4',
+      playerOneId: 'user4',
+      playerTwoId: 'user1',
+      p1s: 10,
+      p2s: 3,
+    },
+  });
+
+  const match5 = await prisma.match.upsert({
+	where: { gameId: 'match5' },
+    update: {},
+    create: {
+      gameId: 'match5',
+      playerOneId: 'user1',
+      playerTwoId: 'user4',
+      p1s: 2,
+      p2s: 10,
+    },
+  });
+
   console.log({
     user1,
     user2,
@@ -132,6 +196,11 @@ async function main() {
     channelProtected,
     directMessage1,
     directMessage2,
+    match1,
+    match2,
+    match3,
+    match4,
+    match5,
   });
 }
 

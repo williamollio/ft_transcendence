@@ -1,5 +1,5 @@
 import { Typography } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { UserSocket } from "../../classes/UserSocket.class";
 import Navbar from "../../components/Navbar";
 import React from "react";
@@ -21,15 +21,16 @@ import { useQuery } from "@tanstack/react-query";
 import PersonalStatPanel from "../../components/stats/PersonalStatPanel";
 import RightDrawer from "../../components/RightDrawer/RightDrawer";
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
+import { GameSocket } from "../../classes/GameSocket.class";
 
 interface Props {
   userSocket: UserSocket;
   channelSocket: ChannelSocket;
-  setToken: React.Dispatch<React.SetStateAction<string>>;
+  gameSocket: GameSocket;
 }
 
 export default function StatsView(props: Props): React.ReactElement {
-  const { userSocket, channelSocket, setToken } = props;
+  const { userSocket, channelSocket, gameSocket } = props;
   const { t } = useTranslation();
   // const { classes } = useStyles();
 
@@ -48,24 +49,22 @@ export default function StatsView(props: Props): React.ReactElement {
     isRefetching: boolean;
   } = useQuery(["playerList"], StatsService.fetchLeaderboard);
 
-  React.useEffect(() => {
-    if (userSocket.socket.connected === false) {
-      let gotToken = localStorage.getItem(Cookie.TOKEN);
-      if (gotToken) {
-        if (typeof userSocket.socket.auth === "object") {
-          setToken("Bearer " + gotToken);
-        }
-      }
-    } else userSocket.logIn();
-  }, []);
-
   return (
     <>
       <Navbar />
       <LeftDrawer />
-      <RightDrawer channelSocket={channelSocket} userSocket={userSocket} />
+      <RightDrawer
+        channelSocket={channelSocket}
+        userSocket={userSocket}
+        gameSocket={gameSocket}
+      />
       <Background>
-        <PersonalStatPanel playerId={userId} lr={true} title={"General"} />
+        <PersonalStatPanel
+          playerId={userId}
+          lr={true}
+          type={"General"}
+          title={t(translationKeys.general)}
+        />
         <ProfileCard>
           <CardContainer>
             <TitleWrapper>
@@ -83,7 +82,12 @@ export default function StatsView(props: Props): React.ReactElement {
             </ContentWrapper>
           </CardContainer>
         </ProfileCard>
-        <PersonalStatPanel playerId={userId} lr={false} title={"Ranked"} />
+        <PersonalStatPanel
+          playerId={userId}
+          lr={false}
+          type={"Ranked"}
+          title={t(translationKeys.ranked)}
+        />
       </Background>
     </>
   );

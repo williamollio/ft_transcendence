@@ -1,35 +1,54 @@
-import { Menu, MenuItem } from "@mui/material";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Menu, MenuItem, Select, SelectChangeEvent } from "@mui/material";
+import React, {
+  Dispatch,
+  SetStateAction,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+import { useTranslation } from "react-i18next";
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { chatRoom } from "../../classes/chatRoom.class";
-import { channelUser } from "../../interfaces/chat.interface";
+import { GameSocket } from "../../classes/GameSocket.class";
+import { ToastType } from "../../context/toast";
+import { TranscendanceContext } from "../../context/transcendance-context";
+import { TranscendanceStateActionType } from "../../context/transcendance-reducer";
+import {
+  GameMode,
+  ChannelInfoContextMenu,
+} from "../../interfaces/chat.interface";
 import ChannelService from "../../services/channel.service";
+import { translationKeys } from "./constants";
 
-export default function ChannelInfoContext({
-  blockedUser,
-  refetchBlockedUsers,
-  setAlertMsg,
-  channel,
-  contextMenu,
-  setContextMenu,
-  channelSocket,
-}: {
+interface Props {
+  toggleChannelInfo: React.Dispatch<React.SetStateAction<boolean>>;
   blockedUser: Array<string>;
   refetchBlockedUsers: any;
-  setAlertMsg: Dispatch<SetStateAction<string>>;
   channel: chatRoom | undefined;
-  contextMenu: {
-    mouseX: number;
-    mouseY: number;
-    user: channelUser;
-  } | null;
-  setContextMenu: any;
+  contextMenu: ChannelInfoContextMenu | null;
+  setContextMenu: Dispatch<SetStateAction<ChannelInfoContextMenu | null>>;
   channelSocket: ChannelSocket;
-}) {
-  //   const [openTime, toggleOpenTime] = useState<boolean>(false);
-  //   const [action, setAction] = useState<"kick" | "mute">("kick");
+  gameSocket: GameSocket;
+}
+
+export default function ChannelInfoContext(props: Props) {
+  const {
+    toggleChannelInfo,
+    blockedUser,
+    refetchBlockedUsers,
+    channel,
+    contextMenu,
+    setContextMenu,
+    channelSocket,
+    gameSocket,
+  } = props;
   const [blockStatus, setBlockStatus] = useState<"Block" | "Unblock">("Block");
   const [self, setSelf] = useState<boolean>(false);
+  const [gameModeSelect, setGameModeSelect] = useState<GameMode>(
+    GameMode.CLASSIC
+  );
+  const { t } = useTranslation();
+  const toast = useContext(TranscendanceContext);
 
   useEffect(() => {
     if (contextMenu) {
@@ -54,46 +73,62 @@ export default function ChannelInfoContext({
   };
 
   const handleDM = () => {
-    setAlertMsg("Failed to set up directmessaging");
     handleContextClose();
     if (contextMenu && contextMenu.user) {
       channelSocket.createDm(contextMenu.user);
     }
+    toggleChannelInfo(false);
   };
 
   const handleProfile = () => {
-    setAlertMsg("Failed to access profile");
     handleContextClose();
     if (contextMenu && contextMenu.user && contextMenu.user.id) {
       // checkout profile with user.id
     }
+    toggleChannelInfo(false);
   };
 
-  const handleInviteGame = () => {
-    setAlertMsg("Failed to invite to play");
+  const handleInviteGame = (_event: React.MouseEvent<HTMLLIElement>) => {
     handleContextClose();
     if (contextMenu && contextMenu.user && contextMenu.user.id) {
-      // setupGame with user.id
+      gameSocket.inviteToGame(gameModeSelect, contextMenu.user.id);
     }
+    toggleChannelInfo(false);
   };
 
   const handleBlock = async () => {
     handleContextClose();
     if (contextMenu && contextMenu.user && contextMenu.user.id) {
       if (blockStatus === "Block") {
-        setAlertMsg("Failed to block User");
-        await ChannelService.blockUser(contextMenu.user.id)
+        let ret = await ChannelService.blockUser(contextMenu.user.id);
+        if (typeof ret === "string") {
+          toast.dispatchTranscendanceState({
+            type: TranscendanceStateActionType.TOGGLE_TOAST,
+            toast: {
+              type: ToastType.ERROR,
+              title: ret,
+              message: t(translationKeys.errorMessages.unblockFail) as string,
+            },
+          });
+        } else refetchBlockedUsers();
         refetchBlockedUsers();
       } else if (blockStatus === "Unblock") {
-        setAlertMsg("Failed to unblock User");
-        await ChannelService.unblockUser(contextMenu.user.id)
-        refetchBlockedUsers();
+        let ret = await ChannelService.unblockUser(contextMenu.user.id);
+        if (typeof ret === "string") {
+          toast.dispatchTranscendanceState({
+            type: TranscendanceStateActionType.TOGGLE_TOAST,
+            toast: {
+              type: ToastType.ERROR,
+              title: ret,
+              message: t(translationKeys.errorMessages.unblockFail) as string,
+            },
+          });
+        } else refetchBlockedUsers();
       }
     }
   };
 
   const handleMute = () => {
-    setAlertMsg("Failed to mute user");
     handleContextClose();
     if (
       channel &&
@@ -102,13 +137,11 @@ export default function ChannelInfoContext({
       contextMenu.user &&
       contextMenu.user.id
     ) {
-      //   setAction("mute");
       channelSocket.muteUser(channel.id, contextMenu.user.id);
     }
   };
 
   const handleKick = () => {
-    setAlertMsg("Failed to ban user");
     handleContextClose();
     if (
       channel &&
@@ -117,14 +150,12 @@ export default function ChannelInfoContext({
       contextMenu.user &&
       contextMenu.user.id
     ) {
-      //   setAction("kick");
       channelSocket.banUser(channel.id, contextMenu.user.id);
     }
   };
 
   const handlePromote = () => {
     handleContextClose();
-    setAlertMsg("Failed to promote user");
     if (
       channel &&
       channel.id &&
@@ -134,6 +165,10 @@ export default function ChannelInfoContext({
     ) {
       channelSocket.editRole(channel.id, contextMenu.user.id);
     }
+  };
+
+  const handleGameModeChange = (event: SelectChangeEvent) => {
+    setGameModeSelect(event.target.value as GameMode);
   };
 
   return (
@@ -149,33 +184,43 @@ export default function ChannelInfoContext({
         }
       >
         <MenuItem disabled={self} onClick={handleDM}>
-          Whisper
+          {t(translationKeys.buttons.whisper)}
         </MenuItem>
         <MenuItem disabled={self} onClick={handlePromote}>
-          Promote
+          {t(translationKeys.buttons.promote)}
         </MenuItem>
         <MenuItem disabled={self} onClick={handleProfile}>
-          View Profile
+          {t(translationKeys.buttons.viewProfile)}
         </MenuItem>
         <MenuItem disabled={self} onClick={handleInviteGame}>
-          Invite to Game
+          {t(translationKeys.buttons.inviteToGame)}
         </MenuItem>
+        <Select
+          sx={{ width: "100%" }}
+          size="small"
+          onChange={handleGameModeChange}
+          placeholder={t(translationKeys.buttons.gameMode) as string}
+          value={gameModeSelect}
+        >
+          <MenuItem value={GameMode.CLASSIC}>
+            {t(translationKeys.invite.classic)}
+          </MenuItem>
+          <MenuItem value={GameMode.MAYHEM}>
+            {t(translationKeys.invite.mayhem)}
+          </MenuItem>
+        </Select>
         <MenuItem disabled={self} onClick={handleBlock}>
-          {blockStatus}
+          {blockStatus === "Block"
+            ? t(translationKeys.buttons.block)
+            : t(translationKeys.buttons.unblock)}
         </MenuItem>
         <MenuItem disabled={self} onClick={handleMute}>
-          Mute
+          {t(translationKeys.buttons.mute)}
         </MenuItem>
         <MenuItem disabled={self} onClick={handleKick}>
-          Ban
+          {t(translationKeys.buttons.ban)}
         </MenuItem>
       </Menu>
-      {/* <GetTimeDialog
-        open={openTime}
-        toggleOpen={toggleOpenTime}
-        user={contextMenu ? contextMenu.user : null}
-        action={action}
-      ></GetTimeDialog> */}
     </>
   );
 }

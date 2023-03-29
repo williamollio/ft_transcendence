@@ -27,6 +27,7 @@ services:
       - "8080:8080"
       - "8888:8888"
       - "3333:3333"
+      - "4444:4444"
     depends_on:
       - postgres
     restart: always

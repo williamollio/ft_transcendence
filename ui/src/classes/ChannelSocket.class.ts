@@ -1,4 +1,4 @@
-import { io, Socket } from "socket.io-client";
+import { Socket } from "socket.io-client";
 import { initSocket } from "../services/initSocket.service";
 import { accessTypes, chatRoom } from "./chatRoom.class";
 import { channelUser, messagesDto, user } from "../interfaces/chat.interface";
@@ -23,7 +23,6 @@ export class ChannelSocket {
     if (token) {
       if (this.user.id === "") {
         this.user = getTokenData(token);
-      } else {
         UserService.getUser(this.user.id).then((resolve) => {
           this.user.name = resolve.data.name;
         });

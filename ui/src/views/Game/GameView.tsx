@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import Navbar from "../../components/Navbar";
-import { Typography } from "@mui/material";
+import { Button, Grid, Typography } from "@mui/material";
 import { translationKeys } from "./constants";
 import { useTranslation } from "react-i18next";
 import LeftDrawer from "../../components/LeftDrawer/LeftDrawer";
@@ -15,20 +15,37 @@ import {
   TitleWrapper,
   ContentWrapper,
 } from "../../styles/MuiStyles";
+import GameBoard from "../../components/game/GameBoard";
+import { GameLoop } from "../../classes/GameLoop.class";
+import { GameSocket } from "../../classes/GameSocket.class";
+import { GameMode } from "../../interfaces/chat.interface";
 
 interface Props {
+  gameSocket: GameSocket;
   userSocket: UserSocket;
   channelSocket: ChannelSocket;
 }
+
 export default function GameView(props: Props): React.ReactElement {
-  const { userSocket, channelSocket } = props;
+  const { gameSocket, userSocket, channelSocket } = props;
   const { t } = useTranslation();
   //   const { classes } = useStyles();
+
+  // for testing
+  const [ticks, setTickts] = useState<number>(0);
+  // for testing
+
+  const [gameLoop] = useState<GameLoop>(new GameLoop(setTickts, gameSocket));
+
   return (
     <>
       <Navbar />
       <LeftDrawer />
-      <RightDrawer channelSocket={channelSocket} userSocket={userSocket} />
+      <RightDrawer
+        channelSocket={channelSocket}
+        userSocket={userSocket}
+        gameSocket={gameSocket}
+      />
       <Background>
         <ProfileCard>
           <CardContainer>
@@ -43,8 +60,64 @@ export default function GameView(props: Props): React.ReactElement {
               </Typography>
             </TitleWrapper>
             <ContentWrapper>
-              <Typography></Typography>
+              <GameBoard gameLoop={gameLoop} gameSocket={gameSocket} />
             </ContentWrapper>
+            {/* for testing */}
+            <Grid container direction="row">
+              <Grid item width={100}>
+                <Button sx={{ width: 70 }} onClick={gameLoop.startLoop}>
+                  start
+                </Button>
+              </Grid>
+              <Grid item width={100}>
+                <Button sx={{ width: 70 }} onClick={gameLoop.stopLoop}>
+                  stop
+                </Button>
+              </Grid>
+              <Grid item width={100}>
+                <Button sx={{ width: 70 }} onClick={gameLoop.resetPositions}>
+                  reset
+                </Button>
+              </Grid>
+              <Grid item width={100}>
+                <Button
+                  sx={{ width: 70 }}
+                  onClick={() => gameSocket.joinGame(GameMode.CLASSIC)}
+                >
+                  queue Up (mode: Classic)
+                </Button>
+              </Grid>
+              <Grid item width={100}>
+                <Button
+                  sx={{ width: 70 }}
+                  onClick={() => gameSocket.joinGame(GameMode.MAYHEM)}
+                >
+                  queue Up (mode: Mayhem)
+                </Button>
+              </Grid>
+              <Grid item width={100}>
+                <Button
+                  sx={{ width: 70 }}
+                  onClick={() =>
+                    gameSocket.joinAsSpectator("clfiqolxb0000obayrxl47r5s")
+                  }
+                >
+                  watch game
+                </Button>
+              </Grid>
+              <Grid item width={100}>
+                <Button
+                  sx={{ width: 70 }}
+                  onClick={() => gameSocket.leaveAsSpectator()}
+                >
+                  leave watch game
+                </Button>
+              </Grid>
+              <Grid item width={100}>
+                <>{ticks}</>
+              </Grid>
+            </Grid>
+            {/* for testing */}
           </CardContainer>
         </ProfileCard>
       </Background>

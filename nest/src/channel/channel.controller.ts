@@ -59,6 +59,11 @@ export class ChannelController {
     return this.channelService.getChannelById(channelId);
   }
 
+  @Get('get-channel-by-name/:name')
+  getChannelByName(@Param('name') channelName: string) {
+    return this.channelService.getChannelByName(channelName);
+  }
+
   @Get('get-user-channel/:id')
   getChannelByUserId(
     @GetCurrentUserId() userId: string,

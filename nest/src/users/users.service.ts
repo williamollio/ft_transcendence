@@ -222,7 +222,7 @@ export class UsersService {
       throw new ForbiddenException(error);
     }
   }
-
+  
   // Game shit
   async getUserMatches(userId: string) {
     const matches = await this.prisma.user.findUnique({
@@ -258,6 +258,8 @@ export class UsersService {
       const stats: Stat = {
         numberOfWin: 0,
         numberOfLoss: 0,
+        ratioWin: 0,
+        ratioLoss: 0,
         ranking: ranking,
         eloScore: user.eloScore,
       };
@@ -272,6 +274,8 @@ export class UsersService {
             stats.numberOfWin++;
         }
         stats.numberOfLoss = matchesList.length - stats.numberOfWin;
+        stats.ratioWin = (stats.numberOfWin / matchesList.length) * 100;
+        stats.ratioLoss = (stats.numberOfLoss / matchesList.length) * 100;
         return res.status(200).send(stats);
       }
     }
@@ -361,7 +365,7 @@ export class UsersService {
     return res.status(500).send();
   }
 
-  async getLeaderboard(res: Response) {
+  async getLeaderboard() {
     try {
       const leaderboard = await this.prisma.user.findMany({
         orderBy: {
@@ -374,7 +378,7 @@ export class UsersService {
           eloScore: true,
         },
       });
-      return res.status(200).send(leaderboard);
+      return leaderboard;
     } catch (error) {
       throw new ForbiddenException(error);
     }

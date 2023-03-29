@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useState } from "react";
+import React, { ChangeEvent, Dispatch, SetStateAction, useState } from "react";
 import { makeStyles } from "tss-react/mui";
 import Navbar from "../../components/Navbar";
 import {
@@ -39,15 +39,16 @@ import friendshipsService from "../../services/friendships.service";
 import { UserSocket } from "../../classes/UserSocket.class";
 import RightDrawer from "../../components/RightDrawer/RightDrawer";
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
+import { GameSocket } from "../../classes/GameSocket.class";
 
 interface Props {
   userSocket: UserSocket;
   channelSocket: ChannelSocket;
-  setToken: React.Dispatch<React.SetStateAction<string>>;
+  gameSocket: GameSocket;
 }
 
 export default function ProfileView(props: Props): React.ReactElement {
-  const { userSocket, channelSocket, setToken } = props;
+  const { userSocket, channelSocket, gameSocket } = props;
   const { t } = useTranslation();
   const { classes } = useStyles();
   const navigate = useNavigate();
@@ -72,17 +73,6 @@ export default function ProfileView(props: Props): React.ReactElement {
   } = useForm({
     mode: "onChange",
   });
-
-  React.useEffect(() => {
-    if (userSocket.socket.connected === false) {
-      let gotToken = localStorage.getItem(Cookie.TOKEN);
-      if (gotToken) {
-        if (typeof userSocket.socket.auth === "object") {
-          setToken("Bearer " + gotToken);
-        }
-      }
-    } else userSocket.logIn();
-  }, []);
 
   React.useEffect(() => {
     if (token === null) {
@@ -210,7 +200,7 @@ export default function ProfileView(props: Props): React.ReactElement {
     <>
       <Navbar />
       <LeftDrawer />
-      <RightDrawer channelSocket={channelSocket} userSocket={userSocket} />
+      <RightDrawer channelSocket={channelSocket} userSocket={userSocket} gameSocket={gameSocket}/>
       <Background>
         <ProfileCard>
           <CardContainer>

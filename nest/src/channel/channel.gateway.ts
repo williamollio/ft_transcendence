@@ -46,7 +46,7 @@ export class ChannelGateway {
 
   @SubscribeMessage('connect')
   handleConnection(@ConnectedSocket() clientSocket: Socket) {
-	if (
+    if (
       clientSocket.handshake.auth &&
       clientSocket.handshake.auth.token !== ''
     ) {
@@ -59,7 +59,7 @@ export class ChannelGateway {
   }
 
   @SubscribeMessage('disconnect')
-  disconnect(@ConnectedSocket() clientSocket: Socket) {
+  handleDisconnect(@ConnectedSocket() clientSocket: Socket) {
     socketToChannelId.delete(clientSocket.id);
   }
 
@@ -90,6 +90,7 @@ export class ChannelGateway {
     targetSockets.push(clientSocket.id);
     dto = {
       ...dto,
+      name: dto.name.trim(),
     };
     let channel: Channel | string | null;
     if (dto.type === ChannelType.DIRECTMESSAGE) {

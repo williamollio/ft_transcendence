@@ -12,39 +12,37 @@ import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { useQuery } from "@tanstack/react-query";
 import {
   channelUser,
+  ContextMenu,
   DBChannelElement,
-  messagesDto,
 } from "../../interfaces/chat.interface";
 import ChannelService from "../../services/channel.service";
+import { translationKeys } from "./constants";
+import { useTranslation } from "react-i18next";
 import { useTheme } from "@mui/material";
+import { listenerWrapper } from "../../services/initSocket.service";
 
-export function ChannelTabs({
-  currentRoom,
-  setContextMenu,
-  contextMenu,
-  toggleAlert,
-  toggleOpen,
-  channelSocket,
-  setNewChannel,
-}: {
+interface Props {
   currentRoom: chatRoom | boolean;
-  setContextMenu: Dispatch<
-    SetStateAction<{
-      mouseX: number;
-      mouseY: number;
-      channel: chatRoom;
-    } | null>
-  >;
-  contextMenu: {
-    mouseX: number;
-    mouseY: number;
-    channel: chatRoom;
-  } | null;
-  toggleAlert: Dispatch<SetStateAction<boolean>>;
+  setContextMenu: Dispatch<SetStateAction<ContextMenu | null>>;
+  contextMenu: ContextMenu | null;
   toggleOpen: Dispatch<SetStateAction<boolean>>;
   channelSocket: ChannelSocket;
   setNewChannel: (newChannel: chatRoom | boolean) => void;
-}) {
+  blockedUsers: Array<any>;
+}
+
+export function ChannelTabs(props: Props) {
+  const {
+    currentRoom,
+    setContextMenu,
+    contextMenu,
+    toggleOpen,
+    channelSocket,
+    setNewChannel,
+    blockedUsers,
+  } = props;
+  const { t } = useTranslation();
+
   const [channelQueryId, setChannelQueryId] = useState<string | undefined>(
     undefined
   );
@@ -53,6 +51,17 @@ export function ChannelTabs({
   const [channelList, setChannelList] = useState<chatRoom[]>(
     channelSocket.channels
   );
+
+  const removeBlockedMessages = (
+    messages: { content: string; senderId: string }[]
+  ) => {
+    let newList = new Array<{ content: string; senderId: string }>();
+    messages.forEach((message) => {
+      if (!blockedUsers.some((user) => message.senderId === user))
+        newList.push(message);
+    });
+    return newList;
+  };
 
   const updateChannelList = () => {
     const newList: Array<chatRoom> = [];
@@ -75,6 +84,7 @@ export function ChannelTabs({
     if (channelSocket.channels.length === 0) {
       if (
         joinedChannels &&
+        blockedUsers &&
         !joinedChannelsLoading &&
         !joinedChannelsError &&
         !isFetching
@@ -85,13 +95,26 @@ export function ChannelTabs({
           updateChannelList();
         }
         joinedChannels.forEach((element: DBChannelElement) => {
+          element.messages = removeBlockedMessages(element.messages);
           if (element.type !== "DIRECTMESSAGE") {
             newList.push({
               key: element.name,
               id: element.id,
               access: element.type,
               users: new Array<channelUser>(),
-              messages: new Array<messagesDto>(),
+              messages: element.messages.map((message: { content: string }) => {
+                if (
+                  message.content.startsWith(`[${channelSocket.user.name}]`)
+                ) {
+                  return {
+                    message: message.content.replace(
+                      `[${channelSocket.user.name}]`,
+                      `[${t(translationKeys.chatInfo.you)}]`
+                    ),
+                  };
+                }
+                return { message: message.content };
+              }),
             });
             channelSocket.channels = newList;
             updateChannelList();
@@ -107,7 +130,23 @@ export function ChannelTabs({
                   id: element.id,
                   access: element.type,
                   users: new Array<channelUser>(),
-                  messages: new Array<messagesDto>(),
+                  messages: element.messages.map(
+                    (message: { content: string }) => {
+                      if (
+                        message.content.startsWith(
+                          `[${channelSocket.user.name}]`
+                        )
+                      ) {
+                        return {
+                          message: message.content.replace(
+                            `[${channelSocket.user.name}]`,
+                            `[${t(translationKeys.chatInfo.you)}]`
+                          ),
+                        };
+                      }
+                      return { message: message.content };
+                    }
+                  ),
                 });
               }
               channelSocket.channels = newList;
@@ -118,7 +157,13 @@ export function ChannelTabs({
         });
       }
     }
-  }, [joinedChannels, joinedChannelsLoading, joinedChannelsError, isFetching]);
+  }, [
+    joinedChannels,
+    blockedUsers,
+    joinedChannelsLoading,
+    joinedChannelsError,
+    isFetching,
+  ]);
 
   const { data, isLoading, isError, isRefetching, refetch } = useQuery(
     ["channels", channelQueryId],
@@ -150,7 +195,13 @@ export function ChannelTabs({
               (element) => element.id !== channelSocket.user.id
             )?.name;
             let channelIndex = channelSocket.channels.push(
-              new chatRoom(data.id, userName ? userName : "missing", data.type)
+              new chatRoom(
+                data.id,
+                userName
+                  ? userName
+                  : (t(translationKeys.chatInfo.missing) as string),
+                data.type
+              )
             );
             channelSocket.channels.forEach((element) => {
               newList.push(element);
@@ -170,10 +221,6 @@ export function ChannelTabs({
           setNewChannel(channelSocket.channels[channelIndex - 1]);
         }
       }
-      localStorage.setItem(
-        "joinedChannels" + channelSocket.user.id,
-        JSON.stringify(channelSocket.channels)
-      );
       setChannelQueryId(undefined);
     }
   }, [data, isLoading, isError, isRefetching]);
@@ -221,23 +268,31 @@ export function ChannelTabs({
   };
 
   useEffect(() => {
-    if (channelSocket.socket.connected) {
-      channelSocket.registerListener("roomLeft", roomLeftListener);
-      channelSocket.registerListener("roomCreated", roomCreatedListener);
-      channelSocket.registerListener("roomJoined", roomJoinedListener);
-      channelSocket.registerListener("roomEdited", roomEditedListener);
-    }
-    return () => {
+    listenerWrapper(() => {
       if (channelSocket.socket.connected) {
-        channelSocket.removeListener("roomLeft", roomLeftListener);
-        channelSocket.removeListener("roomCreated", roomCreatedListener);
-        channelSocket.removeListener("roomJoined", roomJoinedListener);
-        channelSocket.removeListener("roomEdited", roomEditedListener);
+        channelSocket.registerListener("roomLeft", roomLeftListener);
+        channelSocket.registerListener("roomCreated", roomCreatedListener);
+        channelSocket.registerListener("roomJoined", roomJoinedListener);
+        channelSocket.registerListener("roomEdited", roomEditedListener);
+        return true;
       }
+      return false;
+    });
+    return () => {
+      listenerWrapper(() => {
+        if (channelSocket.socket.connected) {
+          channelSocket.removeListener("roomLeft", roomLeftListener);
+          channelSocket.removeListener("roomCreated", roomCreatedListener);
+          channelSocket.removeListener("roomJoined", roomJoinedListener);
+          channelSocket.removeListener("roomEdited", roomEditedListener);
+          return true;
+        }
+        return false;
+      });
     };
   }, [channelSocket.socket, channelSocket.socket.connected]);
 
-  const handleRoomChange = (event: SyntheticEvent, newValue: chatRoom) => {
+  const handleRoomChange = (_event: SyntheticEvent, newValue: chatRoom) => {
     setNewChannel(newValue);
   };
 
@@ -255,19 +310,20 @@ export function ChannelTabs({
   };
 
   const newRoom = () => {
-    toggleAlert(false);
     setNewChannel(currentRoom);
     toggleOpen(true);
   };
 
   return (
     <Tabs
-      sx={{ width: "300px" }}
+      sx={{
+        width: "300px",
+      }}
       value={typeof currentRoom !== "boolean" ? currentRoom.id : false}
       onChange={handleRoomChange}
       variant="scrollable"
       TabIndicatorProps={{
-        style: { marginBottom: "3px"},
+        style: { marginBottom: "3px" },
       }}
     >
       {channelList.map((channel: chatRoom) => {
@@ -276,10 +332,10 @@ export function ChannelTabs({
             sx={{
               color: "white",
               minWidth: "30px",
-              width: "auto",
               maxWidth: "100px",
-              fontSize: "14px",
-              fontWeight: "medium",
+              overflow: "hidden",
+              whiteSpace: "nowrap",
+              textOverflow: "ellipsis",
             }}
             value={channel.id}
             key={channel.id}

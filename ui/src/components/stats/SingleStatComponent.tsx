@@ -3,7 +3,7 @@ import { Grid, Typography, Divider } from "@mui/material";
 interface Props {
   bottomBorder?: boolean;
   title: string;
-  value: number;
+  value: number | string;
   prefix?: string;
   postfix?: string;
 }

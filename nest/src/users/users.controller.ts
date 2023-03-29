@@ -12,6 +12,7 @@ import {
   UploadedFile,
   Res,
   UseGuards,
+  ForbiddenException,
 } from '@nestjs/common';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
 import { UsersService } from './users.service';
@@ -22,6 +23,7 @@ import {
   ApiOkResponse,
   ApiResponse,
   ApiTags,
+  ApiOperation,
 } from '@nestjs/swagger';
 import { UserEntity } from './entities/user.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -35,9 +37,10 @@ import {
   imageFileFilter,
   maxSizeLimit,
 } from './utils/upload-utils';
+import { LeaderboardEntity } from './entities/leaderboard.entity';
 
 @Controller('users')
-// @UseGuards(JwtGuard) TODO : william set back
+@UseGuards(JwtGuard)
 @ApiTags('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -45,13 +48,14 @@ export class UsersController {
   @Get('get-leaderboard')
   @UseGuards(JwtGuard)
   @ApiOkResponse({ type: UserEntity })
-  getLeaderboard(@Res() res: Response) {
-    return this.usersService.getLeaderboard(res);
+  getLeaderboard() {
+    return this.usersService.getLeaderboard();
   }
 
   @Get()
   @ApiOkResponse({ type: UserEntity, isArray: true })
   public async findAll(@Res() res: Response) {
+    console.log('findAll');
     return this.usersService.findAll(res);
   }
 

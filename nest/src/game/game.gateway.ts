@@ -12,14 +12,18 @@ import { Body, UseGuards } from '@nestjs/common';
 import { GetCurrentUserId } from 'src/decorators/getCurrentUserId.decorator';
 import { FrontendUser, GameMode } from './entities/game.entity';
 import * as msgpack from 'socket.io-msgpack-parser';
+import { JwtGuard } from 'src/auth/guards/jwt.guard';
+import { gameSocketToUserId } from './socketToUserIdStorage.service';
+import { JwtUser } from 'src/users/interface/jwt-user.interface';
 
 @WebSocketGateway(4444, {
   cors: {
     credentials: true,
+    origin: process.env.PATH_TO_FRONTEND,
   },
   parser: msgpack,
 })
-@UseGuards()
+@UseGuards(JwtGuard)
 export class GameGateway {
   @WebSocketServer()
   server: Server;
@@ -27,13 +31,25 @@ export class GameGateway {
 
   constructor(private readonly gameService: GameService) {}
 
+  @SubscribeMessage('connect')
+  handleConnection(@ConnectedSocket() clientSocket: Socket) {
+    if (clientSocket.handshake.auth) {
+      const base64Payload = clientSocket.handshake.auth.token.split('.')[1];
+      const payloadBuffer = Buffer.from(base64Payload, 'base64');
+      const user: JwtUser = JSON.parse(payloadBuffer.toString()) as JwtUser;
+      gameSocketToUserId.set(clientSocket.id, String(user.id));
+      clientSocket.emit('userConnected');
+    }
+  }
+
   @SubscribeMessage('PP')
-  create(@MessageBody() encoded: Uint8Array, @GetCurrentUserId() id: string) {
+  create(@MessageBody() encoded: number, @GetCurrentUserId() id: string) {
     this.gameService.create(encoded, id);
   }
 
   @SubscribeMessage('disconnect')
   handleDisconnect(@ConnectedSocket() client: Socket) {
+    gameSocketToUserId.delete(client.id);
     const id = this.socketToId.get(client.id);
     if (id) this.gameService.pause(id, this.server);
   }
@@ -50,54 +66,72 @@ export class GameGateway {
 
   @SubscribeMessage('refuseInvite')
   refuseGameInvite(
-    @Body() challenger: FrontendUser,
+    @Body() challengerId: string,
     @ConnectedSocket() client: Socket,
   ) {
-    this.gameService.refuseInvite(client, challenger.id);
+    this.gameService.refuseInvite(client, challengerId);
+  }
+
+  @SubscribeMessage('leaveWatch')
+  leaveWatchGame(
+    @MessageBody('playerId') playerId: string,
+    @ConnectedSocket() client: Socket,
+  ) {
+    return this.gameService.leaveWatch(client, playerId);
+  }
+
+  // spectating still under tests
+  @SubscribeMessage('watchGame')
+  async watchGame(
+    @MessageBody('playerId') playerId: string,
+    @ConnectedSocket() client: Socket,
+  ) {
+    const playerNumber = await this.gameService.watch(
+      client,
+      playerId,
+      this.server,
+    );
+    this.server.to(client.id).emit('gameJoined', playerNumber);
+    return playerNumber;
+  }
+
+  @SubscribeMessage('joinGame')
+  async joinRoom(
+    @MessageBody('mode') mode: GameMode,
+    @ConnectedSocket() client: Socket,
+    @GetCurrentUserId() id: string,
+    @MessageBody('inviteGameId') inviteGameId?: string,
+  ) {
+    this.socketToId.set(client.id, id);
+    const playerNumber = await this.gameService.join(
+      client,
+      id,
+      this.server,
+      mode,
+      inviteGameId,
+    );
+    if (playerNumber.playerNumber === 1)
+      this.server.emit('gameJoined', playerNumber);
+    return playerNumber;
   }
 
   @SubscribeMessage('createInvitationGame')
-  createInvitationGame(
+  async createInvitationGame(
     @MessageBody('mode') mode: GameMode,
-    @MessageBody('opponent') playerTwoId: GameMode,
+    @MessageBody('opponent') playerTwoId: string,
     @ConnectedSocket() client: Socket,
     @GetCurrentUserId() playerOneId: string,
   ) {
     this.socketToId.set(client.id, playerOneId);
-    return this.gameService.createInvitationGame(
+    const returnMessage = await this.gameService.createInvitationGame(
       client,
       this.server,
       playerOneId,
       playerTwoId,
       mode,
     );
-  }
-
-  // @SubscribeMessage('leaveWatch')
-  // leaveWatchGame(
-  //   @MessageBody('playerId') playerId: string,
-  //   @ConnectedSocket() client: Socket,
-  // ) {
-  //   return this.gameService.leaveWatch(client, playerId);
-  // }
-
-
-  // spectating still under tests
-  // @SubscribeMessage('watchGame')
-  // watchGame(
-  //   @MessageBody('playerId') playerId: string,
-  //   @ConnectedSocket() client: Socket,
-  // ) {
-  //   return this.gameService.watch(client, playerId, this.server);
-  // }
-
-  @SubscribeMessage('joinGame')
-  joinRoom(
-    @MessageBody('mode') mode: GameMode,
-    @ConnectedSocket() client: Socket,
-    @GetCurrentUserId() id: string,
-  ) {
-    this.socketToId.set(client.id, id);
-    return this.gameService.join(client, id, this.server, mode);
+    if (returnMessage === 'gameJoined')
+      this.server.emit('gameJoined', { playerNumber: 1 });
+    return returnMessage;
   }
 }

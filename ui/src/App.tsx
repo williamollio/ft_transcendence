@@ -14,39 +14,53 @@ import theme from "./MuiTheme";
 import classes from "./styles.module.scss";
 import { useImageStore } from "./store/users-store";
 import { PrivateRoute } from "./components/Protection/PrivateRoute";
-import { getIsAuthenticated, initAuthToken } from "./utils/auth-helper";
+import { Cookie, getIsAuthenticated, initAuthToken } from "./utils/auth-helper";
 import { UserSocket } from "./classes/UserSocket.class";
 import { ChannelSocket } from "./classes/ChannelSocket.class";
 import GameView from "./views/Game/GameView";
 import StatsView from "./views/Stats/StatsView";
+import { GameSocket } from "./classes/GameSocket.class";
 
 export default function App() {
   const [userSocket] = useState<UserSocket>(new UserSocket());
+  const [channelSocket] = useState<ChannelSocket>(new ChannelSocket());
+  const [gameSocket] = useState<GameSocket>(new GameSocket());
+
+  const [token, setToken] = useState<boolean>(false);
+
   const [image, setImage] = useImageStore(
     (state: { image: any; setImage: any }) => [state.image, state.setImage]
   );
-  const [channelSocket] = useState<ChannelSocket>(new ChannelSocket());
   const imageUrl = image ? URL.createObjectURL(image) : "";
-  const [token, setToken] = useState<string>("");
 
   // different method to initialize out sockets that makes them persistent over all views
   React.useEffect(() => {
-    if (token !== "") {
-      if (userSocket.socket.connected === false) {
-        userSocket.socket.auth = { token: token };
-        userSocket.socket.connect();
-        userSocket.logIn();
-      }
-      if (channelSocket.socket.connected === false) {
-        channelSocket.socket.auth = { token: token };
-        channelSocket.socket.connect();
+    if (token) {
+      let gotToken = localStorage.getItem(Cookie.TOKEN);
+      if (gotToken !== "") {
+        gotToken = "Bearer " + gotToken;
+        if (userSocket.socket.connected === false) {
+          userSocket.socket.auth = { token: gotToken };
+          userSocket.socket.connect();
+          userSocket.logIn();
+        }
+        if (channelSocket.socket.connected === false) {
+          channelSocket.socket.auth = { token: gotToken };
+          channelSocket.initializeName(gotToken);
+          channelSocket.socket.connect();
+        }
+        if (gameSocket.socket.connected === false) {
+          gameSocket.socket.auth = { token: gotToken };
+          gameSocket.socket.connect();
+        }
       }
     }
     return () => {
       if (userSocket.socket.connected) userSocket.socket.disconnect();
       if (channelSocket.socket.connected) channelSocket.socket.disconnect();
+      if (gameSocket.socket.connected) gameSocket.socket.disconnect();
     };
-  }, [token, channelSocket, userSocket]);
+  }, [token, channelSocket, userSocket, gameSocket]);
 
   // removes the object URL after the component unmounts to prevent memory leaks
   React.useEffect(() => {
@@ -88,7 +102,10 @@ export default function App() {
           type={transcendanceState.toast?.type}
           title={transcendanceState.toast?.title}
           message={transcendanceState.toast?.message}
+          autoClose={transcendanceState.toast?.autoClose}
           onClose={closeToast}
+          onAccept={transcendanceState.toast?.onAccept}
+          onRefuse={transcendanceState.toast?.onRefuse}
         />
       )}
       <Box
@@ -105,17 +122,20 @@ export default function App() {
             <Route
               path={RoutePath.REDIRECT}
               element={
-                <PrivateRoute children={<RedirectWrapper />}></PrivateRoute>
+                <PrivateRoute
+                  setToken={setToken}
+                  children={<RedirectWrapper />}
+                ></PrivateRoute>
               }
             />
             <Route
               path={RoutePath.PROFILE}
               element={
-                <PrivateRoute>
+                <PrivateRoute setToken={setToken}>
                   <ProfileView
                     userSocket={userSocket}
                     channelSocket={channelSocket}
-                    setToken={setToken}
+                    gameSocket={gameSocket}
                   />
                 </PrivateRoute>
               }
@@ -124,10 +144,12 @@ export default function App() {
               path={RoutePath.GAME}
               element={
                 <PrivateRoute
+                  setToken={setToken}
                   children={
                     <GameView
                       userSocket={userSocket}
                       channelSocket={channelSocket}
+                      gameSocket={gameSocket}
                     />
                   }
                 ></PrivateRoute>
@@ -135,16 +157,21 @@ export default function App() {
             />
             <Route
               path={RoutePath.SETUP2FA}
-              element={<PrivateRoute children={<Setup2FA />}></PrivateRoute>}
+              element={
+                <PrivateRoute
+                  setToken={setToken}
+                  children={<Setup2FA />}
+                ></PrivateRoute>
+              }
             />
             <Route
               path={RoutePath.STATS}
               element={
-                <PrivateRoute>
+                <PrivateRoute setToken={setToken}>
                   <StatsView
                     userSocket={userSocket}
                     channelSocket={channelSocket}
-                    setToken={setToken}
+                    gameSocket={gameSocket}
                   />
                 </PrivateRoute>
               }

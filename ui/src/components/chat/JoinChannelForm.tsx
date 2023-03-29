@@ -7,33 +7,36 @@ import {
   DialogActions,
   Button,
 } from "@mui/material";
+import React from "react";
 import { makeStyles } from "tss-react/mui";
-import { translationKeys } from "./constants";
 import { useTranslation } from "react-i18next";
+import { JoinDialogValue } from "../../interfaces/chat.interface";
+import { translationKeys } from "./constants";
 
-export default function JoinForm({
-  dialogJoinValue,
-  setDialogJoinValue,
-  handleClose,
-}: {
-  dialogJoinValue: any;
-  setDialogJoinValue: any;
-  handleClose: any;
-}) {
-  const { classes } = useStyles();
+interface Props {
+  dialogJoinValue: JoinDialogValue;
+  setDialogJoinValue: React.Dispatch<React.SetStateAction<JoinDialogValue>>;
+  handleClose: (e: React.MouseEvent<HTMLButtonElement>) => void;
+}
+
+export default function JoinForm(props: Props) {
+  const { dialogJoinValue, setDialogJoinValue, handleClose } = props;
   const { t } = useTranslation();
+  const { classes } = useStyles();
+
   return (
     <Grid container>
       <Grid item>
-        <DialogTitle>Join existing channel</DialogTitle>
+        <DialogTitle>
+          {t(translationKeys.createInfo.joinChannelTitle)}
+        </DialogTitle>
       </Grid>
       <Grid item>
         <DialogContent>
           <Grid container spacing="20px">
             <Grid item>
               <DialogContentText>
-                Please enter the id and password of the channel you want to
-                Join.
+                {t(translationKeys.createInfo.joinChannelText)}
               </DialogContentText>
             </Grid>
             <Grid item>
@@ -41,15 +44,15 @@ export default function JoinForm({
                 variant="outlined"
                 size="small"
                 autoFocus
-                id="id"
-                value={dialogJoinValue.id}
+                id="name"
+                value={dialogJoinValue.name}
                 onChange={(event) =>
                   setDialogJoinValue({
                     ...dialogJoinValue,
-                    id: event.target.value,
+                    name: event.target.value,
                   })
                 }
-                label="id"
+                label={t(translationKeys.createInfo.name)}
                 type="text"
                 InputLabelProps={{ shrink: true }}
               />
@@ -65,7 +68,7 @@ export default function JoinForm({
                     password: event.target.value,
                   })
                 }
-                label="password"
+                label={t(translationKeys.createInfo.password)}
                 type="password"
                 variant="outlined"
                 InputLabelProps={{ shrink: true }}

@@ -3,7 +3,6 @@ import {
   Button,
   Dialog,
   DialogActions,
-  DialogContent,
   DialogTitle,
   Divider,
   Grid,
@@ -15,7 +14,7 @@ import {
   TableHead,
   TableRow,
 } from "@mui/material";
-import { SyntheticEvent, useEffect, useState } from "react";
+import React, { SyntheticEvent, useEffect, useState } from "react";
 import { channelUser, user } from "../../interfaces/chat.interface";
 import { chatRoom } from "../../classes/chatRoom.class";
 import ChannelInfoContext from "./ChannelInfoContext";
@@ -25,40 +24,43 @@ import GetNameDialog from "./GetNameDialog";
 import { useQuery } from "@tanstack/react-query";
 import { UserSocket } from "../../classes/UserSocket.class";
 import ChannelService from "../../services/channel.service";
+import { GameSocket } from "../../classes/GameSocket.class";
+import { translationKeys } from "./constants";
+import { useTranslation } from "react-i18next";
+import { listenerWrapper } from "../../services/initSocket.service";
 
-export default function ChannelInfoDialog({
-  blockedUser,
-  refetchBlockedUsers,
-  userSocket,
-  setAlertMsg,
-  channelInfoOpen,
-  toggleChannelInfo,
-  channel,
-  channelSocket,
-}: {
+interface Props {
   blockedUser: Array<string>;
   refetchBlockedUsers: any;
   userSocket: UserSocket;
-  toggleError: any;
-  setAlertMsg: any;
-  setNewChannel: any;
+  setNewChannel: React.Dispatch<React.SetStateAction<chatRoom>>;
   channelInfoOpen: boolean;
-  toggleChannelInfo: any;
+  toggleChannelInfo: React.Dispatch<React.SetStateAction<boolean>>;
   channel: chatRoom | undefined;
   channelSocket: ChannelSocket;
-}) {
-  const [selected, setSelected] = useState<user | null>(null);
+  gameSocket: GameSocket;
+}
 
+export default function ChannelInfoDialog(props: Props) {
+  const {
+    blockedUser,
+    refetchBlockedUsers,
+    channelInfoOpen,
+    toggleChannelInfo,
+    channel,
+    channelSocket,
+    gameSocket,
+  } = props;
+  const { t } = useTranslation();
+
+  const [selected, setSelected] = useState<user | null>(null);
   const [contextMenu, setContextMenu] = useState<{
     mouseX: number;
     mouseY: number;
     user: channelUser;
   } | null>(null);
-
   const [userList, setUserList] = useState<Array<channelUser>>([]);
-
   const [openPassword, toggleOpenPassword] = useState<boolean>(false);
-
   const [openName, toggleOpenName] = useState<boolean>(false);
 
   const { data, isError, isLoading, refetch } = useQuery(
@@ -87,28 +89,36 @@ export default function ChannelInfoDialog({
     }
   }, [data, isLoading, isError]);
 
-  const userJoinedListener = (userId: string, channelId: string) => {
+  const userJoinedListener = (userId: string, _channelId: string) => {
     if (userId !== channelSocket.user.id) refetch();
   };
 
-  const userLeftListener = (userId: string, channelId: string) => {
+  const userLeftListener = (userId: string, _channelId: string) => {
     if (userId !== channelSocket.user.id) refetch();
   };
 
   useEffect(() => {
-    if (channelSocket.socket.connected) {
-      channelSocket.registerListener("roomJoined", userJoinedListener);
-      channelSocket.registerListener("roomLeft", userLeftListener);
-      channelSocket.registerListener("roleUpdated", () => {
-        refetch();
-      });
-    }
-    return () => {
+    listenerWrapper(() => {
       if (channelSocket.socket.connected) {
-        channelSocket.removeListener("roomJoined", userJoinedListener);
-        channelSocket.removeListener("roomLeft", userLeftListener);
-        channelSocket.removeListener("roleUpdated");
+        channelSocket.registerListener("roomJoined", userJoinedListener);
+        channelSocket.registerListener("roomLeft", userLeftListener);
+        channelSocket.registerListener("roleUpdated", () => {
+          refetch();
+        });
+        return true;
       }
+      return false;
+    });
+    return () => {
+      listenerWrapper(() => {
+        if (channelSocket.socket.connected) {
+          channelSocket.removeListener("roomJoined", userJoinedListener);
+          channelSocket.removeListener("roomLeft", userLeftListener);
+          channelSocket.removeListener("roleUpdated");
+          return true;
+        }
+        return false;
+      });
     };
   }, [channelSocket.socket, channelSocket.socket.connected]);
 
@@ -150,13 +160,11 @@ export default function ChannelInfoDialog({
   });
 
   const handlePasswordChange = (e?: SyntheticEvent) => {
-    setAlertMsg("Failed to change password");
     e ? e.preventDefault() : false;
     toggleOpenPassword(true);
   };
 
   const handleNameChange = (e?: SyntheticEvent) => {
-    setAlertMsg("Failed to change channel name");
     e ? e.preventDefault() : false;
     toggleOpenName(true);
   };
@@ -177,14 +185,11 @@ export default function ChannelInfoDialog({
     >
       <Grid container direction="column">
         <Grid item>
-          <DialogTitle>Channel Info</DialogTitle>
+          <DialogTitle>
+            {t(translationKeys.roomContext.channelInfo)}
+          </DialogTitle>
         </Grid>
         <Divider></Divider>
-        <Grid item>
-          <DialogContent>
-            Channel ID: {channel?.id !== "" ? channel?.id : "missing"}
-          </DialogContent>
-        </Grid>
         <Grid item>
           <Grid container>
             <Grid item>
@@ -194,7 +199,7 @@ export default function ChannelInfoDialog({
                   onMouseUp={(e) => handlePasswordChange()}
                   onMouseDown={handlePasswordChange}
                 >
-                  Change Password
+                  {t(translationKeys.roomContext.changePassword)}
                 </Button>
               </DialogActions>
             </Grid>
@@ -205,7 +210,7 @@ export default function ChannelInfoDialog({
                   onMouseUp={(e) => handleNameChange()}
                   onMouseDown={handleNameChange}
                 >
-                  Change Name
+                  {t(translationKeys.roomContext.changeName)}
                 </Button>
               </DialogActions>
             </Grid>
@@ -225,8 +230,10 @@ export default function ChannelInfoDialog({
               <Table size="small">
                 <TableHead>
                   <TableRow>
-                    <TableCell>Name</TableCell>
-                    <TableCell>Status</TableCell>
+                    <TableCell>{t(translationKeys.createInfo.name)}</TableCell>
+                    <TableCell>
+                      {t(translationKeys.roomContext.status)}
+                    </TableCell>
                     <TableCell></TableCell>
                   </TableRow>
                 </TableHead>
@@ -234,13 +241,14 @@ export default function ChannelInfoDialog({
               </Table>
             </TableContainer>
             <ChannelInfoContext
+              toggleChannelInfo={toggleChannelInfo}
               blockedUser={blockedUser}
               refetchBlockedUsers={refetchBlockedUsers}
-              setAlertMsg={setAlertMsg}
               channel={channel}
               contextMenu={contextMenu}
               setContextMenu={setContextMenu}
               channelSocket={channelSocket}
+              gameSocket={gameSocket}
             ></ChannelInfoContext>
           </Box>
         </Grid>
