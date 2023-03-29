@@ -1,6 +1,6 @@
 import React, { useRef } from "react";
 import Navbar from "../../components/Navbar";
-import { Box, Button, Grid, Typography } from "@mui/material";
+import { Box, Button, CircularProgress, Grid, Typography } from "@mui/material";
 import { translationKeys } from "./constants";
 import { useTranslation } from "react-i18next";
 import { makeStyles } from "tss-react/mui";
@@ -11,39 +11,90 @@ import {
   TitleWrapper,
   ContentWrapper,
 } from "../../styles/MuiStyles";
-import CustomTextField from "../../components/shared/CustomTextField/CustomTextField";
-import { useForm, FieldValues } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { TextField } from "@mui/material";
 import LeftDrawer from "../../components/LeftDrawer/LeftDrawer";
+import { Cookie, getTokenData } from "../../utils/auth-helper";
+import { RoutePath } from "../../interfaces/router.interface";
+import usersService from "../../services/users.service";
+import { AxiosError } from "axios";
+import { ToastType } from "../../context/toast";
+import { TranscendanceStateActionType } from "../../context/transcendance-reducer";
+import { TranscendanceContext } from "../../context/transcendance-context";
+import authService from "../../services/auth.service";
 
 const CODE_LENGTH = 6; // number of input fields to render
 
 export default function Setup2FA(): React.ReactElement {
   const navigate = useNavigate();
+  const [QRCodeUrl, setQRCodeUrl] = React.useState<string>("");
   const { t } = useTranslation();
-  const {
-    formState: { errors },
-    register,
-    handleSubmit,
-  } = useForm({
-    mode: "onChange",
-  });
   const { classes } = useStyles();
   const [input, setInput] = React.useState<string[]>(
     Array(CODE_LENGTH).fill("")
   );
-
   const [currentIndex, setCurrentIndex] = React.useState<number>(0);
   const inputRefs = useRef<any>([]);
   const [isFocused, setIsFocused] = React.useState<boolean>(false);
-
+  const [userId, setUserId] = React.useState<string>("");
   const handleInputChange = (index: number, value: string) => {
     setCurrentIndex(index);
     const newInputs = [...input];
     newInputs[index] = value.replace(/[^0-9]/g, "").substr(0, 1);
     setInput(newInputs);
   };
+  const [token] = React.useState<string | null>(
+    localStorage.getItem(Cookie.TOKEN)
+  );
+  const { dispatchTranscendanceState } = React.useContext(TranscendanceContext);
+  const [is2faEnabled, setIs2faEnabled] = React.useState<boolean | undefined>(
+    undefined
+  );
+
+  React.useEffect(() => {
+    if (token === null) {
+      navigate(RoutePath.LOGIN);
+    } else {
+      setUserId(getTokenData(token).id);
+      if (userId) {
+        fetchCurrentUser();
+      }
+    }
+  }, [userId]);
+
+  function showErrorToast(error?: AxiosError) {
+    const message = error?.response?.data as any;
+    dispatchTranscendanceState({
+      type: TranscendanceStateActionType.TOGGLE_TOAST,
+      toast: {
+        type: ToastType.ERROR,
+        title: "Error",
+        message: message,
+      },
+    });
+  }
+
+  function showSuccessToast(message: void) {
+    dispatchTranscendanceState({
+      type: TranscendanceStateActionType.TOGGLE_TOAST,
+      toast: {
+        type: ToastType.SUCCESS,
+        title: "Success",
+        message: message as unknown as string,
+      },
+    });
+  }
+
+  async function fetchCurrentUser() {
+    const user = await usersService.getUser(userId);
+    const isSuccess = !user?.error;
+    if (!isSuccess) {
+      showErrorToast(user.error);
+      setIs2faEnabled(undefined);
+    } else {
+      setIs2faEnabled(user.data.secondFactorEnabled);
+    }
+  }
 
   React.useEffect(() => {
     const nextIndex = currentIndex + 1;
@@ -67,20 +118,43 @@ export default function Setup2FA(): React.ReactElement {
     }
   }, [input, isFocused]);
 
-  function onCancelPhone() {
+  function onCancelCode() {
     navigate(-1);
   }
-
-  function onCancelCode() {
-    console.log("to implement");
-  }
-  async function onSubmitPhone(data: FieldValues) {
-    console.log("data.phoneNumber " + data.phoneNumber);
+  async function trigger2fa() {
+    let response;
+    if (is2faEnabled) {
+      response = await authService.disableSecondFactor();
+    } else {
+      response = await authService.activateSecondFactor();
+      if (response.data !== "") {
+        setQRCodeUrl(response.data);
+      }
+    }
+    setIs2faEnabled(!is2faEnabled);
+    // if (response.error) {
+    //   showErrorToast(response.error);
+    // }
   }
 
   async function onSubmitCode() {
-    console.log("input " + input);
+    if (QRCodeUrl === "") {
+      return;
+    }
+    const responseSend2fa = await authService.sendSecondFactor(input);
+    if (!responseSend2fa.error) {
+      showSuccessToast(responseSend2fa.data);
+      setQRCodeUrl("");
+    } else {
+      showErrorToast(responseSend2fa.error);
+    }
+    setInput(Array(CODE_LENGTH).fill(""));
   }
+
+  const isQRCode = () => {
+    if (QRCodeUrl != "") return true;
+    return false;
+  };
 
   const OTPInputField = ({ index }: { index: number }) => {
     return (
@@ -121,34 +195,35 @@ export default function Setup2FA(): React.ReactElement {
               >
                 {t(translationKeys.enterNumber)}
               </Typography>
-              <Box sx={{ width: "40%", marginTop: "50px" }}>
-                <CustomTextField
-                  label={"Phone number"}
-                  isRequired
-                  name="phoneNumber"
-                  rules={{
-                    required: true,
-                  }}
-                  error={errors.phoneNumber}
-                  register={register}
-                />
+              <Box
+                sx={{
+                  minWidth: "40%",
+                  marginTop: "20px",
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+              >
+                {QRCodeUrl && <img src={QRCodeUrl} />}
               </Box>
-              <Box className={classes.buttonsWrapper}>
-                <Button
-                  variant="contained"
-                  className={classes.iconButton}
-                  color="primary"
-                  onClick={handleSubmit(onSubmitPhone)}
-                >
-                  {t(translationKeys.buttons.save)}
-                </Button>
-                <Button
-                  className={classes.iconButton}
-                  variant="outlined"
-                  onClick={onCancelPhone}
-                >
-                  {t(translationKeys.buttons.cancel)}
-                </Button>
+              <Box
+                sx={{ width: "92% !important" }}
+                className={classes.buttonsWrapper}
+              >
+                {is2faEnabled === undefined ? (
+                  <CircularProgress size={24} />
+                ) : (
+                  <Button
+                    variant="contained"
+                    className={classes.iconButton}
+                    color="primary"
+                    onClick={trigger2fa}
+                    disabled={isQRCode()}
+                  >
+                    {is2faEnabled
+                      ? t(translationKeys.buttons.disable)
+                      : t(translationKeys.buttons.enable)}
+                  </Button>
+                )}
               </Box>
               <Grid className={classes.inputWrapper}>
                 {Array(CODE_LENGTH)

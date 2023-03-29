@@ -1,4 +1,4 @@
-import { ReactElement, useEffect, useState } from "react";
+import { ReactElement, useState } from "react";
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import ProfileView from "./views/Profile/ProfileView";
@@ -13,8 +13,8 @@ import { Box, ThemeProvider } from "@mui/material";
 import theme from "./MuiTheme";
 import classes from "./styles.module.scss";
 import { useImageStore } from "./store/users-store";
-import { PrivateRoute } from "./components/PrivateRoute";
-import { Cookie, getIsAuthenticated, initAuthToken } from "./utils/auth-helper";
+import { PrivateRoute } from "./components/Protection/PrivateRoute";
+import { getIsAuthenticated, initAuthToken } from "./utils/auth-helper";
 import { UserSocket } from "./classes/UserSocket.class";
 import { ChannelSocket } from "./classes/ChannelSocket.class";
 import GameView from "./views/Game/GameView";
@@ -82,12 +82,7 @@ export default function App() {
 
   const RedirectWrapper = () => {
     initAuthToken();
-    return (
-      <Navigate
-        to={RoutePath.PROFILE}
-        state={{ creationMode: true }}
-      ></Navigate>
-    );
+    return <Navigate to={RoutePath.PROFILE} />;
   };
 
   function closeToast() {

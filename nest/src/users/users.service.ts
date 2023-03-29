@@ -84,6 +84,17 @@ export class UsersService {
   public async findOne(id: string) {
     return this.prisma.user.findUnique({
       where: { id },
+      select: {
+        id: true,
+        intraId: true,
+        secondFactorSecret: true,
+        refreshToken: true,
+        name: true,
+        filename: true,
+        status: true,
+        secondFactorEnabled: true,
+        secondFactorLogged: true,
+      },
     });
   }
 
@@ -108,6 +119,23 @@ export class UsersService {
     } catch (e) {
       throw e;
     }
+  }
+
+  public async set2FA(userId: string, secret: string | null) {
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        secondFactorSecret: secret,
+        secondFactorEnabled: !!secret,
+      },
+    });
+  }
+
+  public async set2FALogged(userId: string, logged: boolean) {
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { secondFactorLogged: logged },
+    });
   }
 
   public async update(userId: string, updateUserDto: UpdateUserDto) {
@@ -194,7 +222,8 @@ export class UsersService {
       throw new ForbiddenException(error);
     }
   }
-  //  Game shit
+  
+  // Game shit
   async getUserMatches(userId: string) {
     const matches = await this.prisma.user.findUnique({
       where: {

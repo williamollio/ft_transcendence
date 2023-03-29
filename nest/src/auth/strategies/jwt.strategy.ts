@@ -12,22 +12,22 @@ export type JwtPayload = {
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
+  static extractJwtFromSocket = (handshake: HandshakeRequest) => {
+    if (handshake.handshake) {
+      const authHeader = handshake.handshake.auth.token;
+
+      if (authHeader && authHeader.split(' ')[0] === 'Bearer') {
+        return authHeader.split(' ')[1];
+      }
+      return null;
+    } else return ExtractJwt.fromAuthHeaderAsBearerToken()(handshake as any);
+  };
+
   constructor(private userService: UsersService) {
-    const extractJwtFromSocket = (handshake: HandshakeRequest) => {
-      if (handshake.handshake) {
-        const authHeader = handshake.handshake.auth.token;
-
-        if (authHeader && authHeader.split(' ')[0] === 'Bearer') {
-          return authHeader.split(' ')[1];
-        }
-        return null;
-      } else return ExtractJwt.fromAuthHeaderAsBearerToken()(handshake as any);
-    };
-
     super({
       ignoreExpiration: false,
       secretOrKey: process.env.JWT_SECRET,
-      jwtFromRequest: extractJwtFromSocket,
+      jwtFromRequest: JwtStrategy.extractJwtFromSocket,
     });
   }
 

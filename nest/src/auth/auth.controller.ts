@@ -18,6 +18,8 @@ import { Intra42User } from '../users/interface/intra42-user.interface';
 import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
 import { JwtGuard } from './guards/jwt.guard';
 import { CreateUserDto } from '../users/dto/create-user.dto';
+import { FullAuthGuard } from './guards/full-auth.guard';
+import { Response } from 'express';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -86,5 +88,28 @@ export class AuthController {
     const tokens = this.authService.refreshTokens(userId, refreshToken);
     this.setCookieTokens(await tokens, res);
     return HttpStatus.OK;
+  }
+
+  @Get('2fa/activate')
+  @UseGuards(JwtGuard)
+  async enable2FA(@Req() request: any) {
+    return await this.authService.enable2FA(request.user.id);
+  }
+
+  @Post('2fa/disable')
+  @UseGuards(FullAuthGuard)
+  async disable2FA(@Req() request: any) {
+    await this.authService.disable2FA(request.user.id);
+    return HttpStatus.OK;
+  }
+
+  @Post('2fa/validate')
+  @UseGuards(JwtGuard)
+  async validate2FA(@Req() request: any, @Res() res: Response) {
+    return await this.authService.validateSecondFactor(
+      res,
+      request.user.id,
+      request.body.code,
+    );
   }
 }
