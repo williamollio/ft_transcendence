@@ -40,20 +40,28 @@ export class GameLoop {
   handleMovement = () => {
     if (typeof this.keyPressed !== "boolean") {
       if (this.keyPressed.some((key) => key === "ArrowUp")) {
-        if (this.positionalData.playerLeftYOffset - 5 > 0) {
-          if (this.activePlayer === 1) {
-            this.positionalData.playerLeftYOffset -= 5;
-          } else if (this.activePlayer === 2) {
-            this.positionalData.playerRightYOffset -= 5;
-          }
+        if (
+          this.activePlayer === 1 &&
+          this.positionalData.playerLeftYOffset - 5 > 0
+        ) {
+          this.positionalData.playerLeftYOffset -= 5;
+        } else if (
+          this.activePlayer === 2 &&
+          this.positionalData.playerRightYOffset - 5 > 0
+        ) {
+          this.positionalData.playerRightYOffset -= 5;
         }
       } else if (this.keyPressed.some((key) => key === "ArrowDown")) {
-        if (this.positionalData.playerLeftYOffset + 5 <= 350) {
-          if (this.activePlayer === 1) {
-            this.positionalData.playerLeftYOffset += 5;
-          } else if (this.activePlayer === 2) {
-            this.positionalData.playerRightYOffset += 5;
-          }
+        if (
+          this.activePlayer === 1 &&
+          this.positionalData.playerLeftYOffset + 5 < 350
+        ) {
+          this.positionalData.playerLeftYOffset += 5;
+        } else if (
+          this.activePlayer === 2 &&
+          this.positionalData.playerRightYOffset + 5 < 350
+        ) {
+          this.positionalData.playerRightYOffset += 5;
         }
       }
     }

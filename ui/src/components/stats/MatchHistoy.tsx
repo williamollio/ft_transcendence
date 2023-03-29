@@ -25,7 +25,7 @@ export default function MatchHistory(props: Props) {
   const [matchHistory, setMatchHistory] = useState<Array<match>>([]);
 
   useEffect(() => {
-    if (data && !isLoading && !isError && !isRefetching) {
+    if (open && data && !isLoading && !isError && !isRefetching) {
       const newList = new Array<match>();
       data.forEach((element: MatchHistoryDto) => {
         newList.push({

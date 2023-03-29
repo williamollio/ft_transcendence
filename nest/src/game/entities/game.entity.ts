@@ -190,12 +190,14 @@ export class Game {
     paddleX: number,
     paddleY: number,
     paddleSize: number,
+    player: number,
   ): boolean {
     const isColliding =
-      (ballX + ballHeight / 2 === paddleX ||
-        ballX - ballHeight / 2 === paddleX) &&
+      (player === 1
+        ? ballX - ballHeight / 2 <= paddleX
+        : ballX + ballHeight / 2 >= paddleX) &&
       ballY + ballHeight >= paddleY - paddleSize / 2 &&
-      ballY <= paddleY + paddleSize / 2;
+      ballY - ballHeight <= paddleY + paddleSize / 2;
     return isColliding;
   }
 
@@ -220,13 +222,13 @@ export class Game {
       speeds,
     } = this.gameConstants;
 
-    if (this.by + ballHeight >= relativeGameHeight) {
+    if (this.by + ballHeight / 2 >= relativeGameHeight) {
       // bottom collision
-      this.by = relativeGameHeight - ballHeight;
+      this.by = relativeGameHeight - ballHeight / 2;
       this.diry = -this.diry;
-    } else if (this.by <= 0) {
+    } else if (this.by - ballHeight / 2 <= 0) {
       // top collision
-      this.by = 0;
+      this.by = 0 + ballHeight / 2;
       this.diry = -this.diry;
     }
     // player paddle collision
@@ -238,6 +240,7 @@ export class Game {
         player1PaddlePosX,
         this.p1y,
         this.paddleSize,
+        1,
       )
     ) {
       switch (this.mode) {
@@ -273,6 +276,7 @@ export class Game {
         player2PaddlePosX,
         this.p2y,
         this.paddleSize,
+        2,
       )
     ) {
       switch (this.mode) {

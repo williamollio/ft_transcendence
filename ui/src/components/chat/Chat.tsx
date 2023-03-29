@@ -21,7 +21,7 @@ import RoomContextMenu from "./RoomContextMenu";
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { ChannelTabs } from "./ChannelTabs";
 import ChannelService from "../../services/channel.service";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { UserSocket } from "../../classes/UserSocket.class";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
@@ -33,6 +33,7 @@ import { TranscendanceContext } from "../../context/transcendance-context";
 import { TranscendanceStateActionType } from "../../context/transcendance-reducer";
 import { ToastType } from "../../context/toast";
 import { listenerWrapper } from "../../services/initSocket.service";
+import { RoutePath } from "../../interfaces/router.interface";
 
 interface Props {
   channelSocket: ChannelSocket;
@@ -43,6 +44,11 @@ interface Props {
 export default function Chat(props: Props) {
   const { channelSocket, userSocket, gameSocket } = props;
   const theme = useTheme();
+  const scrollRef = useRef<HTMLLIElement | null>(null);
+  const location = useLocation();
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const toast = useContext(TranscendanceContext);
 
   const [open, toggleOpen] = useState(false);
   const [messages, setMessages] = useState<Array<messagesDto>>([]);
@@ -54,11 +60,6 @@ export default function Chat(props: Props) {
     type: "PRIVATE",
     name: "",
   });
-  const scrollRef = useRef<HTMLLIElement | null>(null);
-  const location = useLocation();
-  const { t } = useTranslation();
-
-  const toast = useContext(TranscendanceContext);
 
   const {
     data: blockedUsers,
@@ -195,13 +196,35 @@ export default function Chat(props: Props) {
         toast: {
           type: ToastType.INVITE,
           title: t(translationKeys.invite.roomInvite) as string,
-          message: `${t(translationKeys.invite.inviteTo) as string} ${data.name}`,
-		  autoClose: false,
+          message: `${t(translationKeys.invite.inviteTo) as string} ${
+            data.name
+          }`,
+          autoClose: false,
           onAccept: () => handleInviteSubmit(data),
           onRefuse: () => {},
         },
       });
     }
+  };
+
+  const invitedToGameListener = (data: any) => {
+    toast.dispatchTranscendanceState({
+      type: TranscendanceStateActionType.TOGGLE_TOAST,
+      toast: {
+        type: ToastType.INVITE,
+        title: t(translationKeys.invite.gameInvite) as string,
+        message: `${data.initiatingUser.name} ${
+          t(translationKeys.invite.inviteTo) as string
+        }
+            ${data.game.mode === "CLASSIC" ? "Classic" : "Mayhem"}`,
+        autoClose: false,
+        onAccept: () => {
+          gameSocket.joinGame(data.game.mode, data.initiatingUser.id);
+          navigate(RoutePath.GAME);
+        },
+        onRefuse: () => gameSocket.refuseInvite(data.initiatingUser.id),
+      },
+    });
   };
 
   const banSuccessListener = (result: {
@@ -260,6 +283,7 @@ export default function Chat(props: Props) {
             failedListener(error, element)
           );
         });
+        gameSocket.socket.on("invitedToGame", invitedToGameListener);
         return true;
       }
       return false;
@@ -282,6 +306,7 @@ export default function Chat(props: Props) {
           failEvents.forEach((element) => {
             channelSocket.removeListener(element, failedListener);
           });
+          gameSocket.socket.off("invitedToGame", invitedToGameListener);
           return true;
         }
         return false;

@@ -6,7 +6,7 @@ import { GameSocket } from "../../classes/GameSocket.class";
 import { ToastType } from "../../context/toast";
 import { TranscendanceContext } from "../../context/transcendance-context";
 import { TranscendanceStateActionType } from "../../context/transcendance-reducer";
-import { GameMode } from "../../interfaces/chat.interface";
+import { failedEvents } from "../../interfaces/game.interface";
 import { listenerWrapper } from "../../services/initSocket.service";
 import { translationKeys } from "../../views/Game/constants";
 import Ball from "./Ball";
@@ -48,7 +48,6 @@ export default function GameBoard(props: Props) {
   };
 
   const gameFinishListener = (data: any) => {
-    gameLoop.stopLoop();
     gameLoop.resetPositions();
   };
 
@@ -59,7 +58,6 @@ export default function GameBoard(props: Props) {
     } else if (gameLoop.activePlayer === 2) {
       gameLoop.positionalData.playerLeftYOffset = data.p1y - 50;
     } else {
-      console.log(data);
       gameLoop.positionalData.playerRightYOffset = data.p2y - 50;
       gameLoop.positionalData.playerLeftYOffset = data.p1y - 50;
     }
@@ -73,24 +71,21 @@ export default function GameBoard(props: Props) {
     if (data.status === "PLAYING") gameLoop.startLoop();
   };
 
-  const inviteRefusedListener = (data: any) => {
-    console.log(data);
+  
+
+  const tryRejoinListener = (data: any) => {
+    console.log("rejoined");
+    if (data) gameSocket.joinGame(data);
   };
 
-  const invitedToGameListener = (data: any) => {
+  const failedListener = (data: any) => {
+    gameLoop.resetPositions();
     toast.dispatchTranscendanceState({
       type: TranscendanceStateActionType.TOGGLE_TOAST,
       toast: {
-        type: ToastType.INVITE,
-        title: t(translationKeys.gameInvite) as string,
-        message: `${data.initiatingUser.name} ${
-          t(translationKeys.inviteTo) as string
-        }
-            ${data.game.mode === "CLASSIC" ? "Classic" : "Mayhem"}`,
-        autoClose: false,
-        onAccept: () =>
-          gameSocket.joinGame(data.game.mode, data.initiatingUser.id),
-        onRefuse: () => gameSocket.refuseInvite(data.initiatingUser.id),
+        type: ToastType.ERROR,
+        title: t(translationKeys.invite.failed) as string,
+        message: `${data}`,
       },
     });
   };
@@ -100,13 +95,16 @@ export default function GameBoard(props: Props) {
     document.addEventListener("keyup", playerStopHandler);
     listenerWrapper(() => {
       if (gameSocket.socket.connected) {
+        failedEvents.forEach((event) =>
+          gameSocket.socket.on(event, failedListener)
+        );
+        gameSocket.socket.on("tryRejoin", tryRejoinListener);
         gameSocket.socket.on("matchFinished", gameFinishListener);
         gameSocket.socket.on("gameStarting", gameStartingListener);
         gameSocket.socket.on("GI", giListener);
         gameSocket.socket.on("gameJoined", gameJoinedListener);
         gameSocket.socket.on("gameStatus", mutateGameStatusListener);
-        gameSocket.socket.on("inviteRefused", inviteRefusedListener);
-        gameSocket.socket.on("invitedToGame", invitedToGameListener);
+        gameSocket.rejoin();
         return true;
       }
       return false;
@@ -116,17 +114,21 @@ export default function GameBoard(props: Props) {
       document.removeEventListener("keyup", playerStopHandler);
       listenerWrapper(() => {
         if (gameSocket.socket.connected) {
+          failedEvents.forEach((event) =>
+            gameSocket.socket.off(event, failedListener)
+          );
+          gameSocket.socket.off("tryRejoin", tryRejoinListener);
           gameSocket.socket.off("matchFinished", gameFinishListener);
           gameSocket.socket.off("gameStarting", gameStartingListener);
           gameSocket.socket.off("GI", giListener);
           gameSocket.socket.off("gameJoined", gameJoinedListener);
           gameSocket.socket.off("gameStatus", mutateGameStatusListener);
-          gameSocket.socket.off("inviteRefused", inviteRefusedListener);
-          gameSocket.socket.off("invitedToGame", invitedToGameListener);
+          
           return true;
         }
         return false;
       });
+	  gameLoop.stopLoop();
     };
   }, [gameLoop, gameSocket]);
 

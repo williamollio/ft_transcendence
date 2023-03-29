@@ -20,7 +20,7 @@ interface Props {
 
 export default function PlayerRow(props: Props) {
   const { player, findName } = props;
-  const [open, toggleOpen] = useState(false);
+  const [open, toggleOpen] = useState<boolean>(false);
   const [openView, toggleOpenView] = useState<boolean>(false);
 
   return (
