@@ -14,7 +14,7 @@ import theme from "./MuiTheme";
 import classes from "./styles.module.scss";
 import { useImageStore } from "./store/users-store";
 import { PrivateRoute } from "./components/Protection/PrivateRoute";
-import { getIsAuthenticated, initAuthToken } from "./utils/auth-helper";
+import { Cookie, getIsAuthenticated, initAuthToken } from "./utils/auth-helper";
 import { UserSocket } from "./classes/UserSocket.class";
 import { ChannelSocket } from "./classes/ChannelSocket.class";
 import GameView from "./views/Game/GameView";

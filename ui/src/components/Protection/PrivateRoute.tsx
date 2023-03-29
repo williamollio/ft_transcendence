@@ -6,9 +6,10 @@ import { AuthCheck } from "./AuthCheck";
 import { CircularProgress } from "@mui/material";
 import { RoutePath } from "../../interfaces/router.interface";
 
-export const PrivateRoute: FC<{ children: React.ReactElement }> = ({
-  children,
-}) => {
+export const PrivateRoute: FC<{
+  children: React.ReactElement;
+  setToken: React.Dispatch<React.SetStateAction<boolean>>;
+}> = ({ children, setToken }) => {
   const [isUserAuthorized, setIsUserAuthorized] =
     React.useState<boolean>(false);
   const [is2faRequired, setIs2faRequired] = React.useState<boolean>(false);
@@ -40,6 +41,7 @@ export const PrivateRoute: FC<{ children: React.ReactElement }> = ({
     if (isUserDataLoaded && user) {
       if (!secondFactorEnabled || (secondFactorEnabled && secondFactorLogged)) {
         setIsUserAuthorized(true);
+        setToken(true);
       }
       if (secondFactorEnabled && !secondFactorLogged) {
         setIs2faRequired(true);

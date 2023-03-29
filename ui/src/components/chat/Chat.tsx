@@ -195,7 +195,8 @@ export default function Chat(props: Props) {
         toast: {
           type: ToastType.INVITE,
           title: t(translationKeys.invite.roomInvite) as string,
-          message: t(translationKeys.invite.inviteTo) as string,
+          message: `${t(translationKeys.invite.inviteTo) as string} ${data.name}`,
+		  autoClose: false,
           onAccept: () => handleInviteSubmit(data),
           onRefuse: () => {},
         },
