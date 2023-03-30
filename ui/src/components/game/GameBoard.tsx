@@ -45,19 +45,19 @@ export default function GameBoard(props: Props) {
 
   const gameStartingListener = (data: any) => {
     gameLoop.startLoop();
+  };
+
+  const gameFinishListener = (data: any) => {
+    gameLoop.resetPositions();
     gameLoop.scoreInfo.p1name = "";
     gameLoop.scoreInfo.p2name = "";
     gameLoop.scoreInfo.p1s = 0;
     gameLoop.scoreInfo.p2s = 0;
   };
 
-  const gameFinishListener = (data: any) => {
-    gameLoop.resetPositions();
-  };
-
   const giListener = (data: any) => {
-	gameLoop.scoreInfo.p1s = data.p1s;
-	gameLoop.scoreInfo.p2s = data.p2s;
+    gameLoop.scoreInfo.p1s = data.p1s;
+    gameLoop.scoreInfo.p2s = data.p2s;
     gameLoop.positionalData.ballOffset = { x: data.bx - 15, y: data.by - 15 };
     if (gameLoop.activePlayer === 1) {
       gameLoop.positionalData.playerRightYOffset = data.p2y - 50;
