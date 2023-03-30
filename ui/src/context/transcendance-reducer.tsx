@@ -5,7 +5,8 @@ export interface TranscendanceState {
     type?: ToastType;
     title?: string;
     message?: string;
-	autoClose?: boolean;
+    autoClose?: boolean;
+    autoCloseDelay?: number;
     onAccept?: (...args: any) => void;
     onRefuse?: (...args: any) => void;
   };
@@ -21,7 +22,8 @@ export type TranscendanceStateAction = {
     type?: ToastType;
     title?: string;
     message?: string;
-	autoClose?: boolean;
+    autoClose?: boolean;
+    autoCloseDelay?: number;
     onAccept?: (...args: any) => void;
     onRefuse?: (...args: any) => void;
   };

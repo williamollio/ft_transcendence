@@ -217,7 +217,8 @@ export default function Chat(props: Props) {
           t(translationKeys.invite.inviteTo) as string
         }
             ${data.game.mode === "CLASSIC" ? "Classic" : "Mayhem"}`,
-        autoClose: false,
+        autoClose: true,
+        autoCloseDelay: 9500,
         onAccept: () => {
           gameSocket.joinGame(data.game.mode, data.initiatingUser.id);
           navigate(RoutePath.GAME);

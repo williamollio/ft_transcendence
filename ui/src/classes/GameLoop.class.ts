@@ -1,3 +1,5 @@
+import { GameMode } from "../interfaces/chat.interface";
+import { scoreInfo } from "../interfaces/game.interface";
 import { GameSocket } from "./GameSocket.class";
 import { positionalData } from "./positionalData.class";
 
@@ -7,6 +9,8 @@ export class GameLoop {
   keyPressed: Array<string>;
   gameSocket: GameSocket;
   activePlayer: number;
+  gameMode: GameMode;
+  scoreInfo: scoreInfo;
 
   // for testing
   ticks: number;
@@ -22,6 +26,8 @@ export class GameLoop {
     this.keyPressed = [];
     this.gameSocket = gameSocket;
     this.activePlayer = 0;
+	this.gameMode = GameMode.CLASSIC;
+	this.scoreInfo = {p1s: 0, p2s: 0, p1name: "", p2name: ""}
 
     // for testing
     this.ticks = 0;

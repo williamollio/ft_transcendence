@@ -33,7 +33,7 @@ export default function App() {
   );
   const imageUrl = image ? URL.createObjectURL(image) : "";
 
-  // different method to initialize out sockets that makes them persistent over all views
+  // different method to initialize our sockets that makes them persistent over all views
   React.useEffect(() => {
     if (token) {
       let gotToken = localStorage.getItem(Cookie.TOKEN);
@@ -124,7 +124,10 @@ export default function App() {
         <ThemeProvider theme={theme}>
           <Routes>
             <Route path="*" element={<AuthWrapper />} />
-            <Route path={RoutePath.LOGIN} element={<LoginView userSocket={userSocket}/>} />
+            <Route
+              path={RoutePath.LOGIN}
+              element={<LoginView userSocket={userSocket} />}
+            />
             <Route
               path={RoutePath.REDIRECT}
               element={

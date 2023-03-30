@@ -93,7 +93,7 @@ export class DoubleKeyMap {
     }
     return null;
   }
-
+ 
   rejoinGame(playerId: string) {
     const game: Game | undefined = this.playerMap.get(playerId);
     if (game !== undefined) {
@@ -109,7 +109,7 @@ export class DoubleKeyMap {
   */
   matchPlayer(player2Id: string) {
     for (const [_, game] of this.playerMap) {
-      if (game.p2id === undefined && _) {
+      if (game.p2id === undefined    && _) {
         // the above is ugly but a linting rule is forcing me to add it
         game.p2id = player2Id;
         this.playerMap.set(player2Id, game);
@@ -152,12 +152,12 @@ export class Game {
   }
   // those are the constants that are used in the game (Henric can adjust them)
   gameConstants = {
-    relativeGameWidth: 600,
-    relativeMiddleX: 300,
+    relativeGameWidth: 672,
+    relativeMiddleX: 336,
     relativeGameHeight: 450,
     relativeMiddleY: 225,
     player1PaddlePosX: 30,
-    player2PaddlePosX: 570,
+    player2PaddlePosX: 642,
     paddleWidth: 20,
     ballHeight: 30,
     maxSpeed: 0,
@@ -172,7 +172,7 @@ export class Game {
   diry = 0.0;
   p1y = 225;
   p2y = 225;
-  bx = 300;
+  bx = 336;
   by = 225;
   p1s = 0;
   p2s = 0;

@@ -1,4 +1,4 @@
-import { Box, Paper } from "@mui/material";
+import { Box, Divider, Grid, Paper } from "@mui/material";
 import { useContext, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { GameLoop } from "../../classes/GameLoop.class";
@@ -11,6 +11,7 @@ import { listenerWrapper } from "../../services/initSocket.service";
 import { translationKeys } from "../../views/Game/constants";
 import Ball from "./Ball";
 import Player from "./Player";
+import ChannelService from "../../services/channel.service";
 
 interface Props {
   gameLoop: GameLoop;
@@ -44,7 +45,10 @@ export default function GameBoard(props: Props) {
 
   const gameStartingListener = (data: any) => {
     gameLoop.startLoop();
-    console.log("starting received");
+    gameLoop.scoreInfo.p1name = "";
+    gameLoop.scoreInfo.p2name = "";
+    gameLoop.scoreInfo.p1s = 0;
+    gameLoop.scoreInfo.p2s = 0;
   };
 
   const gameFinishListener = (data: any) => {
@@ -52,6 +56,8 @@ export default function GameBoard(props: Props) {
   };
 
   const giListener = (data: any) => {
+	gameLoop.scoreInfo.p1s = data.p1s;
+	gameLoop.scoreInfo.p2s = data.p2s;
     gameLoop.positionalData.ballOffset = { x: data.bx - 15, y: data.by - 15 };
     if (gameLoop.activePlayer === 1) {
       gameLoop.positionalData.playerRightYOffset = data.p2y - 50;
@@ -67,11 +73,24 @@ export default function GameBoard(props: Props) {
     gameLoop.activePlayer = data.playerNumber;
   };
 
-  const mutateGameStatusListener = (data: any) => {
-    if (data.status === "PLAYING") gameLoop.startLoop();
+  const getPlayerNames = async (p1Id: string, p2Id: string) => {
+    ChannelService.getUserName(p1Id)
+      .then((resolve) => (gameLoop.scoreInfo.p1name = resolve.data.name))
+      .catch(() => {
+        console.log("failed to get player 1 name");
+      });
+    ChannelService.getUserName(p2Id)
+      .then((resolve) => (gameLoop.scoreInfo.p2name = resolve.data.name))
+      .catch(() => {
+        console.log("failed to get player 2 name");
+      });
   };
 
-  
+  const mutateGameStatusListener = (data: any) => {
+    if (gameLoop.scoreInfo.p1name === "" || gameLoop.scoreInfo.p2name === "")
+      getPlayerNames(data.player1id, data.player2id);
+    if (data.status === "PLAYING") gameLoop.startLoop();
+  };
 
   const tryRejoinListener = (data: any) => {
     console.log("rejoined");
@@ -123,28 +142,35 @@ export default function GameBoard(props: Props) {
           gameSocket.socket.off("GI", giListener);
           gameSocket.socket.off("gameJoined", gameJoinedListener);
           gameSocket.socket.off("gameStatus", mutateGameStatusListener);
-          
+
           return true;
         }
         return false;
       });
-	  gameLoop.stopLoop();
+      if (gameLoop.interval) gameLoop.stopLoop();
     };
-  }, [gameLoop, gameSocket]);
+  }, [gameSocket]);
 
   return (
     <>
       <Paper
         ref={boardRef}
         sx={{
-          width: 600,
+          width: 672,
           height: 450,
           backgroundColor: "white",
           display: "flex",
         }}
       >
-        {/* <Box sx={{ backgroundColor: "black", height: "100%", width: "50%", opacity: 2}} /> */}
-        <Box sx={{ backgroundColor: "blue", height: "50%", width: "100%" }} />
+        <Divider
+          orientation="vertical"
+          sx={{
+            position: "relative",
+            left: 335,
+            height: "100%",
+            bgcolor: "black",
+          }}
+        />
         <Player
           lr={true}
           yPos={gameLoop.positionalData.playerLeftYOffset}

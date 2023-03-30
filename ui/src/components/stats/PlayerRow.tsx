@@ -53,7 +53,7 @@ export default function PlayerRow(props: Props) {
           <IconButton
             onClick={() => {
               toggleOpen(!open);
-			  openView ? toggleOpenView(false) : false;
+              openView ? toggleOpenView(false) : false;
             }}
           >
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
@@ -66,7 +66,13 @@ export default function PlayerRow(props: Props) {
           sx={{ paddingBottom: 0, paddingTop: 0 }}
           colSpan={5}
         >
-          <MatchHistory open={open} playerId={player.id} findName={findName} openView={openView} toggleOpenView={toggleOpenView}/>
+          <MatchHistory
+            open={open}
+            playerId={player.id}
+            findName={findName}
+            openView={openView}
+            toggleOpenView={toggleOpenView}
+          />
         </TableCell>
       </TableRow>
     </>

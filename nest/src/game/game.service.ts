@@ -112,10 +112,9 @@ export class GameService {
       game.p2id = userId;
       await client.join(game.gameRoomId);
       server.to(client.id).emit('gameJoined', { playerNumber: 2 });
-      server.to(game.gameRoomId).emit('gameStarting');
       await this.sleep(5000);
       this.mutateGameStatus(game, Status.PLAYING, server);
-      this.addInterval(game.gameRoomId, userId, 16, server);
+      this.addInterval(game.gameRoomId, userId, 30, server);
       return;
     } else {
       // Joining a random game
@@ -134,26 +133,23 @@ export class GameService {
               game.p1id === userId ? { playerNumber: 1 } : { playerNumber: 2 },
             );
           if (game.status === Status.PAUSED) {
-            server.to(game.gameRoomId).emit('gameStarting');
             await this.sleep(5000);
             this.mutateGameStatus(game, Status.PLAYING, server);
             this.deleteTimeout(game.gameRoomId);
-            this.addInterval(game.gameRoomId, userId, 16, server);
+            this.addInterval(game.gameRoomId, userId, 30, server);
           } else if (game.status === Status.PENDING && game.p2id === userId) {
-            server.to(game.gameRoomId).emit('gameStarting');
             await this.sleep(5000);
             this.mutateGameStatus(game, Status.PLAYING, server);
-            this.addInterval(game.gameRoomId, userId, 16, server);
+            this.addInterval(game.gameRoomId, userId, 30, server);
           } else server.to(client.id).emit('gameStarting');
           return;
         }
         if ((game = this.GameMap.matchPlayer(userId))) {
           await client.join(game.gameRoomId);
           server.to(client.id).emit('gameJoined', { playerNumber: 2 });
-          server.to(game.gameRoomId).emit('gameStarting');
           await this.sleep(5000);
           this.mutateGameStatus(game, Status.PLAYING, server);
-          this.addInterval(game.gameRoomId, userId, 16, server);
+          this.addInterval(game.gameRoomId, userId, 30, server);
           return;
         }
         game = this.createGame(userId, mode);
