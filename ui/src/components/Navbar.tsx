@@ -13,6 +13,8 @@ import { Cookie, getTokenData } from "../utils/auth-helper";
 import { fetchProfilePicture } from "../utils/picture-helper";
 import { useDrawersStore } from "../store/drawers-store";
 import { useTheme } from "@mui/material";
+import usersService from "../services/users.service";
+import { UserStatus } from "../interfaces/user.interface";
 
 export const navbarHeight = "4rem";
 
@@ -32,6 +34,7 @@ export default function NavBar(): React.ReactElement {
       state.setIsRightOpen,
     ]
   );
+  const [status, setStatus] = React.useState<UserStatus>(UserStatus.OFFLINE);
 
   React.useEffect(() => {
     let token = localStorage.getItem(Cookie.TOKEN);
@@ -41,12 +44,21 @@ export default function NavBar(): React.ReactElement {
     }
     if (userId && image === null) {
       wrapperFetchProfilePicture(userId);
+      fetchUser(userId);
     }
   }, [userId]);
 
   async function wrapperFetchProfilePicture(userId: string) {
     const pictureFetched = await fetchProfilePicture(userId);
     setImage(pictureFetched);
+  }
+
+  async function fetchUser(userId: string) {
+    const responseUser = await usersService.getUser(userId);
+    if (!responseUser.error) {
+      console.log(responseUser.data);
+      setStatus(responseUser.data.status);
+    }
   }
 
   const [selectedTabId, setSelectedTabId] = useState<number>(
@@ -99,7 +111,7 @@ export default function NavBar(): React.ReactElement {
             }),
           }}
         >
-          <PictureMenu image={image} />
+          <PictureMenu image={image} status={status} />
         </Box>
         <Box
           sx={{

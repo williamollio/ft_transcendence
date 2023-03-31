@@ -12,9 +12,12 @@ import VpnKeyIcon from "@mui/icons-material/VpnKey";
 import { useNavigate } from "react-router-dom";
 import { RoutePath } from "../interfaces/router.interface";
 import { Cookie, eraseCookie } from "../utils/auth-helper";
+import { StyledAvatarBadge } from "./LeftDrawer/AvatarBadge/StyledAvatarBadge";
+import { UserStatus } from "../interfaces/user.interface";
 
 interface Props {
   image: Blob | File | null;
+  status: UserStatus;
 }
 
 enum AnchorEnum {
@@ -24,7 +27,7 @@ enum AnchorEnum {
 }
 
 export default function PictureMenu(props: Props) {
-  const { image } = props;
+  const { image, status } = props;
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -69,13 +72,23 @@ export default function PictureMenu(props: Props) {
             aria-haspopup="true"
             aria-expanded={open ? "true" : undefined}
           >
-            <Avatar
-              style={{
-                width: "55px",
-                height: "55px",
+            <StyledAvatarBadge
+              overlap="circular"
+              anchorOrigin={{
+                vertical: "bottom",
+                horizontal: "right",
               }}
-              src={image ? URL.createObjectURL(image) : ""}
-            />
+              variant="dot"
+              status={status}
+            >
+              <Avatar
+                style={{
+                  width: "55px",
+                  height: "55px",
+                }}
+                src={image ? URL.createObjectURL(image) : ""}
+              />
+            </StyledAvatarBadge>
           </IconButton>
         </Tooltip>
       </Box>
