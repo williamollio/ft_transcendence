@@ -251,7 +251,7 @@ export class UsersService {
     return null;
   }
 
-  async getUserMatchesStats(userId: string, res: Response) {
+  async getUserMatchesStats(userId: string) {
     const user = await this.findOneFromuserName(userId);
     const ranking = await this.getUserRanking(userId);
     if (user && ranking) {
@@ -276,7 +276,7 @@ export class UsersService {
         stats.numberOfLoss = matchesList.length - stats.numberOfWin;
         stats.ratioWin = (stats.numberOfWin / matchesList.length) * 100;
         stats.ratioLoss = (stats.numberOfLoss / matchesList.length) * 100;
-        return res.status(200).send(stats);
+        return stats;
       }
     }
   }
@@ -365,7 +365,7 @@ export class UsersService {
     return res.status(500).send();
   }
 
-  async getLeaderboard(res: Response) {
+  async getLeaderboard() {
     try {
       const leaderboard = await this.prisma.user.findMany({
         orderBy: {
@@ -381,7 +381,7 @@ export class UsersService {
 
       const leaderboardStats = [];
       for (const user of leaderboard) {
-        const stats = await this.getUserMatchesStats(user.id, res);
+        const stats = await this.getUserMatchesStats(user.id);
         leaderboardStats.push({
           ...stats,
           id: user.id,

@@ -48,8 +48,8 @@ export class UsersController {
   @Get('get-leaderboard')
   @UseGuards(JwtGuard)
   @ApiOkResponse({ type: UserEntity })
-  getLeaderboard(@Res() res: Response) {
-    return this.usersService.getLeaderboard(res);
+  getLeaderboard() {
+    return this.usersService.getLeaderboard();
   }
 
   @Get()
@@ -164,8 +164,8 @@ export class UsersController {
   @Get('get-user-matches-stats/:id')
   @UseGuards(JwtGuard)
   @ApiOkResponse({ type: UserEntity })
-  getUserMatchesStats(@Param('id') id: string, @Res() res: Response) {
-    return this.usersService.getUserMatchesStats(id, res);
+  getUserMatchesStats(@Param('id') id: string) {
+    return this.usersService.getUserMatchesStats(id);
   }
 
   @Get('get-user-match-history/:id')
