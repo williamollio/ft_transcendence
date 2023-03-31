@@ -358,7 +358,7 @@ export default function Chat(props: Props) {
       <Box
         sx={{
           width: "300px",
-          height: "87.9%", // TODO : responsiveness to be adapted
+          height: "85.9%", // TODO : responsiveness to be adapted
         }}
       >
         <ChannelTabs
@@ -381,8 +381,8 @@ export default function Chat(props: Props) {
           gameSocket={gameSocket}
         ></RoomContextMenu>
         <Divider></Divider>
-        <Grid container maxWidth="100%" height="100%" flexDirection="column">
-          <Grid item flexGrow={1} sx={{ maxHeight: "90%" }}>
+        <Grid container height="100%">
+          <Grid item height="100%">
             <List
               dense
               disablePadding
@@ -402,10 +402,14 @@ export default function Chat(props: Props) {
             toggleOpen={toggleOpen}
             channelSocket={channelSocket}
           ></AddChannelDialog>
+
           <Grid item alignSelf={"flex-end"}>
+            <Box
+              sx={{ bgcolor: "grey.300", width: "300px", height: "1rem" }}
+            ></Box>
             <TextField
               label={t(translationKeys.chat)}
-              sx={{ width: "300px", input: { color: "white" } }}
+              sx={{ width: "300px", marginTop: "-1px" }}
               onKeyDown={handleSubmit}
             />
           </Grid>
