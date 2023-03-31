@@ -13,4 +13,11 @@ export interface scoreInfo {
 	p2s: number;
 	p1name: string;
 	p2name: string;
+	p1Id: string;
+	p2Id: string;
+}
+
+export enum GameState {
+	WIN = "WIN",
+	LOSS = "LOSS",
 }

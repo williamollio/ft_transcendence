@@ -290,7 +290,7 @@ export class GameService {
       if (!game) return;
       void game.saveGameResults(this.prismaService);
       this.mutateGameStatus(game, Status.DONE, server);
-      server.to(game.gameRoomId).emit('matchFinished');
+      server.to(game.gameRoomId).emit('matchFinished', winnerId);
     };
 
     setTimeout(callback, milliseconds);

@@ -13,7 +13,7 @@ export default function Ball(props: Props) {
     <>
       {posRef.offsetLeft !== 0 && posRef.offsetTop != 0 ? (
         <Avatar
-          src=""
+          src="ball.png"
           sx={{
             position: "absolute",
             left: ballPos.x + posRef.offsetLeft,

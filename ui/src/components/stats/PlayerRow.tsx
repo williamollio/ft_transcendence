@@ -1,6 +1,5 @@
 import {
   Avatar,
-  Collapse,
   Grid,
   IconButton,
   TableCell,
@@ -37,7 +36,7 @@ export default function PlayerRow(props: Props) {
                   width: "45px",
                   height: "45px",
                 }}
-                src={player.image ? URL.createObjectURL(player.image) : ""}
+                src={player.image}
               />
             </Grid>
             <Grid item marginLeft="10px">

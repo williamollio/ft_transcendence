@@ -1,17 +1,18 @@
-import { Box, Divider, Grid, Paper } from "@mui/material";
-import { useContext, useEffect, useRef } from "react";
+import { Divider, Paper } from "@mui/material";
+import { useContext, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { GameLoop } from "../../classes/GameLoop.class";
 import { GameSocket } from "../../classes/GameSocket.class";
 import { ToastType } from "../../context/toast";
 import { TranscendanceContext } from "../../context/transcendance-context";
 import { TranscendanceStateActionType } from "../../context/transcendance-reducer";
-import { failedEvents } from "../../interfaces/game.interface";
+import { GameState, failedEvents } from "../../interfaces/game.interface";
 import { listenerWrapper } from "../../services/initSocket.service";
 import { translationKeys } from "../../views/Game/constants";
 import Ball from "./Ball";
 import Player from "./Player";
 import ChannelService from "../../services/channel.service";
+import GameEndDisplay from "./GameEndDisplay";
 
 interface Props {
   gameLoop: GameLoop;
@@ -24,6 +25,9 @@ export default function GameBoard(props: Props) {
   const toast = useContext(TranscendanceContext);
 
   const boardRef = useRef<HTMLDivElement>(null);
+
+  const [zoom, toggleZoom] = useState<boolean>(true);
+  const [gameStatus, setGameStatus] = useState<GameState>(GameState.WIN);
 
   const playerMoveHandler = (event: KeyboardEvent) => {
     if (event.key === "ArrowUp" || event.key === "ArrowDown") {
@@ -48,9 +52,19 @@ export default function GameBoard(props: Props) {
   };
 
   const gameFinishListener = (data: any) => {
+    const thisPlayer =
+      gameLoop.activePlayer === 1
+        ? gameLoop.scoreInfo.p1Id
+        : gameLoop.scoreInfo.p2Id;
+    if (thisPlayer === data) setGameStatus(GameState.WIN);
+    else setGameStatus(GameState.LOSS);
+    toggleZoom(true);
+
     gameLoop.resetPositions();
     gameLoop.scoreInfo.p1name = "";
     gameLoop.scoreInfo.p2name = "";
+    gameLoop.scoreInfo.p1Id = "";
+    gameLoop.scoreInfo.p2Id = "";
     gameLoop.scoreInfo.p1s = 0;
     gameLoop.scoreInfo.p2s = 0;
   };
@@ -74,6 +88,8 @@ export default function GameBoard(props: Props) {
   };
 
   const getPlayerNames = async (p1Id: string, p2Id: string) => {
+    gameLoop.scoreInfo.p1Id = p1Id;
+    gameLoop.scoreInfo.p2Id = p2Id;
     ChannelService.getUserName(p1Id)
       .then((resolve) => (gameLoop.scoreInfo.p1name = resolve.data.name))
       .catch(() => {
@@ -197,6 +213,11 @@ export default function GameBoard(props: Props) {
               : { offsetLeft: 0, offsetTop: 0 }
           }
         ></Ball>
+        <GameEndDisplay
+          zoom={zoom}
+          toggleZoom={toggleZoom}
+          gameState={gameStatus}
+        />
       </Paper>
     </>
   );
