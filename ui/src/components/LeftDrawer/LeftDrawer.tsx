@@ -4,7 +4,13 @@ import { Response } from "../../services/common/resolve";
 import Box from "@mui/material/Box";
 import MuiDrawer from "@mui/material/Drawer";
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
-import { Divider, IconButton, Toolbar, Typography } from "@mui/material";
+import {
+  Divider,
+  IconButton,
+  Toolbar,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import { User } from "../../interfaces/user.interface";
 import { Cookie, getTokenData } from "../../utils/auth-helper";
 import friendshipsService from "../../services/friendships.service";
@@ -81,7 +87,7 @@ const AppBar = styled(MuiAppBar, {
   border: "none",
   boxShadow: "none",
   ...(open && {
-    marginLeft: -drawerWidth,
+    marginLeft: drawerWidth,
     zIndex: -1,
     transition: theme.transitions.create(["width", "margin"], {
       easing: theme.transitions.easing.sharp,
@@ -183,20 +189,22 @@ export default function MiniDrawer() {
             width="100%"
             height="100%"
           >
-            <IconButton
-              onClick={triggerDrawerOpen}
-              sx={{
-                ...(open && { display: "none" }),
-              }}
-            >
-              <MenuIcon
+            <Tooltip title="List of friends">
+              <IconButton
+                onClick={triggerDrawerOpen}
                 sx={{
-                  fill: theme.palette.secondary.main,
-                  width: "35px",
-                  height: "35px",
+                  ...(open && { display: "none" }),
                 }}
-              />
-            </IconButton>
+              >
+                <MenuIcon
+                  sx={{
+                    fill: theme.palette.secondary.main,
+                    width: "35px",
+                    height: "35px",
+                  }}
+                />
+              </IconButton>
+            </Tooltip>
           </Box>
         </Toolbar>
       </AppBar>
