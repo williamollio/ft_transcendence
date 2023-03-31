@@ -222,7 +222,7 @@ export class UsersService {
       throw new ForbiddenException(error);
     }
   }
-  
+
   // Game shit
   async getUserMatches(userId: string) {
     const matches = await this.prisma.user.findUnique({
@@ -365,7 +365,7 @@ export class UsersService {
     return res.status(500).send();
   }
 
-  async getLeaderboard() {
+  async getLeaderboard(res: Response) {
     try {
       const leaderboard = await this.prisma.user.findMany({
         orderBy: {
@@ -378,9 +378,76 @@ export class UsersService {
           eloScore: true,
         },
       });
-      return leaderboard;
+
+      const leaderboardStats = [];
+      for (const user of leaderboard) {
+        const stats = await this.getUserMatchesStats(user.id, res);
+        leaderboardStats.push({
+          ...stats,
+          id: user.id,
+          name: user.name,
+          filename: user.filename,
+          eloScore: user.eloScore,
+        });
+      }
+
+      return leaderboardStats;
     } catch (error) {
       throw new ForbiddenException(error);
     }
   }
+
+  // async getLeaderboard() {
+  //   try {
+  //     const leaderboard = await this.prisma.user.findMany({
+  //       orderBy: {
+  //         eloScore: 'desc',
+  //       },
+  //       select: {
+  //         id: true,
+  //         intraId: true,
+  //         eloScore: true,
+  //         playerOneMatch: {
+  //           where: {
+  //             OR: [{ p1s: { gt: db.$`p2s` } }, { p2s: { gt: db.$`p1s` } }],
+  //           },
+  //           select: false,
+  //           count: true,
+  //         },
+  //         playerTwoMatch: {
+  //           where: {
+  //             OR: [{ p1s: { lt: db.$`p2s` } }, { p2s: { lt: db.$`p1s` } }],
+  //           },
+  //           select: false,
+  //           count: true,
+  //         },
+  //       },
+  //     });
+
+  //     const leaderboardWithRatios = leaderboard.map((user) => {
+  //       const totalMatches =
+  //         user.playerOneMatch.count + user.playerTwoMatch.count;
+  //       const winLossRatio =
+  //         totalMatches === 0
+  //           ? 0
+  //           : (user.playerOneMatch.count + user.playerTwoMatch.count) /
+  //             totalMatches;
+
+  //       return {
+  //         id: user.id,
+  //         intraId: user.intraId,
+  //         eloScore: user.eloScore,
+  //         playerOneWins: user.playerOneMatch.count,
+  //         playerOneLosses: totalMatches - user.playerOneMatch.count,
+  //         playerTwoWins: user.playerTwoMatch.count,
+  //         playerTwoLosses: totalMatches - user.playerTwoMatch.count,
+  //         winLossRatio: winLossRatio.toFixed(2),
+  //       };
+  //     });
+
+  //     return leaderboardWithRatios;
+  //   } catch (error) {
+  //     throw new ForbiddenException(error);
+  //   }
+  // }
 }
