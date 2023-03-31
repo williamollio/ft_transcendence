@@ -19,6 +19,7 @@ export const translationKeys = {
       nameSaved: "message.success.nameSaved",
       pictureSaved: "message.success.pictureSaved",
       pictureNameSaved: "message.success.pictureNameSaved",
+      friendRequestsSaved: "message.success.friendRequestsSaved",
     },
   },
 };

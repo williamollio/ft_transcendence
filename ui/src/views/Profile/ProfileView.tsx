@@ -40,6 +40,7 @@ import { UserSocket } from "../../classes/UserSocket.class";
 import RightDrawer from "../../components/RightDrawer/RightDrawer";
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { GameSocket } from "../../classes/GameSocket.class";
+import { useDrawersStore } from "../../store/drawers-store";
 
 interface Props {
   userSocket: UserSocket;
@@ -63,6 +64,12 @@ export default function ProfileView(props: Props): React.ReactElement {
   const [currentUser, setCurrentUser] = useState<User | null>();
   const [initialName, setInitialName] = useState<string>();
   const [token] = useState<string | null>(localStorage.getItem(Cookie.TOKEN));
+  const [isCacheInvalid, setIsCacheInvalid] = useDrawersStore(
+    (state: { isFriendsCacheUnvalid: any; setisFriendsCacheUnvalid: any }) => [
+      state.isFriendsCacheUnvalid,
+      state.setisFriendsCacheUnvalid,
+    ]
+  );
 
   const {
     formState: { errors },
@@ -213,6 +220,20 @@ export default function ProfileView(props: Props): React.ReactElement {
       }
     );
 
+    const nonMatchingUsers: LabelValue[] | undefined = data.friends;
+
+    const newUsers = users.filter((user) => {
+      // Check if the user's value is included in the friendsList array
+      const isFriend =
+        nonMatchingUsers &&
+        nonMatchingUsers.some((friend) => friend.value === user.value);
+
+      // Return true if the user is not a friend
+      return !isFriend;
+    });
+
+    setUsers(newUsers);
+
     let responseFrienship;
     friendsList?.forEach(async function (friend) {
       responseFrienship = await friendshipsService.postRequest(userId, friend);
@@ -220,8 +241,21 @@ export default function ProfileView(props: Props): React.ReactElement {
       if (!isSuccessFriendship) {
         showErrorToast(responseFrienship?.error);
         return;
+      } else {
+        showSuccessToast(
+          t(translationKeys.message.success.friendRequestsSaved)
+        );
+        setValue("friends", undefined);
+        setIsCacheInvalid(true);
       }
     });
+
+    // if (friendsList) {
+    //   const nonMatchingUsers = users.filter((user) =>
+    //     friendsList.every((friend) => friend.id !== user.value)
+    //   );
+    //   setUsers(nonMatchingUsers);
+    // }
   }
 
   function handleOnChangePicture(e: ChangeEvent<HTMLInputElement>) {
