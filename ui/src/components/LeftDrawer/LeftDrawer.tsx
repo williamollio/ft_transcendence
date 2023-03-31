@@ -182,14 +182,14 @@ export default function MiniDrawer() {
     <Box sx={{ display: "flex" }}>
       <AppBar position="fixed" open={open}>
         <Toolbar>
-          <Box
-            display={"flex"}
-            alignContent={"center"}
-            justifyContent={"center"}
-            width="100%"
-            height="100%"
-          >
-            <Tooltip title="List of friends">
+          <Tooltip title="List of friends">
+            <Box
+              display={"flex"}
+              alignContent={"center"}
+              justifyContent={"center"}
+              width="100%"
+              height="100%"
+            >
               <IconButton
                 onClick={triggerDrawerOpen}
                 sx={{
@@ -204,8 +204,8 @@ export default function MiniDrawer() {
                   }}
                 />
               </IconButton>
-            </Tooltip>
-          </Box>
+            </Box>
+          </Tooltip>
         </Toolbar>
       </AppBar>
       <Drawer
