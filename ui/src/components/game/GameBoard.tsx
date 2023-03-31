@@ -1,26 +1,32 @@
 import { Divider, Paper } from "@mui/material";
-import { useContext, useEffect, useRef, useState } from "react";
+import React, { SetStateAction, useContext, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { GameLoop } from "../../classes/GameLoop.class";
 import { GameSocket } from "../../classes/GameSocket.class";
 import { ToastType } from "../../context/toast";
 import { TranscendanceContext } from "../../context/transcendance-context";
 import { TranscendanceStateActionType } from "../../context/transcendance-reducer";
-import { GameState, failedEvents } from "../../interfaces/game.interface";
+import {
+  GameState,
+  failedEvents,
+  scoreInfo,
+} from "../../interfaces/game.interface";
 import { listenerWrapper } from "../../services/initSocket.service";
 import { translationKeys } from "../../views/Game/constants";
 import Ball from "./Ball";
 import Player from "./Player";
 import ChannelService from "../../services/channel.service";
 import GameEndDisplay from "./GameEndDisplay";
+import { positionalData } from "../../classes/positionalData.class";
 
 interface Props {
   gameLoop: GameLoop;
   gameSocket: GameSocket;
+  setScoreInfo: React.Dispatch<SetStateAction<scoreInfo>>;
 }
 
 export default function GameBoard(props: Props) {
-  const { gameLoop, gameSocket } = props;
+  const { gameLoop, gameSocket, setScoreInfo } = props;
   const { t } = useTranslation();
   const toast = useContext(TranscendanceContext);
 
@@ -28,6 +34,9 @@ export default function GameBoard(props: Props) {
 
   const [zoom, toggleZoom] = useState<boolean>(false);
   const [gameStatus, setGameStatus] = useState<GameState>(GameState.WIN);
+  const [gamePositions, setGamePositions] = useState<positionalData>(
+    new positionalData()
+  );
 
   const playerMoveHandler = (event: KeyboardEvent) => {
     if (event.key === "ArrowUp" || event.key === "ArrowDown") {
@@ -47,7 +56,8 @@ export default function GameBoard(props: Props) {
     }
   };
 
-  const gameStartingListener = (data: any) => {
+  const gameStartingListener = () => {
+	setScoreInfo({...gameLoop.scoreInfo});
     gameLoop.startLoop();
   };
 
@@ -61,26 +71,34 @@ export default function GameBoard(props: Props) {
     toggleZoom(true);
 
     gameLoop.resetPositions();
-    gameLoop.scoreInfo.p1name = "";
-    gameLoop.scoreInfo.p2name = "";
-    gameLoop.scoreInfo.p1Id = "";
-    gameLoop.scoreInfo.p2Id = "";
-    gameLoop.scoreInfo.p1s = 0;
-    gameLoop.scoreInfo.p2s = 0;
+	setGamePositions(gameLoop.positionalData);
+	gameLoop.scoreInfo = {
+		p1Id: "",
+		p2Id: "",
+		p1name: "",
+		p2name: "",
+		p1s: 0,
+		p2s: 0,
+	}
+	setScoreInfo(gameLoop.scoreInfo);
   };
 
   const giListener = (data: any) => {
-    gameLoop.scoreInfo.p1s = data.p1s;
-    gameLoop.scoreInfo.p2s = data.p2s;
-    gameLoop.positionalData.ballOffset = { x: data.bx - 15, y: data.by - 15 };
-    if (gameLoop.activePlayer === 1) {
-      gameLoop.positionalData.playerRightYOffset = data.p2y - 50;
-    } else if (gameLoop.activePlayer === 2) {
-      gameLoop.positionalData.playerLeftYOffset = data.p1y - 50;
-    } else {
-      gameLoop.positionalData.playerRightYOffset = data.p2y - 50;
-      gameLoop.positionalData.playerLeftYOffset = data.p1y - 50;
-    }
+	gameLoop.scoreInfo.p1s = data.p1s;
+	gameLoop.scoreInfo.p2s = data.p2s;
+    setGamePositions({
+      ...gamePositions,
+      ballOffset: { x: data.bx - 15, y: data.by - 15 },
+      playerRightYOffset:
+        gameLoop.activePlayer !== 2
+          ? data.p2y - 50
+          : gameLoop.positionalData.playerRightYOffset,
+      playerLeftYOffset:
+        gameLoop.activePlayer !== 1
+          ? data.p1y - 50
+          : gameLoop.positionalData.playerLeftYOffset,
+    });
+	setScoreInfo({...gameLoop.scoreInfo});
   };
 
   const gameJoinedListener = (data: any) => {
@@ -189,7 +207,7 @@ export default function GameBoard(props: Props) {
         />
         <Player
           lr={true}
-          yPos={gameLoop.positionalData.playerLeftYOffset}
+          yPos={gamePositions.playerLeftYOffset}
           posRef={
             boardRef.current
               ? boardRef.current
@@ -198,7 +216,7 @@ export default function GameBoard(props: Props) {
         ></Player>
         <Player
           lr={false}
-          yPos={gameLoop.positionalData.playerRightYOffset}
+          yPos={gamePositions.playerRightYOffset}
           posRef={
             boardRef.current
               ? boardRef.current
@@ -206,7 +224,7 @@ export default function GameBoard(props: Props) {
           }
         ></Player>
         <Ball
-          ballPos={gameLoop.positionalData.ballOffset}
+          ballPos={gamePositions.ballOffset}
           posRef={
             boardRef.current
               ? boardRef.current

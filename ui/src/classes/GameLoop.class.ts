@@ -12,13 +12,7 @@ export class GameLoop {
   gameMode: GameMode;
   scoreInfo: scoreInfo;
 
-  // for testing
-  ticks: number;
-  setTicks: React.Dispatch<React.SetStateAction<number>>;
-  // for testing
-
   constructor(
-    setTicks: React.Dispatch<React.SetStateAction<number>>,
     gameSocket: GameSocket
   ) {
     this.interval = null;
@@ -27,20 +21,13 @@ export class GameLoop {
     this.gameSocket = gameSocket;
     this.activePlayer = 0;
 	this.gameMode = GameMode.CLASSIC;
-	this.scoreInfo = {p1s: 0, p2s: 0, p1name: "", p2name: ""}
-
-    // for testing
-    this.ticks = 0;
-    this.setTicks = setTicks;
-    // for testing
+	this.scoreInfo = {p1s: 0, p2s: 0, p1name: "", p2name: "", p1Id: "", p2Id: ""}
   }
 
   resetPositions = () => {
     this.stopLoop();
     this.positionalData.resetPositions();
     this.handleMovement();
-    this.ticks = 0;
-    this.setTicks(0);
   };
 
   handleMovement = () => {
@@ -74,8 +61,6 @@ export class GameLoop {
   };
 
   updateGame = () => {
-    this.ticks++;
-    this.setTicks(this.ticks);
     this.handleMovement();
     this.gameSocket.PP(
       this.activePlayer === 1

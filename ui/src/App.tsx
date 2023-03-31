@@ -62,12 +62,6 @@ export default function App() {
     };
   }, [token, channelSocket, userSocket, gameSocket]);
 
-  const disconnectSockets = () => {
-    if (userSocket.socket.connected) userSocket.socket.disconnect();
-    if (channelSocket.socket.connected) channelSocket.socket.disconnect();
-    if (gameSocket.socket.connected) gameSocket.socket.disconnect();
-  };
-
   // removes the object URL after the component unmounts to prevent memory leaks
   React.useEffect(() => {
     return () => {
