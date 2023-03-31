@@ -220,15 +220,13 @@ export default function ProfileView(props: Props): React.ReactElement {
       }
     );
 
-    const nonMatchingUsers: LabelValue[] | undefined = data.friends;
+    const nonMatchingUsers: string[] | undefined = data.friends;
 
     const newUsers = users.filter((user) => {
-      // Check if the user's value is included in the friendsList array
       const isFriend =
         nonMatchingUsers &&
-        nonMatchingUsers.some((friend) => friend.value === user.value);
+        nonMatchingUsers.some((friend) => friend === user.value);
 
-      // Return true if the user is not a friend
       return !isFriend;
     });
 
@@ -249,13 +247,6 @@ export default function ProfileView(props: Props): React.ReactElement {
         setIsCacheInvalid(true);
       }
     });
-
-    // if (friendsList) {
-    //   const nonMatchingUsers = users.filter((user) =>
-    //     friendsList.every((friend) => friend.id !== user.value)
-    //   );
-    //   setUsers(nonMatchingUsers);
-    // }
   }
 
   function handleOnChangePicture(e: ChangeEvent<HTMLInputElement>) {
