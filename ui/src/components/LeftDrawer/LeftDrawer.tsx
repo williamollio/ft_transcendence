@@ -114,6 +114,12 @@ export default function MiniDrawer() {
   const [userId, setUserId] = React.useState<string>("");
   const { dispatchTranscendanceState } = React.useContext(TranscendanceContext);
   const [open, setOpen] = React.useState(false);
+  const [isCacheInvalid, setIsCacheInvalid] = useDrawersStore(
+    (state: { isFriendsCacheUnvalid: any; setisFriendsCacheUnvalid: any }) => [
+      state.isFriendsCacheUnvalid,
+      state.setisFriendsCacheUnvalid,
+    ]
+  );
 
   React.useEffect(() => {
     let token = localStorage.getItem(Cookie.TOKEN);
@@ -126,7 +132,7 @@ export default function MiniDrawer() {
       fetchRequested();
       fetchReceived();
     }
-  }, [userId]);
+  }, [userId, isCacheInvalid]);
 
   function showErrorToast(error?: AxiosError) {
     const message = error?.response?.data as any;
