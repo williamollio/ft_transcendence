@@ -53,10 +53,10 @@ export default function ProfileView(props: Props): React.ReactElement {
   const { classes } = useStyles();
   const navigate = useNavigate();
   const { dispatchTranscendanceState } = React.useContext(TranscendanceContext);
-  const [picture, setPicture] = useState<any>();
   const [image, setImage] = useImageStore(
     (state: { image: any; setImage: any }) => [state.image, state.setImage]
   );
+  const [picture, setPicture] = useState<any>(image);
   const [users, setUsers] = useState<LabelValue[]>([]);
   const [userId, setUserId] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -96,6 +96,10 @@ export default function ProfileView(props: Props): React.ReactElement {
     }
   }, [currentUser]);
 
+  React.useEffect(() => {
+    setPicture(image);
+  }, [image]);
+
   function showErrorToast(error?: AxiosError) {
     const message = (error?.response?.data as any).message as string;
     dispatchTranscendanceState({
@@ -104,6 +108,17 @@ export default function ProfileView(props: Props): React.ReactElement {
         type: ToastType.ERROR,
         title: "Error",
         message: message,
+      },
+    });
+  }
+
+  function showSuccessToast(message: string) {
+    dispatchTranscendanceState({
+      type: TranscendanceStateActionType.TOGGLE_TOAST,
+      toast: {
+        type: ToastType.SUCCESS,
+        title: "Success",
+        message: message as unknown as string,
       },
     });
   }
@@ -142,23 +157,38 @@ export default function ProfileView(props: Props): React.ReactElement {
 
   function onCancel() {
     setValue("name", initialName);
+    if (initialName) localStorage.setItem("userName" + userId, initialName);
   }
 
-  async function onSubmit(data: FieldValues) {
+  async function handleSubmitName(
+    data: FieldValues,
+    hasPictureChanged: boolean
+  ) {
     const responseUser = await usersService.patchUser(userId, data.name);
     const isSuccessUser = !responseUser?.error;
     if (!isSuccessUser) {
       showErrorToast(responseUser?.error);
     } else {
+      if (!hasPictureChanged)
+        showSuccessToast(t(translationKeys.message.success.nameSaved));
+      setInitialName(data.name);
       localStorage.setItem("userName" + userId, data.name);
-    }
-
-    if (picture) {
-      handleOnSubmitPicture();
     }
   }
 
-  async function handleOnSubmitPicture() {
+  async function onSubmit(data: FieldValues) {
+    const hasNameChanged = data.name !== initialName;
+    const hasPictureChanged = picture !== image;
+    if (hasNameChanged) {
+      handleSubmitName(data, hasPictureChanged);
+    }
+
+    if (picture && hasPictureChanged) {
+      handleOnSubmitPicture(hasNameChanged);
+    }
+  }
+
+  async function handleOnSubmitPicture(hasNameChanged: boolean) {
     const formData = new FormData();
     formData.append("file", picture, picture.name);
     const response = await usersService.postUserImage(formData, userId);
@@ -166,6 +196,11 @@ export default function ProfileView(props: Props): React.ReactElement {
     if (!isSuccess) {
       showErrorToast(response.error);
       setImage(null);
+    } else {
+      if (hasNameChanged)
+        showSuccessToast(t(translationKeys.message.success.pictureNameSaved));
+      else showSuccessToast(t(translationKeys.message.success.pictureSaved));
+      setImage(picture);
     }
   }
 
@@ -192,7 +227,6 @@ export default function ProfileView(props: Props): React.ReactElement {
   function handleOnChangePicture(e: ChangeEvent<HTMLInputElement>) {
     if (e.target.files) {
       setPicture(e.target.files[0]);
-      setImage(e.target.files[0]);
     }
   }
 
@@ -200,7 +234,11 @@ export default function ProfileView(props: Props): React.ReactElement {
     <>
       <Navbar />
       <LeftDrawer />
-      <RightDrawer channelSocket={channelSocket} userSocket={userSocket} gameSocket={gameSocket}/>
+      <RightDrawer
+        channelSocket={channelSocket}
+        userSocket={userSocket}
+        gameSocket={gameSocket}
+      />
       <Background>
         <ProfileCard>
           <CardContainer>
@@ -233,7 +271,7 @@ export default function ProfileView(props: Props): React.ReactElement {
                   >
                     <Box className={classes.avatarWrapper}>
                       <Avatar
-                        src={image ? URL.createObjectURL(image) : ""}
+                        src={picture ? URL.createObjectURL(picture) : ""}
                         style={{
                           width: "100px",
                           height: "100px",

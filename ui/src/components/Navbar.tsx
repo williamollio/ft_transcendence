@@ -56,7 +56,6 @@ export default function NavBar(): React.ReactElement {
   async function fetchUser(userId: string) {
     const responseUser = await usersService.getUser(userId);
     if (!responseUser.error) {
-      console.log(responseUser.data);
       setStatus(responseUser.data.status);
     }
   }

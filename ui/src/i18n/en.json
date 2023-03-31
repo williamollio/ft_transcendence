@@ -26,5 +26,12 @@
   },
   "friends": "Friends",
   "requested": "Requested",
-  "received": "Received"
+  "received": "Received",
+  "message": {
+    "success": {
+      "nameSaved": "Name was successfully saved",
+      "pictureSaved": "Picture was successfully saved",
+      "pictureNameSaved": "Name and Picture were successfully saved"
+    }
+  }
 }
