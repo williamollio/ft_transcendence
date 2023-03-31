@@ -27,9 +27,9 @@ export default function NavBar(): React.ReactElement {
     state.setImage,
   ]);
   const [isOpen, setIsOpen] = useDrawersStore(
-    (state: { isLeftOpen: any; setIsLeftOpen: any }) => [
-      state.isLeftOpen,
-      state.setIsLeftOpen,
+    (state: { isRightOpen: any; setIsRightOpen: any }) => [
+      state.isRightOpen,
+      state.setIsRightOpen,
     ]
   );
 
@@ -84,12 +84,19 @@ export default function NavBar(): React.ReactElement {
         <Box
           className={classes.picture}
           sx={{
-            left: isOpen ? 230 : 55,
+            right: isOpen ? 320 : 70,
             transition: (theme) =>
-              theme.transitions.create("left", {
+              theme.transitions.create("right", {
                 easing: theme.transitions.easing.sharp,
                 duration: theme.transitions.duration.leavingScreen,
               }),
+            ...(isOpen && {
+              transition: (theme) =>
+                theme.transitions.create("right", {
+                  easing: theme.transitions.easing.easeOut,
+                  duration: theme.transitions.duration.enteringScreen,
+                }),
+            }),
           }}
         >
           <PictureMenu image={image} />
@@ -142,7 +149,6 @@ const useStyles = makeStyles()((theme: Theme) => ({
   picture: {
     zIndex: theme.zIndex.appBar + 1,
     position: "absolute",
-    top: 0,
   },
   tab: {
     color: classes.colorSecondary,

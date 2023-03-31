@@ -13,6 +13,7 @@ import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { UserSocket } from "../../classes/UserSocket.class";
 import { navbarHeight } from "../Navbar";
 import { GameSocket } from "../../classes/GameSocket.class";
+import { useDrawersStore } from "../../store/drawers-store";
 
 const drawerWidth = 300;
 const drawerWidthClosed = "4rem";
@@ -60,7 +61,12 @@ interface Props {
 export default function RightDrawer(props: Props) {
   const { channelSocket, userSocket, gameSocket } = props;
   const theme = useTheme();
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useDrawersStore(
+    (state: { isRightOpen: any; setIsRightOpen: any }) => [
+      state.isRightOpen,
+      state.setIsRightOpen,
+    ]
+  );
 
   const handleDrawerOpen = () => {
     setOpen(true);

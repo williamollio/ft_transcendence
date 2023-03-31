@@ -107,12 +107,7 @@ export default function MiniDrawer() {
   const [requestsReceived, setRequestsReceived] = React.useState<User[]>([]);
   const [userId, setUserId] = React.useState<string>("");
   const { dispatchTranscendanceState } = React.useContext(TranscendanceContext);
-  const [open, setOpen] = useDrawersStore(
-    (state: { isLeftOpen: any; setIsLeftOpen: any }) => [
-      state.isLeftOpen,
-      state.setIsLeftOpen,
-    ]
-  );
+  const [open, setOpen] = React.useState(false);
 
   React.useEffect(() => {
     let token = localStorage.getItem(Cookie.TOKEN);
