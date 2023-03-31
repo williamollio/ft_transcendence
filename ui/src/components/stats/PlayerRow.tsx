@@ -37,7 +37,7 @@ export default function PlayerRow(props: Props) {
                   width: "45px",
                   height: "45px",
                 }}
-                src={player.image ? player.image : ""}
+                src={player.image ? URL.createObjectURL(player.image) : ""}
               />
             </Grid>
             <Grid item marginLeft="10px">
@@ -46,9 +46,9 @@ export default function PlayerRow(props: Props) {
           </Grid>
         </TableCell>
         <TableCell align="center">{player.rating}</TableCell>
-        {/* <TableCell align="center">
+        <TableCell align="center">
           {player.wins}:{player.loss}
-        </TableCell> */}
+        </TableCell>
         <TableCell align="right">
           <IconButton
             onClick={() => {

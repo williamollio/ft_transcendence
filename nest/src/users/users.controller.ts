@@ -48,8 +48,8 @@ export class UsersController {
   @Get('get-leaderboard')
   @UseGuards(JwtGuard)
   @ApiOkResponse({ type: UserEntity })
-  getLeaderboard(@Res() res: Response) {
-    return this.usersService.getLeaderboard(res);
+  async getLeaderboard(@Res() res: Response) {
+    return res.status(200).send(await this.usersService.getLeaderboard(res));
   }
 
   @Get()
@@ -134,7 +134,6 @@ export class UsersController {
         }
       });
     }
-
     this.usersService.setFilename(file.filename, id);
     return of({ imagePath: file.filename });
   }
@@ -164,8 +163,10 @@ export class UsersController {
   @Get('get-user-matches-stats/:id')
   @UseGuards(JwtGuard)
   @ApiOkResponse({ type: UserEntity })
-  getUserMatchesStats(@Param('id') id: string, @Res() res: Response) {
-    return this.usersService.getUserMatchesStats(id, res);
+  async getUserMatchesStats(@Param('id') id: string, @Res() res: Response) {
+    return res
+      .status(200)
+      .send(await this.usersService.getUserMatchesStats(id, res));
   }
 
   @Get('get-user-match-history/:id')

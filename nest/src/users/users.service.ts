@@ -276,7 +276,7 @@ export class UsersService {
         stats.numberOfLoss = matchesList.length - stats.numberOfWin;
         stats.ratioWin = (stats.numberOfWin / matchesList.length) * 100;
         stats.ratioLoss = (stats.numberOfLoss / matchesList.length) * 100;
-        return res.status(200).send(stats);
+		return stats;
       }
     }
   }

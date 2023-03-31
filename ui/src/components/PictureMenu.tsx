@@ -31,6 +31,12 @@ export default function PictureMenu(props: Props) {
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
+  const [imageURL, setImageURL] = React.useState<string>("");
+
+  React.useEffect(() => {
+    image ? setImageURL(URL.createObjectURL(image)) : setImageURL("");
+  }, []);
+
   const handleClose = (type: AnchorEnum) => {
     switch (type) {
       case AnchorEnum.LOGOUT: {
@@ -74,7 +80,7 @@ export default function PictureMenu(props: Props) {
                 width: "55px",
                 height: "55px",
               }}
-              src={image ? URL.createObjectURL(image) : ""}
+              src={imageURL}
             />
           </IconButton>
         </Tooltip>
