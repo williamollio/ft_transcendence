@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { GameLoop } from "../../classes/GameLoop.class";
 import GameBoard from "./GameBoard";
 import ScoreDisplay from "./ScoreDisplay";
 import { GameSocket } from "../../classes/GameSocket.class";
 import { scoreInfo } from "../../interfaces/game.interface";
+import { Cookie } from "../../utils/auth-helper";
 
 interface Props {
   gameSocket: GameSocket;
@@ -11,7 +12,7 @@ interface Props {
 
 export default function Game(props: Props) {
   const { gameSocket } = props;
-  
+
   const [gameLoop] = useState<GameLoop>(new GameLoop(gameSocket));
   const [scoreInfo, setScoreInfo] = useState<scoreInfo>({
     p1s: 0,
