@@ -163,7 +163,7 @@ export default function App() {
               element={
                 <PrivateRoute
                   setToken={setToken}
-                  children={<Setup2FA />}
+                  children={<Setup2FA userSocket={userSocket} />}
                 ></PrivateRoute>
               }
             />
@@ -180,7 +180,6 @@ export default function App() {
               }
             />
             <Route path={RoutePath.LOGIN_2FA} element={<Login2FAView />} />
-            {/* TODO : William Private ? */}
           </Routes>
         </ThemeProvider>
       </Box>

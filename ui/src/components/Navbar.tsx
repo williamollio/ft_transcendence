@@ -15,10 +15,16 @@ import { useDrawersStore } from "../store/drawers-store";
 import { useTheme } from "@mui/material";
 import usersService from "../services/users.service";
 import { UserStatus } from "../interfaces/user.interface";
+import { UserSocket } from "../classes/UserSocket.class";
 
 export const navbarHeight = "4rem";
 
-export default function NavBar(): React.ReactElement {
+interface Props {
+  userSocket: UserSocket;
+}
+
+export default function NavBar(props: Props): React.ReactElement {
+  const { userSocket } = props;
   const theme = useTheme();
   const state = useLocation().state;
   const navigate = useNavigate();
@@ -44,9 +50,14 @@ export default function NavBar(): React.ReactElement {
     }
     if (userId && image === null) {
       wrapperFetchProfilePicture(userId);
-      fetchUser(userId);
     }
   }, [userId]);
+
+  React.useEffect(() => {
+    if (userSocket.socket.connected) {
+      fetchUser(userId);
+    }
+  }, [userSocket, userId]);
 
   async function wrapperFetchProfilePicture(userId: string) {
     const pictureFetched = await fetchProfilePicture(userId);

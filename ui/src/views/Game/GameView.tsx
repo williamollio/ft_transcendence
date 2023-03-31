@@ -33,7 +33,7 @@ export default function GameView(props: Props): React.ReactElement {
 
   return (
     <>
-      <Navbar />
+      <Navbar userSocket={userSocket} />
       <LeftDrawer />
       <RightDrawer
         channelSocket={channelSocket}

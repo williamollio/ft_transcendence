@@ -232,7 +232,7 @@ export default function ProfileView(props: Props): React.ReactElement {
 
   return (
     <>
-      <Navbar />
+      <Navbar userSocket={userSocket} />
       <LeftDrawer />
       <RightDrawer
         channelSocket={channelSocket}
