@@ -404,8 +404,6 @@ export default function Chat(props: Props) {
           ></AddChannelDialog>
           <Grid item alignSelf={"flex-end"}>
             <TextField
-              variant="filled"
-              size="small"
               label={t(translationKeys.chat)}
               sx={{ width: "300px", input: { color: "white" } }}
               onKeyDown={handleSubmit}
