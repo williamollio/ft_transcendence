@@ -131,6 +131,7 @@ export default function MiniDrawer() {
       fetchFriends();
       fetchRequested();
       fetchReceived();
+      setIsCacheInvalid(false);
     }
   }, [userId, isCacheInvalid]);
 
