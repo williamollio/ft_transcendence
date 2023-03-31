@@ -31,7 +31,6 @@ export default function PictureMenu(props: Props) {
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
-
   const handleClose = (type: AnchorEnum) => {
     switch (type) {
       case AnchorEnum.LOGOUT: {
@@ -103,7 +102,7 @@ export default function PictureMenu(props: Props) {
               display: "block",
               position: "absolute",
               top: 0,
-              left: 14,
+              right: 30,
               width: 10,
               height: 10,
               bgcolor: "background.paper",
@@ -112,8 +111,8 @@ export default function PictureMenu(props: Props) {
             },
           },
         }}
-        transformOrigin={{ horizontal: "left", vertical: "top" }}
-        anchorOrigin={{ horizontal: "left", vertical: "bottom" }}
+        transformOrigin={{ horizontal: "right", vertical: "top" }}
+        anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
         <MenuItem onClick={() => handleClose(AnchorEnum.SETTINGS)}>
           <ListItemIcon>
