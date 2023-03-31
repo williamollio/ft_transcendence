@@ -93,7 +93,7 @@ export class DoubleKeyMap {
     }
     return null;
   }
- 
+
   rejoinGame(playerId: string) {
     const game: Game | undefined = this.playerMap.get(playerId);
     if (game !== undefined) {
@@ -109,7 +109,7 @@ export class DoubleKeyMap {
   */
   matchPlayer(player2Id: string) {
     for (const [_, game] of this.playerMap) {
-      if (game.p2id === undefined    && _) {
+      if (game.p2id === undefined && _) {
         // the above is ugly but a linting rule is forcing me to add it
         game.p2id = player2Id;
         this.playerMap.set(player2Id, game);
@@ -196,16 +196,17 @@ export class Game {
       (player === 1
         ? ballX - ballHeight / 2 <= paddleX
         : ballX + ballHeight / 2 >= paddleX) &&
-      ballY + ballHeight >= paddleY - paddleSize / 2 &&
-      ballY - ballHeight <= paddleY + paddleSize / 2;
+      ballY + ballHeight / 2 >= paddleY - paddleSize / 2 &&
+      ballY - ballHeight / 2 <= paddleY + paddleSize / 2;
     return isColliding;
   }
 
   // Classic Game reset
-  resetBallForClassicMode(): void {
+  resetBallForClassicMode(playerScored: number): void {
     const MIN_RANDOM_Y_SPEED = -5;
     const MAX_RANDOM_Y_SPEED = 5;
     this.dirx = this.gameConstants.speeds[(this.gameConstants.speed = 0)];
+    if (playerScored === 1) this.dirx *= -1;
     this.bx = this.gameConstants.relativeMiddleX;
     this.by = this.gameConstants.relativeMiddleY;
     this.diry = generateRandomNumber(MIN_RANDOM_Y_SPEED, MAX_RANDOM_Y_SPEED);
@@ -315,7 +316,7 @@ export class Game {
       }
       switch (this.mode) {
         case GameMode.CLASSIC: {
-          this.resetBallForClassicMode();
+          this.resetBallForClassicMode(1);
           break;
         }
         case GameMode.MAYHEM: {
@@ -333,7 +334,7 @@ export class Game {
       }
       switch (this.mode) {
         case GameMode.CLASSIC: {
-          this.resetBallForClassicMode();
+          this.resetBallForClassicMode(2);
           break;
         }
         case GameMode.MAYHEM: {

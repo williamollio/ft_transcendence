@@ -26,7 +26,7 @@ export default function GameBoard(props: Props) {
 
   const boardRef = useRef<HTMLDivElement>(null);
 
-  const [zoom, toggleZoom] = useState<boolean>(true);
+  const [zoom, toggleZoom] = useState<boolean>(false);
   const [gameStatus, setGameStatus] = useState<GameState>(GameState.WIN);
 
   const playerMoveHandler = (event: KeyboardEvent) => {

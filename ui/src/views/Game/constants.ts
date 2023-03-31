@@ -9,4 +9,8 @@ export const translationKeys = {
 	classic: "Classic Pong Game",
 	mayhem: "Pong MAYHEM",
   },
+  gameEndState: {
+	win: "Victory!",
+	loss: "Defeat!",
+  },
 };
