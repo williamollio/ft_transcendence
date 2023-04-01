@@ -21,12 +21,15 @@ import { translationKeys } from "../constants";
 import { useDrawersStore } from "../../../store/drawers-store";
 import { useUserStore } from "../../../store/users-store";
 import { ChannelSocket } from "../../../classes/ChannelSocket.class";
+import { UserSocket } from "../../../classes/UserSocket.class";
+import { listenerWrapper } from "../../../services/initSocket.service";
 
 interface Props {
   userId: string;
   open: boolean;
   users: User[];
   channelSocket: ChannelSocket;
+  userSocket: UserSocket;
   triggerDrawerOpen: () => void;
   showErrorToast: (error?: AxiosError) => void;
   showSuccessToast: (message: string) => void;
@@ -39,6 +42,7 @@ export default function ListFriends(props: Props) {
     open,
     users,
     channelSocket,
+    userSocket,
     triggerDrawerOpen,
     showErrorToast,
     showSuccessToast,
@@ -87,6 +91,20 @@ export default function ListFriends(props: Props) {
 
     loadProfilePictures();
   }, [users]);
+
+  React.useEffect(() => {
+    listenerWrapper(() => {
+      if (userSocket.socket.connected) {
+        for (const user of users) {
+          userSocket.socket.on("statusRequest", user.id, (data) => {
+            setStatus();
+          });
+        }
+        return true;
+      }
+      return false;
+    });
+  }, [userSocket, users]);
 
   async function getProfilePicture(friendId: string): Promise<string> {
     const image = await fetchProfilePicture(friendId);

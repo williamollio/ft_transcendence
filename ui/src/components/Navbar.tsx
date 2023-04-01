@@ -57,7 +57,7 @@ export default function NavBar(props: Props): React.ReactElement {
     listenerWrapper(() => {
       if (userSocket.socket.connected) {
         userSocket.socket.on("statusRequest", (data) => {
-          setStatus(data);
+          setStatus(data.status);
         });
         userSocket.status();
         return true;

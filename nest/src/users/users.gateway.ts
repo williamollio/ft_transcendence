@@ -95,7 +95,10 @@ export class UserGateway {
   ) {
     void this.usersService.updateConnectionStatus(userId, UserStatus.PLAYING);
     clientSocket.broadcast.emit('userInGame');
-    clientSocket.emit('statusRequest', UserStatus.PLAYING);
+    this.server.emit('statusRequest', {
+      id: userId,
+      status: UserStatus.PLAYING,
+    });
   }
 
   @SubscribeMessage('leaveGame')
@@ -105,6 +108,9 @@ export class UserGateway {
   ) {
     void this.usersService.updateConnectionStatus(userId, UserStatus.ONLINE);
     clientSocket.broadcast.emit('userGameEnded');
-    clientSocket.emit('statusRequest', UserStatus.ONLINE);
+    this.server.emit('statusRequest', {
+      id: userId,
+      status: UserStatus.ONLINE,
+    });
   }
 }
