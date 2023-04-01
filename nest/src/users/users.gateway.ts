@@ -37,13 +37,12 @@ export class UserGateway {
   @SubscribeMessage('connectUser')
   userConnect(
     @GetCurrentUserId() userId: string,
-    @ConnectedSocket() clientSocket: Socket,
   ) {
     void this.usersService.updateConnectionStatus(
       String(userId),
       UserStatus.ONLINE,
     );
-    this.server.emit('statusRequest', {
+    this.server.emit('statusUpdate', {
       id: userId,
       status: UserStatus.ONLINE,
     });
@@ -65,7 +64,7 @@ export class UserGateway {
         status: true,
       },
     });
-    clientSocket.emit('statusRequest', { id: userId, status: User?.status });
+    clientSocket.emit('statusUpdate', { id: userId, status: User?.status });
   }
 
   @SubscribeMessage('connect')
@@ -87,7 +86,7 @@ export class UserGateway {
       void this.usersService.updateConnectionStatus(userId, UserStatus.OFFLINE);
       // this.socketToIdService.delete(clientSocket.id);
       socketToUserId.delete(clientSocket.id);
-      this.server.emit('statusRequest', {
+      this.server.emit('statusUpdate', {
         id: userId,
         status: UserStatus.OFFLINE,
       });
@@ -98,7 +97,7 @@ export class UserGateway {
   @SubscribeMessage('joinGame')
   userInGame(@GetCurrentUserId() userId: string) {
     void this.usersService.updateConnectionStatus(userId, UserStatus.PLAYING);
-    this.server.emit('statusRequest', {
+    this.server.emit('statusUpdate', {
       id: userId,
       status: UserStatus.PLAYING,
     });
@@ -107,7 +106,7 @@ export class UserGateway {
   @SubscribeMessage('leaveGame')
   gameEnded(@GetCurrentUserId() userId: string) {
     void this.usersService.updateConnectionStatus(userId, UserStatus.ONLINE);
-    this.server.emit('statusRequest', {
+    this.server.emit('statusUpdate', {
       id: userId,
       status: UserStatus.ONLINE,
     });
