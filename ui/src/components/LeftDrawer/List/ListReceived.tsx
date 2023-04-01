@@ -18,11 +18,13 @@ import { useTranslation } from "react-i18next";
 import { translationKeys } from "../constants";
 import { useDrawersStore } from "../../../store/drawers-store";
 import { useUserStore } from "../../../store/users-store";
+import { UserSocket } from "../../../classes/UserSocket.class";
 
 interface Props {
   userId: string;
   open: boolean;
   users: User[];
+  userSocket: UserSocket;
   triggerDrawerOpen: () => void;
   showErrorToast: (error?: AxiosError) => void;
   showSuccessToast: (message: string) => void;
@@ -32,6 +34,7 @@ export default function ListReceived(props: Props) {
     userId,
     open,
     users,
+    userSocket,
     triggerDrawerOpen,
     showErrorToast,
     showSuccessToast,

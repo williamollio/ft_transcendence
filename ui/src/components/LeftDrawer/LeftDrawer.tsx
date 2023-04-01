@@ -208,7 +208,7 @@ export default function LeftDrawer(props: Props) {
     <Box sx={{ display: "flex" }}>
       <AppBar position="fixed" open={open}>
         <Toolbar>
-          <Tooltip title="List of friends">
+          <Tooltip title="Friendships">
             <Box
               display={"flex"}
               alignContent={"center"}
@@ -276,6 +276,7 @@ export default function LeftDrawer(props: Props) {
           open={open}
           users={friends}
           channelSocket={channelSocket}
+          userSocket={userSocket}
           triggerDrawerOpen={triggerDrawerOpen}
           showErrorToast={showErrorToast}
           showSuccessToast={showSuccessToast}
@@ -304,6 +305,7 @@ export default function LeftDrawer(props: Props) {
           userId={userId}
           open={open}
           users={requests}
+          userSocket={userSocket}
           triggerDrawerOpen={triggerDrawerOpen}
           showErrorToast={showErrorToast}
           showSuccessToast={showSuccessToast}
@@ -332,6 +334,7 @@ export default function LeftDrawer(props: Props) {
           userId={userId}
           open={open}
           users={requestsReceived}
+          userSocket={userSocket}
           triggerDrawerOpen={triggerDrawerOpen}
           showErrorToast={showErrorToast}
           showSuccessToast={showSuccessToast}
