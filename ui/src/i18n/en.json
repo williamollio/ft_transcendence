@@ -32,7 +32,8 @@
       "nameSaved": "Name was successfully saved",
       "pictureSaved": "Picture was successfully saved",
       "pictureNameSaved": "Name and Picture were successfully saved",
-      "friendRequestsSaved": "Friendship requests were successfully saved"
+      "friendRequestsSaved": "Friendship requests were successfully saved",
+      "requestDeleted": "Request deleted successfully"
     }
   }
 }
