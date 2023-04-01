@@ -80,19 +80,21 @@ export default function ListReceived(props: Props) {
     setUsersState(users);
   }, [users]);
 
+  const statusUpdateListener = (data: any) => {
+    const newList: User[] = new Array<User>();
+    users?.forEach((element) => newList.push(element));
+    const index = newList.findIndex((element) => element.id === data.id);
+    if (index !== -1) {
+      newList[index].status = data.status;
+    }
+    setUsersState(newList);
+  };
+
   React.useEffect(() => {
     listenerWrapper(() => {
       if (userSocket.socket.connected) {
         // receiving data from server
-        userSocket.socket.on("statusRequest", (data) => {
-          const newList: User[] = new Array<User>();
-          users?.forEach((element) => newList.push(element));
-          const index = newList.findIndex((element) => element.id === data.id);
-          if (index !== -1) {
-            newList[index].status = data.status;
-          }
-          setUsersState(newList);
-        });
+        userSocket.socket.on("statusUpdate", statusUpdateListener);
         // sending request to server
         for (const user of users) {
           userSocket.status(user.id);
@@ -101,6 +103,15 @@ export default function ListReceived(props: Props) {
       }
       return false;
     });
+    return () => {
+      listenerWrapper(() => {
+        if (userSocket.socket.connected) {
+          userSocket.socket.off("statusUpdate", statusUpdateListener);
+          return true;
+        }
+        return false;
+      });
+    };
   }, [userSocket, users]);
 
   async function getProfilePicture(friendId: string): Promise<string> {

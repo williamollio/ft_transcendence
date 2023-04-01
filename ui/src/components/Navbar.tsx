@@ -53,17 +53,28 @@ export default function NavBar(props: Props): React.ReactElement {
     }
   }, [userId]);
 
+  const statusUpdateListener = (data: any) => {
+    if (data.id === userId) setStatus(data.status);
+  };
+
   React.useEffect(() => {
     listenerWrapper(() => {
       if (userSocket.socket.connected) {
-        userSocket.socket.on("statusRequest", (data) => {
-          if (data.id === userId) setStatus(data.status);
-        });
+        userSocket.socket.on("statusUpdate", statusUpdateListener);
         userSocket.status(userId);
         return true;
       }
       return false;
     });
+    return () => {
+      listenerWrapper(() => {
+        if (userSocket.socket.connected) {
+          userSocket.socket.off("statusUpdate", statusUpdateListener);
+          return true;
+        }
+        return false;
+      });
+    };
   }, [userSocket, userId]);
 
   async function wrapperFetchProfilePicture(userId: string) {
