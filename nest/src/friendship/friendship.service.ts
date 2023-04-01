@@ -1,6 +1,6 @@
 import { Injectable, HttpStatus } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Friendship, FriendshipStatus, UserStatus } from '@prisma/client';
+import { Friendship, FriendshipStatus } from '@prisma/client';
 import { Response } from 'express';
 import { GetFriendDto } from './dto/friend.dto';
 

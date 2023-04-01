@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { FriendshipStatus, PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 async function main() {
@@ -10,6 +10,7 @@ async function main() {
       intraId: 'user1',
       name: 'william',
       eloScore: 1200,
+      filename: 'IMG_007694d40247-1d43-43a4-a518-f556deacc3ec.JPG',
     },
   });
 
@@ -21,6 +22,7 @@ async function main() {
       intraId: 'user2',
       name: 'manuel',
       eloScore: 1100,
+      filename: 'IMG_0077(1)6974d812-624c-4903-a058-bed642946a0b.JPG',
     },
   });
 
@@ -32,6 +34,7 @@ async function main() {
       intraId: 'user3',
       name: 'tomas',
       eloScore: 500,
+      filename: 'PhotoCartedeVisite18d25844-b64c-44ea-80df-7b273ade313e.JPG',
     },
   });
 
@@ -43,6 +46,165 @@ async function main() {
       intraId: 'user4',
       name: 'mouad',
       eloScore: 1150,
+      filename:
+        'maxime-agnelli-bhD6TGRjnWc-unsplashc10feb34-b130-4024-aed3-a7e73c660274.jpg',
+    },
+  });
+
+  const user5 = await prisma.user.upsert({
+    where: { id: 'user5' },
+    update: {},
+    create: {
+      id: 'user5',
+      intraId: 'user5',
+      name: 'henrik',
+      eloScore: 655,
+    },
+  });
+
+  const user6 = await prisma.user.upsert({
+    where: { id: 'user6' },
+    update: {},
+    create: {
+      id: 'user6',
+      intraId: 'user6',
+      name: 'ruslan',
+      eloScore: 1105,
+    },
+  });
+
+  const friendship1 = await prisma.friendship.upsert({
+    where: {
+      requesterId_addresseeId: {
+        requesterId: 'user1',
+        addresseeId: 'user3',
+      },
+    },
+    update: {},
+    create: {
+      requesterId: 'user1',
+      addresseeId: 'user3',
+      status: FriendshipStatus.REQUESTED,
+    },
+  });
+
+  const friendship2 = await prisma.friendship.upsert({
+    where: {
+      requesterId_addresseeId: {
+        requesterId: 'user1',
+        addresseeId: 'user2',
+      },
+    },
+    update: {},
+    create: {
+      requesterId: 'user1',
+      addresseeId: 'user2',
+      status: FriendshipStatus.ACCEPTED,
+    },
+  });
+
+  const friendship3 = await prisma.friendship.upsert({
+    where: {
+      requesterId_addresseeId: {
+        requesterId: 'user3',
+        addresseeId: 'user4',
+      },
+    },
+    update: {},
+    create: {
+      requesterId: 'user3',
+      addresseeId: 'user4',
+      status: FriendshipStatus.REQUESTED,
+    },
+  });
+
+  const friendship4 = await prisma.friendship.upsert({
+    where: {
+      requesterId_addresseeId: {
+        requesterId: 'user2',
+        addresseeId: 'user3',
+      },
+    },
+    update: {},
+    create: {
+      requesterId: 'user2',
+      addresseeId: 'user3',
+      status: FriendshipStatus.ACCEPTED,
+    },
+  });
+
+  const friendship5 = await prisma.friendship.upsert({
+    where: {
+      requesterId_addresseeId: {
+        requesterId: 'user6',
+        addresseeId: 'user5',
+      },
+    },
+    update: {},
+    create: {
+      requesterId: 'user6',
+      addresseeId: 'user5',
+      status: FriendshipStatus.REQUESTED,
+    },
+  });
+
+  const friendship6 = await prisma.friendship.upsert({
+    where: {
+      requesterId_addresseeId: {
+        requesterId: 'user6',
+        addresseeId: 'user1',
+      },
+    },
+    update: {},
+    create: {
+      requesterId: 'user6',
+      addresseeId: 'user1',
+      status: FriendshipStatus.REQUESTED,
+    },
+  });
+
+  const friendship7 = await prisma.friendship.upsert({
+    where: {
+      requesterId_addresseeId: {
+        requesterId: 'user6',
+        addresseeId: 'user4',
+      },
+    },
+    update: {},
+    create: {
+      requesterId: 'user6',
+      addresseeId: 'user4',
+      status: FriendshipStatus.ACCEPTED,
+    },
+  });
+
+  const friendship8 = await prisma.friendship.upsert({
+    where: {
+      requesterId_addresseeId: {
+        requesterId: 'user2',
+        addresseeId: 'user6',
+      },
+    },
+    update: {},
+    create: {
+      requesterId: 'user2',
+      addresseeId: 'user6',
+      status: FriendshipStatus.ACCEPTED,
+    },
+  });
+
+  const friendship9 = await prisma.friendship.upsert({
+    where: {
+      requesterId_addresseeId: {
+        requesterId: 'user5',
+        addresseeId: 'user1',
+      },
+    },
+    update: {},
+    create: {
+      requesterId: 'user5',
+      addresseeId: 'user1',
+      status: FriendshipStatus.REQUESTED,
     },
   });
 
@@ -191,6 +353,17 @@ async function main() {
     user2,
     user3,
     user4,
+    user5,
+    user6,
+    friendship1,
+    friendship2,
+    friendship3,
+    friendship4,
+    friendship5,
+    friendship6,
+    friendship7,
+    friendship8,
+    friendship9,
     channelPublic,
     channelPrivate,
     channelProtected,

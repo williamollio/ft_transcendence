@@ -63,11 +63,11 @@ export const PrivateRoute: FC<{
       {isLoading ? (
         <Box
           sx={{
-            width: "100%",
-            height: "100%",
+            width: "100vw",
+            height: "100vh",
             display: "flex",
-            alignContent: "center",
-            justifyContent: "100%",
+            alignItems: "center",
+            justifyContent: "center",
           }}
         >
           <CircularProgress size={24} />
