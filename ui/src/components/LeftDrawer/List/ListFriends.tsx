@@ -8,7 +8,7 @@ import {
   Tooltip,
 } from "@mui/material";
 import ChatIcon from "@mui/icons-material/Chat";
-import { User } from "../../../interfaces/user.interface";
+import { User, UserStatus } from "../../../interfaces/user.interface";
 import React from "react";
 import { fetchProfilePicture } from "../../../utils/picture-helper";
 import friendshipsService from "../../../services/friendships.service";
@@ -95,10 +95,19 @@ export default function ListFriends(props: Props) {
   React.useEffect(() => {
     listenerWrapper(() => {
       if (userSocket.socket.connected) {
+        // receiving data from server
+        userSocket.socket.on("statusRequest", (data) => {
+          const newList: User[] = new Array<User>();
+          users?.forEach((element) => newList.push(element));
+          const index = newList.findIndex((element) => element.id === data.id);
+          if (index !== -1) {
+            newList[index].status = data.status;
+          }
+		  setUsersState(newList);
+        });
+        // sending request to server
         for (const user of users) {
-          userSocket.socket.on("statusRequest", user.id, (data) => {
-            setStatus();
-          });
+          userSocket.status(user.id);
         }
         return true;
       }

@@ -20,8 +20,8 @@ export class UserSocket {
     this.socket.emit("leaveGame");
   };
 
-  status = () => {
-    this.socket.emit("status");
+  status = (userId: string) => {
+    this.socket.emit("status", { requestedUser: userId });
   };
 
   logOut = () => {

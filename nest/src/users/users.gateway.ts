@@ -1,6 +1,7 @@
 import { UseGuards } from '@nestjs/common';
 import {
   ConnectedSocket,
+  MessageBody,
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
@@ -42,7 +43,10 @@ export class UserGateway {
       String(userId),
       UserStatus.ONLINE,
     );
-    clientSocket.broadcast.emit('userConnected');
+    this.server.emit('statusRequest', {
+      id: userId,
+      status: UserStatus.ONLINE,
+    });
   }
 
   @SubscribeMessage('disconnectUser')
@@ -52,7 +56,7 @@ export class UserGateway {
 
   @SubscribeMessage('status')
   async statusRequest(
-    @GetCurrentUserId() userId: string,
+    @MessageBody('requestedUser') userId: string,
     @ConnectedSocket() clientSocket: Socket,
   ) {
     const User = await this.prisma.user.findUnique({
@@ -61,7 +65,7 @@ export class UserGateway {
         status: true,
       },
     });
-    clientSocket.emit('statusRequest', User?.status);
+    clientSocket.emit('statusRequest', { id: userId, status: User?.status });
   }
 
   @SubscribeMessage('connect')
@@ -83,18 +87,17 @@ export class UserGateway {
       void this.usersService.updateConnectionStatus(userId, UserStatus.OFFLINE);
       // this.socketToIdService.delete(clientSocket.id);
       socketToUserId.delete(clientSocket.id);
-      clientSocket.broadcast.emit('userDisconnected');
+      this.server.emit('statusRequest', {
+        id: userId,
+        status: UserStatus.OFFLINE,
+      });
     }
   }
 
   // Game gateway
   @SubscribeMessage('joinGame')
-  userInGame(
-    @ConnectedSocket() clientSocket: Socket,
-    @GetCurrentUserId() userId: string,
-  ) {
+  userInGame(@GetCurrentUserId() userId: string) {
     void this.usersService.updateConnectionStatus(userId, UserStatus.PLAYING);
-    clientSocket.broadcast.emit('userInGame');
     this.server.emit('statusRequest', {
       id: userId,
       status: UserStatus.PLAYING,
@@ -102,12 +105,8 @@ export class UserGateway {
   }
 
   @SubscribeMessage('leaveGame')
-  gameEnded(
-    @ConnectedSocket() clientSocket: Socket,
-    @GetCurrentUserId() userId: string,
-  ) {
+  gameEnded(@GetCurrentUserId() userId: string) {
     void this.usersService.updateConnectionStatus(userId, UserStatus.ONLINE);
-    clientSocket.broadcast.emit('userGameEnded');
     this.server.emit('statusRequest', {
       id: userId,
       status: UserStatus.ONLINE,
