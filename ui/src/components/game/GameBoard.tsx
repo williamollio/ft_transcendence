@@ -1,5 +1,11 @@
 import { Divider, Paper } from "@mui/material";
-import React, { SetStateAction, useContext, useEffect, useRef, useState } from "react";
+import React, {
+  SetStateAction,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { useTranslation } from "react-i18next";
 import { GameLoop } from "../../classes/GameLoop.class";
 import { GameSocket } from "../../classes/GameSocket.class";
@@ -57,7 +63,7 @@ export default function GameBoard(props: Props) {
   };
 
   const gameStartingListener = () => {
-	setScoreInfo({...gameLoop.scoreInfo});
+    setScoreInfo({ ...gameLoop.scoreInfo });
     gameLoop.startLoop();
   };
 
@@ -71,21 +77,21 @@ export default function GameBoard(props: Props) {
     toggleZoom(true);
 
     gameLoop.resetPositions();
-	setGamePositions(gameLoop.positionalData);
-	gameLoop.scoreInfo = {
-		p1Id: "",
-		p2Id: "",
-		p1name: "",
-		p2name: "",
-		p1s: 0,
-		p2s: 0,
-	}
-	setScoreInfo(gameLoop.scoreInfo);
+    setGamePositions(gameLoop.positionalData);
+    gameLoop.scoreInfo = {
+      p1Id: "",
+      p2Id: "",
+      p1name: "",
+      p2name: "",
+      p1s: 0,
+      p2s: 0,
+    };
+    setScoreInfo(gameLoop.scoreInfo);
   };
 
   const giListener = (data: any) => {
-	gameLoop.scoreInfo.p1s = data.p1s;
-	gameLoop.scoreInfo.p2s = data.p2s;
+    gameLoop.scoreInfo.p1s = data.p1s;
+    gameLoop.scoreInfo.p2s = data.p2s;
     setGamePositions({
       ...gamePositions,
       ballOffset: { x: data.bx - 15, y: data.by - 15 },
@@ -98,7 +104,7 @@ export default function GameBoard(props: Props) {
           ? data.p1y - 50
           : gameLoop.positionalData.playerLeftYOffset,
     });
-	setScoreInfo({...gameLoop.scoreInfo});
+    setScoreInfo({ ...gameLoop.scoreInfo });
   };
 
   const gameJoinedListener = (data: any) => {
@@ -128,7 +134,9 @@ export default function GameBoard(props: Props) {
 
   const tryRejoinListener = (data: any) => {
     console.log("rejoined");
-    if (data) gameSocket.joinGame(data);
+    if (data) {
+      gameSocket.joinGame(data);
+    }
   };
 
   const failedListener = (data: any) => {

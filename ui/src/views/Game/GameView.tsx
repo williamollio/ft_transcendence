@@ -54,13 +54,13 @@ export default function GameView(props: Props): React.ReactElement {
               </Typography>
             </TitleWrapper>
             <ContentWrapper>
-              <Game gameSocket={gameSocket} />
+              <Game gameSocket={gameSocket} userSocket={userSocket} />
             </ContentWrapper>
           </CardContainer>
         </ProfileCard>
       </Background>
       {/* for testing */}
-      <Grid container direction="row">
+      <Grid container direction="row" marginLeft={"20rem"}>
         <Grid item width={100}>
           <Button
             sx={{ width: 70 }}

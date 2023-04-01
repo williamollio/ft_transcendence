@@ -12,6 +12,14 @@ export class UserSocket {
     this.socket.emit("connectUser");
   };
 
+  joinGame = () => {
+    this.socket.emit("joinGame");
+  };
+
+  leaveGame = () => {
+    this.socket.emit("leaveGame");
+  };
+
   status = () => {
     this.socket.emit("status");
   };

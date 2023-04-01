@@ -82,9 +82,7 @@ export default function ListFriends(props: Props) {
     const image = await fetchProfilePicture(friendId);
     return URL.createObjectURL(image);
   }
-  function createDmChat() {
-    console.log("createDmChat");
-  }
+  function createDmChat() {}
 
   async function deleteFriendship(friendId: string) {
     const responseDelete = await friendshipsService.deleteRequest(
