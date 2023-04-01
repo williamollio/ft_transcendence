@@ -139,7 +139,7 @@ async function main() {
   });
 
   const match2 = await prisma.match.upsert({
-	where: { gameId: 'match2' },
+    where: { gameId: 'match2' },
     update: {},
     create: {
       gameId: 'match2',
@@ -151,7 +151,7 @@ async function main() {
   });
 
   const match3 = await prisma.match.upsert({
-	where: { gameId: 'match3' },
+    where: { gameId: 'match3' },
     update: {},
     create: {
       gameId: 'match3',
@@ -163,7 +163,7 @@ async function main() {
   });
 
   const match4 = await prisma.match.upsert({
-	where: { gameId: 'match4' },
+    where: { gameId: 'match4' },
     update: {},
     create: {
       gameId: 'match4',
@@ -175,7 +175,7 @@ async function main() {
   });
 
   const match5 = await prisma.match.upsert({
-	where: { gameId: 'match5' },
+    where: { gameId: 'match5' },
     update: {},
     create: {
       gameId: 'match5',
