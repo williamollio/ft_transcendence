@@ -79,6 +79,17 @@ export default function GetNameDialog(props: Props) {
           },
         });
       }
+	  else if (channel && channel.access === "PROTECTED" && input === "")
+	  {
+		toast.dispatchTranscendanceState({
+			type: TranscendanceStateActionType.TOGGLE_TOAST,
+			toast: {
+			  type: ToastType.ERROR,
+			  title: t(translationKeys.createInfo.password) as string,
+			  message: `${t(translationKeys.errorMessages.passwordEmpty) as string}`
+			},
+		  });
+	  }
       handleClose();
     }
   };
