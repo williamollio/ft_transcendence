@@ -15,6 +15,9 @@ import CloseIcon from "@mui/icons-material/Close";
 import { StyledAvatarBadge } from "../AvatarBadge/StyledAvatarBadge";
 import { AxiosError } from "axios";
 import { useTheme } from "@mui/material";
+import { useTranslation } from "react-i18next";
+import { translationKeys } from "../constants";
+import { useDrawersStore } from "../../../store/drawers-store";
 
 interface Props {
   userId: string;
@@ -22,14 +25,32 @@ interface Props {
   users: User[];
   triggerDrawerOpen: () => void;
   showErrorToast: (error?: AxiosError) => void;
+  showSuccessToast: (message: string) => void;
 }
 export default function ListFriends(props: Props) {
   const theme = useTheme();
-  const { userId, open, users, triggerDrawerOpen, showErrorToast } = props;
+  const { t } = useTranslation();
+  const {
+    userId,
+    open,
+    users,
+    triggerDrawerOpen,
+    showErrorToast,
+    showSuccessToast,
+  } = props;
 
   const [profilePictures, setProfilePictures] = React.useState<{
     [key: string]: string;
   }>({});
+  const [usersState, setUsersState] = React.useState<User[] | undefined>(
+    undefined
+  );
+  const [isCacheInvalid, setIsCacheInvalid] = useDrawersStore(
+    (state: { isFriendsCacheUnvalid: any; setisFriendsCacheUnvalid: any }) => [
+      state.isFriendsCacheUnvalid,
+      state.setisFriendsCacheUnvalid,
+    ]
+  );
 
   React.useEffect(() => {
     async function loadProfilePictures() {
@@ -44,6 +65,7 @@ export default function ListFriends(props: Props) {
       }
 
       setProfilePictures(pictures);
+      setUsersState(users);
     }
 
     loadProfilePictures();
@@ -65,12 +87,15 @@ export default function ListFriends(props: Props) {
     const isSuccess = !responseDelete?.error;
     if (!isSuccess) {
       showErrorToast(responseDelete.error);
+    } else {
+      showSuccessToast(t(translationKeys.message.success.friendRemoved));
+      setIsCacheInvalid(true);
     }
   }
 
   return (
     <List>
-      {users.map((user: User, index) => (
+      {usersState?.map((user: User, index) => (
         <ListItem key={index} disablePadding sx={{ display: "flex" }}>
           <ListItemButton
             sx={{

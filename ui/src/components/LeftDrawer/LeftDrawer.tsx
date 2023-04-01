@@ -269,6 +269,7 @@ export default function MiniDrawer() {
           users={friends}
           triggerDrawerOpen={triggerDrawerOpen}
           showErrorToast={showErrorToast}
+          showSuccessToast={showSuccessToast}
         />
         <Divider
           variant="middle"
@@ -324,6 +325,7 @@ export default function MiniDrawer() {
           users={requestsReceived}
           triggerDrawerOpen={triggerDrawerOpen}
           showErrorToast={showErrorToast}
+          showSuccessToast={showSuccessToast}
         />
       </Drawer>
       <Box component="main" sx={{ flexGrow: 1, p: 3 }}></Box>

@@ -14,6 +14,9 @@ import CloseIcon from "@mui/icons-material/Close";
 import friendshipsService from "../../../services/friendships.service";
 import { StyledAvatarBadge } from "../AvatarBadge/StyledAvatarBadge";
 import { AxiosError } from "axios";
+import { useTranslation } from "react-i18next";
+import { translationKeys } from "../constants";
+import { useDrawersStore } from "../../../store/drawers-store";
 
 interface Props {
   userId: string;
@@ -21,13 +24,31 @@ interface Props {
   users: User[];
   triggerDrawerOpen: () => void;
   showErrorToast: (error?: AxiosError) => void;
+  showSuccessToast: (message: string) => void;
 }
 export default function ListReceived(props: Props) {
-  const { userId, open, users, triggerDrawerOpen, showErrorToast } = props;
+  const {
+    userId,
+    open,
+    users,
+    triggerDrawerOpen,
+    showErrorToast,
+    showSuccessToast,
+  } = props;
 
+  const { t } = useTranslation();
   const [profilePictures, setProfilePictures] = React.useState<{
     [key: string]: string;
   }>({});
+  const [usersState, setUsersState] = React.useState<User[] | undefined>(
+    undefined
+  );
+  const [isCacheInvalid, setIsCacheInvalid] = useDrawersStore(
+    (state: { isFriendsCacheUnvalid: any; setisFriendsCacheUnvalid: any }) => [
+      state.isFriendsCacheUnvalid,
+      state.setisFriendsCacheUnvalid,
+    ]
+  );
 
   React.useEffect(() => {
     async function loadProfilePictures() {
@@ -45,6 +66,7 @@ export default function ListReceived(props: Props) {
     }
 
     loadProfilePictures();
+    setUsersState(users);
   }, [users]);
 
   async function getProfilePicture(friendId: string): Promise<string> {
@@ -60,6 +82,9 @@ export default function ListReceived(props: Props) {
     const isSuccess = !responseAccept?.error;
     if (!isSuccess) {
       showErrorToast(responseAccept.error);
+    } else {
+      showSuccessToast(t(translationKeys.message.success.requestAccepted));
+      setIsCacheInvalid(true);
     }
   }
 
@@ -71,12 +96,16 @@ export default function ListReceived(props: Props) {
     const isSuccess = !responseDelete?.error;
     if (!isSuccess) {
       showErrorToast(responseDelete.error);
+    } else {
+      showSuccessToast(t(translationKeys.message.success.requestDeleted));
+      const tmpUsers = users.filter((user) => friendId !== user.id);
+      setUsersState(tmpUsers);
     }
   }
 
   return (
     <List>
-      {users.map((user: User, index) => (
+      {usersState?.map((user: User, index) => (
         <ListItem key={index} disablePadding sx={{ display: "block" }}>
           <ListItemButton
             sx={{

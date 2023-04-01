@@ -15,6 +15,7 @@ import { StyledAvatarBadge } from "../AvatarBadge/StyledAvatarBadge";
 import { AxiosError } from "axios";
 import { useTranslation } from "react-i18next";
 import { translationKeys } from "../constants";
+import { useDrawersStore } from "../../../store/drawers-store";
 
 interface Props {
   userId: string;
@@ -40,6 +41,12 @@ export default function ListRequested(props: Props) {
   }>({});
   const [usersState, setUsersState] = React.useState<User[] | undefined>(
     undefined
+  );
+  const [isCacheInvalid, setIsCacheInvalid] = useDrawersStore(
+    (state: { isFriendsCacheUnvalid: any; setisFriendsCacheUnvalid: any }) => [
+      state.isFriendsCacheUnvalid,
+      state.setisFriendsCacheUnvalid,
+    ]
   );
 
   React.useEffect(() => {
@@ -76,8 +83,7 @@ export default function ListRequested(props: Props) {
       showErrorToast(responseDelete.error);
     } else {
       showSuccessToast(t(translationKeys.message.success.requestDeleted));
-      const tmpUsers = users.filter((user) => friendId !== user.id);
-      setUsersState(tmpUsers);
+      setIsCacheInvalid(true);
     }
   }
 
