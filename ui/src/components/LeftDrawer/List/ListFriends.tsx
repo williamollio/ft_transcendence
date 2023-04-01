@@ -45,7 +45,7 @@ export default function ListFriends(props: Props) {
   const [usersState, setUsersState] = React.useState<User[] | undefined>(
     undefined
   );
-  const [isCacheInvalid, setIsCacheInvalid] = useDrawersStore(
+  const [isDrawerCacheInvalid, setIsDrawerCacheInvalid] = useDrawersStore(
     (state: { isFriendsCacheUnvalid: any; setisFriendsCacheUnvalid: any }) => [
       state.isFriendsCacheUnvalid,
       state.setisFriendsCacheUnvalid,
@@ -89,7 +89,7 @@ export default function ListFriends(props: Props) {
       showErrorToast(responseDelete.error);
     } else {
       showSuccessToast(t(translationKeys.message.success.friendRemoved));
-      setIsCacheInvalid(true);
+      setIsDrawerCacheInvalid(true);
     }
   }
 

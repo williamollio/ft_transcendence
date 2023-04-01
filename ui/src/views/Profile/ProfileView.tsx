@@ -64,7 +64,7 @@ export default function ProfileView(props: Props): React.ReactElement {
   const [currentUser, setCurrentUser] = useState<User | null>();
   const [initialName, setInitialName] = useState<string>();
   const [token] = useState<string | null>(localStorage.getItem(Cookie.TOKEN));
-  const [isCacheInvalid, setIsCacheInvalid] = useDrawersStore(
+  const [isDrawerCacheInvalid, setIsDrawerCacheInvalid] = useDrawersStore(
     (state: { isFriendsCacheUnvalid: any; setisFriendsCacheUnvalid: any }) => [
       state.isFriendsCacheUnvalid,
       state.setisFriendsCacheUnvalid,
@@ -248,7 +248,7 @@ export default function ProfileView(props: Props): React.ReactElement {
           t(translationKeys.message.success.friendRequestsSaved)
         );
         setValue("friends", undefined);
-        setIsCacheInvalid(true);
+        setIsDrawerCacheInvalid(true);
       }
     });
   }

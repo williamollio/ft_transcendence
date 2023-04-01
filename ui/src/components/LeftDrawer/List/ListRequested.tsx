@@ -42,7 +42,7 @@ export default function ListRequested(props: Props) {
   const [usersState, setUsersState] = React.useState<User[] | undefined>(
     undefined
   );
-  const [isCacheInvalid, setIsCacheInvalid] = useDrawersStore(
+  const [isDrawerCacheInvalid, setIsDrawerCacheInvalid] = useDrawersStore(
     (state: { isFriendsCacheUnvalid: any; setisFriendsCacheUnvalid: any }) => [
       state.isFriendsCacheUnvalid,
       state.setisFriendsCacheUnvalid,
@@ -83,7 +83,7 @@ export default function ListRequested(props: Props) {
       showErrorToast(responseDelete.error);
     } else {
       showSuccessToast(t(translationKeys.message.success.requestDeleted));
-      setIsCacheInvalid(true);
+      setIsDrawerCacheInvalid(true);
     }
   }
 

@@ -43,7 +43,7 @@ export default function ListReceived(props: Props) {
   const [usersState, setUsersState] = React.useState<User[] | undefined>(
     undefined
   );
-  const [isCacheInvalid, setIsCacheInvalid] = useDrawersStore(
+  const [isDrawerCacheInvalid, setIsDrawerCacheInvalid] = useDrawersStore(
     (state: { isFriendsCacheUnvalid: any; setisFriendsCacheUnvalid: any }) => [
       state.isFriendsCacheUnvalid,
       state.setisFriendsCacheUnvalid,
@@ -84,7 +84,7 @@ export default function ListReceived(props: Props) {
       showErrorToast(responseAccept.error);
     } else {
       showSuccessToast(t(translationKeys.message.success.requestAccepted));
-      setIsCacheInvalid(true);
+      setIsDrawerCacheInvalid(true);
     }
   }
 
