@@ -147,6 +147,17 @@ export default function MiniDrawer() {
     });
   }
 
+  function showSuccessToast(message: string) {
+    dispatchTranscendanceState({
+      type: TranscendanceStateActionType.TOGGLE_TOAST,
+      toast: {
+        type: ToastType.SUCCESS,
+        title: "Success",
+        message: message as unknown as string,
+      },
+    });
+  }
+
   async function fetchFriends() {
     const usersFriends: Response<User[]> = await friendshipsService.getAccepted(
       userId
@@ -285,6 +296,7 @@ export default function MiniDrawer() {
           users={requests}
           triggerDrawerOpen={triggerDrawerOpen}
           showErrorToast={showErrorToast}
+          showSuccessToast={showSuccessToast}
         />
         <Divider
           variant="middle"
