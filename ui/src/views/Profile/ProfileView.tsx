@@ -41,6 +41,7 @@ import RightDrawer from "../../components/RightDrawer/RightDrawer";
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { GameSocket } from "../../classes/GameSocket.class";
 import { useDrawersStore } from "../../store/drawers-store";
+import { useUserStore } from "../../store/users-store";
 
 interface Props {
   userSocket: UserSocket;
@@ -70,6 +71,12 @@ export default function ProfileView(props: Props): React.ReactElement {
       state.setisFriendsCacheUnvalid,
     ]
   );
+  const [isUserCacheInvalid, setIsUserCacheInvalid] = useUserStore(
+    (state: { isFriendsCacheUnvalid: any; setisFriendsCacheUnvalid: any }) => [
+      state.isFriendsCacheUnvalid,
+      state.setisFriendsCacheUnvalid,
+    ]
+  );
 
   const {
     formState: { errors },
@@ -90,9 +97,10 @@ export default function ProfileView(props: Props): React.ReactElement {
         fetchCurrentUser();
         fetchUsersWithoutFriendship();
         setIsLoading(false);
+        setIsUserCacheInvalid(false);
       }
     }
-  }, [userId]);
+  }, [userId, isUserCacheInvalid]);
 
   React.useEffect(() => {
     for (const property in currentUser) {

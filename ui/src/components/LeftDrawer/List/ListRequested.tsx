@@ -16,6 +16,7 @@ import { AxiosError } from "axios";
 import { useTranslation } from "react-i18next";
 import { translationKeys } from "../constants";
 import { useDrawersStore } from "../../../store/drawers-store";
+import { useUserStore } from "../../../store/users-store";
 
 interface Props {
   userId: string;
@@ -43,6 +44,12 @@ export default function ListRequested(props: Props) {
     undefined
   );
   const [isDrawerCacheInvalid, setIsDrawerCacheInvalid] = useDrawersStore(
+    (state: { isFriendsCacheUnvalid: any; setisFriendsCacheUnvalid: any }) => [
+      state.isFriendsCacheUnvalid,
+      state.setisFriendsCacheUnvalid,
+    ]
+  );
+  const [isUserCacheInvalid, setIsUserCacheInvalid] = useUserStore(
     (state: { isFriendsCacheUnvalid: any; setisFriendsCacheUnvalid: any }) => [
       state.isFriendsCacheUnvalid,
       state.setisFriendsCacheUnvalid,
@@ -84,6 +91,7 @@ export default function ListRequested(props: Props) {
     } else {
       showSuccessToast(t(translationKeys.message.success.requestDeleted));
       setIsDrawerCacheInvalid(true);
+      setIsUserCacheInvalid(true);
     }
   }
 

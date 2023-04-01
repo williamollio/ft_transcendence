@@ -20,3 +20,17 @@ export const useImageStore = create<ImageStore>(
       set((state) => ({ ...state, isFriendsCacheUnvalid: cacheInv })),
   })
 );
+
+interface UserStore {
+  isFriendsCacheUnvalid: boolean;
+  setisFriendsCacheUnvalid: (cacheInv: boolean) => void;
+}
+// Dispatch<SetStateAction<UserStore>>
+// allows the TypeScript compiler to infer the correct type of the state
+export const useUserStore = create<UserStore>(
+  (set: Dispatch<SetStateAction<UserStore>>) => ({
+    isFriendsCacheUnvalid: false,
+    setisFriendsCacheUnvalid: (cacheInv: boolean) =>
+      set((state) => ({ ...state, isFriendsCacheUnvalid: cacheInv })),
+  })
+);
