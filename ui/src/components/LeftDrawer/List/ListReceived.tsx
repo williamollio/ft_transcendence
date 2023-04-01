@@ -19,6 +19,7 @@ import { translationKeys } from "../constants";
 import { useDrawersStore } from "../../../store/drawers-store";
 import { useUserStore } from "../../../store/users-store";
 import { UserSocket } from "../../../classes/UserSocket.class";
+import { listenerWrapper } from "../../../services/initSocket.service";
 
 interface Props {
   userId: string;
@@ -78,6 +79,29 @@ export default function ListReceived(props: Props) {
     loadProfilePictures();
     setUsersState(users);
   }, [users]);
+
+  React.useEffect(() => {
+    listenerWrapper(() => {
+      if (userSocket.socket.connected) {
+        // receiving data from server
+        userSocket.socket.on("statusRequest", (data) => {
+          const newList: User[] = new Array<User>();
+          users?.forEach((element) => newList.push(element));
+          const index = newList.findIndex((element) => element.id === data.id);
+          if (index !== -1) {
+            newList[index].status = data.status;
+          }
+          setUsersState(newList);
+        });
+        // sending request to server
+        for (const user of users) {
+          userSocket.status(user.id);
+        }
+        return true;
+      }
+      return false;
+    });
+  }, [userSocket, users]);
 
   async function getProfilePicture(friendId: string): Promise<string> {
     const image = await fetchProfilePicture(friendId);

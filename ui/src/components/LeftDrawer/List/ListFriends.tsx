@@ -103,7 +103,7 @@ export default function ListFriends(props: Props) {
           if (index !== -1) {
             newList[index].status = data.status;
           }
-		  setUsersState(newList);
+          setUsersState(newList);
         });
         // sending request to server
         for (const user of users) {
