@@ -10,10 +10,11 @@ interface Props {
   toggleOpen: any;
   channel: chatRoom | undefined;
   channelSocket: ChannelSocket;
+  toggleChannelInfo: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export default function GetPasswordDialog(props: Props) {
-  const { open, toggleOpen, channel, channelSocket } = props;
+  const { open, toggleOpen, channel, channelSocket, toggleChannelInfo } = props;
   const { t } = useTranslation();
 
   const [input, setInput] = useState<string>("");
@@ -23,6 +24,7 @@ export default function GetPasswordDialog(props: Props) {
     setInput("");
     setOldInput("");
     toggleOpen();
+    toggleChannelInfo(false);
   };
 
   const handleChange = (e: any) => {

@@ -50,7 +50,7 @@ export default function GameView(props: Props): React.ReactElement {
                 fontWeight={"bold"}
                 sx={{ textDecoration: "underline" }}
               >
-                {t(translationKeys.gameMode.classic)}
+                {t(translationKeys.gameTitle)}
               </Typography>
             </TitleWrapper>
             <ContentWrapper>

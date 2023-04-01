@@ -14,7 +14,9 @@ class UsersService {
 
   async getUser(id: string): Promise<Response<User>> {
     return resolve<User>(
-      axiosInstance.get(`${PATH}/${id}`).then((res: AxiosResponse) => res.data)
+      axiosInstance.get(`${PATH}/${id}`).then((res: AxiosResponse) => {
+        return res.data;
+      })
     );
   }
 

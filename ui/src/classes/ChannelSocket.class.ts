@@ -82,7 +82,7 @@ export class ChannelSocket {
         name: newName ? newName : channel.key,
         type: type,
         passwordHash: newPassword,
-        // currentPasswordHash: password,
+        currentPasswordHash: password,
       },
     });
   };

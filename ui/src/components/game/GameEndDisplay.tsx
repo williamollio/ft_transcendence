@@ -1,4 +1,4 @@
-import { Grid, Paper, Typography, Zoom } from "@mui/material";
+import { Grid, Typography, Zoom } from "@mui/material";
 import { useEffect } from "react";
 import { GameState } from "../../interfaces/game.interface";
 import { useTranslation } from "react-i18next";
