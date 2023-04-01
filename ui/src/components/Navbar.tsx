@@ -16,6 +16,7 @@ import { useTheme } from "@mui/material";
 import usersService from "../services/users.service";
 import { UserStatus } from "../interfaces/user.interface";
 import { UserSocket } from "../classes/UserSocket.class";
+import { listenerWrapper } from "../services/initSocket.service";
 
 export const navbarHeight = "4rem";
 
@@ -54,21 +55,21 @@ export default function NavBar(props: Props): React.ReactElement {
   }, [userId]);
 
   React.useEffect(() => {
-    if (userSocket.socket.connected) {
-      fetchUser(userId);
-    }
+    listenerWrapper(() => {
+      if (userSocket.socket.connected) {
+        userSocket.socket.on("statusRequest", (data) => {
+          setStatus(data);
+        });
+        userSocket.status();
+        return true;
+      }
+      return false;
+    });
   }, [userSocket, userId]);
 
   async function wrapperFetchProfilePicture(userId: string) {
     const pictureFetched = await fetchProfilePicture(userId);
     setImage(pictureFetched);
-  }
-
-  async function fetchUser(userId: string) {
-    const responseUser = await usersService.getUser(userId);
-    if (!responseUser.error) {
-      setStatus(responseUser.data.status);
-    }
   }
 
   const [selectedTabId, setSelectedTabId] = useState<number>(

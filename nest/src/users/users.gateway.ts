@@ -13,6 +13,7 @@ import { socketToUserId } from './socketToUserIdStorage.service';
 import { UsersService } from './users.service';
 import * as msgpack from 'socket.io-msgpack-parser';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
+import { PrismaService } from '../prisma/prisma.service';
 
 // add some cors sanitazation here
 @WebSocketGateway(8888, {
@@ -29,6 +30,7 @@ export class UserGateway {
   server: Server;
   constructor(
     private readonly usersService: UsersService, // private readonly socketToIdService: SocketToUserIdStorage,
+    private prisma: PrismaService,
   ) {}
 
   @SubscribeMessage('connectUser')
@@ -46,6 +48,20 @@ export class UserGateway {
   @SubscribeMessage('disconnectUser')
   userDisconnect(@ConnectedSocket() clientSocket: Socket) {
     clientSocket.broadcast.emit('userDisconnected');
+  }
+
+  @SubscribeMessage('status')
+  async statusRequest(
+    @GetCurrentUserId() userId: string,
+    @ConnectedSocket() clientSocket: Socket,
+  ) {
+    const User = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        status: true,
+      },
+    });
+    clientSocket.emit('statusRequest', User?.status);
   }
 
   @SubscribeMessage('connect')
@@ -79,6 +95,7 @@ export class UserGateway {
   ) {
     void this.usersService.updateConnectionStatus(userId, UserStatus.PLAYING);
     clientSocket.broadcast.emit('userInGame');
+    clientSocket.broadcast.emit('statusRequest', UserStatus.PLAYING);
   }
 
   @SubscribeMessage('leaveGame')

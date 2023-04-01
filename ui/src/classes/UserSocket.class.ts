@@ -12,6 +12,10 @@ export class UserSocket {
     this.socket.emit("connectUser");
   };
 
+  status = () => {
+    this.socket.emit("status");
+  };
+
   logOut = () => {
     this.socket.disconnect();
   };
