@@ -64,7 +64,7 @@ export default function Login2FAView(): ReactElement {
   async function handleSubmit() {
     const response = await authService.sendSecondFactor(input);
     if (!response.error) {
-      navigate(RoutePath.PROFILE);
+      navigate(RoutePath.EDITPROFILE);
     } else {
       showErrorToast(response.error);
     }

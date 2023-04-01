@@ -44,7 +44,7 @@ export default function PictureMenu(props: Props) {
         break;
       }
       case AnchorEnum.SETTINGS: {
-        navigate(RoutePath.PROFILE, { state: { isEditMode: true } });
+        navigate(RoutePath.EDITPROFILE, { state: { isEditMode: true } });
         break;
       }
       case AnchorEnum.SETUP2FA: {

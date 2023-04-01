@@ -34,7 +34,7 @@ export default function LoginView(props: Props): React.ReactElement {
   React.useEffect(() => {
     const token = localStorage.getItem(Cookie.TOKEN);
     if (token !== null) {
-      navigate(RoutePath.PROFILE);
+      navigate(RoutePath.EDITPROFILE);
     }
     if (userSocket.socket.connected) userSocket.logOut();
     setIsLoading(false);
@@ -66,7 +66,7 @@ export default function LoginView(props: Props): React.ReactElement {
       showErrorToast(response.error);
       localStorage.removeItem(Cookie.TOKEN);
     } else {
-      navigate(RoutePath.PROFILE);
+      navigate(RoutePath.EDITPROFILE);
     }
   }
 
