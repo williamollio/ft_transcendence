@@ -211,6 +211,20 @@ export default function ProfileView(props: Props): React.ReactElement {
     }
   }
 
+  function updateOptionsFriends(data: FieldValues) {
+    const nonMatchingUsers: string[] | undefined = data.friends;
+
+    const newUsers: LabelValue[] = users.filter((user) => {
+      const isFriend =
+        nonMatchingUsers &&
+        nonMatchingUsers.some((friend) => friend === user.value);
+
+      return !isFriend;
+    });
+
+    setUsers(newUsers);
+  }
+
   async function onSubmitFriendship(data: FieldValues) {
     const friendsList: User[] | undefined = data.friends?.map(
       (friend: LabelValue) => {
@@ -220,17 +234,7 @@ export default function ProfileView(props: Props): React.ReactElement {
       }
     );
 
-    const nonMatchingUsers: string[] | undefined = data.friends;
-
-    const newUsers = users.filter((user) => {
-      const isFriend =
-        nonMatchingUsers &&
-        nonMatchingUsers.some((friend) => friend === user.value);
-
-      return !isFriend;
-    });
-
-    setUsers(newUsers);
+    updateOptionsFriends(data);
 
     let responseFrienship;
     friendsList?.forEach(async function (friend) {
