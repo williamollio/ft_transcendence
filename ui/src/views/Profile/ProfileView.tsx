@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import usersService from "../../services/users.service";
 import { User } from "../../interfaces/user.interface";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { RoutePath } from "../../interfaces/router.interface";
 import { AxiosError } from "axios";
 import { TranscendanceContext } from "../../context/transcendance-context";
@@ -35,6 +35,7 @@ import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { GameSocket } from "../../classes/GameSocket.class";
 import { useParams } from "react-router-dom";
 import CustomTextField from "../../components/shared/CustomTextField/CustomTextField";
+import { fetchProfilePicture } from "../../utils/picture-helper";
 
 interface Props {
   userSocket: UserSocket;
@@ -44,15 +45,12 @@ interface Props {
 
 export default function ProfileView(props: Props): React.ReactElement {
   const { userSocket, channelSocket, gameSocket } = props;
-  const { userIdParam } = useParams();
+  const userIdParam = useParams().userId;
   const { t } = useTranslation();
   const { classes } = useStyles();
   const navigate = useNavigate();
   const { dispatchTranscendanceState } = React.useContext(TranscendanceContext);
-  const [image, setImage] = useImageStore(
-    (state: { image: any; setImage: any }) => [state.image, state.setImage]
-  );
-  const [picture, setPicture] = useState<any>(image);
+  const [image, setImage] = useState<any>(null);
   const [userId, setUserId] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [currentUser, setCurrentUser] = useState<User | null>();
@@ -61,22 +59,41 @@ export default function ProfileView(props: Props): React.ReactElement {
   React.useEffect(() => {
     if (token === null) {
       navigate(RoutePath.LOGIN);
-    } else {
-      wrapperSetUserId(token);
-      if (userId) {
-        fetchCurrentUser();
-        setIsLoading(false);
-      }
     }
-  }, [userId]);
+  }, []);
 
   React.useEffect(() => {
-    setPicture(image);
-  }, [image]);
+    wrapperSetUserId(token);
+    if (userId) {
+      fetchCurrentUser();
+      setIsLoading(false);
+    }
+  }, [userId, userIdParam]);
 
-  function wrapperSetUserId(token: string) {
-    if (!userIdParam) {
-      setUserId(getTokenData(token).id);
+  React.useEffect(() => {
+    async function loadProfilePictures() {
+      if (currentUser?.filename) {
+        const picture = await getProfilePicture(currentUser.id);
+        setImage(picture);
+      } else {
+        setImage("");
+      }
+    }
+
+    loadProfilePictures();
+  }, [userId]);
+
+  async function getProfilePicture(friendId: string): Promise<string> {
+    const image = await fetchProfilePicture(friendId);
+    return URL.createObjectURL(image);
+  }
+
+  function wrapperSetUserId(token: string | null) {
+    if (!userIdParam || userIdParam === ":userId") {
+      if (token) setUserId(getTokenData(token).id);
+      else navigate(RoutePath.LOGIN);
+    } else {
+      setUserId(userIdParam);
     }
   }
 
@@ -146,7 +163,7 @@ export default function ProfileView(props: Props): React.ReactElement {
                     <Box className={classes.avatarWrapper}>
                       <Tooltip title="Profile picture">
                         <Avatar
-                          src={picture ? URL.createObjectURL(picture) : ""}
+                          src={image ? URL.createObjectURL(image) : ""}
                           style={{
                             width: "100px",
                             height: "100px",

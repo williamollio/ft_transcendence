@@ -277,7 +277,6 @@ export default function LeftDrawer(props: Props) {
           users={friends}
           channelSocket={channelSocket}
           userSocket={userSocket}
-          triggerDrawerOpen={triggerDrawerOpen}
           showErrorToast={showErrorToast}
           showSuccessToast={showSuccessToast}
         />
@@ -306,7 +305,6 @@ export default function LeftDrawer(props: Props) {
           open={open}
           users={requests}
           userSocket={userSocket}
-          triggerDrawerOpen={triggerDrawerOpen}
           showErrorToast={showErrorToast}
           showSuccessToast={showSuccessToast}
         />
@@ -335,7 +333,6 @@ export default function LeftDrawer(props: Props) {
           open={open}
           users={requestsReceived}
           userSocket={userSocket}
-          triggerDrawerOpen={triggerDrawerOpen}
           showErrorToast={showErrorToast}
           showSuccessToast={showSuccessToast}
         />

@@ -5,6 +5,7 @@ import {
   ListItemIcon,
   Avatar,
   ListItemText,
+  Tooltip,
 } from "@mui/material";
 import { User } from "../../../interfaces/user.interface";
 import React from "react";
@@ -19,27 +20,22 @@ import { useDrawersStore } from "../../../store/drawers-store";
 import { useUserStore } from "../../../store/users-store";
 import { UserSocket } from "../../../classes/UserSocket.class";
 import { listenerWrapper } from "../../../services/initSocket.service";
+import { useNavigate } from "react-router-dom";
+import { RoutePath } from "../../../interfaces/router.interface";
 
 interface Props {
   userId: string;
   open: boolean;
   users: User[];
   userSocket: UserSocket;
-  triggerDrawerOpen: () => void;
   showErrorToast: (error?: AxiosError) => void;
   showSuccessToast: (message: string) => void;
 }
 export default function ListRequested(props: Props) {
-  const {
-    userId,
-    open,
-    users,
-    userSocket,
-    triggerDrawerOpen,
-    showErrorToast,
-    showSuccessToast,
-  } = props;
+  const { userId, open, users, userSocket, showErrorToast, showSuccessToast } =
+    props;
 
+  const navigate = useNavigate();
   const { t } = useTranslation();
   const [profilePictures, setProfilePictures] = React.useState<{
     [key: string]: string;
@@ -133,6 +129,10 @@ export default function ListRequested(props: Props) {
     }
   }
 
+  function navigateToUserProfile(userId: string) {
+    navigate(`/profile/${userId}`);
+  }
+
   return (
     <List>
       {usersState?.map((user: User, index) => (
@@ -144,7 +144,7 @@ export default function ListRequested(props: Props) {
             }}
           >
             <ListItemIcon
-              onClick={triggerDrawerOpen}
+              onClick={() => navigateToUserProfile(user.id)}
               sx={{
                 marginLeft: -1,
               }}
@@ -159,18 +159,20 @@ export default function ListRequested(props: Props) {
               </StyledAvatarBadge>
             </ListItemIcon>
             <ListItemText primary={user.name} sx={{ opacity: open ? 1 : 0 }} />
-            <ListItemButton
-              onClick={() => cancelRequestSent(user.id)}
-              sx={{
-                opacity: open ? 1 : 0,
-                color: "lightcoral",
-                width: "7px",
-                display: "flex",
-                justifyContent: "center",
-              }}
-            >
-              <CloseIcon />
-            </ListItemButton>
+            <Tooltip title="Cancel friendship request">
+              <ListItemButton
+                onClick={() => cancelRequestSent(user.id)}
+                sx={{
+                  opacity: open ? 1 : 0,
+                  color: "lightcoral",
+                  width: "7px",
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+              >
+                <CloseIcon />
+              </ListItemButton>
+            </Tooltip>
           </ListItemButton>
         </ListItem>
       ))}

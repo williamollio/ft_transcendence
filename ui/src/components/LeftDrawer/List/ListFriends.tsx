@@ -8,7 +8,7 @@ import {
   Tooltip,
 } from "@mui/material";
 import ChatIcon from "@mui/icons-material/Chat";
-import { User, UserStatus } from "../../../interfaces/user.interface";
+import { User } from "../../../interfaces/user.interface";
 import React from "react";
 import { fetchProfilePicture } from "../../../utils/picture-helper";
 import friendshipsService from "../../../services/friendships.service";
@@ -23,6 +23,8 @@ import { useUserStore } from "../../../store/users-store";
 import { ChannelSocket } from "../../../classes/ChannelSocket.class";
 import { UserSocket } from "../../../classes/UserSocket.class";
 import { listenerWrapper } from "../../../services/initSocket.service";
+import { useNavigate } from "react-router-dom";
+import { RoutePath } from "../../../interfaces/router.interface";
 
 interface Props {
   userId: string;
@@ -30,7 +32,6 @@ interface Props {
   users: User[];
   channelSocket: ChannelSocket;
   userSocket: UserSocket;
-  triggerDrawerOpen: () => void;
   showErrorToast: (error?: AxiosError) => void;
   showSuccessToast: (message: string) => void;
 }
@@ -43,11 +44,11 @@ export default function ListFriends(props: Props) {
     users,
     channelSocket,
     userSocket,
-    triggerDrawerOpen,
     showErrorToast,
     showSuccessToast,
   } = props;
 
+  const navigate = useNavigate();
   const [profilePictures, setProfilePictures] = React.useState<{
     [key: string]: string;
   }>({});
@@ -150,6 +151,10 @@ export default function ListFriends(props: Props) {
     }
   }
 
+  function navigateToUserProfile(userId: string) {
+    navigate(`/profile/${userId}`);
+  }
+
   return (
     <List>
       {usersState?.map((user: User, index) => (
@@ -161,7 +166,7 @@ export default function ListFriends(props: Props) {
             }}
           >
             <ListItemIcon
-              onClick={triggerDrawerOpen}
+              onClick={() => navigateToUserProfile(user.id)}
               sx={{
                 marginLeft: -1,
               }}
@@ -178,11 +183,7 @@ export default function ListFriends(props: Props) {
                 <Avatar key={user.id} src={profilePictures[user.id]} />
               </StyledAvatarBadge>
             </ListItemIcon>
-            <ListItemText
-              primary={user.name}
-              sx={{ opacity: open ? 1 : 0 }}
-              onClick={triggerDrawerOpen}
-            />
+            <ListItemText primary={user.name} sx={{ opacity: open ? 1 : 0 }} />
             <Tooltip title="Create DM Chat">
               <ListItemButton
                 onClick={() => createDmChat(user)}
@@ -197,18 +198,20 @@ export default function ListFriends(props: Props) {
                 <ChatIcon />
               </ListItemButton>
             </Tooltip>
-            <ListItemButton
-              onClick={() => deleteFriendship(user.id)}
-              sx={{
-                opacity: open ? 1 : 0,
-                color: "lightcoral",
-                width: "7px",
-                display: "flex",
-                justifyContent: "center",
-              }}
-            >
-              <CloseIcon />
-            </ListItemButton>
+            <Tooltip title="Remove friend">
+              <ListItemButton
+                onClick={() => deleteFriendship(user.id)}
+                sx={{
+                  opacity: open ? 1 : 0,
+                  color: "lightcoral",
+                  width: "7px",
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+              >
+                <CloseIcon />
+              </ListItemButton>
+            </Tooltip>
           </ListItemButton>
         </ListItem>
       ))}
