@@ -5,6 +5,7 @@ import {
   ListItemIcon,
   Avatar,
   ListItemText,
+  Tooltip,
 } from "@mui/material";
 import ChatIcon from "@mui/icons-material/Chat";
 import { User } from "../../../interfaces/user.interface";
@@ -19,11 +20,13 @@ import { useTranslation } from "react-i18next";
 import { translationKeys } from "../constants";
 import { useDrawersStore } from "../../../store/drawers-store";
 import { useUserStore } from "../../../store/users-store";
+import { ChannelSocket } from "../../../classes/ChannelSocket.class";
 
 interface Props {
   userId: string;
   open: boolean;
   users: User[];
+  channelSocket: ChannelSocket;
   triggerDrawerOpen: () => void;
   showErrorToast: (error?: AxiosError) => void;
   showSuccessToast: (message: string) => void;
@@ -35,6 +38,7 @@ export default function ListFriends(props: Props) {
     userId,
     open,
     users,
+    channelSocket,
     triggerDrawerOpen,
     showErrorToast,
     showSuccessToast,
@@ -50,6 +54,12 @@ export default function ListFriends(props: Props) {
     (state: { isFriendsCacheUnvalid: any; setisFriendsCacheUnvalid: any }) => [
       state.isFriendsCacheUnvalid,
       state.setisFriendsCacheUnvalid,
+    ]
+  );
+  const [isRightOpen, setIsRightOpen] = useDrawersStore(
+    (state: { isRightOpen: any; setIsRightOpen: any }) => [
+      state.isRightOpen,
+      state.setIsRightOpen,
     ]
   );
   const [isUserCacheInvalid, setIsUserCacheInvalid] = useUserStore(
@@ -82,7 +92,10 @@ export default function ListFriends(props: Props) {
     const image = await fetchProfilePicture(friendId);
     return URL.createObjectURL(image);
   }
-  function createDmChat() {}
+  function createDmChat(user: User) {
+    setIsRightOpen(true);
+    channelSocket.createDm(user);
+  }
 
   async function deleteFriendship(friendId: string) {
     const responseDelete = await friendshipsService.deleteRequest(
@@ -132,18 +145,20 @@ export default function ListFriends(props: Props) {
               sx={{ opacity: open ? 1 : 0 }}
               onClick={triggerDrawerOpen}
             />
-            <ListItemButton
-              onClick={createDmChat}
-              sx={{
-                opacity: open ? 1 : 0,
-                width: "7px",
-                color: theme.palette.secondary.main,
-                display: "flex",
-                justifyContent: "center",
-              }}
-            >
-              <ChatIcon />
-            </ListItemButton>
+            <Tooltip title="Create DM Chat">
+              <ListItemButton
+                onClick={() => createDmChat(user)}
+                sx={{
+                  opacity: open ? 1 : 0,
+                  width: "7px",
+                  color: theme.palette.secondary.main,
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+              >
+                <ChatIcon />
+              </ListItemButton>
+            </Tooltip>
             <ListItemButton
               onClick={() => deleteFriendship(user.id)}
               sx={{

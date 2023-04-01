@@ -163,7 +163,12 @@ export default function App() {
               element={
                 <PrivateRoute
                   setToken={setToken}
-                  children={<Setup2FA userSocket={userSocket} />}
+                  children={
+                    <Setup2FA
+                      userSocket={userSocket}
+                      channelSocket={channelSocket}
+                    />
+                  }
                 ></PrivateRoute>
               }
             />

@@ -270,7 +270,7 @@ export default function ProfileView(props: Props): React.ReactElement {
   return (
     <>
       <Navbar userSocket={userSocket} />
-      <LeftDrawer />
+      <LeftDrawer channelSocket={channelSocket} userSocket={userSocket} />
       <RightDrawer
         channelSocket={channelSocket}
         userSocket={userSocket}

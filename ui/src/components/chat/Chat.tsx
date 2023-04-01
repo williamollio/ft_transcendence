@@ -21,7 +21,7 @@ import RoomContextMenu from "./RoomContextMenu";
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { ChannelTabs } from "./ChannelTabs";
 import ChannelService from "../../services/channel.service";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { UserSocket } from "../../classes/UserSocket.class";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
@@ -45,7 +45,6 @@ export default function Chat(props: Props) {
   const { channelSocket, userSocket, gameSocket } = props;
   const theme = useTheme();
   const scrollRef = useRef<HTMLLIElement | null>(null);
-  const location = useLocation();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const toast = useContext(TranscendanceContext);
@@ -70,12 +69,6 @@ export default function Chat(props: Props) {
   } = useQuery(["blocks"], ChannelService.fetchBlockedUsers, {
     enabled: channelSocket.user.id !== "",
   });
-
-  useEffect(() => {
-    if (location && location.state && location.state.id) {
-      channelSocket.createDm(location.state.id); // TODO : william to implement
-    }
-  }, [location]);
 
   const handleSubmit = async (e: any) => {
     if (e.key === "Enter") {

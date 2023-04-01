@@ -23,15 +23,17 @@ import { TranscendanceStateActionType } from "../../context/transcendance-reduce
 import { TranscendanceContext } from "../../context/transcendance-context";
 import authService from "../../services/auth.service";
 import { UserSocket } from "../../classes/UserSocket.class";
+import { ChannelSocket } from "../../classes/ChannelSocket.class";
 
 const CODE_LENGTH = 6; // number of input fields to render
 
 interface Props {
   userSocket: UserSocket;
+  channelSocket: ChannelSocket;
 }
 
 export default function Setup2FA(props: Props): React.ReactElement {
-  const { userSocket } = props;
+  const { userSocket, channelSocket } = props;
   const navigate = useNavigate();
   const [QRCodeUrl, setQRCodeUrl] = React.useState<string>("");
   const { t } = useTranslation();
@@ -178,7 +180,7 @@ export default function Setup2FA(props: Props): React.ReactElement {
   return (
     <>
       <Navbar userSocket={userSocket} />
-      <LeftDrawer />
+      <LeftDrawer channelSocket={channelSocket} userSocket={userSocket} />
       <Background>
         <ProfileCard>
           <CardContainer>

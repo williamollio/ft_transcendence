@@ -13,7 +13,6 @@ import { Cookie, getTokenData } from "../utils/auth-helper";
 import { fetchProfilePicture } from "../utils/picture-helper";
 import { useDrawersStore } from "../store/drawers-store";
 import { useTheme } from "@mui/material";
-import usersService from "../services/users.service";
 import { UserStatus } from "../interfaces/user.interface";
 import { UserSocket } from "../classes/UserSocket.class";
 import { listenerWrapper } from "../services/initSocket.service";
@@ -35,7 +34,7 @@ export default function NavBar(props: Props): React.ReactElement {
     state.image,
     state.setImage,
   ]);
-  const [isOpen, setIsOpen] = useDrawersStore(
+  const [isRightOpen, setIsRightOpen] = useDrawersStore(
     (state: { isRightOpen: any; setIsRightOpen: any }) => [
       state.isRightOpen,
       state.setIsRightOpen,
@@ -107,13 +106,13 @@ export default function NavBar(props: Props): React.ReactElement {
         <Box
           className={classes.picture}
           sx={{
-            right: isOpen ? 320 : 70,
+            right: isRightOpen ? 320 : 70,
             transition: (theme) =>
               theme.transitions.create("right", {
                 easing: theme.transitions.easing.sharp,
                 duration: theme.transitions.duration.leavingScreen,
               }),
-            ...(isOpen && {
+            ...(isRightOpen && {
               transition: (theme) =>
                 theme.transitions.create("right", {
                   easing: theme.transitions.easing.easeOut,

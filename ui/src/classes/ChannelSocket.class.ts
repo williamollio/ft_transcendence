@@ -1,10 +1,11 @@
 import { Socket } from "socket.io-client";
 import { initSocket } from "../services/initSocket.service";
 import { accessTypes, chatRoom } from "./chatRoom.class";
-import { channelUser, messagesDto, user } from "../interfaces/chat.interface";
+import { messagesDto, user } from "../interfaces/chat.interface";
 import { getTokenData } from "../utils/auth-helper";
 import UserService from "../services/users.service";
 import ChannelService from "../services/channel.service";
+import { User } from "../interfaces/user.interface";
 
 export class ChannelSocket {
   socket: Socket;
@@ -87,7 +88,7 @@ export class ChannelSocket {
     });
   };
 
-  createDm = (otherUser: channelUser) => {
+  createDm = (otherUser: User) => {
     this.socket.emit("createRoom", {
       createInfo: {
         name: otherUser.name,

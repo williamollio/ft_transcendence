@@ -28,6 +28,8 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import { useDrawersStore } from "../../store/drawers-store";
 import { navbarHeight } from "../Navbar";
+import { ChannelSocket } from "../../classes/ChannelSocket.class";
+import { UserSocket } from "../../classes/UserSocket.class";
 
 const drawerWidth = 240;
 const drawerWidthClosed = "4rem";
@@ -105,7 +107,13 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   ...theme.mixins.toolbar,
 }));
 
-export default function MiniDrawer() {
+interface Props {
+  channelSocket: ChannelSocket;
+  userSocket: UserSocket;
+}
+
+export default function LeftDrawer(props: Props) {
+  const { channelSocket, userSocket } = props;
   const { t } = useTranslation();
   const theme = useTheme();
   const [friends, setFriends] = React.useState<User[]>([]);
@@ -267,6 +275,7 @@ export default function MiniDrawer() {
           userId={userId}
           open={open}
           users={friends}
+          channelSocket={channelSocket}
           triggerDrawerOpen={triggerDrawerOpen}
           showErrorToast={showErrorToast}
           showSuccessToast={showSuccessToast}
