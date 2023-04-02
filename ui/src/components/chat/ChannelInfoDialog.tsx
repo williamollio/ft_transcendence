@@ -123,7 +123,6 @@ export default function ChannelInfoDialog(props: Props) {
         hover
         onClick={(e) => handleSelect(e, user)}
         selected={user.id === (selected ? selected.id : false)}
-        // onContextMenu={(e) => handleContextMenu(e, user)}
       >
         <TableCell>{user.name}</TableCell>
         <TableCell>{user.status}</TableCell>
@@ -213,16 +212,6 @@ export default function ChannelInfoDialog(props: Props) {
                 <TableBody>{listUsers}</TableBody>
               </Table>
             </TableContainer>
-            {/* <ChannelInfoContext
-              toggleChannelInfo={toggleChannelInfo}
-              blockedUser={blockedUser}
-              refetchBlockedUsers={refetchBlockedUsers}
-              channel={channel}
-              contextMenu={contextMenu}
-              setContextMenu={setContextMenu}
-              channelSocket={channelSocket}
-              gameSocket={gameSocket}
-            ></ChannelInfoContext> */}
           </Box>
         </Grid>
       </Grid>
