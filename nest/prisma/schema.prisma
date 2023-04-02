@@ -82,10 +82,10 @@ model Message {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    senderId  String
-    sender    User    @relation("messageSender", fields: [senderId], references: [id], onDelete: Cascade)
-    channelId String
-    channel   Channel @relation("channelMessage", fields: [channelId], references: [id], onDelete: Cascade)
+    senderId  	String
+    sender    	User    @relation("messageSender", fields: [senderId], references: [id], onDelete: Cascade)
+	channelId 	String
+    channel   	Channel @relation("channelMessage", fields: [channelId], references: [id], onDelete: Cascade)
 
     @@map("messages")
 }

@@ -1,12 +1,17 @@
 import {
   Box,
+  Button,
+  ClickAwayListener,
   Divider,
   Grid,
   List,
   ListItem,
+  ListItemButton,
   ListItemText,
   Paper,
   TextField,
+  Tooltip,
+  Typography,
 } from "@mui/material";
 import { useContext, useEffect, useRef, useState } from "react";
 import {
@@ -14,6 +19,9 @@ import {
   failEvents,
   ContextMenu,
   RoomInvite,
+  channelUser,
+  ChannelInfoContextMenu,
+  user,
 } from "../../interfaces/chat.interface";
 import { accessTypes, chatRoom } from "../../classes/chatRoom.class";
 import AddChannelDialog from "./AddChannelDialog";
@@ -34,6 +42,7 @@ import { TranscendanceStateActionType } from "../../context/transcendance-reduce
 import { ToastType } from "../../context/toast";
 import { listenerWrapper } from "../../services/initSocket.service";
 import { RoutePath } from "../../interfaces/router.interface";
+import UserContext from "./UserContext";
 
 interface Props {
   channelSocket: ChannelSocket;
@@ -59,6 +68,8 @@ export default function Chat(props: Props) {
     type: "PRIVATE",
     name: "",
   });
+  const [userContextMenu, setUserContextMenu] =
+    useState<ChannelInfoContextMenu | null>(null);
 
   const {
     data: blockedUsers,
@@ -75,15 +86,20 @@ export default function Chat(props: Props) {
       if (
         currentRoom &&
         typeof currentRoom !== "boolean" &&
+        currentRoom.id &&
         e.target.value.trim()
       ) {
         currentRoom.messages.push({
-          message: `[${t(translationKeys.chatInfo.you)}]: ` + e.target.value,
-          room: currentRoom.id,
+          userId: channelSocket.user.id,
+          userName: channelSocket.user.name,
+          content: e.target.value,
+          channelId: currentRoom.id,
         });
         channelSocket.messageRoom({
-          message: "[" + channelSocket.user.name + "]: " + e.target.value,
-          room: currentRoom.id,
+          userId: channelSocket.user.id,
+          userName: channelSocket.user.name,
+          content: e.target.value,
+          channelId: currentRoom.id,
         });
         updateMessages(currentRoom, undefined);
       }
@@ -105,6 +121,20 @@ export default function Chat(props: Props) {
     }
   };
 
+  const handleUserContextMenu = (event: any, user: user, channelId: string) => {
+    event.preventDefault();
+    setUserContextMenu(
+      userContextMenu === null
+        ? {
+            mouseX: event.clientX + 2,
+            mouseY: event.clientY - 6,
+            user: user,
+            channelId: channelId,
+          }
+        : null
+    );
+  };
+
   const updateMessages = (
     channel: chatRoom,
     incChannelId: string | undefined
@@ -123,6 +153,8 @@ export default function Chat(props: Props) {
 
   const incomingMessageListener = (data: {
     messageInfo: {
+      userId: string;
+      userName: string;
       channelId: string;
       content: string;
     };
@@ -135,8 +167,10 @@ export default function Chat(props: Props) {
         );
         if (index >= 0) {
           channelSocket.channels[index].messages.push({
-            message: data.messageInfo.content,
-            room: data.messageInfo.channelId,
+            userId: data.messageInfo.userId,
+            userName: data.messageInfo.userName,
+            content: data.messageInfo.content,
+            channelId: data.messageInfo.channelId,
           });
           updateMessages(
             channelSocket.channels[index],
@@ -154,8 +188,10 @@ export default function Chat(props: Props) {
     if (index >= 0) {
       ChannelService.getUserName(data.userId).then((res) => {
         channelSocket.channels[index].messages.push({
-          message: `${res.data.name} ${t(translationKeys.chatInfo.userLeft)}`,
-          room: data.channelId,
+          userId: data.userId,
+          userName: res.data.name,
+          content: `${t(translationKeys.chatInfo.userLeft)}`,
+          channelId: data.channelId,
         });
         updateMessages(channelSocket.channels[index], data.channelId);
       });
@@ -169,8 +205,10 @@ export default function Chat(props: Props) {
     if (index >= 0) {
       ChannelService.getUserName(data.userId).then((res) => {
         channelSocket.channels[index].messages.push({
-          message: `${res.data.name} ${t(translationKeys.chatInfo.userJoined)}`,
-          room: data.channelId,
+          userId: data.userId,
+          userName: res.data.name,
+          content: `${t(translationKeys.chatInfo.userJoined)}`,
+          channelId: data.channelId,
         });
         updateMessages(channelSocket.channels[index], data.channelId);
       });
@@ -241,9 +279,12 @@ export default function Chat(props: Props) {
       const mutedChannel = channelSocket.channels.find(
         (element) => element.id === result.channelActionOnChannelId
       );
-      if (mutedChannel) {
+      if (mutedChannel && mutedChannel.id) {
         mutedChannel.messages.push({
-          message: t(translationKeys.chatInfo.muted),
+          userId: channelSocket.user.id,
+          userName: t(translationKeys.chatInfo.notice),
+          content: t(translationKeys.chatInfo.muted),
+          channelId: mutedChannel.id,
         });
         updateMessages(mutedChannel, result.channelActionOnChannelId);
       }
@@ -310,7 +351,7 @@ export default function Chat(props: Props) {
 
   const listMessages = messages
     ? messages.map((messagesDto: messagesDto, index) => {
-        if (messagesDto && messagesDto.message !== "") {
+        if (messagesDto && messagesDto.content !== "") {
           return (
             <ListItem
               disablePadding
@@ -318,7 +359,27 @@ export default function Chat(props: Props) {
               ref={scrollRef}
               key={index}
             >
-              <ListItemText primary={messagesDto.message} />
+              <ListItemButton
+                disableRipple
+                disableGutters
+                onClick={(event) =>
+                  handleUserContextMenu(
+                    event,
+                    { id: messagesDto.userId, name: messagesDto.userName },
+                    messagesDto.channelId
+                  )
+                }
+                sx={{ maxWidth: "min-content", boxSizing: "border-box" }}
+              >
+                <Typography fontSize={15} sx={{ whiteSpace: "pre-wrap" }}>
+                  {"[" +
+                    (messagesDto.userId === channelSocket.user.id
+                      ? t(translationKeys.chatInfo.you)
+                      : messagesDto.userName) +
+                    "]: "}
+                </Typography>
+              </ListItemButton>
+              <ListItemText primary={messagesDto.content} />
             </ListItem>
           );
         }
@@ -419,6 +480,14 @@ export default function Chat(props: Props) {
         label={t(translationKeys.createInfo.password)}
         type="password"
       ></GetTextInputDialog>
+      <UserContext
+        blockedUser={blockedUsers}
+        refetchBlockedUsers={refetchBlockedUsers}
+        contextMenu={userContextMenu}
+        setContextMenu={setUserContextMenu}
+        channelSocket={channelSocket}
+        gameSocket={gameSocket}
+      />
     </Paper>
   );
 }

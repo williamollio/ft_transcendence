@@ -26,12 +26,14 @@ import { IncomingMessageDto } from './dto/incomingMessage.dto';
 import { Response } from 'express';
 import { ModerateChannelDto } from './dto/moderateChannelUser.dto';
 import { BlockService } from 'src/block/block.service';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class ChannelService {
   constructor(
     private prisma: PrismaService,
     private readonly blockService: BlockService,
+    private readonly userService: UsersService,
   ) {}
 
   getChannels() {
@@ -56,6 +58,7 @@ export class ChannelService {
       id: string;
       name: string;
       type: ChannelType;
+      messages: Message[];
     }[] = await this.prisma.channel.findMany({
       where: {
         users: {
@@ -87,7 +90,36 @@ export class ChannelService {
     //     else if (channelUser) channel.name = channelUser[0].name;
     //   }
     // }
-    return channels;
+    const channelDto: {
+      id: string;
+      name: string;
+      type: ChannelType;
+      messages: IncomingMessageDto[];
+    }[] = new Array<{
+      id: string;
+      name: string;
+      type: ChannelType;
+      messages: IncomingMessageDto[];
+    }>();
+    for (const channel of channels) {
+      const channelMessages = new Array<IncomingMessageDto>();
+      for (const message of channel.messages) {
+        const userName = await this.userService.getUserName(message.senderId);
+        channelMessages.push({
+          channelId: channel.id,
+          content: message.content,
+          userId: message.senderId,
+          userName: userName ? userName : 'missing',
+        });
+      }
+      channelDto.push({
+        id: channel.id,
+        name: channel.name,
+        type: channel.type,
+        messages: channelMessages,
+      });
+    }
+    return channelDto;
   }
 
   getChannelById(channelId: string) {
@@ -106,7 +138,7 @@ export class ChannelService {
     });
   }
 
-  getChannelByUserId(userId: string, channelId: string) {
+  async getChannelByUserId(userId: string, channelId: string) {
     return this.prisma.channelUser.findUnique({
       where: {
         userId_channelId: {
@@ -391,7 +423,7 @@ export class ChannelService {
         },
       });
       if (objMessages) {
-        return res.status(200).send(objMessages.messages);
+        return res.status(200).send(objMessages);
       } else {
         return res.status(500).send();
       }

@@ -14,12 +14,14 @@ import {
   channelUser,
   ContextMenu,
   DBChannelElement,
+  messagesDto,
 } from "../../interfaces/chat.interface";
 import ChannelService from "../../services/channel.service";
 import { translationKeys } from "./constants";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "@mui/material";
 import { listenerWrapper } from "../../services/initSocket.service";
+import { Message } from "@mui/icons-material";
 
 interface Props {
   currentRoom: chatRoom | boolean;
@@ -52,12 +54,10 @@ export function ChannelTabs(props: Props) {
     channelSocket.channels
   );
 
-  const removeBlockedMessages = (
-    messages: { content: string; senderId: string }[]
-  ) => {
-    let newList = new Array<{ content: string; senderId: string }>();
+  const removeBlockedMessages = (messages: messagesDto[]) => {
+    let newList = new Array<messagesDto>();
     messages.forEach((message) => {
-      if (!blockedUsers.some((user) => message.senderId === user))
+      if (!blockedUsers.some((user) => message.userId === user))
         newList.push(message);
     });
     return newList;
@@ -102,19 +102,7 @@ export function ChannelTabs(props: Props) {
               id: element.id,
               access: element.type,
               users: new Array<channelUser>(),
-              messages: element.messages.map((message: { content: string }) => {
-                if (
-                  message.content.startsWith(`[${channelSocket.user.name}]`)
-                ) {
-                  return {
-                    message: message.content.replace(
-                      `[${channelSocket.user.name}]`,
-                      `[${t(translationKeys.chatInfo.you)}]`
-                    ),
-                  };
-                }
-                return { message: message.content };
-              }),
+              messages: element.messages,
             });
             channelSocket.channels = newList;
             updateChannelList();
@@ -130,23 +118,7 @@ export function ChannelTabs(props: Props) {
                   id: element.id,
                   access: element.type,
                   users: new Array<channelUser>(),
-                  messages: element.messages.map(
-                    (message: { content: string }) => {
-                      if (
-                        message.content.startsWith(
-                          `[${channelSocket.user.name}]`
-                        )
-                      ) {
-                        return {
-                          message: message.content.replace(
-                            `[${channelSocket.user.name}]`,
-                            `[${t(translationKeys.chatInfo.you)}]`
-                          ),
-                        };
-                      }
-                      return { message: message.content };
-                    }
-                  ),
+                  messages: element.messages,
                 });
               }
               channelSocket.channels = newList;

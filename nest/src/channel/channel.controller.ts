@@ -111,6 +111,7 @@ export class ChannelController {
   ) {
     return this.channelService.getMessagesFromChannel(channelId, userId, res);
   }
+  
   @Get('get-authors-from-channel/:id')
   getAuthorsFromAChannel(@Param('id') channelId: string) {
     return this.channelService.getChannelAuthors(channelId);
