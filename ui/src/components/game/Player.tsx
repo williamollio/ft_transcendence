@@ -19,7 +19,7 @@ export default function Player(props: Props) {
             top: posRef.offsetTop + yPos,
             ...(lr
               ? { left: 10 + posRef.offsetLeft }
-              : { left: 570 + posRef.offsetLeft }),
+              : { left: 642 + posRef.offsetLeft }),
             ...(!lr
               ? {
                   backgroundColor: "black",

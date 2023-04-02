@@ -17,5 +17,5 @@ export const initSocket = (uri: string, tokenPart: string | null) => {
 export const listenerWrapper = (callback: () => boolean) => {
   const interval: NodeJS.Timer = setInterval(() => {
     if (callback()) clearInterval(interval);
-  }, 500);
+  }, 1000);
 };

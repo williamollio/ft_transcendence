@@ -6,6 +6,7 @@ import { Socket } from 'socket.io';
 import { Status, Game, DoubleKeyMap, GameMode } from './entities/game.entity';
 import { Root } from 'protobufjs';
 import { gameSocketToUserId } from './socketToUserIdStorage.service';
+import { UserStatus } from '@prisma/client';
 
 @Injectable()
 export class GameService {
@@ -51,47 +52,6 @@ export class GameService {
       } catch (error) {}
     }
   }
-
-  // async createInvitationGame(
-  //   client: Socket,
-  //   server: Server,
-  //   p1id: string,
-  //   p2id: string,
-  //   gameMode: GameMode,
-  // ) {
-  //   const opponentSocket = socketToUserId.getFromUserId(p2id);
-  //   if (opponentSocket) {
-  //     if (this.GameMap.getGame(p2id) !== null) {
-  //       server
-  //         .to(client.id)
-  //         .emit(
-  //           'inviteRefused',
-  //           'Your opponent already has an invite pending, try again later',
-  //         );
-  //       return 'inviteFailed';
-  //     }
-  //     try {
-  //       const challenger = await this.prismaService.user.findUnique({
-  //         where: {
-  //           id: p1id,
-  //         },
-  //         select: {
-  //           id: true,
-  //           name: true,
-  //           eloScore: true,
-  //           status: true,
-  //         },
-  //       });
-
-  //       this.createGame(p1id, gameMode, p2id);
-  //       await this.join(client, p1id, server, gameMode);
-  //       client.to(opponentSocket).emit('invitedToGame', challenger);
-  //       return 'gameJoined';
-  //     } catch (error) {
-  //       return 'inviteFailed';
-  //     }
-  //   }
-  // }
 
   async leaveWatch(client: Socket, playerId: string) {
     const game = this.GameMap.getGame(playerId);
@@ -152,43 +112,49 @@ export class GameService {
       game.p2id = userId;
       await client.join(game.gameRoomId);
       server.to(client.id).emit('gameJoined', { playerNumber: 2 });
-      server.to(game.gameRoomId).emit('gameStarting');
       await this.sleep(5000);
       this.mutateGameStatus(game, Status.PLAYING, server);
-      this.addInterval(game.gameRoomId, userId, 16, server);
-      return { playerNumber: 2 };
+      this.addInterval(game.gameRoomId, userId, 30, server);
+      return;
     } else {
       // Joining a random game
       if (this.GameMap.size === 0) {
         game = this.createGame(userId, mode);
         await client.join(game.gameRoomId);
-        return { playerNumber: 1 };
+        server.to(client.id).emit('gameJoined', { playerNumber: 1 });
+        return;
       } else {
         if ((game = this.GameMap.rejoinGame(userId)) != null) {
           await client.join(game.gameRoomId);
+          server
+            .to(client.id)
+            .emit(
+              'gameJoined',
+              game.p1id === userId ? { playerNumber: 1 } : { playerNumber: 2 },
+            );
           if (game.status === Status.PAUSED) {
+            await this.sleep(5000);
             this.mutateGameStatus(game, Status.PLAYING, server);
             this.deleteTimeout(game.gameRoomId);
-            this.addInterval(game.gameRoomId, userId, 16, server);
+            this.addInterval(game.gameRoomId, userId, 30, server);
           } else if (game.status === Status.PENDING && game.p2id === userId) {
+            await this.sleep(5000);
             this.mutateGameStatus(game, Status.PLAYING, server);
-            this.addInterval(game.gameRoomId, userId, 16, server);
-          }
-          if (game.p2id === userId) return { playerNumber: 2 };
-          return { playerNumber: 1 };
+            this.addInterval(game.gameRoomId, userId, 30, server);
+          } else server.to(client.id).emit('gameStarting');
+          return;
         }
         if ((game = this.GameMap.matchPlayer(userId))) {
           await client.join(game.gameRoomId);
           server.to(client.id).emit('gameJoined', { playerNumber: 2 });
-          server.to(game.gameRoomId).emit('gameStarting');
           await this.sleep(5000);
           this.mutateGameStatus(game, Status.PLAYING, server);
-          this.addInterval(game.gameRoomId, userId, 16, server);
-          return { playerNumber: 2 };
+          this.addInterval(game.gameRoomId, userId, 30, server);
+          return;
         }
         game = this.createGame(userId, mode);
         await client.join(game.gameRoomId);
-        return { playerNumber: 1 };
+        server.to(client.id).emit('gameJoined', { playerNumber: 1 });
       }
     }
   }
@@ -221,6 +187,23 @@ export class GameService {
       return 'inviteFailed';
     }
 
+    // Check if invited user is online
+    let invitedUser;
+    try {
+      invitedUser = await this.prismaService.user.findUnique({
+        where: { id: invitedUserId },
+        select: { status: true },
+      });
+    } catch (error) {
+      console.error('Error retrieving user data:', error);
+      initiatingSocket.emit('inviteRefused', 'Failed to retrieve user data.');
+      return 'inviteFailed';
+    }
+
+    if (invitedUser?.status === UserStatus.OFFLINE) {
+      initiatingSocket.emit('inviteRefused', 'Your opponent is offline.');
+      return 'inviteFailed';
+    }
     // Create a new game room and add the initiating user to it as player 1
     const game = this.createGame(initiatingUserId, gameMode, invitedUserId);
     await this.join(
@@ -307,7 +290,7 @@ export class GameService {
       if (!game) return;
       void game.saveGameResults(this.prismaService);
       this.mutateGameStatus(game, Status.DONE, server);
-      server.to(game.gameRoomId).emit('matchFinished');
+      server.to(game.gameRoomId).emit('matchFinished', winnerId);
     };
 
     setTimeout(callback, milliseconds);
@@ -388,8 +371,12 @@ export class GameService {
       server.to(gameRoomId).volatile.timeout(5000).emit('GI', payload);
     };
 
-    const interval = setInterval(callback, milliseconds);
-    this.schedulerRegistry.addInterval(gameRoomId, interval);
+    try {
+      this.schedulerRegistry.getInterval(gameRoomId);
+    } catch (err) {
+      const interval = setInterval(callback, milliseconds);
+      this.schedulerRegistry.addInterval(gameRoomId, interval);
+    }
   }
 
   deleteInterval(name: string) {

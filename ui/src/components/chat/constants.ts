@@ -73,5 +73,6 @@ export const translationKeys = {
     inviteTo: "Invite to Room: ",
     roomInvite: "Room Invitation",
     userName: "User-Name",
+    gameInvite: "Game Inviation",
   },
 };

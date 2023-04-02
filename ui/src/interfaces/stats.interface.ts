@@ -3,8 +3,8 @@ export interface leaderBoardEntry {
   name: string;
   rank: number;
   rating: number;
-//   wins: number;
-//   loss: number;
+  wins: number;
+  loss: number;
   image: string;
 }
 
@@ -34,8 +34,8 @@ export interface MatchHistoryDto {
 }
 
 export interface playerStats {
-	currentRating: number;
-	rank: number;
-	gamesWon: number;
-	gamesLost: number;
+  currentRating: number;
+  rank: number;
+  gamesWon: number;
+  gamesLost: number;
 }

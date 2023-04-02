@@ -15,8 +15,14 @@ import usersService from "../../services/users.service";
 import { AxiosError } from "axios";
 import { ToastType } from "../../context/toast";
 import { TranscendanceStateActionType } from "../../context/transcendance-reducer";
+import { UserSocket } from "../../classes/UserSocket.class";
 
-export default function LoginView(): React.ReactElement {
+interface Props {
+  userSocket: UserSocket;
+}
+
+export default function LoginView(props: Props): React.ReactElement {
+  const { userSocket } = props;
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { dispatchTranscendanceState } = React.useContext(TranscendanceContext);
@@ -28,8 +34,9 @@ export default function LoginView(): React.ReactElement {
   React.useEffect(() => {
     const token = localStorage.getItem(Cookie.TOKEN);
     if (token !== null) {
-      navigate(RoutePath.PROFILE);
+      navigate(RoutePath.EDITPROFILE);
     }
+    if (userSocket.socket.connected) userSocket.logOut();
     setIsLoading(false);
   }, []);
 
@@ -59,7 +66,7 @@ export default function LoginView(): React.ReactElement {
       showErrorToast(response.error);
       localStorage.removeItem(Cookie.TOKEN);
     } else {
-      navigate(RoutePath.PROFILE);
+      navigate(RoutePath.EDITPROFILE);
     }
   }
 

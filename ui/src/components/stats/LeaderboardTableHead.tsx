@@ -14,7 +14,7 @@ export default function LeaderboardTableHead() {
         <TableCell align="left">{t(translationKeys.rank)}</TableCell>
         <TableCell align="center">{t(translationKeys.player)}</TableCell>
         <TableCell align="center">{t(translationKeys.rating)}</TableCell>
-        {/* <TableCell align="center">{t(translationKeys.winLoss)}</TableCell> */}
+        <TableCell align="center">{t(translationKeys.winLoss)}</TableCell>
         <TableCell align="center" sx={{ width: "90px" }}>
           {t(translationKeys.history)}
         </TableCell>

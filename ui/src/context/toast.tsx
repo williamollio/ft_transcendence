@@ -17,12 +17,11 @@ interface Props {
   title?: string;
   message?: string;
   autoClose?: boolean;
+  autoCloseDelay?: number;
   onClose: () => void;
   onAccept?: () => void;
   onRefuse?: () => void;
 }
-
-const TOAST_TIMEOUT = 4000;
 
 export default function Toast(props: Props): React.ReactElement {
   const {
@@ -30,6 +29,7 @@ export default function Toast(props: Props): React.ReactElement {
     title,
     message,
     autoClose = true,
+	autoCloseDelay = 4000,
     onClose,
     onRefuse,
     onAccept,
@@ -44,7 +44,7 @@ export default function Toast(props: Props): React.ReactElement {
     if (autoClose) {
       setTimeout(() => {
         onClose();
-      }, TOAST_TIMEOUT);
+      }, autoCloseDelay);
     }
   });
 

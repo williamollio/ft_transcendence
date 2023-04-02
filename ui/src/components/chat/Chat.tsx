@@ -21,7 +21,7 @@ import RoomContextMenu from "./RoomContextMenu";
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { ChannelTabs } from "./ChannelTabs";
 import ChannelService from "../../services/channel.service";
-import { useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { UserSocket } from "../../classes/UserSocket.class";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
@@ -33,6 +33,7 @@ import { TranscendanceContext } from "../../context/transcendance-context";
 import { TranscendanceStateActionType } from "../../context/transcendance-reducer";
 import { ToastType } from "../../context/toast";
 import { listenerWrapper } from "../../services/initSocket.service";
+import { RoutePath } from "../../interfaces/router.interface";
 
 interface Props {
   channelSocket: ChannelSocket;
@@ -43,6 +44,10 @@ interface Props {
 export default function Chat(props: Props) {
   const { channelSocket, userSocket, gameSocket } = props;
   const theme = useTheme();
+  const scrollRef = useRef<HTMLLIElement | null>(null);
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const toast = useContext(TranscendanceContext);
 
   const [open, toggleOpen] = useState(false);
   const [messages, setMessages] = useState<Array<messagesDto>>([]);
@@ -54,11 +59,6 @@ export default function Chat(props: Props) {
     type: "PRIVATE",
     name: "",
   });
-  const scrollRef = useRef<HTMLLIElement | null>(null);
-  const location = useLocation();
-  const { t } = useTranslation();
-
-  const toast = useContext(TranscendanceContext);
 
   const {
     data: blockedUsers,
@@ -69,12 +69,6 @@ export default function Chat(props: Props) {
   } = useQuery(["blocks"], ChannelService.fetchBlockedUsers, {
     enabled: channelSocket.user.id !== "",
   });
-
-  useEffect(() => {
-    if (location && location.state && location.state.id) {
-      channelSocket.createDm(location.state.id); // TODO : william to implement
-    }
-  }, [location]);
 
   const handleSubmit = async (e: any) => {
     if (e.key === "Enter") {
@@ -195,13 +189,36 @@ export default function Chat(props: Props) {
         toast: {
           type: ToastType.INVITE,
           title: t(translationKeys.invite.roomInvite) as string,
-          message: `${t(translationKeys.invite.inviteTo) as string} ${data.name}`,
-		  autoClose: false,
+          message: `${t(translationKeys.invite.inviteTo) as string} ${
+            data.name
+          }`,
+          autoClose: false,
           onAccept: () => handleInviteSubmit(data),
           onRefuse: () => {},
         },
       });
     }
+  };
+
+  const invitedToGameListener = (data: any) => {
+    toast.dispatchTranscendanceState({
+      type: TranscendanceStateActionType.TOGGLE_TOAST,
+      toast: {
+        type: ToastType.INVITE,
+        title: t(translationKeys.invite.gameInvite) as string,
+        message: `${data.initiatingUser.name} ${
+          t(translationKeys.invite.inviteTo) as string
+        }
+            ${data.game.mode === "CLASSIC" ? "Classic" : "Mayhem"}`,
+        autoClose: true,
+        autoCloseDelay: 9500,
+        onAccept: () => {
+          gameSocket.joinGame(data.game.mode, data.initiatingUser.id);
+          navigate(RoutePath.GAME);
+        },
+        onRefuse: () => gameSocket.refuseInvite(data.initiatingUser.id),
+      },
+    });
   };
 
   const banSuccessListener = (result: {
@@ -260,6 +277,7 @@ export default function Chat(props: Props) {
             failedListener(error, element)
           );
         });
+        gameSocket.socket.on("invitedToGame", invitedToGameListener);
         return true;
       }
       return false;
@@ -282,6 +300,7 @@ export default function Chat(props: Props) {
           failEvents.forEach((element) => {
             channelSocket.removeListener(element, failedListener);
           });
+          gameSocket.socket.off("invitedToGame", invitedToGameListener);
           return true;
         }
         return false;
@@ -332,7 +351,7 @@ export default function Chat(props: Props) {
       <Box
         sx={{
           width: "300px",
-          height: "87.9%", // TODO : responsiveness to be adapted
+          height: "85.9%", // TODO : responsiveness to be adapted
         }}
       >
         <ChannelTabs
@@ -355,8 +374,8 @@ export default function Chat(props: Props) {
           gameSocket={gameSocket}
         ></RoomContextMenu>
         <Divider></Divider>
-        <Grid container maxWidth="100%" height="100%" flexDirection="column">
-          <Grid item flexGrow={1} sx={{ maxHeight: "90%" }}>
+        <Grid container height="100%">
+          <Grid item height="100%">
             <List
               dense
               disablePadding
@@ -376,12 +395,14 @@ export default function Chat(props: Props) {
             toggleOpen={toggleOpen}
             channelSocket={channelSocket}
           ></AddChannelDialog>
+
           <Grid item alignSelf={"flex-end"}>
+            <Box
+              sx={{ bgcolor: "grey.300", width: "300px", height: "1rem" }}
+            ></Box>
             <TextField
-              variant="filled"
-              size="small"
               label={t(translationKeys.chat)}
-              sx={{ width: "300px", input: { color: "white" } }}
+              sx={{ width: "300px", marginTop: "-1px" }}
               onKeyDown={handleSubmit}
             />
           </Grid>

@@ -8,12 +8,12 @@ export class positionalData {
   constructor() {
     this.playerLeftYOffset = 175;
     this.playerRightYOffset = 175;
-    this.ballOffset = { x: 285, y: 210 };
+    this.ballOffset = { x: 321, y: 210 };
   }
 
   resetPositions = () => {
     this.playerLeftYOffset = 175;
     this.playerRightYOffset = 175;
-    this.ballOffset = { x: 285, y: 210 };
+    this.ballOffset = { x: 321, y: 210 };
   };
 }

@@ -152,12 +152,12 @@ export class Game {
   }
   // those are the constants that are used in the game (Henric can adjust them)
   gameConstants = {
-    relativeGameWidth: 600,
-    relativeMiddleX: 300,
+    relativeGameWidth: 672,
+    relativeMiddleX: 336,
     relativeGameHeight: 450,
     relativeMiddleY: 225,
     player1PaddlePosX: 30,
-    player2PaddlePosX: 570,
+    player2PaddlePosX: 642,
     paddleWidth: 20,
     ballHeight: 30,
     maxSpeed: 0,
@@ -172,7 +172,7 @@ export class Game {
   diry = 0.0;
   p1y = 225;
   p2y = 225;
-  bx = 300;
+  bx = 336;
   by = 225;
   p1s = 0;
   p2s = 0;
@@ -196,16 +196,17 @@ export class Game {
       (player === 1
         ? ballX - ballHeight / 2 <= paddleX
         : ballX + ballHeight / 2 >= paddleX) &&
-      ballY + ballHeight >= paddleY - paddleSize / 2 &&
-      ballY - ballHeight <= paddleY + paddleSize / 2;
+      ballY + ballHeight / 2 >= paddleY - paddleSize / 2 &&
+      ballY - ballHeight / 2 <= paddleY + paddleSize / 2;
     return isColliding;
   }
 
   // Classic Game reset
-  resetBallForClassicMode(): void {
+  resetBallForClassicMode(playerScored: number): void {
     const MIN_RANDOM_Y_SPEED = -5;
     const MAX_RANDOM_Y_SPEED = 5;
     this.dirx = this.gameConstants.speeds[(this.gameConstants.speed = 0)];
+    if (playerScored === 1) this.dirx *= -1;
     this.bx = this.gameConstants.relativeMiddleX;
     this.by = this.gameConstants.relativeMiddleY;
     this.diry = generateRandomNumber(MIN_RANDOM_Y_SPEED, MAX_RANDOM_Y_SPEED);
@@ -315,7 +316,7 @@ export class Game {
       }
       switch (this.mode) {
         case GameMode.CLASSIC: {
-          this.resetBallForClassicMode();
+          this.resetBallForClassicMode(1);
           break;
         }
         case GameMode.MAYHEM: {
@@ -333,7 +334,7 @@ export class Game {
       }
       switch (this.mode) {
         case GameMode.CLASSIC: {
-          this.resetBallForClassicMode();
+          this.resetBallForClassicMode(2);
           break;
         }
         case GameMode.MAYHEM: {

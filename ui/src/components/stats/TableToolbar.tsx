@@ -1,5 +1,7 @@
 import { TextField, Toolbar } from "@mui/material";
 import { useState } from "react";
+import { translationKeys } from "../../views/Stats/constants";
+import { useTranslation } from "react-i18next";
 
 interface Props {
   filter: (filterValue: string) => void;
@@ -7,6 +9,7 @@ interface Props {
 
 export default function TableToolbar(props: Props) {
   const { filter } = props;
+  const { t } = useTranslation();
 
   const [value, setValue] = useState<string>("");
 
@@ -20,7 +23,8 @@ export default function TableToolbar(props: Props) {
       <TextField
         sx={{ marginLeft: "auto" }}
         size="small"
-		value={value}
+        label={t(translationKeys.filter)}
+        value={value}
         onChange={handleChange}
       ></TextField>
     </Toolbar>

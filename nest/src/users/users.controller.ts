@@ -12,7 +12,6 @@ import {
   UploadedFile,
   Res,
   UseGuards,
-  ForbiddenException,
 } from '@nestjs/common';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
 import { UsersService } from './users.service';
@@ -23,7 +22,6 @@ import {
   ApiOkResponse,
   ApiResponse,
   ApiTags,
-  ApiOperation,
 } from '@nestjs/swagger';
 import { UserEntity } from './entities/user.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -37,7 +35,6 @@ import {
   imageFileFilter,
   maxSizeLimit,
 } from './utils/upload-utils';
-import { LeaderboardEntity } from './entities/leaderboard.entity';
 
 @Controller('users')
 @UseGuards(JwtGuard)
@@ -55,7 +52,6 @@ export class UsersController {
   @Get()
   @ApiOkResponse({ type: UserEntity, isArray: true })
   public async findAll(@Res() res: Response) {
-    console.log('findAll');
     return this.usersService.findAll(res);
   }
 
@@ -81,7 +77,6 @@ export class UsersController {
     try {
       return await this.usersService.update(id, updateUserDto);
     } catch (error) {
-      console.error(error);
       throw new HttpException(
         'This user cant be updated',
         HttpStatus.BAD_REQUEST,
@@ -129,12 +124,10 @@ export class UsersController {
       const filePath = path.resolve(`./uploads/profileimages/${filename}`);
       fs.unlink(filePath, (err) => {
         if (err) {
-          console.error(err);
           return err;
         }
       });
     }
-
     this.usersService.setFilename(file.filename, id);
     return of({ imagePath: file.filename });
   }
@@ -152,7 +145,6 @@ export class UsersController {
       res.contentType('image/jpeg');
       return res.send(image);
     } catch (error) {
-      console.error(error);
       throw new HttpException(
         'Error when trying to send the file',
         HttpStatus.BAD_REQUEST,
@@ -164,8 +156,8 @@ export class UsersController {
   @Get('get-user-matches-stats/:id')
   @UseGuards(JwtGuard)
   @ApiOkResponse({ type: UserEntity })
-  getUserMatchesStats(@Param('id') id: string, @Res() res: Response) {
-    return this.usersService.getUserMatchesStats(id, res);
+  getUserMatchesStats(@Param('id') id: string) {
+    return this.usersService.getUserMatchesStats(id);
   }
 
   @Get('get-user-match-history/:id')

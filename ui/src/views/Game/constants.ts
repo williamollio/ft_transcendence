@@ -1,5 +1,16 @@
 export const translationKeys = {
   game: "game",
-  inviteTo: " invited you to play ",
-  gameInvite: "Game Inviation",
+  invite: {
+    inviteTo: " invited you to play ",
+    inviteRefused: "Invitation Refused",
+    failed: "Failed!",
+  },
+  gameMode: {
+	classic: "Classic Pong Game",
+	mayhem: "Pong MAYHEM",
+  },
+  gameEndState: {
+	win: "Victory!",
+	loss: "Defeat!",
+  },
 };

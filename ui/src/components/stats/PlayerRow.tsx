@@ -1,6 +1,5 @@
 import {
   Avatar,
-  Collapse,
   Grid,
   IconButton,
   TableCell,
@@ -20,7 +19,7 @@ interface Props {
 
 export default function PlayerRow(props: Props) {
   const { player, findName } = props;
-  const [open, toggleOpen] = useState(false);
+  const [open, toggleOpen] = useState<boolean>(false);
   const [openView, toggleOpenView] = useState<boolean>(false);
 
   return (
@@ -37,7 +36,7 @@ export default function PlayerRow(props: Props) {
                   width: "45px",
                   height: "45px",
                 }}
-                src={player.image ? player.image : ""}
+                src={player.image}
               />
             </Grid>
             <Grid item marginLeft="10px">
@@ -46,14 +45,14 @@ export default function PlayerRow(props: Props) {
           </Grid>
         </TableCell>
         <TableCell align="center">{player.rating}</TableCell>
-        {/* <TableCell align="center">
+        <TableCell align="center">
           {player.wins}:{player.loss}
-        </TableCell> */}
+        </TableCell>
         <TableCell align="right">
           <IconButton
             onClick={() => {
               toggleOpen(!open);
-			  openView ? toggleOpenView(false) : false;
+              openView ? toggleOpenView(false) : false;
             }}
           >
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
@@ -66,7 +65,13 @@ export default function PlayerRow(props: Props) {
           sx={{ paddingBottom: 0, paddingTop: 0 }}
           colSpan={5}
         >
-          <MatchHistory open={open} playerId={player.id} findName={findName} openView={openView} toggleOpenView={toggleOpenView}/>
+          <MatchHistory
+            open={open}
+            playerId={player.id}
+            findName={findName}
+            openView={openView}
+            toggleOpenView={toggleOpenView}
+          />
         </TableCell>
       </TableRow>
     </>

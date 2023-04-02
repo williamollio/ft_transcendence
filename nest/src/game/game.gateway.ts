@@ -59,9 +59,15 @@ export class GameGateway {
     const id = this.socketToId.get(client.id);
     if (id) this.gameService.pause(id, this.server);
   }
+
   @SubscribeMessage('reJoin')
-  rejoin(@GetCurrentUserId() userId: string) {
-    return this.gameService.rejoin(userId);
+  rejoin(
+    @GetCurrentUserId() userId: string,
+    @ConnectedSocket() client: Socket,
+  ) {
+    const game = this.gameService.rejoin(userId);
+    this.server.to(client.id).emit('tryRejoin', game);
+    return game;
   }
 
   @SubscribeMessage('refuseInvite')
@@ -103,16 +109,11 @@ export class GameGateway {
     @MessageBody('inviteGameId') inviteGameId?: string,
   ) {
     this.socketToId.set(client.id, id);
-    const playerNumber = await this.gameService.join(
-      client,
-      id,
-      this.server,
-      mode,
-      inviteGameId,
-    );
-    if (playerNumber.playerNumber === 1)
-      this.server.emit('gameJoined', playerNumber);
-    return playerNumber;
+    try {
+      this.gameService.join(client, id, this.server, mode, inviteGameId);
+    } catch (err) {
+      this.server.to(client.id).emit('gameJoinFail', err);
+    }
   }
 
   @SubscribeMessage('createInvitationGame')

@@ -14,4 +14,12 @@ export const translationKeys = {
   addFriends: "addFriends",
   setup2fa: "setup2fa",
   enterNumber: "enterNumber",
+  message: {
+    success: {
+      nameSaved: "message.success.nameSaved",
+      pictureSaved: "message.success.pictureSaved",
+      pictureNameSaved: "message.success.pictureNameSaved",
+      friendRequestsSaved: "message.success.friendRequestsSaved",
+    },
+  },
 };

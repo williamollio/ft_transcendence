@@ -13,10 +13,18 @@ import { Cookie, getTokenData } from "../utils/auth-helper";
 import { fetchProfilePicture } from "../utils/picture-helper";
 import { useDrawersStore } from "../store/drawers-store";
 import { useTheme } from "@mui/material";
+import { UserStatus } from "../interfaces/user.interface";
+import { UserSocket } from "../classes/UserSocket.class";
+import { listenerWrapper } from "../services/initSocket.service";
 
 export const navbarHeight = "4rem";
 
-export default function NavBar(): React.ReactElement {
+interface Props {
+  userSocket: UserSocket;
+}
+
+export default function NavBar(props: Props): React.ReactElement {
+  const { userSocket } = props;
   const theme = useTheme();
   const state = useLocation().state;
   const navigate = useNavigate();
@@ -26,12 +34,13 @@ export default function NavBar(): React.ReactElement {
     state.image,
     state.setImage,
   ]);
-  const [isOpen, setIsOpen] = useDrawersStore(
-    (state: { isLeftOpen: any; setIsLeftOpen: any }) => [
-      state.isLeftOpen,
-      state.setIsLeftOpen,
+  const [isRightOpen, setIsRightOpen] = useDrawersStore(
+    (state: { isRightOpen: any; setIsRightOpen: any }) => [
+      state.isRightOpen,
+      state.setIsRightOpen,
     ]
   );
+  const [status, setStatus] = React.useState<UserStatus>(UserStatus.OFFLINE);
 
   React.useEffect(() => {
     let token = localStorage.getItem(Cookie.TOKEN);
@@ -43,6 +52,30 @@ export default function NavBar(): React.ReactElement {
       wrapperFetchProfilePicture(userId);
     }
   }, [userId]);
+
+  const statusUpdateListener = (data: any) => {
+    if (data.id === userId) setStatus(data.status);
+  };
+
+  React.useEffect(() => {
+    listenerWrapper(() => {
+      if (userSocket.socket.connected) {
+        userSocket.socket.on("statusUpdate", statusUpdateListener);
+        userSocket.status(userId);
+        return true;
+      }
+      return false;
+    });
+    return () => {
+      listenerWrapper(() => {
+        if (userSocket.socket.connected) {
+          userSocket.socket.off("statusUpdate", statusUpdateListener);
+          return true;
+        }
+        return false;
+      });
+    };
+  }, [userSocket, userId]);
 
   async function wrapperFetchProfilePicture(userId: string) {
     const pictureFetched = await fetchProfilePicture(userId);
@@ -84,15 +117,22 @@ export default function NavBar(): React.ReactElement {
         <Box
           className={classes.picture}
           sx={{
-            left: isOpen ? 230 : 55,
+            right: isRightOpen ? 320 : 70,
             transition: (theme) =>
-              theme.transitions.create("left", {
+              theme.transitions.create("right", {
                 easing: theme.transitions.easing.sharp,
                 duration: theme.transitions.duration.leavingScreen,
               }),
+            ...(isRightOpen && {
+              transition: (theme) =>
+                theme.transitions.create("right", {
+                  easing: theme.transitions.easing.easeOut,
+                  duration: theme.transitions.duration.enteringScreen,
+                }),
+            }),
           }}
         >
-          <PictureMenu image={image} />
+          <PictureMenu image={image} status={status} />
         </Box>
         <Box
           sx={{
@@ -142,7 +182,6 @@ const useStyles = makeStyles()((theme: Theme) => ({
   picture: {
     zIndex: theme.zIndex.appBar + 1,
     position: "absolute",
-    top: 0,
   },
   tab: {
     color: classes.colorSecondary,
