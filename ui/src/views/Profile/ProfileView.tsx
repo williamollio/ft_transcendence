@@ -50,7 +50,7 @@ export default function ProfileView(props: Props): React.ReactElement {
   const [image, setImage] = useState<any>(null);
   const [userId, setUserId] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [currentUser, setCurrentUser] = useState<User | null>();
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [token] = useState<string | null>(localStorage.getItem(Cookie.TOKEN));
 
   React.useEffect(() => {
