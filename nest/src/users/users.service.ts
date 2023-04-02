@@ -298,6 +298,18 @@ export class UsersService {
     return user;
   }
 
+  async getUserName(userId: string): Promise<string | null> {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+	  select: {
+		name: true,
+	  },
+    });
+    return user ? user.name : null;
+  }
+
   async getUserRanking(userId: string) {
     let userRank = '';
 

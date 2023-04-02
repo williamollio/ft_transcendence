@@ -17,7 +17,6 @@ import {
 import React, { SyntheticEvent, useEffect, useState } from "react";
 import { channelUser, user } from "../../interfaces/chat.interface";
 import { chatRoom } from "../../classes/chatRoom.class";
-import ChannelInfoContext from "./ChannelInfoContext";
 import GetPasswordDialog from "./GetPasswordDialog";
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import GetNameDialog from "./GetNameDialog";
@@ -30,35 +29,22 @@ import { useTranslation } from "react-i18next";
 import { listenerWrapper } from "../../services/initSocket.service";
 
 interface Props {
-  blockedUser: Array<string>;
-  refetchBlockedUsers: any;
-  userSocket: UserSocket;
-  setNewChannel: React.Dispatch<React.SetStateAction<chatRoom>>;
   channelInfoOpen: boolean;
   toggleChannelInfo: React.Dispatch<React.SetStateAction<boolean>>;
   channel: chatRoom | undefined;
   channelSocket: ChannelSocket;
-  gameSocket: GameSocket;
 }
 
 export default function ChannelInfoDialog(props: Props) {
   const {
-    blockedUser,
-    refetchBlockedUsers,
     channelInfoOpen,
     toggleChannelInfo,
     channel,
     channelSocket,
-    gameSocket,
   } = props;
   const { t } = useTranslation();
 
   const [selected, setSelected] = useState<user | null>(null);
-  const [contextMenu, setContextMenu] = useState<{
-    mouseX: number;
-    mouseY: number;
-    user: channelUser;
-  } | null>(null);
   const [userList, setUserList] = useState<Array<channelUser>>([]);
   const [openPassword, toggleOpenPassword] = useState<boolean>(false);
   const [openName, toggleOpenName] = useState<boolean>(false);
@@ -130,19 +116,6 @@ export default function ChannelInfoDialog(props: Props) {
     setSelected(data);
   };
 
-  const handleContextMenu = (event: any, User: channelUser) => {
-    event.preventDefault();
-    setContextMenu(
-      contextMenu === null
-        ? {
-            mouseX: event.clientX + 2,
-            mouseY: event.clientY - 6,
-            user: User,
-          }
-        : null
-    );
-  };
-
   const listUsers = userList.map((user) => {
     return (
       <TableRow
@@ -150,7 +123,6 @@ export default function ChannelInfoDialog(props: Props) {
         hover
         onClick={(e) => handleSelect(e, user)}
         selected={user.id === (selected ? selected.id : false)}
-        onContextMenu={(e) => handleContextMenu(e, user)}
       >
         <TableCell>{user.name}</TableCell>
         <TableCell>{user.status}</TableCell>
@@ -240,16 +212,6 @@ export default function ChannelInfoDialog(props: Props) {
                 <TableBody>{listUsers}</TableBody>
               </Table>
             </TableContainer>
-            <ChannelInfoContext
-              toggleChannelInfo={toggleChannelInfo}
-              blockedUser={blockedUser}
-              refetchBlockedUsers={refetchBlockedUsers}
-              channel={channel}
-              contextMenu={contextMenu}
-              setContextMenu={setContextMenu}
-              channelSocket={channelSocket}
-              gameSocket={gameSocket}
-            ></ChannelInfoContext>
           </Box>
         </Grid>
       </Grid>
