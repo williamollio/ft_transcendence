@@ -4,7 +4,13 @@ import { Response } from "../../services/common/resolve";
 import Box from "@mui/material/Box";
 import MuiDrawer from "@mui/material/Drawer";
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
-import { Divider, IconButton, Toolbar, Typography } from "@mui/material";
+import {
+  Divider,
+  IconButton,
+  Toolbar,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import { User } from "../../interfaces/user.interface";
 import { Cookie, getTokenData } from "../../utils/auth-helper";
 import friendshipsService from "../../services/friendships.service";
@@ -22,6 +28,8 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import { useDrawersStore } from "../../store/drawers-store";
 import { navbarHeight } from "../Navbar";
+import { ChannelSocket } from "../../classes/ChannelSocket.class";
+import { UserSocket } from "../../classes/UserSocket.class";
 
 const drawerWidth = 240;
 const drawerWidthClosed = "4rem";
@@ -81,7 +89,7 @@ const AppBar = styled(MuiAppBar, {
   border: "none",
   boxShadow: "none",
   ...(open && {
-    marginLeft: -drawerWidth,
+    marginLeft: drawerWidth,
     zIndex: -1,
     transition: theme.transitions.create(["width", "margin"], {
       easing: theme.transitions.easing.sharp,
@@ -99,7 +107,13 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   ...theme.mixins.toolbar,
 }));
 
-export default function MiniDrawer() {
+interface Props {
+  channelSocket: ChannelSocket;
+  userSocket: UserSocket;
+}
+
+export default function LeftDrawer(props: Props) {
+  const { channelSocket, userSocket } = props;
   const { t } = useTranslation();
   const theme = useTheme();
   const [friends, setFriends] = React.useState<User[]>([]);
@@ -107,10 +121,11 @@ export default function MiniDrawer() {
   const [requestsReceived, setRequestsReceived] = React.useState<User[]>([]);
   const [userId, setUserId] = React.useState<string>("");
   const { dispatchTranscendanceState } = React.useContext(TranscendanceContext);
-  const [open, setOpen] = useDrawersStore(
-    (state: { isLeftOpen: any; setIsLeftOpen: any }) => [
-      state.isLeftOpen,
-      state.setIsLeftOpen,
+  const [open, setOpen] = React.useState(false);
+  const [isDrawerCacheInvalid, setIsDrawerCacheInvalid] = useDrawersStore(
+    (state: { isFriendsCacheUnvalid: any; setisFriendsCacheUnvalid: any }) => [
+      state.isFriendsCacheUnvalid,
+      state.setisFriendsCacheUnvalid,
     ]
   );
 
@@ -124,8 +139,9 @@ export default function MiniDrawer() {
       fetchFriends();
       fetchRequested();
       fetchReceived();
+      setIsDrawerCacheInvalid(false);
     }
-  }, [userId]);
+  }, [userId, isDrawerCacheInvalid]);
 
   function showErrorToast(error?: AxiosError) {
     const message = error?.response?.data as any;
@@ -135,6 +151,17 @@ export default function MiniDrawer() {
         type: ToastType.ERROR,
         title: "Error",
         message: message,
+      },
+    });
+  }
+
+  function showSuccessToast(message: string) {
+    dispatchTranscendanceState({
+      type: TranscendanceStateActionType.TOGGLE_TOAST,
+      toast: {
+        type: ToastType.SUCCESS,
+        title: "Success",
+        message: message as unknown as string,
       },
     });
   }
@@ -181,28 +208,30 @@ export default function MiniDrawer() {
     <Box sx={{ display: "flex" }}>
       <AppBar position="fixed" open={open}>
         <Toolbar>
-          <Box
-            display={"flex"}
-            alignContent={"center"}
-            justifyContent={"center"}
-            width="100%"
-            height="100%"
-          >
-            <IconButton
-              onClick={triggerDrawerOpen}
-              sx={{
-                ...(open && { display: "none" }),
-              }}
+          <Tooltip title="Friendships">
+            <Box
+              display={"flex"}
+              alignContent={"center"}
+              justifyContent={"center"}
+              width="100%"
+              height="100%"
             >
-              <MenuIcon
+              <IconButton
+                onClick={triggerDrawerOpen}
                 sx={{
-                  fill: theme.palette.secondary.main,
-                  width: "35px",
-                  height: "35px",
+                  ...(open && { display: "none" }),
                 }}
-              />
-            </IconButton>
-          </Box>
+              >
+                <MenuIcon
+                  sx={{
+                    fill: theme.palette.secondary.main,
+                    width: "35px",
+                    height: "35px",
+                  }}
+                />
+              </IconButton>
+            </Box>
+          </Tooltip>
         </Toolbar>
       </AppBar>
       <Drawer
@@ -246,8 +275,10 @@ export default function MiniDrawer() {
           userId={userId}
           open={open}
           users={friends}
-          triggerDrawerOpen={triggerDrawerOpen}
+          channelSocket={channelSocket}
+          userSocket={userSocket}
           showErrorToast={showErrorToast}
+          showSuccessToast={showSuccessToast}
         />
         <Divider
           variant="middle"
@@ -273,8 +304,9 @@ export default function MiniDrawer() {
           userId={userId}
           open={open}
           users={requests}
-          triggerDrawerOpen={triggerDrawerOpen}
+          userSocket={userSocket}
           showErrorToast={showErrorToast}
+          showSuccessToast={showSuccessToast}
         />
         <Divider
           variant="middle"
@@ -300,8 +332,9 @@ export default function MiniDrawer() {
           userId={userId}
           open={open}
           users={requestsReceived}
-          triggerDrawerOpen={triggerDrawerOpen}
+          userSocket={userSocket}
           showErrorToast={showErrorToast}
+          showSuccessToast={showSuccessToast}
         />
       </Drawer>
       <Box component="main" sx={{ flexGrow: 1, p: 3 }}></Box>

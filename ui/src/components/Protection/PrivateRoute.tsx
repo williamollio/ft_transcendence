@@ -3,7 +3,7 @@ import { Cookie, getTokenData, initAuthToken } from "../../utils/auth-helper";
 import usersService from "../../services/users.service";
 import { User } from "../../interfaces/user.interface";
 import { AuthCheck } from "./AuthCheck";
-import { CircularProgress } from "@mui/material";
+import { Box, CircularProgress } from "@mui/material";
 import { RoutePath } from "../../interfaces/router.interface";
 
 export const PrivateRoute: FC<{
@@ -61,7 +61,17 @@ export const PrivateRoute: FC<{
   return (
     <>
       {isLoading ? (
-        <CircularProgress size={24} />
+        <Box
+          sx={{
+            width: "100vw",
+            height: "100vh",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <CircularProgress size={24} />
+        </Box>
       ) : (
         <AuthCheck
           isUserAuthorized={isUserAuthorized}

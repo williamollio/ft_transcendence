@@ -2,7 +2,7 @@ export interface User {
   id: string;
   name: string;
   filename?: string;
-  status?: UserStatus;
+  status: UserStatus;
   secondFactorEnabled: boolean;
   secondFactorLogged: boolean;
 }

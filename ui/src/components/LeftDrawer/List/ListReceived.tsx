@@ -5,6 +5,7 @@ import {
   ListItemIcon,
   Avatar,
   ListItemText,
+  Tooltip,
 } from "@mui/material";
 import { User } from "../../../interfaces/user.interface";
 import React from "react";
@@ -14,20 +15,47 @@ import CloseIcon from "@mui/icons-material/Close";
 import friendshipsService from "../../../services/friendships.service";
 import { StyledAvatarBadge } from "../AvatarBadge/StyledAvatarBadge";
 import { AxiosError } from "axios";
+import { useTranslation } from "react-i18next";
+import { translationKeys } from "../constants";
+import { useDrawersStore } from "../../../store/drawers-store";
+import { useUserStore } from "../../../store/users-store";
+import { UserSocket } from "../../../classes/UserSocket.class";
+import { listenerWrapper } from "../../../services/initSocket.service";
+import { useNavigate } from "react-router-dom";
+import { RoutePath } from "../../../interfaces/router.interface";
 
 interface Props {
   userId: string;
   open: boolean;
   users: User[];
-  triggerDrawerOpen: () => void;
+  userSocket: UserSocket;
   showErrorToast: (error?: AxiosError) => void;
+  showSuccessToast: (message: string) => void;
 }
 export default function ListReceived(props: Props) {
-  const { userId, open, users, triggerDrawerOpen, showErrorToast } = props;
+  const { userId, open, users, userSocket, showErrorToast, showSuccessToast } =
+    props;
 
+  const navigate = useNavigate();
+  const { t } = useTranslation();
   const [profilePictures, setProfilePictures] = React.useState<{
     [key: string]: string;
   }>({});
+  const [usersState, setUsersState] = React.useState<User[] | undefined>(
+    undefined
+  );
+  const [isDrawerCacheInvalid, setIsDrawerCacheInvalid] = useDrawersStore(
+    (state: { isFriendsCacheUnvalid: any; setisFriendsCacheUnvalid: any }) => [
+      state.isFriendsCacheUnvalid,
+      state.setisFriendsCacheUnvalid,
+    ]
+  );
+  const [isUserCacheInvalid, setIsUserCacheInvalid] = useUserStore(
+    (state: { isFriendsCacheUnvalid: any; setisFriendsCacheUnvalid: any }) => [
+      state.isFriendsCacheUnvalid,
+      state.setisFriendsCacheUnvalid,
+    ]
+  );
 
   React.useEffect(() => {
     async function loadProfilePictures() {
@@ -45,7 +73,42 @@ export default function ListReceived(props: Props) {
     }
 
     loadProfilePictures();
+    setUsersState(users);
   }, [users]);
+
+  const statusUpdateListener = (data: any) => {
+    const newList: User[] = new Array<User>();
+    users?.forEach((element) => newList.push(element));
+    const index = newList.findIndex((element) => element.id === data.id);
+    if (index !== -1) {
+      newList[index].status = data.status;
+    }
+    setUsersState(newList);
+  };
+
+  React.useEffect(() => {
+    listenerWrapper(() => {
+      if (userSocket.socket.connected) {
+        // receiving data from server
+        userSocket.socket.on("statusUpdate", statusUpdateListener);
+        // sending request to server
+        for (const user of users) {
+          userSocket.status(user.id);
+        }
+        return true;
+      }
+      return false;
+    });
+    return () => {
+      listenerWrapper(() => {
+        if (userSocket.socket.connected) {
+          userSocket.socket.off("statusUpdate", statusUpdateListener);
+          return true;
+        }
+        return false;
+      });
+    };
+  }, [userSocket, users]);
 
   async function getProfilePicture(friendId: string): Promise<string> {
     const image = await fetchProfilePicture(friendId);
@@ -60,6 +123,10 @@ export default function ListReceived(props: Props) {
     const isSuccess = !responseAccept?.error;
     if (!isSuccess) {
       showErrorToast(responseAccept.error);
+    } else {
+      showSuccessToast(t(translationKeys.message.success.requestAccepted));
+      setIsDrawerCacheInvalid(true);
+      setIsUserCacheInvalid(true);
     }
   }
 
@@ -71,12 +138,20 @@ export default function ListReceived(props: Props) {
     const isSuccess = !responseDelete?.error;
     if (!isSuccess) {
       showErrorToast(responseDelete.error);
+    } else {
+      showSuccessToast(t(translationKeys.message.success.requestDeleted));
+      const tmpUsers = users.filter((user) => friendId !== user.id);
+      setUsersState(tmpUsers);
     }
+  }
+
+  function navigateToUserProfile(userId: string) {
+    navigate(`/profile/${userId}`, { state: { userId: userId } });
   }
 
   return (
     <List>
-      {users.map((user: User, index) => (
+      {usersState?.map((user: User, index) => (
         <ListItem key={index} disablePadding sx={{ display: "block" }}>
           <ListItemButton
             sx={{
@@ -85,7 +160,7 @@ export default function ListReceived(props: Props) {
             }}
           >
             <ListItemIcon
-              onClick={triggerDrawerOpen}
+              onClick={() => navigateToUserProfile(user.id)}
               sx={{
                 marginLeft: -1,
               }}
@@ -99,35 +174,35 @@ export default function ListReceived(props: Props) {
                 <Avatar key={user.id} src={profilePictures[user.id]} />
               </StyledAvatarBadge>
             </ListItemIcon>
-            <ListItemText
-              primary={user.name}
-              sx={{ opacity: open ? 1 : 0 }}
-              onClick={triggerDrawerOpen}
-            />
-            <ListItemButton
-              onClick={() => acceptRequestReceived(user.id)}
-              sx={{
-                opacity: open ? 1 : 0,
-                color: "limegreen",
-                width: "7px",
-                display: "flex",
-                justifyContent: "center",
-              }}
-            >
-              <CheckIcon />
-            </ListItemButton>
-            <ListItemButton
-              onClick={() => cancelRequestReceived(user.id)}
-              sx={{
-                opacity: open ? 1 : 0,
-                color: "lightcoral",
-                width: "7px",
-                display: "flex",
-                justifyContent: "center",
-              }}
-            >
-              <CloseIcon />
-            </ListItemButton>
+            <ListItemText primary={user.name} sx={{ opacity: open ? 1 : 0 }} />
+            <Tooltip title="Accept friendship received">
+              <ListItemButton
+                onClick={() => acceptRequestReceived(user.id)}
+                sx={{
+                  opacity: open ? 1 : 0,
+                  color: "limegreen",
+                  width: "7px",
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+              >
+                <CheckIcon />
+              </ListItemButton>
+            </Tooltip>
+            <Tooltip title="Decline friendship received">
+              <ListItemButton
+                onClick={() => cancelRequestReceived(user.id)}
+                sx={{
+                  opacity: open ? 1 : 0,
+                  color: "lightcoral",
+                  width: "7px",
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+              >
+                <CloseIcon />
+              </ListItemButton>
+            </Tooltip>
           </ListItemButton>
         </ListItem>
       ))}

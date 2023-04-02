@@ -135,7 +135,9 @@ export default function GameBoard(props: Props) {
 
   const tryRejoinListener = (data: any) => {
     console.log("rejoined");
-    if (data) gameSocket.joinGame(data);
+    if (data) {
+      gameSocket.joinGame(data);
+    }
   };
 
   const failedListener = (data: any) => {

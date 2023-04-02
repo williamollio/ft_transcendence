@@ -1,6 +1,7 @@
 import { UseGuards } from '@nestjs/common';
 import {
   ConnectedSocket,
+  MessageBody,
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
@@ -13,6 +14,7 @@ import { socketToUserId } from './socketToUserIdStorage.service';
 import { UsersService } from './users.service';
 import * as msgpack from 'socket.io-msgpack-parser';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
+import { PrismaService } from '../prisma/prisma.service';
 
 // add some cors sanitazation here
 @WebSocketGateway(8888, {
@@ -29,23 +31,40 @@ export class UserGateway {
   server: Server;
   constructor(
     private readonly usersService: UsersService, // private readonly socketToIdService: SocketToUserIdStorage,
+    private prisma: PrismaService,
   ) {}
 
   @SubscribeMessage('connectUser')
   userConnect(
     @GetCurrentUserId() userId: string,
-    @ConnectedSocket() clientSocket: Socket,
   ) {
     void this.usersService.updateConnectionStatus(
       String(userId),
       UserStatus.ONLINE,
     );
-    clientSocket.broadcast.emit('userConnected');
+    this.server.emit('statusUpdate', {
+      id: userId,
+      status: UserStatus.ONLINE,
+    });
   }
 
   @SubscribeMessage('disconnectUser')
   userDisconnect(@ConnectedSocket() clientSocket: Socket) {
     clientSocket.broadcast.emit('userDisconnected');
+  }
+
+  @SubscribeMessage('status')
+  async statusRequest(
+    @MessageBody('requestedUser') userId: string,
+    @ConnectedSocket() clientSocket: Socket,
+  ) {
+    const User = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        status: true,
+      },
+    });
+    clientSocket.emit('statusUpdate', { id: userId, status: User?.status });
   }
 
   @SubscribeMessage('connect')
@@ -67,26 +86,29 @@ export class UserGateway {
       void this.usersService.updateConnectionStatus(userId, UserStatus.OFFLINE);
       // this.socketToIdService.delete(clientSocket.id);
       socketToUserId.delete(clientSocket.id);
-      clientSocket.broadcast.emit('userDisconnected');
+      this.server.emit('statusUpdate', {
+        id: userId,
+        status: UserStatus.OFFLINE,
+      });
     }
   }
 
   // Game gateway
   @SubscribeMessage('joinGame')
-  userInGame(
-    @ConnectedSocket() clientSocket: Socket,
-    @GetCurrentUserId() userId: string,
-  ) {
+  userInGame(@GetCurrentUserId() userId: string) {
     void this.usersService.updateConnectionStatus(userId, UserStatus.PLAYING);
-    clientSocket.broadcast.emit('userInGame');
+    this.server.emit('statusUpdate', {
+      id: userId,
+      status: UserStatus.PLAYING,
+    });
   }
 
   @SubscribeMessage('leaveGame')
-  gameEnded(
-    @ConnectedSocket() clientSocket: Socket,
-    @GetCurrentUserId() userId: string,
-  ) {
+  gameEnded(@GetCurrentUserId() userId: string) {
     void this.usersService.updateConnectionStatus(userId, UserStatus.ONLINE);
-    clientSocket.broadcast.emit('userGameEnded');
+    this.server.emit('statusUpdate', {
+      id: userId,
+      status: UserStatus.ONLINE,
+    });
   }
 }

@@ -7,7 +7,12 @@
 - `make up` for building the images and for spinning up the containers.
 - For stopping them run `make down`.
 
-## Build and run the application
+## Environment variables ft_transcendance
+
+Set your passwords and credentials in a `.env` file which has to be located in the `nest` folder.
+Use [env.example](https://github.com/williamollio/ft_transcendance/blob/master/nest/env.example) as an example.
+
+## Build and run ft_transcendance
 
 ### UI
 

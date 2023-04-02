@@ -22,10 +22,18 @@ import { ToastType } from "../../context/toast";
 import { TranscendanceStateActionType } from "../../context/transcendance-reducer";
 import { TranscendanceContext } from "../../context/transcendance-context";
 import authService from "../../services/auth.service";
+import { UserSocket } from "../../classes/UserSocket.class";
+import { ChannelSocket } from "../../classes/ChannelSocket.class";
 
 const CODE_LENGTH = 6; // number of input fields to render
 
-export default function Setup2FA(): React.ReactElement {
+interface Props {
+  userSocket: UserSocket;
+  channelSocket: ChannelSocket;
+}
+
+export default function Setup2FA(props: Props): React.ReactElement {
+  const { userSocket, channelSocket } = props;
   const navigate = useNavigate();
   const [QRCodeUrl, setQRCodeUrl] = React.useState<string>("");
   const { t } = useTranslation();
@@ -171,8 +179,8 @@ export default function Setup2FA(): React.ReactElement {
 
   return (
     <>
-      <Navbar />
-      <LeftDrawer />
+      <Navbar userSocket={userSocket} />
+      <LeftDrawer channelSocket={channelSocket} userSocket={userSocket} />
       <Background>
         <ProfileCard>
           <CardContainer>

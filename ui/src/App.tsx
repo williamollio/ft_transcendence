@@ -1,7 +1,7 @@
 import { ReactElement, useState } from "react";
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
-import ProfileView from "./views/Profile/ProfileView";
+import EditProfileView from "./views/Profile/EditProfileView";
 import Setup2FA from "./views/Profile/Setup2FA";
 import LoginView from "./views/Login/LoginView";
 import Login2FAView from "./views/Login/Login2FAView";
@@ -20,6 +20,7 @@ import { ChannelSocket } from "./classes/ChannelSocket.class";
 import GameView from "./views/Game/GameView";
 import StatsView from "./views/Stats/StatsView";
 import { GameSocket } from "./classes/GameSocket.class";
+import ProfileView from "./views/Profile/ProfileView";
 
 export default function App() {
   const [userSocket] = useState<UserSocket>(new UserSocket());
@@ -74,7 +75,7 @@ export default function App() {
   const AuthWrapper = (): ReactElement => {
     const isAuthenticated = getIsAuthenticated();
     return isAuthenticated ? (
-      <Navigate to={RoutePath.PROFILE} replace />
+      <Navigate to={RoutePath.EDITPROFILE} replace />
     ) : (
       <Navigate to={RoutePath.LOGIN} replace />
     );
@@ -82,7 +83,7 @@ export default function App() {
 
   const RedirectWrapper = () => {
     initAuthToken();
-    return <Navigate to={RoutePath.PROFILE} />;
+    return <Navigate to={RoutePath.EDITPROFILE} />;
   };
 
   function closeToast() {
@@ -132,10 +133,10 @@ export default function App() {
               }
             />
             <Route
-              path={RoutePath.PROFILE}
+              path={RoutePath.EDITPROFILE}
               element={
                 <PrivateRoute setToken={setToken}>
-                  <ProfileView
+                  <EditProfileView
                     userSocket={userSocket}
                     channelSocket={channelSocket}
                     gameSocket={gameSocket}
@@ -163,7 +164,12 @@ export default function App() {
               element={
                 <PrivateRoute
                   setToken={setToken}
-                  children={<Setup2FA />}
+                  children={
+                    <Setup2FA
+                      userSocket={userSocket}
+                      channelSocket={channelSocket}
+                    />
+                  }
                 ></PrivateRoute>
               }
             />
@@ -180,7 +186,18 @@ export default function App() {
               }
             />
             <Route path={RoutePath.LOGIN_2FA} element={<Login2FAView />} />
-            {/* TODO : William Private ? */}
+            <Route
+              path={RoutePath.PROFILE}
+              element={
+                <PrivateRoute setToken={setToken}>
+                  <ProfileView
+                    userSocket={userSocket}
+                    channelSocket={channelSocket}
+                    gameSocket={gameSocket}
+                  />
+                </PrivateRoute>
+              }
+            />
           </Routes>
         </ThemeProvider>
       </Box>

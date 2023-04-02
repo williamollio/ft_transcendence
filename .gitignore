@@ -21,6 +21,3 @@ ui/node_modules
 ui/logs
 ui/*.log
 ui/npm-debug.log*
-
-#Images Updloaded
-nest/uploads/profileImages/**.**

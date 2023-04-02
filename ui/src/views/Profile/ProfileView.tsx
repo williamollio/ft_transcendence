@@ -1,28 +1,23 @@
-import React, { ChangeEvent, Dispatch, SetStateAction, useState } from "react";
+import React, { useState } from "react";
 import { makeStyles } from "tss-react/mui";
 import Navbar from "../../components/Navbar";
 import {
   Box,
-  Button,
   Typography,
-  Input,
   Avatar,
   CircularProgress,
-  Divider,
+  Tooltip,
 } from "@mui/material";
 import usersService from "../../services/users.service";
 import { User } from "../../interfaces/user.interface";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { RoutePath } from "../../interfaces/router.interface";
 import { AxiosError } from "axios";
 import { TranscendanceContext } from "../../context/transcendance-context";
 import { ToastType } from "../../context/toast";
 import { TranscendanceStateActionType } from "../../context/transcendance-reducer";
-import { Response } from "../../services/common/resolve";
-import { LabelValue } from "../../interfaces/common.interface";
 import { translationKeys } from "./constants";
 import { useTranslation } from "react-i18next";
-import { useImageStore } from "../../store/users-store";
 import {
   Background,
   CardContainer,
@@ -30,16 +25,14 @@ import {
   TitleWrapper,
   ContentWrapper,
 } from "../../styles/MuiStyles";
-import { Controller, FieldValues, useForm } from "react-hook-form";
-import CustomMultiSelect from "../../components/shared/CustomMultiSelect/CustomMultiselect";
-import CustomTextField from "../../components/shared/CustomTextField/CustomTextField";
 import { Cookie, getTokenData } from "../../utils/auth-helper";
 import LeftDrawer from "../../components/LeftDrawer/LeftDrawer";
-import friendshipsService from "../../services/friendships.service";
 import { UserSocket } from "../../classes/UserSocket.class";
 import RightDrawer from "../../components/RightDrawer/RightDrawer";
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { GameSocket } from "../../classes/GameSocket.class";
+import CustomTextField from "../../components/shared/CustomTextField/CustomTextField";
+import { fetchProfilePicture } from "../../utils/picture-helper";
 
 interface Props {
   userSocket: UserSocket;
@@ -49,52 +42,52 @@ interface Props {
 
 export default function ProfileView(props: Props): React.ReactElement {
   const { userSocket, channelSocket, gameSocket } = props;
+  const userIdParam = useLocation().state;
   const { t } = useTranslation();
   const { classes } = useStyles();
   const navigate = useNavigate();
   const { dispatchTranscendanceState } = React.useContext(TranscendanceContext);
-  const [picture, setPicture] = useState<any>();
-  const [image, setImage] = useImageStore(
-    (state: { image: any; setImage: any }) => [state.image, state.setImage]
-  );
-  const [users, setUsers] = useState<LabelValue[]>([]);
+  const [image, setImage] = useState<any>(null);
   const [userId, setUserId] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [currentUser, setCurrentUser] = useState<User | null>();
-  const [initialName, setInitialName] = useState<string>();
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [token] = useState<string | null>(localStorage.getItem(Cookie.TOKEN));
-
-  const {
-    formState: { errors },
-    register,
-    handleSubmit,
-    setValue,
-    control,
-  } = useForm({
-    mode: "onChange",
-  });
 
   React.useEffect(() => {
     if (token === null) {
       navigate(RoutePath.LOGIN);
-    } else {
-      setUserId(getTokenData(token).id);
-      if (userId) {
-        fetchCurrentUser();
-        fetchUsersWithoutFriendship();
-        setIsLoading(false);
-      }
     }
-  }, [userId]);
+  }, []);
 
   React.useEffect(() => {
-    for (const property in currentUser) {
-      if (property === "name") {
-        setValue(property, currentUser.name);
-        setInitialName(currentUser.name);
-      }
+    wrapperSetUserId(token);
+    if (userId) {
+      fetchCurrentUser();
+      setIsLoading(false);
     }
-  }, [currentUser]);
+    if (userId) {
+      wrapperFetchProfilePicture(userId);
+    }
+  }, [userId, userIdParam]);
+
+  async function wrapperFetchProfilePicture(userId: string) {
+    const pictureFetched = await fetchProfilePicture(userId);
+    if (pictureFetched) setImage(pictureFetched);
+    else setImage("");
+  }
+
+  function wrapperSetUserId(token: string | null) {
+    if (
+      !userIdParam ||
+      !userIdParam.userId ||
+      userIdParam.userId === ":userId"
+    ) {
+      if (token) setUserId(getTokenData(token).id);
+      else navigate(RoutePath.LOGIN);
+    } else {
+      setUserId(userIdParam.userId);
+    }
+  }
 
   function showErrorToast(error?: AxiosError) {
     const message = (error?.response?.data as any).message as string;
@@ -110,97 +103,24 @@ export default function ProfileView(props: Props): React.ReactElement {
 
   async function fetchCurrentUser() {
     const user = await usersService.getUser(userId);
-    setCurrentUser(user.data);
     const isSuccess = !user?.error;
     if (!isSuccess) {
       showErrorToast(user.error);
       setCurrentUser(null);
     } else {
       setCurrentUser(user.data);
-      setInitialName(user.data.name);
-    }
-  }
-
-  async function fetchUsersWithoutFriendship() {
-    const usersWithoutFriendship: Response<User[]> =
-      await friendshipsService.getNone(userId);
-    const isSuccess = !usersWithoutFriendship?.error;
-    if (!isSuccess) {
-      showErrorToast(usersWithoutFriendship.error);
-    } else {
-      const usersAsLabelValue: LabelValue[] = usersWithoutFriendship.data.map(
-        (user: User) => {
-          return {
-            label: `${user.name}`,
-            value: user.id,
-          };
-        }
-      );
-      setUsers(usersAsLabelValue);
-    }
-  }
-
-  function onCancel() {
-    setValue("name", initialName);
-  }
-
-  async function onSubmit(data: FieldValues) {
-    const responseUser = await usersService.patchUser(userId, data.name);
-    const isSuccessUser = !responseUser?.error;
-    if (!isSuccessUser) {
-      showErrorToast(responseUser?.error);
-    } else {
-      localStorage.setItem("userName" + userId, data.name);
-    }
-
-    if (picture) {
-      handleOnSubmitPicture();
-    }
-  }
-
-  async function handleOnSubmitPicture() {
-    const formData = new FormData();
-    formData.append("file", picture, picture.name);
-    const response = await usersService.postUserImage(formData, userId);
-    const isSuccess = !response?.error;
-    if (!isSuccess) {
-      showErrorToast(response.error);
-      setImage(null);
-    }
-  }
-
-  async function onSubmitFriendship(data: FieldValues) {
-    const friendsList: User[] | undefined = data.friends?.map(
-      (friend: LabelValue) => {
-        return {
-          id: friend,
-        };
-      }
-    );
-
-    let responseFrienship;
-    friendsList?.forEach(async function (friend) {
-      responseFrienship = await friendshipsService.postRequest(userId, friend);
-      const isSuccessFriendship = !responseFrienship?.error;
-      if (!isSuccessFriendship) {
-        showErrorToast(responseFrienship?.error);
-        return;
-      }
-    });
-  }
-
-  function handleOnChangePicture(e: ChangeEvent<HTMLInputElement>) {
-    if (e.target.files) {
-      setPicture(e.target.files[0]);
-      setImage(e.target.files[0]);
     }
   }
 
   return (
     <>
-      <Navbar />
-      <LeftDrawer />
-      <RightDrawer channelSocket={channelSocket} userSocket={userSocket} gameSocket={gameSocket}/>
+      <Navbar userSocket={userSocket} />
+      <LeftDrawer channelSocket={channelSocket} userSocket={userSocket} />
+      <RightDrawer
+        channelSocket={channelSocket}
+        userSocket={userSocket}
+        gameSocket={gameSocket}
+      />
       <Background>
         <ProfileCard>
           <CardContainer>
@@ -232,104 +152,23 @@ export default function ProfileView(props: Props): React.ReactElement {
                     }}
                   >
                     <Box className={classes.avatarWrapper}>
-                      <Avatar
-                        src={image ? URL.createObjectURL(image) : ""}
-                        style={{
-                          width: "100px",
-                          height: "100px",
-                        }}
-                      />
-                    </Box>
-                    <Box className={classes.uploadButtonWrapper}>
-                      <Button
-                        color="primary"
-                        variant="contained"
-                        component="label"
-                      >
-                        {t(translationKeys.updloadPicture)}
-                        <Input
-                          type="file"
-                          sx={{ display: "none" }}
-                          onChange={handleOnChangePicture}
-                        />
-                      </Button>
-                    </Box>
-                  </Box>
-                  <Box
-                    sx={{
-                      width: "70%",
-                      height: "8rem",
-                      marginTop: "2rem",
-                      display: "flex",
-                      justifyContent: "center",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      flexWrap: "no-wrap",
-                    }}
-                  >
-                    <Box className={classes.inputWrapper}>
-                      <Box sx={{ width: "100%" }}>
-                        <CustomTextField
-                          label={"Name"}
-                          isRequired
-                          name="name"
-                          rules={{
-                            required: true,
+                      <Tooltip title="Profile picture">
+                        <Avatar
+                          src={image ? URL.createObjectURL(image) : ""}
+                          style={{
+                            width: "100px",
+                            height: "100px",
                           }}
-                          error={errors.name}
-                          register={register}
                         />
-                      </Box>
+                      </Tooltip>
                     </Box>
-                    <Box className={classes.buttonsWrapper}>
-                      <Button
-                        variant="contained"
-                        onClick={handleSubmit(onSubmit)}
-                      >
-                        {t(translationKeys.buttons.save)}
-                      </Button>
-                      <Button
-                        color="primary"
-                        variant="outlined"
-                        onClick={onCancel}
-                      >
-                        {t(translationKeys.buttons.cancel)}
-                      </Button>
-                    </Box>
-                  </Box>
-                  <Divider
-                    sx={{
-                      marginTop: "2.5rem",
-                      marginBottom: "2.5rem",
-                      width: "70%",
-                    }}
-                  ></Divider>
-                  <Box className={classes.multiInputWrapper}>
-                    <Box sx={{ width: "100%" }}>
-                      <Controller
-                        control={control}
-                        name="friends"
-                        defaultValue={[]}
-                        render={({ field: { onChange, value } }) => {
-                          return (
-                            <CustomMultiSelect
-                              label={t(translationKeys.addFriends)}
-                              options={users}
-                              onChange={onChange}
-                              selectedValues={value}
-                            />
-                          );
-                        }}
+                    <Box sx={{ width: "40%" }}>
+                      <CustomTextField
+                        label={"Name"}
+                        name="name"
+                        value={currentUser ? currentUser.name : ""}
                       />
                     </Box>
-                  </Box>
-                  <Box className={classes.buttonRequestWrapper}>
-                    <Button
-                      variant="contained"
-                      onClick={handleSubmit(onSubmitFriendship)}
-                    >
-                      {t(translationKeys.buttons.sendRequest)}
-                    </Button>
                   </Box>
                 </>
               )}
@@ -349,41 +188,5 @@ const useStyles = makeStyles()(() => ({
     display: "flex",
     justifyContent: "center",
     alignItems: "start",
-  },
-  buttonsWrapper: {
-    height: "40%",
-    width: "50%",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "start",
-    gap: "1em",
-  },
-  buttonRequestWrapper: {
-    height: "10%",
-    width: "50%",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "start",
-  },
-  uploadButtonWrapper: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "end",
-    height: "35%",
-  },
-  inputWrapper: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "start",
-    height: "70%",
-    width: "70%",
-    minHeight: "77px",
-  },
-  multiInputWrapper: {
-    width: "65%",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "start",
-    minHeight: "77px",
   },
 }));

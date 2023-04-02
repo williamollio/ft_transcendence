@@ -13,6 +13,8 @@ import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { UserSocket } from "../../classes/UserSocket.class";
 import { navbarHeight } from "../Navbar";
 import { GameSocket } from "../../classes/GameSocket.class";
+import { useDrawersStore } from "../../store/drawers-store";
+import { Tooltip } from "@mui/material";
 
 const drawerWidth = 300;
 const drawerWidthClosed = "4rem";
@@ -60,7 +62,12 @@ interface Props {
 export default function RightDrawer(props: Props) {
   const { channelSocket, userSocket, gameSocket } = props;
   const theme = useTheme();
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useDrawersStore(
+    (state: { isRightOpen: any; setIsRightOpen: any }) => [
+      state.isRightOpen,
+      state.setIsRightOpen,
+    ]
+  );
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -80,18 +87,20 @@ export default function RightDrawer(props: Props) {
           width="100%"
           height="100%"
         >
-          <IconButton
-            onClick={handleDrawerOpen}
-            sx={{ ...(open && { display: "none" }) }}
-          >
-            <ChatIcon
-              sx={{
-                fill: theme.palette.secondary.main,
-                width: "35px",
-                height: "35px",
-              }}
-            />
-          </IconButton>
+          <Tooltip title="Chat">
+            <IconButton
+              onClick={handleDrawerOpen}
+              sx={{ ...(open && { display: "none" }) }}
+            >
+              <ChatIcon
+                sx={{
+                  fill: theme.palette.secondary.main,
+                  width: "35px",
+                  height: "35px",
+                }}
+              />
+            </IconButton>
+          </Tooltip>
         </Box>
       </AppBar>
       <Drawer
