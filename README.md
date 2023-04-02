@@ -12,7 +12,7 @@
 Set your passwords and credentials in a `.env` file which has to be located in the `nest` folder.
 Use [env.example](https://github.com/williamollio/ft_transcendance/blob/master/nest/env.example) as an example.
 
-## Build and run the application
+## Build and run ft_transcendance
 
 ### UI
 
