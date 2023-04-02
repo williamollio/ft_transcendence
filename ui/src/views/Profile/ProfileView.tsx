@@ -166,7 +166,7 @@ export default function ProfileView(props: Props): React.ReactElement {
                       <CustomTextField
                         label={"Name"}
                         name="name"
-                        value={currentUser?.name}
+                        value={currentUser ? currentUser.name : ""}
                       />
                     </Box>
                   </Box>
