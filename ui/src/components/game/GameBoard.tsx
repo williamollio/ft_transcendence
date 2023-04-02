@@ -127,6 +127,7 @@ export default function GameBoard(props: Props) {
   };
 
   const mutateGameStatusListener = (data: any) => {
+    setScoreInfo({ ...gameLoop.scoreInfo });
     if (gameLoop.scoreInfo.p1name === "" || gameLoop.scoreInfo.p2name === "")
       getPlayerNames(data.player1id, data.player2id);
     if (data.status === "PLAYING") gameLoop.startLoop();
@@ -162,9 +163,9 @@ export default function GameBoard(props: Props) {
         gameSocket.socket.on("tryRejoin", tryRejoinListener);
         gameSocket.socket.on("matchFinished", gameFinishListener);
         gameSocket.socket.on("gameStarting", gameStartingListener);
-        gameSocket.socket.on("GI", giListener);
         gameSocket.socket.on("gameJoined", gameJoinedListener);
         gameSocket.socket.on("gameStatus", mutateGameStatusListener);
+        gameSocket.socket.on("GI", giListener);
         gameSocket.rejoin();
         return true;
       }
@@ -181,10 +182,9 @@ export default function GameBoard(props: Props) {
           gameSocket.socket.off("tryRejoin", tryRejoinListener);
           gameSocket.socket.off("matchFinished", gameFinishListener);
           gameSocket.socket.off("gameStarting", gameStartingListener);
-          gameSocket.socket.off("GI", giListener);
           gameSocket.socket.off("gameJoined", gameJoinedListener);
           gameSocket.socket.off("gameStatus", mutateGameStatusListener);
-
+          gameSocket.socket.off("GI", giListener);
           return true;
         }
         return false;

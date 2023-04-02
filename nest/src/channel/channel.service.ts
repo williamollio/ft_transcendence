@@ -785,32 +785,6 @@ export class ChannelService {
     }
   }
 
-  // async handlePasswords(dto: EditChannelDto, channelId: string) {
-  //   /* Get the channel password to verify if the dto's current password is right */
-  //   const channel: { passwordHash: string | null } | null =
-  //     await this.prisma.channel.findFirst({
-  //       where: {
-  //         id: channelId,
-  //       },
-  //       select: {
-  //         passwordHash: true,
-  //       },
-  //     });
-  //   if (channel?.passwordHash && !dto.passwordHash) {
-  //     /* There is already a password and no new password provided,
-  //     we shouldn't remove the pwd in db */
-  //     delete dto.passwordHash;
-  //   } else if (dto.passwordHash) {
-  //     /* There is a new password provided, we hash it for the db */
-  //     dto.passwordHash = await argon.hash(dto.passwordHash, {
-  //       type: argon.argon2id,
-  //     });
-  //   } else {
-  //     /* There is no new password for a Protected type channel */
-  //     throw new Error('passwordIncorrect');
-  //   }
-  // }
-
   async handlePasswords(dto: EditChannelDto, channelId: string) {
     /* Get the channel password to verify if the dto's current password is right */
     const channel = await this.prisma.channel.findFirst({
@@ -821,6 +795,14 @@ export class ChannelService {
         passwordHash: true,
       },
     });
+
+    if (dto.currentPasswordHash && channel?.passwordHash) {
+      if (
+        !(await argon.verify(channel.passwordHash, dto.currentPasswordHash))
+      ) {
+        throw new Error('currentPasswordIncorrect');
+      }
+    }
 
     if (channel?.passwordHash && !dto.passwordHash) {
       /* There is already a password and no new password provided,
@@ -835,12 +817,6 @@ export class ChannelService {
       /* There is no new password for a Protected type channel */
       throw new Error('passwordIncorrect');
     }
-
-    //     if (dto.currentPasswordHash && channel?.passwordHash) {
-    //       if (!await argon.verify(channel.passwordHash, dto.currentPasswordHash)) {
-    //         throw new Error('currentPasswordIncorrect');
-    //       }
-    //     }
   }
 
   async editChannelByIdWS(
@@ -868,22 +844,67 @@ export class ChannelService {
           id: channelId,
         },
         data: {
-          ...dto,
+          name: dto.name,
+          type: dto.type,
+          passwordHash: dto.passwordHash,
         },
       });
       editedChannel.passwordHash = '';
       return editedChannel;
     } catch (error) {
+      console.log(error);
       if (error.code === 'P2002') {
         return 'alreadyUsed';
       }
-      if (error == 'Error: passwordIncorrect') {
+      if (error == 'Error: currentPasswordIncorrect') {
         return 'passwordIncorrect';
       }
       if (typeof error === 'string') return error;
       return 'errorEditChannel';
     }
   }
+
+  //   async editChannelByIdWS(
+  //     userId: string,
+  //     channelId: string,
+  //     dto: EditChannelDto,
+  //   ) {
+  //     try {
+  //       /* Check the password is provided in the DTO for protected chan) */
+  //       if (dto.name === '') {
+  //         return null;
+  //       }
+  //       /* Check that the user is owner or admin for update rights */
+  //       const userRole: { role: ChannelRole } | null =
+  //         await this.getRoleOfUserChannel(userId, channelId);
+  //       if (!userRole || userRole.role === ChannelRole.USER) {
+  //         return 'noEligibleRights';
+  //       }
+  //       if (dto.type === ChannelType.PROTECTED) {
+  //         await this.handlePasswords(dto, channelId);
+  //       }
+  //       /* Then, update channel's information */
+  //       const editedChannel: Channel = await this.prisma.channel.update({
+  //         where: {
+  //           id: channelId,
+  //         },
+  //         data: {
+  //           ...dto,
+  //         },
+  //       });
+  //       editedChannel.passwordHash = '';
+  //       return editedChannel;
+  //     } catch (error) {
+  //       if (error.code === 'P2002') {
+  //         return 'alreadyUsed';
+  //       }
+  //       if (error == 'Error: passwordIncorrect') {
+  //         return 'passwordIncorrect';
+  //       }
+  //       if (typeof error === 'string') return error;
+  //       return 'errorEditChannel';
+  //     }
+  //   }
 
   async leaveChannelWS(userId: string, dto: LeaveChannelDto) {
     try {

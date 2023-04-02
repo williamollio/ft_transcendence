@@ -258,12 +258,14 @@ export default function ChannelInfoDialog(props: Props) {
         toggleOpen={closeNameDialog}
         channel={channel}
         channelSocket={channelSocket}
+        toggleChannelInfo={toggleChannelInfo}
       ></GetNameDialog>
       <GetPasswordDialog
         open={openPassword}
         toggleOpen={closePasswordDialog}
         channel={channel}
         channelSocket={channelSocket}
+        toggleChannelInfo={toggleChannelInfo}
       ></GetPasswordDialog>
     </Dialog>
   );
