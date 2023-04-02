@@ -6,7 +6,6 @@ import {
   Typography,
   Avatar,
   CircularProgress,
-  TextField,
   Tooltip,
 } from "@mui/material";
 import usersService from "../../services/users.service";
@@ -19,7 +18,6 @@ import { ToastType } from "../../context/toast";
 import { TranscendanceStateActionType } from "../../context/transcendance-reducer";
 import { translationKeys } from "./constants";
 import { useTranslation } from "react-i18next";
-import { useImageStore } from "../../store/users-store";
 import {
   Background,
   CardContainer,
@@ -33,7 +31,6 @@ import { UserSocket } from "../../classes/UserSocket.class";
 import RightDrawer from "../../components/RightDrawer/RightDrawer";
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { GameSocket } from "../../classes/GameSocket.class";
-import { useParams } from "react-router-dom";
 import CustomTextField from "../../components/shared/CustomTextField/CustomTextField";
 import { fetchProfilePicture } from "../../utils/picture-helper";
 
@@ -45,7 +42,7 @@ interface Props {
 
 export default function ProfileView(props: Props): React.ReactElement {
   const { userSocket, channelSocket, gameSocket } = props;
-  const userIdParam = useParams().userId;
+  const userIdParam = useLocation().state;
   const { t } = useTranslation();
   const { classes } = useStyles();
   const navigate = useNavigate();
@@ -68,32 +65,27 @@ export default function ProfileView(props: Props): React.ReactElement {
       fetchCurrentUser();
       setIsLoading(false);
     }
+    if (userId) {
+      wrapperFetchProfilePicture(userId);
+    }
   }, [userId, userIdParam]);
 
-  React.useEffect(() => {
-    async function loadProfilePictures() {
-      if (currentUser?.filename) {
-        const picture = await getProfilePicture(currentUser.id);
-        setImage(picture);
-      } else {
-        setImage("");
-      }
-    }
-
-    loadProfilePictures();
-  }, [userId]);
-
-  async function getProfilePicture(friendId: string): Promise<string> {
-    const image = await fetchProfilePicture(friendId);
-    return URL.createObjectURL(image);
+  async function wrapperFetchProfilePicture(userId: string) {
+    const pictureFetched = await fetchProfilePicture(userId);
+    if (pictureFetched) setImage(pictureFetched);
+    else setImage("");
   }
 
   function wrapperSetUserId(token: string | null) {
-    if (!userIdParam || userIdParam === ":userId") {
+    if (
+      !userIdParam ||
+      !userIdParam.userId ||
+      userIdParam.userId === ":userId"
+    ) {
       if (token) setUserId(getTokenData(token).id);
       else navigate(RoutePath.LOGIN);
     } else {
-      setUserId(userIdParam);
+      setUserId(userIdParam.userId);
     }
   }
 
@@ -111,7 +103,6 @@ export default function ProfileView(props: Props): React.ReactElement {
 
   async function fetchCurrentUser() {
     const user = await usersService.getUser(userId);
-    setCurrentUser(user.data);
     const isSuccess = !user?.error;
     if (!isSuccess) {
       showErrorToast(user.error);
@@ -197,41 +188,5 @@ const useStyles = makeStyles()(() => ({
     display: "flex",
     justifyContent: "center",
     alignItems: "start",
-  },
-  buttonsWrapper: {
-    height: "40%",
-    width: "50%",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "start",
-    gap: "1em",
-  },
-  buttonRequestWrapper: {
-    height: "10%",
-    width: "50%",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "start",
-  },
-  uploadButtonWrapper: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "end",
-    height: "35%",
-  },
-  inputWrapper: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "start",
-    height: "70%",
-    width: "70%",
-    minHeight: "77px",
-  },
-  multiInputWrapper: {
-    width: "65%",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "start",
-    minHeight: "77px",
   },
 }));

@@ -130,7 +130,7 @@ export default function ListRequested(props: Props) {
   }
 
   function navigateToUserProfile(userId: string) {
-    navigate(`/profile/${userId}`);
+    navigate(`/profile/${userId}`, { state: { userId: userId } });
   }
 
   return (

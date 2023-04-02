@@ -146,7 +146,7 @@ export default function ListReceived(props: Props) {
   }
 
   function navigateToUserProfile(userId: string) {
-    navigate(`/profile/${userId}`);
+    navigate(`/profile/${userId}`, { state: { userId: userId } });
   }
 
   return (
