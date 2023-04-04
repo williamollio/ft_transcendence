@@ -4,13 +4,20 @@ import { initSocket } from "../services/initSocket.service";
 
 export class GameSocket {
   socket: Socket;
+  latestGame: "PLAY" | "WATCH" | null;
 
   constructor() {
     this.socket = initSocket("http://localhost:4444", null);
+    this.latestGame = null;
   }
 
   PP = (newPosition: number) => {
     this.socket.volatile.emit("PP", newPosition + 50);
+  };
+
+  leave = () => {
+    if (this.latestGame === "PLAY") this.leaveGame();
+    else if (this.latestGame === "WATCH") this.leaveAsSpectator();
   };
 
   leaveGame = () => {

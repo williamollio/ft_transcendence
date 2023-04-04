@@ -467,7 +467,7 @@ export class Game {
     }
   }
 
-  async saveGameResults(prismaService: PrismaService) {
+  async saveGameResults(prismaService: PrismaService, winnerId: string) {
     if (this.p2id) {
       await prismaService.user.update({
         where: {
@@ -481,6 +481,7 @@ export class Game {
                 p1s: this.p1s,
                 p2s: this.p2s,
                 playerTwoId: this.p2id,
+				winnerId: winnerId,
               },
             ],
           },
@@ -488,7 +489,7 @@ export class Game {
       });
     }
 
-    const newElos = await this.getNewElos(prismaService, this.p1s >= 10);
+    const newElos = await this.getNewElos(prismaService, this.p1id === winnerId);
     if (newElos && this.p1id && this.p2id) {
       await this.updateUserElo(this.p1id, newElos.eloPlayer1, prismaService);
       await this.updateUserElo(this.p2id, newElos.eloPlayer2, prismaService);

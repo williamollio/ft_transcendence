@@ -78,13 +78,11 @@ export class GameLoop {
   };
 
   startLoop = async () => {
-    console.log("starting");
     this.userSocket.joinGame();
     if (!this.interval) this.interval = setInterval(this.updateGame, 30);
   };
 
   stopLoop = () => {
-    console.log("stopping");
     this.userSocket.leaveGame();
     if (this.interval !== null) {
       clearInterval(this.interval);

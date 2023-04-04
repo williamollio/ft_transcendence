@@ -68,6 +68,7 @@ export default function GameBoard(props: Props) {
   };
 
   const gameFinishListener = (data: any) => {
+	gameSocket.latestGame = null;
     const thisPlayer =
       gameLoop.activePlayer === 1
         ? gameLoop.scoreInfo.p1Id
@@ -108,10 +109,13 @@ export default function GameBoard(props: Props) {
   };
 
   const gameJoinedListener = (data: any) => {
+	if (data.playerNumber === 0) gameSocket.latestGame = "WATCH";
+	else gameSocket.latestGame = "PLAY";
     gameLoop.activePlayer = data.playerNumber;
   };
 
   const getPlayerNames = async (p1Id: string, p2Id: string) => {
+	console.log(p1Id);
     gameLoop.scoreInfo.p1Id = p1Id;
     gameLoop.scoreInfo.p2Id = p2Id;
     ChannelService.getUserName(p1Id)
@@ -133,7 +137,6 @@ export default function GameBoard(props: Props) {
   };
 
   const tryRejoinListener = (data: any) => {
-    console.log("rejoined");
     if (data) {
       gameSocket.joinGame(data);
     }

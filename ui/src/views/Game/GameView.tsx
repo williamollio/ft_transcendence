@@ -50,11 +50,20 @@ export default function GameView(props: Props): React.ReactElement {
                 fontWeight={"bold"}
                 sx={{ textDecoration: "underline" }}
               >
-                {t(translationKeys.gameMode.classic)}
+                {t(translationKeys.title)}
               </Typography>
             </TitleWrapper>
             <ContentWrapper>
-              <Game gameSocket={gameSocket} userSocket={userSocket} />
+              <Grid container justifyContent="center">
+                <Grid item>
+                  <Game gameSocket={gameSocket} userSocket={userSocket} />
+                </Grid>
+                <Grid item>
+                  <Button variant="contained" onClick={gameSocket.leave}>
+                    {t(translationKeys.leaveGame)}
+                  </Button>
+                </Grid>
+              </Grid>
             </ContentWrapper>
           </CardContainer>
         </ProfileCard>

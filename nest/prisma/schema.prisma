@@ -49,6 +49,8 @@ model Match {
   p1s Int
   p2s Int
 
+  winnerId String @default ("")
+
   playerOneId String
   playerOne   User   @relation("playerOne", fields: [playerOneId], references: [id], onDelete: Cascade)
   playerTwoId String

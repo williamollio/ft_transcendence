@@ -326,20 +326,17 @@ export class UsersService {
     const currentUser = await this.findOneFromuserName(userId);
     let opponent: User | null;
     let matchWon: boolean;
-    let score: string;
 
     if (matchesList && currentUser) {
       try {
         for (const match of matchesList) {
           if (match.playerOneId === currentUser.id) {
             opponent = await this.getUserInfo(match.playerTwoId);
-            score = match.p1s.toString() + '-' + match.p2s.toString();
-            if (match.p1s == 10) matchWon = true;
+            if (match.winnerId === match.playerOneId) matchWon = true;
             else matchWon = false;
           } else {
             opponent = await this.getUserInfo(match.playerOneId);
-            score = match.p2s.toString() + '-' + match.p1s.toString();
-            if (match.p2s == 10) matchWon = true;
+            if (match.winnerId === match.playerTwoId) matchWon = true;
             else matchWon = false;
           }
           if (opponent) {
@@ -350,9 +347,8 @@ export class UsersService {
               currentUserId: currentUser.id,
               imageOpponent: imageOpponent,
               opponentId: opponent.id,
-              p1Score: match.p1s,
-              p2Score: match.p2s,
-              // score: score,
+              p1Score: currentUser.id === match.playerOneId ? match.p1s : match.p2s,
+              p2Score: currentUser.id === match.playerOneId ? match.p2s : match.p1s,
               matchWon: matchWon,
             });
           }
