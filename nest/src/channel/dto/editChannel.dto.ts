@@ -15,7 +15,7 @@ export class EditChannelDto {
   @IsOptional()
   passwordHash?: string;
 
-//   @IsString()
-//   @IsOptional()
-//   currentPasswordHash?: string;
+  @IsString()
+  @IsOptional()
+  currentPasswordHash?: string;
 }

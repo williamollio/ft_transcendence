@@ -1,5 +1,5 @@
 import { GameMode } from "../interfaces/chat.interface";
-import { scoreInfo } from "../interfaces/game.interface";
+import { GameConstants, scoreInfo } from "../interfaces/game.interface";
 import { GameSocket } from "./GameSocket.class";
 import { positionalData } from "./positionalData.class";
 import { UserSocket } from "./UserSocket.class";
@@ -13,10 +13,12 @@ export class GameLoop {
   activePlayer: number;
   gameMode: GameMode;
   scoreInfo: scoreInfo;
+  gameConstants: GameConstants;
 
-  constructor(gameSocket: GameSocket, userSocket: UserSocket) {
+  constructor(gameSocket: GameSocket, userSocket: UserSocket, constants: GameConstants) {
     this.interval = null;
-    this.positionalData = new positionalData();
+	this.gameConstants = constants;
+    this.positionalData = new positionalData(constants);
     this.keyPressed = [];
     this.gameSocket = gameSocket;
     this.userSocket = userSocket;
@@ -35,7 +37,6 @@ export class GameLoop {
   resetPositions = () => {
     this.stopLoop();
     this.positionalData.resetPositions();
-    this.handleMovement();
   };
 
   handleMovement = () => {
@@ -55,12 +56,12 @@ export class GameLoop {
       } else if (this.keyPressed.some((key) => key === "ArrowDown")) {
         if (
           this.activePlayer === 1 &&
-          this.positionalData.playerLeftYOffset + 5 < 350
+          this.positionalData.playerLeftYOffset + 5 < this.gameConstants.boardHeight - this.gameConstants.paddleSize
         ) {
           this.positionalData.playerLeftYOffset += 5;
         } else if (
           this.activePlayer === 2 &&
-          this.positionalData.playerRightYOffset + 5 < 350
+          this.positionalData.playerRightYOffset + 5 < this.gameConstants.boardHeight - this.gameConstants.paddleSize
         ) {
           this.positionalData.playerRightYOffset += 5;
         }

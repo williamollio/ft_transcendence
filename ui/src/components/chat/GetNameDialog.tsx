@@ -1,28 +1,35 @@
 import { Dialog, DialogContent, TextField } from "@mui/material";
-import { useState } from "react";
+import React, { useContext, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { chatRoom } from "../../classes/chatRoom.class";
 import { translationKeys } from "./constants";
+import { TranscendanceContext } from "../../context/transcendance-context";
+import { ToastType } from "../../context/toast";
+import { TranscendanceStateActionType } from "../../context/transcendance-reducer";
 
 interface Props {
   open: boolean;
   toggleOpen: any;
   channel: chatRoom | undefined;
   channelSocket: ChannelSocket;
+  toggleChannelInfo: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export default function GetNameDialog(props: Props) {
-  const { open, toggleOpen, channel, channelSocket } = props;
+  const { open, toggleOpen, channel, channelSocket, toggleChannelInfo } = props;
   const { t } = useTranslation();
 
   const [input, setInput] = useState<string>("");
   const [nameInput, setNameInput] = useState<string>("");
 
+  const toast = useContext(TranscendanceContext);
+
   const handleClose = () => {
     setInput("");
     setNameInput("");
     toggleOpen();
+    toggleChannelInfo(false);
   };
 
   const handleChange = (e: any) => {
@@ -48,8 +55,41 @@ export default function GetNameDialog(props: Props) {
             undefined,
             nameInput
           );
+        } else {
+          toast.dispatchTranscendanceState({
+            type: TranscendanceStateActionType.TOGGLE_TOAST,
+            toast: {
+              type: ToastType.ERROR,
+              title: t(translationKeys.createInfo.name) as string,
+              message: `${
+                t(translationKeys.errorMessages.channelNameEmpty) as string
+              }`,
+            },
+          });
         }
+      } else if (channel && channel.access === "PROTECTED" && input === "") {
+        toast.dispatchTranscendanceState({
+          type: TranscendanceStateActionType.TOGGLE_TOAST,
+          toast: {
+            type: ToastType.ERROR,
+            title: t(translationKeys.createInfo.password) as string,
+            message: `${
+              t(translationKeys.errorMessages.passwordEmpty) as string
+            }`,
+          },
+        });
       }
+	  else if (channel && channel.access === "PROTECTED" && input === "")
+	  {
+		toast.dispatchTranscendanceState({
+			type: TranscendanceStateActionType.TOGGLE_TOAST,
+			toast: {
+			  type: ToastType.ERROR,
+			  title: t(translationKeys.createInfo.password) as string,
+			  message: `${t(translationKeys.errorMessages.passwordEmpty) as string}`
+			},
+		  });
+	  }
       handleClose();
     }
   };
@@ -65,12 +105,16 @@ export default function GetNameDialog(props: Props) {
         value={nameInput}
         onChange={handleNameChange}
       ></TextField>
-      <TextField
-        label={t(translationKeys.createInfo.password)}
-        type="password"
-        value={input}
-        onChange={handleChange}
-      ></TextField>
+      {channel?.access === "PROTECTED" ? (
+        <TextField
+          label={t(translationKeys.createInfo.password)}
+          type="password"
+          value={input}
+          onChange={handleChange}
+        ></TextField>
+      ) : (
+        false
+      )}
     </Dialog>
   );
 }

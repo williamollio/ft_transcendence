@@ -1,13 +1,14 @@
 import { Avatar } from "@mui/material";
-import { ballPosition } from "../../interfaces/game.interface";
+import { GameConstants, ballPosition } from "../../interfaces/game.interface";
 
 interface Props {
   ballPos: ballPosition;
   posRef: { offsetLeft: number; offsetTop: number };
+  gameConstants: GameConstants;
 }
 
 export default function Ball(props: Props) {
-  const { posRef, ballPos } = props;
+  const { posRef, ballPos, gameConstants } = props;
 
   return (
     <>
@@ -19,8 +20,8 @@ export default function Ball(props: Props) {
             left: ballPos.x + posRef.offsetLeft,
             top: ballPos.y + posRef.offsetTop,
             boxShadow: 5,
-            width: 30,
-            height: 30,
+            width: gameConstants.ballSize,
+            height: gameConstants.ballSize,
           }}
         />
       ) : (

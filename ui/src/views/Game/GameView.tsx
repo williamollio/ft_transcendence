@@ -90,7 +90,7 @@ export default function GameView(props: Props): React.ReactElement {
           <Button
             sx={{ width: 70 }}
             onClick={() =>
-              gameSocket.joinAsSpectator("clfiqolxb0000obayrxl47r5s")
+              gameSocket.joinAsSpectator("clg25gq4l0000s0axxoojzacx")
             }
           >
             watch game

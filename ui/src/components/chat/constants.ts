@@ -41,6 +41,7 @@ export const translationKeys = {
     passwordReq: "This channel requires a password",
     you: "You",
     missing: "missing",
+	notice: "Notice"
   },
   createInfo: {
     public: "Public",

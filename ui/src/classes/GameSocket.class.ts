@@ -5,10 +5,12 @@ import { initSocket } from "../services/initSocket.service";
 export class GameSocket {
   socket: Socket;
   latestGame: "PLAY" | "WATCH" | null;
+  spectatingPlayerId: string;
 
   constructor() {
     this.socket = initSocket("http://localhost:4444", null);
     this.latestGame = null;
+    this.spectatingPlayerId = "";
   }
 
   PP = (newPosition: number) => {
@@ -44,10 +46,12 @@ export class GameSocket {
   };
 
   joinAsSpectator = (playerId: string) => {
+	this.spectatingPlayerId = playerId;
     this.socket.emit("watchGame", { playerId: playerId });
   };
 
   leaveAsSpectator = () => {
-    this.socket.emit("leaveWatch");
+    this.socket.emit("leaveWatch", {playerId: this.spectatingPlayerId});
+	this.spectatingPlayerId = "";
   };
 }

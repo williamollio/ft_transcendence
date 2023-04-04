@@ -19,7 +19,7 @@ export default function ScoreDisplay(props: Props) {
       <Grid item>
         <Typography fontSize={30}>{scoreInfo.p1s}</Typography>
       </Grid>
-      <Grid item marginLeft={10}>
+      <Grid item marginLeft={10} sx={{ width: 100 }}>
         <Typography fontSize={20}>{scoreInfo.p1name}</Typography>
       </Grid>
       <Grid container direction="column" flex={0}>
@@ -35,7 +35,7 @@ export default function ScoreDisplay(props: Props) {
           <BoltIcon sx={{ color: "yellow" }} />
         </Grid>
       </Grid>
-      <Grid item marginRight={10}>
+      <Grid item marginRight={10} sx={{ width: 100 }}>
         <Typography fontSize={20}>{scoreInfo.p2name}</Typography>
       </Grid>
       <Grid item>

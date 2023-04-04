@@ -66,7 +66,7 @@ export class ChannelSocket {
 
   messageRoom = (message: messagesDto) => {
     this.socket.emit("messageRoom", {
-      messageInfo: { channelId: message.room, content: message.message },
+      messageInfo: message,
     });
   };
 
@@ -83,12 +83,12 @@ export class ChannelSocket {
         name: newName ? newName : channel.key,
         type: type,
         passwordHash: newPassword,
-        // currentPasswordHash: password,
+        currentPasswordHash: password,
       },
     });
   };
 
-  createDm = (otherUser: User) => {
+  createDm = (otherUser: { name: string; id: string }) => {
     this.socket.emit("createRoom", {
       createInfo: {
         name: otherUser.name,

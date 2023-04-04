@@ -246,24 +246,26 @@ export class Game {
     ) {
       switch (this.mode) {
         case GameMode.MAYHEM: {
-          if (this.dirx > 0) {
+          if (this.dirx < 0) {
             if (this.gameConstants.speed < maxSpeed) {
               this.gameConstants.speed = 5;
               this.dirx = speeds[5];
-            }
-          } else {
-            this.dirx = this.dirx * -1;
-            if (this.gameConstants.speed < maxSpeed) {
-              this.dirx = speeds[this.gameConstants.speed++];
+            } else {
+              this.dirx = this.dirx * -1;
+              if (this.gameConstants.speed < maxSpeed) {
+                this.dirx = speeds[this.gameConstants.speed++];
+              }
             }
           }
           this.diry = (this.by - this.p1y) / 2;
           break;
         }
         case GameMode.CLASSIC: {
-          this.dirx = this.dirx * -1;
-          if (this.gameConstants.speed < maxSpeed) {
-            this.dirx = speeds[this.gameConstants.speed++];
+          if (this.dirx < 0) {
+            this.dirx = this.dirx * -1;
+            if (this.gameConstants.speed < maxSpeed) {
+              this.dirx = speeds[this.gameConstants.speed++];
+            }
           }
           this.diry = (this.by - this.p1y) / 2;
           break;
@@ -282,26 +284,34 @@ export class Game {
     ) {
       switch (this.mode) {
         case GameMode.MAYHEM: {
-          if (this.dirx < 0) {
+          if (this.dirx > 0) {
             if (this.gameConstants.speed < maxSpeed) {
               this.gameConstants.speed = 5;
               this.dirx = -speeds[5];
-            }
-          } else {
-            this.dirx = this.dirx * -1;
-            if (this.gameConstants.speed < maxSpeed) {
-              this.dirx = -speeds[this.gameConstants.speed++];
+            } else {
+              this.dirx = this.dirx * -1;
+              if (this.gameConstants.speed < maxSpeed) {
+                this.dirx = -speeds[this.gameConstants.speed++];
+              }
             }
           }
           this.diry = this.by - this.p2y;
           break;
         }
         case GameMode.CLASSIC: {
-          this.dirx = this.dirx * -1;
-          if (this.gameConstants.speed < maxSpeed) {
-            this.dirx = -speeds[this.gameConstants.speed++];
-          }
           this.diry = this.by - this.p2y;
+          if (this.dirx > 0) {
+			if (this.diry > 0)
+			{
+				let newDirx = speeds[this.gameConstants.speed]
+				
+			}
+
+            this.dirx = this.dirx * -1;
+            if (this.gameConstants.speed < maxSpeed) {
+              this.dirx = -speeds[this.gameConstants.speed++];
+            }
+          }
           break;
         }
       }
@@ -481,7 +491,7 @@ export class Game {
                 p1s: this.p1s,
                 p2s: this.p2s,
                 playerTwoId: this.p2id,
-				winnerId: winnerId,
+                winnerId: winnerId,
               },
             ],
           },
@@ -489,7 +499,10 @@ export class Game {
       });
     }
 
-    const newElos = await this.getNewElos(prismaService, this.p1id === winnerId);
+    const newElos = await this.getNewElos(
+      prismaService,
+      this.p1id === winnerId,
+    );
     if (newElos && this.p1id && this.p2id) {
       await this.updateUserElo(this.p1id, newElos.eloPlayer1, prismaService);
       await this.updateUserElo(this.p2id, newElos.eloPlayer2, prismaService);

@@ -58,6 +58,7 @@ export class GameService {
     if (game !== null) {
       await client.leave(game.gameRoomId);
     }
+	client.emit("leftWatch");
   }
   /*
   Spectating mode logic:

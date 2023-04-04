@@ -1,13 +1,15 @@
 import { Paper } from "@mui/material";
+import { GameConstants } from "../../interfaces/game.interface";
 
 interface Props {
   yPos: number;
   lr: boolean;
   posRef: { offsetLeft: number; offsetTop: number };
+  gameConstants: GameConstants;
 }
 
 export default function Player(props: Props) {
-  const { yPos, posRef, lr } = props;
+  const { yPos, posRef, lr, gameConstants } = props;
 
   return (
     <>
@@ -18,15 +20,25 @@ export default function Player(props: Props) {
             position: "absolute",
             top: posRef.offsetTop + yPos,
             ...(lr
-              ? { left: 10 + posRef.offsetLeft }
-              : { left: 642 + posRef.offsetLeft }),
+              ? {
+                  left:
+                    gameConstants.paddleRelativeOffset -
+                    gameConstants.paddleWidth +
+                    posRef.offsetLeft,
+                }
+              : {
+                  left:
+                    gameConstants.boardWidth -
+                    gameConstants.paddleRelativeOffset +
+                    posRef.offsetLeft,
+                }),
             ...(!lr
               ? {
                   backgroundColor: "black",
                 }
               : false),
-            width: 20,
-            height: 100,
+            width: gameConstants.paddleWidth,
+            height: gameConstants.paddleSize,
           }}
         />
       ) : (

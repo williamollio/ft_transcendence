@@ -1,8 +1,10 @@
 import { accessTypes, chatRoom } from "../classes/chatRoom.class";
 
 export interface messagesDto {
-  message?: string | null;
-  room?: string;
+  userId: string;
+  userName: string;
+  content: string;
+  channelId: string;
 }
 
 export interface user {
@@ -33,7 +35,7 @@ export interface DBChannelElement {
   name: string;
   type: accessTypes;
   users: channelUser[];
-  messages: Array<{ content: string, senderId: string }>;
+  messages: Array<messagesDto>;
 }
 
 export interface DBChannelUserListElement {
@@ -44,7 +46,8 @@ export interface DBChannelUserListElement {
 export interface ChannelInfoContextMenu {
   mouseX: number;
   mouseY: number;
-  user: channelUser;
+  user: user;
+  channelId: string;
 }
 
 export enum GameMode {

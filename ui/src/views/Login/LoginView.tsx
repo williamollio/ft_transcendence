@@ -66,6 +66,7 @@ export default function LoginView(props: Props): React.ReactElement {
       showErrorToast(response.error);
       localStorage.removeItem(Cookie.TOKEN);
     } else {
+      if (userSocket.socket.connected) userSocket.logIn();
       navigate(RoutePath.EDITPROFILE);
     }
   }

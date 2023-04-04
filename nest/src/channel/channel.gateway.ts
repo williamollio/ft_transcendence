@@ -25,6 +25,7 @@ import { ModerateChannelDto } from './dto/moderateChannelUser.dto';
 import * as msgpack from 'socket.io-msgpack-parser';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
 import { JwtUser } from 'src/users/interface/jwt-user.interface';
+import { UsersService } from 'src/users/users.service';
 
 enum acknoledgementStatus {
   OK = 'OK',
@@ -42,7 +43,10 @@ enum acknoledgementStatus {
 export class ChannelGateway {
   @WebSocketServer()
   server: Server;
-  constructor(private readonly channelService: ChannelService) {}
+  constructor(
+    private readonly channelService: ChannelService,
+    private readonly userService: UsersService,
+  ) {}
 
   @SubscribeMessage('connect')
   handleConnection(@ConnectedSocket() clientSocket: Socket) {
@@ -153,7 +157,10 @@ export class ChannelGateway {
     @MessageBody('messageInfo') messageInfo: IncomingMessageDto,
     @ConnectedSocket() clientSocket: Socket,
   ) {
-    const messageSaved = await this.channelService.storeMessage(
+    messageInfo.userId = senderId;
+    const userName = await this.userService.getUserName(senderId);
+    userName ? messageInfo.userName = userName : "missing";
+	const messageSaved = await this.channelService.storeMessage(
       senderId,
       messageInfo,
     );

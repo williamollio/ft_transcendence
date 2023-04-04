@@ -8,7 +8,6 @@ import React, {
 } from "react";
 import { useTranslation } from "react-i18next";
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
-import { chatRoom } from "../../classes/chatRoom.class";
 import { GameSocket } from "../../classes/GameSocket.class";
 import { ToastType } from "../../context/toast";
 import { TranscendanceContext } from "../../context/transcendance-context";
@@ -19,36 +18,35 @@ import {
 } from "../../interfaces/chat.interface";
 import ChannelService from "../../services/channel.service";
 import { translationKeys } from "./constants";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
-  toggleChannelInfo: React.Dispatch<React.SetStateAction<boolean>>;
   blockedUser: Array<string>;
   refetchBlockedUsers: any;
-  channel: chatRoom | undefined;
   contextMenu: ChannelInfoContextMenu | null;
   setContextMenu: Dispatch<SetStateAction<ChannelInfoContextMenu | null>>;
   channelSocket: ChannelSocket;
   gameSocket: GameSocket;
 }
 
-export default function ChannelInfoContext(props: Props) {
+export default function UserContext(props: Props) {
   const {
-    toggleChannelInfo,
     blockedUser,
     refetchBlockedUsers,
-    channel,
     contextMenu,
     setContextMenu,
     channelSocket,
     gameSocket,
   } = props;
+  const { t } = useTranslation();
+  const toast = useContext(TranscendanceContext);
+  const navigate = useNavigate();
+
   const [blockStatus, setBlockStatus] = useState<"Block" | "Unblock">("Block");
   const [self, setSelf] = useState<boolean>(false);
   const [gameModeSelect, setGameModeSelect] = useState<GameMode>(
     GameMode.CLASSIC
   );
-  const { t } = useTranslation();
-  const toast = useContext(TranscendanceContext);
 
   useEffect(() => {
     if (contextMenu) {
@@ -77,15 +75,13 @@ export default function ChannelInfoContext(props: Props) {
     if (contextMenu && contextMenu.user) {
       channelSocket.createDm(contextMenu.user);
     }
-    toggleChannelInfo(false);
   };
 
   const handleProfile = () => {
     handleContextClose();
     if (contextMenu && contextMenu.user && contextMenu.user.id) {
-      // checkout profile with user.id
+      navigate(`/profile/${contextMenu.user.id}`, { state: { userId: contextMenu.user.id } });
     }
-    toggleChannelInfo(false);
   };
 
   const handleInviteGame = (_event: React.MouseEvent<HTMLLIElement>) => {
@@ -93,7 +89,6 @@ export default function ChannelInfoContext(props: Props) {
     if (contextMenu && contextMenu.user && contextMenu.user.id) {
       gameSocket.inviteToGame(gameModeSelect, contextMenu.user.id);
     }
-    toggleChannelInfo(false);
   };
 
   const handleBlock = async () => {
@@ -131,39 +126,36 @@ export default function ChannelInfoContext(props: Props) {
   const handleMute = () => {
     handleContextClose();
     if (
-      channel &&
-      channel.id &&
       contextMenu &&
+      contextMenu.channelId &&
       contextMenu.user &&
       contextMenu.user.id
     ) {
-      channelSocket.muteUser(channel.id, contextMenu.user.id);
+      channelSocket.muteUser(contextMenu.channelId, contextMenu.user.id);
     }
   };
 
   const handleKick = () => {
     handleContextClose();
     if (
-      channel &&
-      channel.id &&
       contextMenu &&
+      contextMenu.channelId &&
       contextMenu.user &&
       contextMenu.user.id
     ) {
-      channelSocket.banUser(channel.id, contextMenu.user.id);
+      channelSocket.banUser(contextMenu.channelId, contextMenu.user.id);
     }
   };
 
   const handlePromote = () => {
     handleContextClose();
     if (
-      channel &&
-      channel.id &&
       contextMenu &&
+      contextMenu.channelId &&
       contextMenu.user &&
       contextMenu.user.id
     ) {
-      channelSocket.editRole(channel.id, contextMenu.user.id);
+      channelSocket.editRole(contextMenu.channelId, contextMenu.user.id);
     }
   };
 

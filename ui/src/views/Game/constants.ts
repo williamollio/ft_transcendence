@@ -7,12 +7,8 @@ export const translationKeys = {
     inviteRefused: "Invitation Refused",
     failed: "Failed!",
   },
-  gameMode: {
-	classic: "Classic Pong Game",
-	mayhem: "Pong MAYHEM",
-  },
   gameEndState: {
-	win: "Victory!",
-	loss: "Defeat!",
+    win: "Victory!",
+    loss: "Defeat!",
   },
 };

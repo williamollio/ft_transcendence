@@ -13,6 +13,7 @@ import { ToastType } from "../../context/toast";
 import { TranscendanceContext } from "../../context/transcendance-context";
 import { TranscendanceStateActionType } from "../../context/transcendance-reducer";
 import {
+  GameConstants,
   GameState,
   failedEvents,
   scoreInfo,
@@ -29,10 +30,11 @@ interface Props {
   gameLoop: GameLoop;
   gameSocket: GameSocket;
   setScoreInfo: React.Dispatch<SetStateAction<scoreInfo>>;
+  gameConstants: GameConstants;
 }
 
 export default function GameBoard(props: Props) {
-  const { gameLoop, gameSocket, setScoreInfo } = props;
+  const { gameLoop, gameSocket, setScoreInfo, gameConstants } = props;
   const { t } = useTranslation();
   const toast = useContext(TranscendanceContext);
 
@@ -41,7 +43,7 @@ export default function GameBoard(props: Props) {
   const [zoom, toggleZoom] = useState<boolean>(false);
   const [gameStatus, setGameStatus] = useState<GameState>(GameState.WIN);
   const [gamePositions, setGamePositions] = useState<positionalData>(
-    new positionalData()
+    new positionalData(gameConstants)
   );
 
   const playerMoveHandler = (event: KeyboardEvent) => {
@@ -68,15 +70,21 @@ export default function GameBoard(props: Props) {
   };
 
   const gameFinishListener = (data: any) => {
-	gameSocket.latestGame = null;
+    gameSocket.latestGame = null;
     const thisPlayer =
-      gameLoop.activePlayer === 1
+      gameLoop.activePlayer === 0
+        ? gameSocket.spectatingPlayerId
+        : gameLoop.activePlayer === 1
         ? gameLoop.scoreInfo.p1Id
         : gameLoop.scoreInfo.p2Id;
     if (thisPlayer === data) setGameStatus(GameState.WIN);
     else setGameStatus(GameState.LOSS);
     toggleZoom(true);
 
+    resetGame();
+  };
+
+  const resetGame = () => {
     gameLoop.resetPositions();
     setGamePositions(gameLoop.positionalData);
     gameLoop.scoreInfo = {
@@ -93,29 +101,33 @@ export default function GameBoard(props: Props) {
   const giListener = (data: any) => {
     gameLoop.scoreInfo.p1s = data.p1s;
     gameLoop.scoreInfo.p2s = data.p2s;
-    setGamePositions({
-      ...gamePositions,
-      ballOffset: { x: data.bx - 15, y: data.by - 15 },
-      playerRightYOffset:
-        gameLoop.activePlayer !== 2
-          ? data.p2y - 50
-          : gameLoop.positionalData.playerRightYOffset,
-      playerLeftYOffset:
-        gameLoop.activePlayer !== 1
-          ? data.p1y - 50
-          : gameLoop.positionalData.playerLeftYOffset,
-    });
+    setGamePositions(
+      new positionalData(gameConstants, {
+        ...gamePositions,
+        ballOffset: {
+          x: data.bx - gameConstants.ballSize / 2,
+          y: data.by - gameConstants.ballSize / 2,
+        },
+        playerRightYOffset:
+          gameLoop.activePlayer !== 2
+            ? data.p2y - gameConstants.paddleSize / 2
+            : gameLoop.positionalData.playerRightYOffset,
+        playerLeftYOffset:
+          gameLoop.activePlayer !== 1
+            ? data.p1y - gameConstants.paddleSize / 2
+            : gameLoop.positionalData.playerLeftYOffset,
+      })
+    );
     setScoreInfo({ ...gameLoop.scoreInfo });
   };
 
   const gameJoinedListener = (data: any) => {
-	if (data.playerNumber === 0) gameSocket.latestGame = "WATCH";
-	else gameSocket.latestGame = "PLAY";
+    if (data.playerNumber === 0) gameSocket.latestGame = "WATCH";
+    else gameSocket.latestGame = "PLAY";
     gameLoop.activePlayer = data.playerNumber;
   };
 
   const getPlayerNames = async (p1Id: string, p2Id: string) => {
-	console.log(p1Id);
     gameLoop.scoreInfo.p1Id = p1Id;
     gameLoop.scoreInfo.p2Id = p2Id;
     ChannelService.getUserName(p1Id)
@@ -131,6 +143,7 @@ export default function GameBoard(props: Props) {
   };
 
   const mutateGameStatusListener = (data: any) => {
+    setScoreInfo({ ...gameLoop.scoreInfo });
     if (gameLoop.scoreInfo.p1name === "" || gameLoop.scoreInfo.p2name === "")
       getPlayerNames(data.player1id, data.player2id);
     if (data.status === "PLAYING") gameLoop.startLoop();
@@ -140,6 +153,11 @@ export default function GameBoard(props: Props) {
     if (data) {
       gameSocket.joinGame(data);
     }
+  };
+
+  const leftWatchListener = () => {
+    resetGame();
+    gameSocket.latestGame = null;
   };
 
   const failedListener = (data: any) => {
@@ -165,9 +183,10 @@ export default function GameBoard(props: Props) {
         gameSocket.socket.on("tryRejoin", tryRejoinListener);
         gameSocket.socket.on("matchFinished", gameFinishListener);
         gameSocket.socket.on("gameStarting", gameStartingListener);
-        gameSocket.socket.on("GI", giListener);
         gameSocket.socket.on("gameJoined", gameJoinedListener);
         gameSocket.socket.on("gameStatus", mutateGameStatusListener);
+        gameSocket.socket.on("GI", giListener);
+        gameSocket.socket.on("leftWatch", leftWatchListener);
         gameSocket.rejoin();
         return true;
       }
@@ -184,10 +203,10 @@ export default function GameBoard(props: Props) {
           gameSocket.socket.off("tryRejoin", tryRejoinListener);
           gameSocket.socket.off("matchFinished", gameFinishListener);
           gameSocket.socket.off("gameStarting", gameStartingListener);
-          gameSocket.socket.off("GI", giListener);
           gameSocket.socket.off("gameJoined", gameJoinedListener);
           gameSocket.socket.off("gameStatus", mutateGameStatusListener);
-
+          gameSocket.socket.off("GI", giListener);
+          gameSocket.socket.off("leftWatch", leftWatchListener);
           return true;
         }
         return false;
@@ -201,8 +220,8 @@ export default function GameBoard(props: Props) {
       <Paper
         ref={boardRef}
         sx={{
-          width: 672,
-          height: 450,
+          width: gameConstants.boardWidth,
+          height: gameConstants.boardHeight,
           backgroundColor: "white",
           display: "flex",
         }}
@@ -211,7 +230,7 @@ export default function GameBoard(props: Props) {
           orientation="vertical"
           sx={{
             position: "relative",
-            left: 335,
+            left: gameConstants.boardWidth / 2 - 1,
             height: "100%",
             bgcolor: "black",
           }}
@@ -224,6 +243,7 @@ export default function GameBoard(props: Props) {
               ? boardRef.current
               : { offsetLeft: 0, offsetTop: 0 }
           }
+          gameConstants={gameConstants}
         ></Player>
         <Player
           lr={false}
@@ -233,6 +253,7 @@ export default function GameBoard(props: Props) {
               ? boardRef.current
               : { offsetLeft: 0, offsetTop: 0 }
           }
+          gameConstants={gameConstants}
         ></Player>
         <Ball
           ballPos={gamePositions.ballOffset}
@@ -241,6 +262,7 @@ export default function GameBoard(props: Props) {
               ? boardRef.current
               : { offsetLeft: 0, offsetTop: 0 }
           }
+          gameConstants={gameConstants}
         ></Ball>
         <GameEndDisplay
           zoom={zoom}
