@@ -2,6 +2,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { Request } from 'express';
 import { GameService } from '../game.service';
 import { Server } from 'socket.io';
+import { threadId } from 'worker_threads';
 
 // To Manuel to check if this is correct
 export interface HandshakeRequest extends Request {
@@ -160,16 +161,17 @@ export class Game {
     player2PaddlePosX: 642,
     paddleWidth: 20,
     ballHeight: 30,
-    maxSpeed: 0,
+    maxSpeed: 5,
     speed: 0,
-    speeds: [7, 8, 10, 12, 14, 15, 20],
+    speeds: [7, 8, 10, 12, 14, 15, 20, 25, 30],
   };
   gameRoomId: string;
   p1id: string | undefined = undefined;
   p2id: string | undefined = undefined;
   status: Status;
-  dirx = this.gameConstants.speeds[0];
-  diry = 0.0;
+  ballAngle = 0;
+  ballSpeed = this.gameConstants.speeds[0];
+  movementVector = { x: 0.0, y: 0.0 };
   p1y = 225;
   p2y = 225;
   bx = 336;
@@ -202,14 +204,46 @@ export class Game {
   }
 
   // Classic Game reset
-  resetBallForClassicMode(playerScored: number): void {
-    const MIN_RANDOM_Y_SPEED = -5;
-    const MAX_RANDOM_Y_SPEED = 5;
-    this.dirx = this.gameConstants.speeds[(this.gameConstants.speed = 0)];
-    if (playerScored === 1) this.dirx *= -1;
+  calculateMovementVector(
+    speed: number,
+    angle: number,
+  ): { x: number; y: number } {
+    const radians = (angle * Math.PI) / 180;
+    const x = speed * Math.cos(radians);
+    const y = speed * -Math.sin(radians);
+    return { x, y };
+  }
+
+  resetBallForClassicMode(playerScored: number = 1): void {
+    const angleRanges = { min: -30, max: 30 };
     this.bx = this.gameConstants.relativeMiddleX;
     this.by = this.gameConstants.relativeMiddleY;
-    this.diry = generateRandomNumber(MIN_RANDOM_Y_SPEED, MAX_RANDOM_Y_SPEED);
+    this.ballAngle =
+      Math.floor(Math.random() * (angleRanges.max - angleRanges.min + 1)) +
+      angleRanges.min;
+    if (playerScored === 1) this.ballAngle = 180 - this.ballAngle;
+    this.movementVector = this.calculateMovementVector(
+      this.gameConstants.speeds[(this.gameConstants.speed = 0)],
+      this.ballAngle,
+    );
+  }
+
+  resetBallForMayhemMode(playerScored: number = 1): void {
+    const angleRanges = { min: -45, max: 45 };
+    this.gameConstants.maxSpeed = 8;
+    this.bx = this.gameConstants.relativeMiddleX;
+    this.by =
+      Math.floor(
+        Math.random() * (this.gameConstants.relativeGameHeight - 15 - 15 + 1),
+      ) + 15;
+    this.ballAngle =
+      Math.floor(Math.random() * (angleRanges.max - angleRanges.min + 1)) +
+      angleRanges.min;
+    if (playerScored === 1) this.ballAngle = 180 - this.ballAngle;
+    this.movementVector = this.calculateMovementVector(
+      this.gameConstants.speeds[(this.gameConstants.speed = 5)],
+      this.ballAngle,
+    );
   }
 
   moveBall(gameService: GameService, server: Server) {
@@ -226,11 +260,19 @@ export class Game {
     if (this.by + ballHeight / 2 >= relativeGameHeight) {
       // bottom collision
       this.by = relativeGameHeight - ballHeight / 2;
-      this.diry = -this.diry;
+      this.ballAngle = -this.ballAngle;
+      this.movementVector = this.calculateMovementVector(
+        this.ballSpeed,
+        this.ballAngle,
+      );
     } else if (this.by - ballHeight / 2 <= 0) {
       // top collision
       this.by = 0 + ballHeight / 2;
-      this.diry = -this.diry;
+      this.ballAngle = -this.ballAngle;
+      this.movementVector = this.calculateMovementVector(
+        this.ballSpeed,
+        this.ballAngle,
+      );
     }
     // player paddle collision
     if (
@@ -246,28 +288,35 @@ export class Game {
     ) {
       switch (this.mode) {
         case GameMode.MAYHEM: {
-          if (this.dirx < 0) {
-            if (this.gameConstants.speed < maxSpeed) {
-              this.gameConstants.speed = 5;
-              this.dirx = speeds[5];
-            } else {
-              this.dirx = this.dirx * -1;
-              if (this.gameConstants.speed < maxSpeed) {
-                this.dirx = speeds[this.gameConstants.speed++];
-              }
-            }
+          const paddleCenter = this.p1y + this.paddleSize / 2;
+          const ballDistanceFromPaddleCenter = this.by - paddleCenter;
+          const res =
+            Math.sign(ballDistanceFromPaddleCenter) * 60 -
+            (ballDistanceFromPaddleCenter / (this.paddleSize / 2)) * 60;
+          this.ballAngle = res;
+          if (this.gameConstants.speed < maxSpeed) {
+            this.ballSpeed = speeds[this.gameConstants.speed++];
           }
-          this.diry = (this.by - this.p1y) / 2;
+          this.movementVector = this.calculateMovementVector(
+            this.ballSpeed,
+            this.ballAngle,
+          );
           break;
         }
         case GameMode.CLASSIC: {
-          if (this.dirx < 0) {
-            this.dirx = this.dirx * -1;
-            if (this.gameConstants.speed < maxSpeed) {
-              this.dirx = speeds[this.gameConstants.speed++];
-            }
+          const paddleCenter = this.p1y + this.paddleSize / 2;
+          const ballDistanceFromPaddleCenter = this.by - paddleCenter;
+          const res =
+            Math.sign(ballDistanceFromPaddleCenter) * 45 -
+            (ballDistanceFromPaddleCenter / (this.paddleSize / 2)) * 45;
+          this.ballAngle = res;
+          if (this.gameConstants.speed < maxSpeed) {
+            this.ballSpeed = speeds[this.gameConstants.speed++];
           }
-          this.diry = (this.by - this.p1y) / 2;
+          this.movementVector = this.calculateMovementVector(
+            this.ballSpeed,
+            this.ballAngle,
+          );
           break;
         }
       }
@@ -284,34 +333,35 @@ export class Game {
     ) {
       switch (this.mode) {
         case GameMode.MAYHEM: {
-          if (this.dirx > 0) {
-            if (this.gameConstants.speed < maxSpeed) {
-              this.gameConstants.speed = 5;
-              this.dirx = -speeds[5];
-            } else {
-              this.dirx = this.dirx * -1;
-              if (this.gameConstants.speed < maxSpeed) {
-                this.dirx = -speeds[this.gameConstants.speed++];
-              }
-            }
+          const paddleCenter = this.p2y + this.paddleSize / 2;
+          const ballDistanceFromPaddleCenter = this.by - paddleCenter;
+          const res =
+            Math.sign(ballDistanceFromPaddleCenter) * 60 -
+            (ballDistanceFromPaddleCenter / (this.paddleSize / 2)) * 60;
+          this.ballAngle = 180 - res;
+          if (this.gameConstants.speed < maxSpeed) {
+            this.ballSpeed = speeds[this.gameConstants.speed++];
           }
-          this.diry = this.by - this.p2y;
+          this.movementVector = this.calculateMovementVector(
+            this.ballSpeed,
+            this.ballAngle,
+          );
           break;
         }
         case GameMode.CLASSIC: {
-          this.diry = this.by - this.p2y;
-          if (this.dirx > 0) {
-			if (this.diry > 0)
-			{
-				let newDirx = speeds[this.gameConstants.speed]
-				
-			}
-
-            this.dirx = this.dirx * -1;
-            if (this.gameConstants.speed < maxSpeed) {
-              this.dirx = -speeds[this.gameConstants.speed++];
-            }
+          const paddleCenter = this.p2y + this.paddleSize / 2;
+          const ballDistanceFromPaddleCenter = this.by - paddleCenter;
+          const res =
+            Math.sign(ballDistanceFromPaddleCenter) * 45 -
+            (ballDistanceFromPaddleCenter / (this.paddleSize / 2)) * 45;
+          this.ballAngle = 180 - res;
+          if (this.gameConstants.speed < maxSpeed) {
+            this.ballSpeed = speeds[this.gameConstants.speed++];
           }
+          this.movementVector = this.calculateMovementVector(
+            this.ballSpeed,
+            this.ballAngle,
+          );
           break;
         }
       }
@@ -326,12 +376,11 @@ export class Game {
       }
       switch (this.mode) {
         case GameMode.CLASSIC: {
-          this.resetBallForClassicMode(1);
+          this.resetBallForClassicMode(0);
           break;
         }
         case GameMode.MAYHEM: {
-          this.bx = 0;
-          this.dirx = speeds[(this.gameConstants.speed = 1)];
+          this.resetBallForMayhemMode(0);
           break;
         }
       }
@@ -344,19 +393,18 @@ export class Game {
       }
       switch (this.mode) {
         case GameMode.CLASSIC: {
-          this.resetBallForClassicMode(2);
+          this.resetBallForClassicMode(1);
           break;
         }
         case GameMode.MAYHEM: {
-          this.bx = relativeGameWidth;
-          this.dirx = -speeds[(this.gameConstants.speed = 1)];
+          this.resetBallForMayhemMode(1);
           break;
         }
       }
     }
 
-    this.bx += this.dirx;
-    this.by += this.diry;
+    this.bx += this.movementVector.x;
+    this.by += this.movementVector.y;
     return this;
   }
 

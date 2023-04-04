@@ -21,6 +21,7 @@ export default function Game(props: Props) {
     paddleSize: 100,
     paddleWidth: 20,
     ballSize: 30,
+	playerSpeed: 7,
   };
 
   const [gameLoop] = useState<GameLoop>(

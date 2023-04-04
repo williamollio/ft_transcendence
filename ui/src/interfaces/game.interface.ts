@@ -26,4 +26,5 @@ export interface GameConstants {
   paddleSize: number;
   paddleWidth: number;
   ballSize: number;
+  playerSpeed: number;
 }

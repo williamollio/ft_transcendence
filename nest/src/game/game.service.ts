@@ -58,7 +58,7 @@ export class GameService {
     if (game !== null) {
       await client.leave(game.gameRoomId);
     }
-	client.emit("leftWatch");
+    client.emit('leftWatch');
   }
   /*
   Spectating mode logic:
@@ -363,6 +363,8 @@ export class GameService {
     if (p2 !== undefined) {
       this.GameMap.setPlayer2(p2, game);
     }
+    if (mode === GameMode.CLASSIC) game.resetBallForClassicMode();
+	else game.resetBallForMayhemMode();
     return game;
   }
 
@@ -384,9 +386,6 @@ export class GameService {
     const callback = () => {
       const payload = this.moveBall(userId, server);
       if (!payload) return;
-      //   this.gameInfo.verify(payload);
-      //   const message = this.gameInfo.create(payload);
-      //   const encoded = this.gameInfo.encode(message).finish();
       server.to(gameRoomId).volatile.timeout(5000).emit('GI', payload);
     };
 
