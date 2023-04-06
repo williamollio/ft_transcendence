@@ -80,7 +80,7 @@ export class GameLoop {
   };
 
   startLoop = async (togglePause: React.Dispatch<React.SetStateAction<boolean>>) => {
-    this.userSocket.joinGame();
+	this.userSocket.joinGame();
     togglePause(false);
 	if (!this.interval) this.interval = setInterval(this.updateGame, 30);
   };

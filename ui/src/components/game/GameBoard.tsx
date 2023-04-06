@@ -27,7 +27,6 @@ import GameEndDisplay from "./GameEndDisplay";
 import { positionalData } from "../../classes/positionalData.class";
 import PauseOverlay from "./PauseOverlay";
 import PauseNotification from "./PauseNotification";
-import { Pause } from "@mui/icons-material";
 
 interface Props {
   gameLoop: GameLoop;
@@ -47,6 +46,9 @@ export default function GameBoard(props: Props) {
     new positionalData(gameConstants)
   );
   const [pause, togglePause] = useState<boolean>(true);
+  const [pauseContent, setPauseContent] = useState<JSX.Element | boolean>(
+    false
+  ); // set main menu as initial value
 
   const playerMoveHandler = (event: KeyboardEvent) => {
     if (event.key === "ArrowUp" || event.key === "ArrowDown") {
@@ -98,11 +100,12 @@ export default function GameBoard(props: Props) {
       p2s: 0,
     };
     setScoreInfo(gameLoop.scoreInfo);
+    setPauseContent(false); // back to main menu
   };
 
   const giListener = (data: any) => {
-    gameLoop.scoreInfo.p1s = data.p1s;
-    gameLoop.scoreInfo.p2s = data.p2s;
+    if (gameLoop.scoreInfo.p1s !== data.p1s) gameLoop.scoreInfo.p1s = data.p1s;
+    if (gameLoop.scoreInfo.p2s !== data.p2s) gameLoop.scoreInfo.p2s = data.p2s;
     setGamePositions(
       new positionalData(gameConstants, {
         ...gamePositions,
@@ -149,11 +152,27 @@ export default function GameBoard(props: Props) {
     if (gameLoop.scoreInfo.p1name === "" || gameLoop.scoreInfo.p2name === "")
       getPlayerNames(data.player1id, data.player2id);
     if (data.status === "PLAYING") gameLoop.startLoop(togglePause);
+    if (data.status === "PAUSED") {
+      setPauseContent(<PauseNotification />);
+      gameLoop.stopLoop(togglePause);
+    }
+    if (data.status === "DONE" || data.status === "OVER") {
+      setPauseContent(false);
+    }
   };
 
   const tryRejoinListener = (data: any) => {
     if (data) {
-      gameSocket.joinGame(data);
+      gameSocket.joinGame(data.mode);
+      gameLoop.positionalData = new positionalData(gameConstants, {
+        ...gamePositions,
+        playerLeftYOffset: data.pos.p1y - gameConstants.paddleSize / 2,
+        playerRightYOffset: data.pos.p2y - gameConstants.paddleSize / 2,
+        ballOffset: {
+          x: data.pos.ballPos.x - gameConstants.ballSize / 2,
+          y: data.pos.ballPos.y - gameConstants.ballSize / 2,
+        },
+      });
     }
   };
 
@@ -229,9 +248,7 @@ export default function GameBoard(props: Props) {
         }}
       >
         <PauseOverlay open={pause}>
-          <>
-            <PauseNotification />
-          </>
+          <>{pauseContent}</>
         </PauseOverlay>
         <Divider
           orientation="vertical"

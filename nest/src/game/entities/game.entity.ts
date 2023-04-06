@@ -2,7 +2,6 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { Request } from 'express';
 import { GameService } from '../game.service';
 import { Server } from 'socket.io';
-import { threadId } from 'worker_threads';
 
 // To Manuel to check if this is correct
 export interface HandshakeRequest extends Request {
@@ -79,9 +78,6 @@ export enum GameMode {
   CLASSIC = 'CLASSIC',
   MAYHEM = 'MAYHEM',
 }
-const generateRandomNumber = (min: number, max: number) => {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-};
 
 export class DoubleKeyMap {
   playerMap = new Map<string, Game>();
@@ -148,7 +144,6 @@ export class Game {
   constructor(mode: GameMode) {
     this.status = Status.PENDING;
     this.gameRoomId = this.makeid(5);
-    this.status = Status.PENDING;
     this.mode = mode;
   }
   // those are the constants that are used in the game (Henric can adjust them)
@@ -214,21 +209,26 @@ export class Game {
     return { x, y };
   }
 
-  resetBallForClassicMode(playerScored: number = 1): void {
+  sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+  resetBallForClassicMode(playerScored: number = 1, initialSleep?: number): void {
     const angleRanges = { min: -30, max: 30 };
     this.bx = this.gameConstants.relativeMiddleX;
     this.by = this.gameConstants.relativeMiddleY;
+    this.movementVector = { x: 0, y: 0 };
     this.ballAngle =
       Math.floor(Math.random() * (angleRanges.max - angleRanges.min + 1)) +
       angleRanges.min;
     if (playerScored === 1) this.ballAngle = 180 - this.ballAngle;
-    this.movementVector = this.calculateMovementVector(
-      this.gameConstants.speeds[(this.gameConstants.speed = 0)],
-      this.ballAngle,
-    );
+    this.sleep(initialSleep ? initialSleep : 3000).then(() => {
+      this.movementVector = this.calculateMovementVector(
+        this.gameConstants.speeds[(this.gameConstants.speed = 0)],
+        this.ballAngle,
+      );
+    });
   }
 
-  resetBallForMayhemMode(playerScored: number = 1): void {
+  resetBallForMayhemMode(playerScored: number = 1, initialSleep?: number): void {
     const angleRanges = { min: -45, max: 45 };
     this.gameConstants.maxSpeed = 8;
     this.bx = this.gameConstants.relativeMiddleX;
@@ -240,10 +240,12 @@ export class Game {
       Math.floor(Math.random() * (angleRanges.max - angleRanges.min + 1)) +
       angleRanges.min;
     if (playerScored === 1) this.ballAngle = 180 - this.ballAngle;
-    this.movementVector = this.calculateMovementVector(
-      this.gameConstants.speeds[(this.gameConstants.speed = 5)],
-      this.ballAngle,
-    );
+    this.sleep(initialSleep ? initialSleep : 1000).then(() => {
+      this.movementVector = this.calculateMovementVector(
+        this.gameConstants.speeds[(this.gameConstants.speed = 5)],
+        this.ballAngle,
+      );
+    });
   }
 
   moveBall(gameService: GameService, server: Server) {
