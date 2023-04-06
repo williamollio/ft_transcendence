@@ -27,6 +27,7 @@ import GameEndDisplay from "./GameEndDisplay";
 import { positionalData } from "../../classes/positionalData.class";
 import PauseOverlay from "./PauseOverlay";
 import PauseNotification from "./PauseNotification";
+import MainMenu from "./MainMenu";
 
 interface Props {
   gameLoop: GameLoop;
@@ -47,8 +48,8 @@ export default function GameBoard(props: Props) {
   );
   const [pause, togglePause] = useState<boolean>(true);
   const [pauseContent, setPauseContent] = useState<JSX.Element | boolean>(
-    false
-  ); // set main menu as initial value
+    <MainMenu gameSocket={gameSocket}/>
+  );
 
   const playerMoveHandler = (event: KeyboardEvent) => {
     if (event.key === "ArrowUp" || event.key === "ArrowDown") {
@@ -100,7 +101,7 @@ export default function GameBoard(props: Props) {
       p2s: 0,
     };
     setScoreInfo(gameLoop.scoreInfo);
-    setPauseContent(false); // back to main menu
+    setPauseContent(<MainMenu gameSocket={gameSocket}/>);
   };
 
   const giListener = (data: any) => {

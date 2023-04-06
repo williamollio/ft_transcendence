@@ -250,7 +250,6 @@ export default function Chat(props: Props) {
         }
             ${data.game.mode === "CLASSIC" ? "Classic" : "Mayhem"}`,
         autoClose: true,
-        autoCloseDelay: 9500,
         onAccept: () => {
           gameSocket.joinGame(data.game.mode, data.initiatingUser.id);
           navigate(RoutePath.GAME);

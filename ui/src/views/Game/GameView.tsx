@@ -60,7 +60,7 @@ export default function GameView(props: Props): React.ReactElement {
                 </Grid>
                 <Grid item>
                   <Button variant="contained" onClick={gameSocket.leave}>
-                    {t(translationKeys.leaveGame)}
+                    {t(translationKeys.buttons.leaveGame)}
                   </Button>
                 </Grid>
               </Grid>

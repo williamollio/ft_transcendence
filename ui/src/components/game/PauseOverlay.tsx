@@ -1,18 +1,23 @@
-import { Backdrop } from "@mui/material";
+import { Backdrop, Button } from "@mui/material";
 import React from "react";
 
 interface Props {
-	children?: JSX.Element;
-	open: boolean;
-	toggleOverlay?: React.Dispatch<React.SetStateAction<boolean>>
+  children?: JSX.Element;
+  open: boolean;
 }
 
 export default function PauseOverlay(props: Props) {
-  const {children, open} = props;
+  const { children, open } = props;
 
   return (
-    <Backdrop open={open} sx={{ position: "absolute", zIndex: 10 }}>
-		{children}
-	</Backdrop>
+    <>
+      <Backdrop
+        onClick={() => {}}
+        open={open}
+        sx={{ position: "absolute", zIndex: (theme) => theme.zIndex.modal + 1 }}
+      >
+        {children}
+      </Backdrop>
+    </>
   );
 }

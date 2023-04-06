@@ -107,6 +107,7 @@ export class GameService {
       if (inviteGame.p2id !== userId) {
         throw new Error('Game is already full');
       }
+      this.schedulerRegistry.deleteTimeout(inviteGame.gameRoomId);
       game = inviteGame;
       game.p2id = userId;
       await client.join(game.gameRoomId);
@@ -215,6 +216,12 @@ export class GameService {
       server
         .to(invitedUserSocket)
         .emit('invitedToGame', { initiatingUser: initiatingUser, game: game });
+      this.addInvitationTimeout(
+        game.gameRoomId,
+        server,
+        initiatingSocket.id,
+        initiatingUserId,
+      );
       return 'gameJoined';
     } else {
       console.error(`Failed to retrieve socket for user ${invitedUserId}.`);
@@ -229,7 +236,14 @@ export class GameService {
   rejoin(userId: string) {
     let game: Game | null;
     if ((game = this.GameMap.getGame(userId))) {
-      return {mode: game.mode, pos: {p1y: game.p1y, p2y: game.p2y, ballPos: {x: game.bx, y: game.by}}};
+      return {
+        mode: game.mode,
+        pos: {
+          p1y: game.p1y,
+          p2y: game.p2y,
+          ballPos: { x: game.bx, y: game.by },
+        },
+      };
     }
     return null;
   }
@@ -269,7 +283,7 @@ export class GameService {
       this.GameMap.delete(userId);
       server
         .to(socketId)
-        .emit('inviteRefused', 'Your opponent is to slow for you');
+        .emit('inviteRefused', 'Your opponent is too slow for you');
     };
     const timeoutInMs = 10000;
     const timeout = setTimeout(callback, timeoutInMs);
@@ -351,12 +365,13 @@ export class GameService {
   }
 
   createGame(p1: string, mode: GameMode, p2?: string) {
-    const game = new Game(mode, );
+    const game = new Game(mode);
     this.GameMap.setPlayer1(p1, game);
     if (p2 !== undefined) {
       this.GameMap.setPlayer2(p2, game);
     }
-    if (mode === GameMode.CLASSIC) game.resetBallForClassicMode(undefined, 5000);
+    if (mode === GameMode.CLASSIC)
+      game.resetBallForClassicMode(undefined, 5000);
     else game.resetBallForMayhemMode(undefined, 5000);
     return game;
   }
