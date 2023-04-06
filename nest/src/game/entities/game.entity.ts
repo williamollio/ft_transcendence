@@ -104,9 +104,9 @@ export class DoubleKeyMap {
   of the second player in a game. The purpose of this function is to match
   up two players in a game.
   */
-  matchPlayer(player2Id: string) {
+  matchPlayer(player2Id: string, mode: GameMode) {
     for (const [_, game] of this.playerMap) {
-      if (game.p2id === undefined && _) {
+      if (game.p2id === undefined && game.mode === mode &&_) {
         // the above is ugly but a linting rule is forcing me to add it
         game.p2id = player2Id;
         this.playerMap.set(player2Id, game);

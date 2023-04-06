@@ -7,6 +7,8 @@ import { Intra42User } from './interface/intra42-user.interface';
 import { Response } from 'express';
 import { MatchHistory } from 'src/game/interfaces/matchHistory.interface';
 import { Stat } from 'src/game/interfaces/stats.interface';
+import path = require('path');
+import * as fs from 'fs';
 // import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 
 // have to update this file and user response to display error
@@ -303,9 +305,9 @@ export class UsersService {
       where: {
         id: userId,
       },
-	  select: {
-		name: true,
-	  },
+      select: {
+        name: true,
+      },
     });
     return user ? user.name : null;
   }
@@ -359,8 +361,10 @@ export class UsersService {
               currentUserId: currentUser.id,
               imageOpponent: imageOpponent,
               opponentId: opponent.id,
-              p1Score: currentUser.id === match.playerOneId ? match.p1s : match.p2s,
-              p2Score: currentUser.id === match.playerOneId ? match.p2s : match.p1s,
+              p1Score:
+                currentUser.id === match.playerOneId ? match.p1s : match.p2s,
+              p2Score:
+                currentUser.id === match.playerOneId ? match.p2s : match.p1s,
               matchWon: matchWon,
             });
           }
@@ -389,6 +393,13 @@ export class UsersService {
 
       const leaderboardStats = [];
       for (const user of leaderboard) {
+        var userImage: Buffer | null;
+        if (user.filename) {
+          const filePath = path.resolve(
+            `./uploads/profileimages/${user.filename}`,
+          );
+          userImage = fs.readFileSync(filePath);
+        } else userImage = null;
         const stats = await this.getUserMatchesStats(user.id);
         leaderboardStats.push({
           ...stats,
@@ -396,6 +407,7 @@ export class UsersService {
           name: user.name,
           filename: user.filename,
           eloScore: user.eloScore,
+          image: userImage ? userImage : '',
         });
       }
 

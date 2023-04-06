@@ -1,4 +1,12 @@
-import { Button, Grid, Paper, Slide, Switch, Typography } from "@mui/material";
+import {
+  Button,
+  Grid,
+  Paper,
+  Slide,
+  Switch,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { translationKeys } from "../../views/Game/constants";
 import CustomTextField from "../shared/CustomTextField/CustomTextField";
@@ -42,7 +50,10 @@ export default function MainMenu(props: Props) {
   const handleInvite = (data: FieldValues) => {
     ChannelService.getUserByName(data.playerName).then((resolve) => {
       if (resolve.data)
-        gameSocket.inviteToGame(GameMode.CLASSIC, resolve.data.id);
+        gameSocket.inviteToGame(
+          checked ? GameMode.MAYHEM : GameMode.MAYHEM,
+          resolve.data.id
+        );
       else {
         toast.dispatchTranscendanceState({
           type: TranscendanceStateActionType.TOGGLE_TOAST,
@@ -72,6 +83,72 @@ export default function MainMenu(props: Props) {
     });
   };
 
+  const tooltipClassic = () => {
+    return (
+      <>
+        <Typography fontWeight="bold" fontSize={12}>
+          {t(translationKeys.buttons.classic)}
+        </Typography>
+        <Typography fontSize={12}>{t(translationKeys.tooltips.classic)}</Typography>
+      </>
+    );
+  };
+
+  const tooltipMayhem = () => {
+    return (
+      <>
+        <Typography fontWeight="bold" fontSize={12}>
+          {t(translationKeys.buttons.mayhem)}
+        </Typography>
+        <Typography fontSize={12}>{t(translationKeys.tooltips.mayhem)}</Typography>
+      </>
+    );
+  };
+
+  const tooltipQueue = () => {
+    return (
+      <>
+        <Typography fontWeight="bold" fontSize={12}>
+          {t(translationKeys.buttons.queue)}
+        </Typography>
+        <Typography fontSize={12}>{t(translationKeys.tooltips.queue)}</Typography>
+      </>
+    );
+  };
+
+  const tooltipInvite = () => {
+    return (
+      <>
+        <Typography fontWeight="bold" fontSize={12}>
+          {t(translationKeys.buttons.invite)}
+        </Typography>
+        <Typography fontSize={12}>{t(translationKeys.tooltips.invite)}</Typography>
+      </>
+    );
+  };
+
+  const tooltipSpectate = () => {
+    return (
+      <>
+        <Typography fontWeight="bold" fontSize={12}>
+          {t(translationKeys.buttons.watch)}
+        </Typography>
+        <Typography fontSize={12}>{t(translationKeys.tooltips.spectate)}</Typography>
+      </>
+    );
+  };
+
+  const tooltipPlayerName = () => {
+    return (
+      <>
+        <Typography fontWeight="bold" fontSize={12}>
+          {t(translationKeys.buttons.playerName)}
+        </Typography>
+        <Typography fontSize={12}>{t(translationKeys.tooltips.playerName)}</Typography>
+      </>
+    );
+  };
+
   return (
     <>
       <Grid
@@ -85,66 +162,85 @@ export default function MainMenu(props: Props) {
           <Paper
             sx={{
               backgroundColor: classes.colorPrimary,
-              paddingLeft: 1,
-              paddingRight: 1,
+              width: 300,
             }}
           >
-            <Grid container alignItems="center" direction="row">
-              <Typography color={checked ? "grey" : classes.colorAccent}>
-                {t(translationKeys.buttons.classic)}
-              </Typography>
+            <Grid
+              container
+              alignItems="center"
+              justifyContent="center"
+              direction="row"
+            >
+              <Tooltip title={tooltipClassic()}>
+                <Typography color={checked ? "grey" : classes.colorAccent}>
+                  {t(translationKeys.buttons.classic)}
+                </Typography>
+              </Tooltip>
               <Switch
                 checked={checked}
                 onChange={() => toggleChecked(!checked)}
                 color="default"
               ></Switch>
-              <Typography color={checked ? classes.colorAccent : "grey"}>
-                {t(translationKeys.buttons.mayhem)}
-              </Typography>
+              <Tooltip title={tooltipMayhem()}>
+                <Typography color={checked ? classes.colorAccent : "grey"}>
+                  {t(translationKeys.buttons.mayhem)}
+                </Typography>
+              </Tooltip>
             </Grid>
           </Paper>
         </Grid>
         <Grid item>
-          <Button variant="contained" onClick={handleQueue}>
-            <Typography>{t(translationKeys.buttons.queue)}</Typography>
-          </Button>
+          <Tooltip title={tooltipQueue()}>
+            <Button
+              sx={{ width: 300 }}
+              variant="contained"
+              onClick={handleQueue}
+            >
+              <Typography>{t(translationKeys.buttons.queue)}</Typography>
+            </Button>
+          </Tooltip>
         </Grid>
         <Grid container direction="row" justifyContent="center" spacing={1}>
           <Grid item>
-            <Button
-              onClick={handleSubmit(handleInvite)}
-              variant="contained"
-              sx={{
-                width: 250,
-                paddingLeft: 0,
-                paddingRight: 0,
-              }}
-            >
-              <Typography>{t(translationKeys.buttons.invite)}</Typography>
-            </Button>
+            <Tooltip title={tooltipInvite()}>
+              <Button
+                onClick={handleSubmit(handleInvite)}
+                variant="contained"
+                sx={{
+                  width: 146,
+                  paddingLeft: 0,
+                  paddingRight: 0,
+                }}
+              >
+                <Typography>{t(translationKeys.buttons.invite)}</Typography>
+              </Button>
+            </Tooltip>
           </Grid>
           <Grid item>
-            <Button
-              onClick={handleSubmit(handleSpectate)}
-              variant="contained"
-              sx={{
-                width: 250,
-                paddingLeft: 0,
-                paddingRight: 0,
-              }}
-            >
-              <Typography>{t(translationKeys.buttons.watch)}</Typography>
-            </Button>
+            <Tooltip title={tooltipSpectate()}>
+              <Button
+                onClick={handleSubmit(handleSpectate)}
+                variant="contained"
+                sx={{
+                  width: 146,
+                  paddingLeft: 0,
+                  paddingRight: 0,
+                }}
+              >
+                <Typography>{t(translationKeys.buttons.watch)}</Typography>
+              </Button>
+            </Tooltip>
           </Grid>
         </Grid>
-        <Grid item sx={{ marginTop: 1, width: 300 }}>
-          <CustomTextField
-            register={register}
-            isRequired
-            name="playerName"
-            label={t(translationKeys.buttons.playerName) as string}
-          />
-        </Grid>
+        <Tooltip title={tooltipPlayerName()}>
+          <Grid item sx={{ marginTop: 1, width: 300 }}>
+            <CustomTextField
+              register={register}
+              name="playerName"
+              label={t(translationKeys.buttons.playerName) as string}
+            />
+          </Grid>
+        </Tooltip>
       </Grid>
     </>
   );

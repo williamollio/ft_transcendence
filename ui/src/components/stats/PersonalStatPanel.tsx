@@ -18,7 +18,6 @@ interface Props {
 }
 
 export default function PersonalStatPanel(props: Props) {
-  const { classes } = useStyles();
   const { lr, title, playerId, type } = props;
   const { t } = useTranslation();
 
@@ -50,9 +49,9 @@ export default function PersonalStatPanel(props: Props) {
     <>
       <Box>
         <Paper
-          className={classes.colorScheme}
           sx={{
-			position: "relative",
+			backgroundColor: classes.colorPrimary,
+            position: "relative",
             height: "auto",
             width: 300,
             ...(!lr ? { left: "77px" } : { right: "77px" }),
@@ -65,7 +64,14 @@ export default function PersonalStatPanel(props: Props) {
             justifyContent={"center"}
           >
             <Grid item>
-              <Typography variant="h4">{title}</Typography>
+              <Typography
+                variant="h4"
+                color={classes.colorAccent}
+                fontWeight="bold"
+                sx={{ textDecoration: "underline" }}
+              >
+                {title}
+              </Typography>
             </Grid>
           </Grid>
           <Divider />
@@ -93,11 +99,11 @@ export default function PersonalStatPanel(props: Props) {
               ></SingleStatComponent>
               <SingleStatComponent
                 title={t(translationKeys.winPerc)}
-                value={
-                  ((playerStats.gamesWon /
+                value={(
+                  (playerStats.gamesWon /
                     (playerStats.gamesWon + playerStats.gamesLost)) *
-                  100).toPrecision(3)
-                }
+                  100
+                ).toPrecision(3)}
                 postfix="%"
               ></SingleStatComponent>
             </>
@@ -107,11 +113,3 @@ export default function PersonalStatPanel(props: Props) {
     </>
   );
 }
-
-const useStyles = makeStyles()(() => ({
-  colorScheme: {
-    backgroundColor: classes.colorPrimary,
-    color: classes.colorPrimary,
-    WebkitTextFillColor: classes.colorSecondary,
-  },
-}));

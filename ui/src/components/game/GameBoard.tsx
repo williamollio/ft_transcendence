@@ -48,7 +48,7 @@ export default function GameBoard(props: Props) {
   );
   const [pause, togglePause] = useState<boolean>(true);
   const [pauseContent, setPauseContent] = useState<JSX.Element | boolean>(
-    <MainMenu gameSocket={gameSocket}/>
+    <MainMenu gameSocket={gameSocket} />
   );
 
   const playerMoveHandler = (event: KeyboardEvent) => {
@@ -86,7 +86,7 @@ export default function GameBoard(props: Props) {
     else setGameStatus(GameState.LOSS);
     toggleZoom(true);
 
-    resetGame();
+    setTimeout(resetGame, 4000);
   };
 
   const resetGame = () => {
@@ -101,7 +101,7 @@ export default function GameBoard(props: Props) {
       p2s: 0,
     };
     setScoreInfo(gameLoop.scoreInfo);
-    setPauseContent(<MainMenu gameSocket={gameSocket}/>);
+    setPauseContent(<MainMenu gameSocket={gameSocket} />);
   };
 
   const giListener = (data: any) => {

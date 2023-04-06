@@ -1,4 +1,5 @@
 import { Grid, Typography, Divider } from "@mui/material";
+import classes from "../../styles.module.scss";
 
 interface Props {
   bottomBorder?: boolean;
@@ -15,12 +16,12 @@ export default function SingleStatComponent(props: Props) {
     <>
       <Grid container justifyContent="space-around">
         <Grid item>
-          <Typography fontSize={"20px"}>{title}</Typography>
+          <Typography fontWeight="bold" color="white" fontSize={"20px"}>{title}</Typography>
         </Grid>
       </Grid>
       <Grid container justifyContent="space-around">
         <Grid item>
-          <Typography fontSize={"26px"}>
+          <Typography color={classes.colorAccent} fontSize={"26px"}>
             {prefix ? prefix : false}
             {value}
             {postfix ? postfix : false}

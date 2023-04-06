@@ -21,9 +21,9 @@ export default function TableToolbar(props: Props) {
   return (
     <Toolbar>
       <TextField
-        sx={{ marginLeft: "auto" }}
+        sx={{ marginLeft: "auto", zIndex: 2}}
         size="small"
-        label={t(translationKeys.filter)}
+        placeholder={t(translationKeys.filter) as string}
         value={value}
         onChange={handleChange}
       ></TextField>

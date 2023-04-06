@@ -108,6 +108,7 @@ export class GameGateway {
     @GetCurrentUserId() id: string,
     @MessageBody('inviteGameId') inviteGameId?: string,
   ) {
+    if (this.socketToId.has(client.id)) return;
     this.socketToId.set(client.id, id);
     try {
       this.gameService.join(client, id, this.server, mode, inviteGameId);
@@ -124,6 +125,9 @@ export class GameGateway {
     @GetCurrentUserId() playerOneId: string,
   ) {
     this.socketToId.set(client.id, playerOneId);
+    console.log(this.socketToId.get(client.id));
+    console.log(this.socketToId.has(client.id));
+    if (!this.socketToId.has(client.id)) return;
     const returnMessage = await this.gameService.createInvitationGame(
       client,
       this.server,

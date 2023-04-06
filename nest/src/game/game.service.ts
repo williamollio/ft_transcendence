@@ -89,6 +89,8 @@ export class GameService {
     return { playerNumber: 0 };
   }
 
+  lookForGameByMode(mode: GameMode) {}
+
   async join(
     client: Socket,
     userId: string,
@@ -117,41 +119,34 @@ export class GameService {
       return;
     } else {
       // Joining a random game
-      if (this.GameMap.size === 0) {
-        game = this.createGame(userId, mode);
+      if ((game = this.GameMap.rejoinGame(userId)) != null) {
         await client.join(game.gameRoomId);
-        server.to(client.id).emit('gameJoined', { playerNumber: 1 });
-        return;
-      } else {
-        if ((game = this.GameMap.rejoinGame(userId)) != null) {
-          await client.join(game.gameRoomId);
-          server
-            .to(client.id)
-            .emit(
-              'gameJoined',
-              game.p1id === userId ? { playerNumber: 1 } : { playerNumber: 2 },
-            );
-          if (game.status === Status.PAUSED) {
-            this.mutateGameStatus(game, Status.PLAYING, server);
-            this.deleteTimeout(game.gameRoomId);
-            this.addInterval(game.gameRoomId, userId, 30, server);
-          } else if (game.status === Status.PENDING && game.p2id === userId) {
-            this.mutateGameStatus(game, Status.PLAYING, server);
-            this.addInterval(game.gameRoomId, userId, 30, server);
-          } else server.to(client.id).emit('gameStarting');
-          return;
-        }
-        if ((game = this.GameMap.matchPlayer(userId))) {
-          await client.join(game.gameRoomId);
-          server.to(client.id).emit('gameJoined', { playerNumber: 2 });
+        server
+          .to(client.id)
+          .emit(
+            'gameJoined',
+            game.p1id === userId ? { playerNumber: 1 } : { playerNumber: 2 },
+          );
+        if (game.status === Status.PAUSED) {
+          this.mutateGameStatus(game, Status.PLAYING, server);
+          this.deleteTimeout(game.gameRoomId);
+          this.addInterval(game.gameRoomId, userId, 30, server);
+        } else if (game.status === Status.PENDING && game.p2id === userId) {
           this.mutateGameStatus(game, Status.PLAYING, server);
           this.addInterval(game.gameRoomId, userId, 30, server);
-          return;
-        }
-        game = this.createGame(userId, mode);
-        await client.join(game.gameRoomId);
-        server.to(client.id).emit('gameJoined', { playerNumber: 1 });
+        } else server.to(client.id).emit('gameStarting');
+        return;
       }
+      if ((game = this.GameMap.matchPlayer(userId, mode))) {
+        await client.join(game.gameRoomId);
+        server.to(client.id).emit('gameJoined', { playerNumber: 2 });
+        this.mutateGameStatus(game, Status.PLAYING, server);
+        this.addInterval(game.gameRoomId, userId, 30, server);
+        return;
+      }
+      game = this.createGame(userId, mode);
+      await client.join(game.gameRoomId);
+      server.to(client.id).emit('gameJoined', { playerNumber: 1 });
     }
   }
 

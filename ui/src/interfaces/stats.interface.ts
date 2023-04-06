@@ -5,7 +5,7 @@ export interface leaderBoardEntry {
   rating: number;
   wins: number;
   loss: number;
-  image: string;
+  image: Blob;
 }
 
 export interface match {
