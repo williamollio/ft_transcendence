@@ -25,6 +25,9 @@ import Player from "./Player";
 import ChannelService from "../../services/channel.service";
 import GameEndDisplay from "./GameEndDisplay";
 import { positionalData } from "../../classes/positionalData.class";
+import PauseOverlay from "./PauseOverlay";
+import PauseNotification from "./PauseNotification";
+import { Pause } from "@mui/icons-material";
 
 interface Props {
   gameLoop: GameLoop;
@@ -38,13 +41,12 @@ export default function GameBoard(props: Props) {
   const { t } = useTranslation();
   const toast = useContext(TranscendanceContext);
 
-  const boardRef = useRef<HTMLDivElement>(null);
-
   const [zoom, toggleZoom] = useState<boolean>(false);
   const [gameStatus, setGameStatus] = useState<GameState>(GameState.WIN);
   const [gamePositions, setGamePositions] = useState<positionalData>(
     new positionalData(gameConstants)
   );
+  const [pause, togglePause] = useState<boolean>(true);
 
   const playerMoveHandler = (event: KeyboardEvent) => {
     if (event.key === "ArrowUp" || event.key === "ArrowDown") {
@@ -66,7 +68,7 @@ export default function GameBoard(props: Props) {
 
   const gameStartingListener = () => {
     setScoreInfo({ ...gameLoop.scoreInfo });
-    gameLoop.startLoop();
+    gameLoop.startLoop(togglePause);
   };
 
   const gameFinishListener = (data: any) => {
@@ -85,7 +87,7 @@ export default function GameBoard(props: Props) {
   };
 
   const resetGame = () => {
-    gameLoop.resetPositions();
+    gameLoop.resetPositions(togglePause);
     setGamePositions(gameLoop.positionalData);
     gameLoop.scoreInfo = {
       p1Id: "",
@@ -146,7 +148,7 @@ export default function GameBoard(props: Props) {
     setScoreInfo({ ...gameLoop.scoreInfo });
     if (gameLoop.scoreInfo.p1name === "" || gameLoop.scoreInfo.p2name === "")
       getPlayerNames(data.player1id, data.player2id);
-    if (data.status === "PLAYING") gameLoop.startLoop();
+    if (data.status === "PLAYING") gameLoop.startLoop(togglePause);
   };
 
   const tryRejoinListener = (data: any) => {
@@ -161,7 +163,7 @@ export default function GameBoard(props: Props) {
   };
 
   const failedListener = (data: any) => {
-    gameLoop.resetPositions();
+    gameLoop.resetPositions(togglePause);
     toast.dispatchTranscendanceState({
       type: TranscendanceStateActionType.TOGGLE_TOAST,
       toast: {
@@ -211,21 +213,26 @@ export default function GameBoard(props: Props) {
         }
         return false;
       });
-      if (gameLoop.interval) gameLoop.stopLoop();
+      if (gameLoop.interval) gameLoop.stopLoop(togglePause);
     };
   }, [gameSocket]);
 
   return (
     <>
       <Paper
-        ref={boardRef}
         sx={{
+          position: "relative",
           width: gameConstants.boardWidth,
           height: gameConstants.boardHeight,
           backgroundColor: "white",
           display: "flex",
         }}
       >
+        <PauseOverlay open={pause}>
+          <>
+            <PauseNotification />
+          </>
+        </PauseOverlay>
         <Divider
           orientation="vertical"
           sx={{
@@ -238,30 +245,15 @@ export default function GameBoard(props: Props) {
         <Player
           lr={true}
           yPos={gamePositions.playerLeftYOffset}
-          posRef={
-            boardRef.current
-              ? boardRef.current
-              : { offsetLeft: 0, offsetTop: 0 }
-          }
           gameConstants={gameConstants}
         ></Player>
         <Player
           lr={false}
           yPos={gamePositions.playerRightYOffset}
-          posRef={
-            boardRef.current
-              ? boardRef.current
-              : { offsetLeft: 0, offsetTop: 0 }
-          }
           gameConstants={gameConstants}
         ></Player>
         <Ball
           ballPos={gamePositions.ballOffset}
-          posRef={
-            boardRef.current
-              ? boardRef.current
-              : { offsetLeft: 0, offsetTop: 0 }
-          }
           gameConstants={gameConstants}
         ></Ball>
         <GameEndDisplay

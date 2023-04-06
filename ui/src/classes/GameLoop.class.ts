@@ -1,3 +1,4 @@
+import React from "react";
 import { GameMode } from "../interfaces/chat.interface";
 import { GameConstants, scoreInfo } from "../interfaces/game.interface";
 import { GameSocket } from "./GameSocket.class";
@@ -34,8 +35,8 @@ export class GameLoop {
     };
   }
 
-  resetPositions = () => {
-    this.stopLoop();
+  resetPositions = (togglePause: React.Dispatch<React.SetStateAction<boolean>>) => {
+    this.stopLoop(togglePause);
     this.positionalData.resetPositions();
   };
 
@@ -78,13 +79,15 @@ export class GameLoop {
     );
   };
 
-  startLoop = async () => {
+  startLoop = async (togglePause: React.Dispatch<React.SetStateAction<boolean>>) => {
     this.userSocket.joinGame();
-    if (!this.interval) this.interval = setInterval(this.updateGame, 30);
+    togglePause(false);
+	if (!this.interval) this.interval = setInterval(this.updateGame, 30);
   };
 
-  stopLoop = () => {
+  stopLoop = (togglePause: React.Dispatch<React.SetStateAction<boolean>>) => {
     this.userSocket.leaveGame();
+	togglePause(true);
     if (this.interval !== null) {
       clearInterval(this.interval);
       this.interval = null;
