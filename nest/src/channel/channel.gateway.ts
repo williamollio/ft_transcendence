@@ -33,10 +33,7 @@ enum acknoledgementStatus {
 }
 
 @WebSocketGateway(3333, {
-  cors: {
-    credentials: true,
-    origin: process.env.PATH_TO_FRONTEND,
-  },
+  cors: {},
   parser: msgpack,
 })
 @UseGuards(JwtGuard)
@@ -159,8 +156,8 @@ export class ChannelGateway {
   ) {
     messageInfo.userId = senderId;
     const userName = await this.userService.getUserName(senderId);
-    userName ? messageInfo.userName = userName : "missing";
-	const messageSaved = await this.channelService.storeMessage(
+    userName ? (messageInfo.userName = userName) : 'missing';
+    const messageSaved = await this.channelService.storeMessage(
       senderId,
       messageInfo,
     );

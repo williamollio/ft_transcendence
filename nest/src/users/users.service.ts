@@ -393,13 +393,6 @@ export class UsersService {
 
       const leaderboardStats = [];
       for (const user of leaderboard) {
-        var userImage: Buffer | null;
-        if (user.filename) {
-          const filePath = path.resolve(
-            `./uploads/profileimages/${user.filename}`,
-          );
-          userImage = fs.readFileSync(filePath);
-        } else userImage = null;
         const stats = await this.getUserMatchesStats(user.id);
         leaderboardStats.push({
           ...stats,
@@ -407,7 +400,6 @@ export class UsersService {
           name: user.name,
           filename: user.filename,
           eloScore: user.eloScore,
-          image: userImage ? userImage : '',
         });
       }
 

@@ -34,7 +34,6 @@ export default function MainTalbe(props: Props) {
             id: string;
             eloScore: number;
             filename: string;
-            image: Buffer;
             numberOfWin: number;
             numberOfLoss: number;
           },
@@ -44,7 +43,6 @@ export default function MainTalbe(props: Props) {
             ...element,
             rating: element.eloScore,
             rank: index + 1,
-            image: new Blob([element.image]),
             wins: element.numberOfWin,
             loss: element.numberOfLoss,
           });

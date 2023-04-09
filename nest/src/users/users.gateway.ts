@@ -18,10 +18,7 @@ import { PrismaService } from '../prisma/prisma.service';
 
 // add some cors sanitazation here
 @WebSocketGateway(8888, {
-  cors: {
-    credentials: true,
-    origin: process.env.PATH_TO_FRONTEND,
-  },
+  cors: {},
   parser: msgpack,
 })
 // add some guards here
@@ -35,9 +32,7 @@ export class UserGateway {
   ) {}
 
   @SubscribeMessage('connectUser')
-  userConnect(
-    @GetCurrentUserId() userId: string,
-  ) {
+  userConnect(@GetCurrentUserId() userId: string) {
     void this.usersService.updateConnectionStatus(
       String(userId),
       UserStatus.ONLINE,

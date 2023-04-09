@@ -1,7 +1,7 @@
 import { Avatar, Grid, IconButton, TableCell, TableRow } from "@mui/material";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import MatchHistory from "./MatchHistoy";
 import { leaderBoardEntry } from "../../interfaces/stats.interface";
 
