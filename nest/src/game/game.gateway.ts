@@ -7,10 +7,9 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { GameService } from './game.service';
-// import { JwtAuthGuard } from 'src/auth/guard/jwt.auth-guard';
 import { Body, UseGuards } from '@nestjs/common';
 import { GetCurrentUserId } from 'src/decorators/getCurrentUserId.decorator';
-import { FrontendUser, GameMode } from './entities/game.entity';
+import { GameMode } from './entities/game.entity';
 import * as msgpack from 'socket.io-msgpack-parser';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
 import { gameSocketToUserId } from './socketToUserIdStorage.service';
@@ -18,7 +17,8 @@ import { JwtUser } from 'src/users/interface/jwt-user.interface';
 
 @WebSocketGateway(4444, {
   cors: {
-	origin: "http://localhost:3000"
+    credentials: true,
+    origin: process.env.PATH_TO_FRONTEND,
   },
   parser: msgpack,
 })
