@@ -106,7 +106,7 @@ export class DoubleKeyMap {
   */
   matchPlayer(player2Id: string, mode: GameMode) {
     for (const [_, game] of this.playerMap) {
-      if (game.p2id === undefined && game.mode === mode &&_) {
+      if (game.p2id === undefined && game.mode === mode && _) {
         // the above is ugly but a linting rule is forcing me to add it
         game.p2id = player2Id;
         this.playerMap.set(player2Id, game);
@@ -211,7 +211,10 @@ export class Game {
 
   sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-  resetBallForClassicMode(playerScored: number = 1, initialSleep?: number): void {
+  resetBallForClassicMode(
+    playerScored: number = 1,
+    initialSleep?: number,
+  ): void {
     const angleRanges = { min: -30, max: 30 };
     this.bx = this.gameConstants.relativeMiddleX;
     this.by = this.gameConstants.relativeMiddleY;
@@ -228,7 +231,10 @@ export class Game {
     });
   }
 
-  resetBallForMayhemMode(playerScored: number = 1, initialSleep?: number): void {
+  resetBallForMayhemMode(
+    playerScored: number = 1,
+    initialSleep?: number,
+  ): void {
     const angleRanges = { min: -45, max: 45 };
     this.gameConstants.maxSpeed = 8;
     this.bx = this.gameConstants.relativeMiddleX;
@@ -247,6 +253,24 @@ export class Game {
       );
     });
   }
+
+  //   bottomPaddleEdge = (
+  //     ballX: number,
+  //     ballY: number,
+  //     ballHeight: number,
+  //     paddleX: number,
+  //     paddleY: number,
+  //     paddleSize: number,
+  //     player: number,
+  //   ): boolean => {
+  // 	if (player === 1)
+  // 	{
+  // 		if (ballX < paddleX)
+  // 	}
+  // 	else if (player === 2)
+  //     {}
+  // 	return false;
+  //   };
 
   moveBall(gameService: GameService, server: Server) {
     const {
@@ -290,11 +314,10 @@ export class Game {
     ) {
       switch (this.mode) {
         case GameMode.MAYHEM: {
-          const paddleCenter = this.p1y + this.paddleSize / 2;
+          const paddleCenter = this.p1y;
           const ballDistanceFromPaddleCenter = this.by - paddleCenter;
           const res =
-            Math.sign(ballDistanceFromPaddleCenter) * 60 -
-            (ballDistanceFromPaddleCenter / (this.paddleSize / 2)) * 60;
+            -(ballDistanceFromPaddleCenter / (this.paddleSize / 2)) * 60;
           this.ballAngle = res;
           if (this.gameConstants.speed < maxSpeed) {
             this.ballSpeed = speeds[this.gameConstants.speed++];
@@ -306,11 +329,10 @@ export class Game {
           break;
         }
         case GameMode.CLASSIC: {
-          const paddleCenter = this.p1y + this.paddleSize / 2;
+          const paddleCenter = this.p1y;
           const ballDistanceFromPaddleCenter = this.by - paddleCenter;
           const res =
-            Math.sign(ballDistanceFromPaddleCenter) * 45 -
-            (ballDistanceFromPaddleCenter / (this.paddleSize / 2)) * 45;
+            -(ballDistanceFromPaddleCenter / (this.paddleSize / 2)) * 45;
           this.ballAngle = res;
           if (this.gameConstants.speed < maxSpeed) {
             this.ballSpeed = speeds[this.gameConstants.speed++];
@@ -335,11 +357,10 @@ export class Game {
     ) {
       switch (this.mode) {
         case GameMode.MAYHEM: {
-          const paddleCenter = this.p2y + this.paddleSize / 2;
+          const paddleCenter = this.p2y;
           const ballDistanceFromPaddleCenter = this.by - paddleCenter;
           const res =
-            Math.sign(ballDistanceFromPaddleCenter) * 60 -
-            (ballDistanceFromPaddleCenter / (this.paddleSize / 2)) * 60;
+            -(ballDistanceFromPaddleCenter / (this.paddleSize / 2)) * 60;
           this.ballAngle = 180 - res;
           if (this.gameConstants.speed < maxSpeed) {
             this.ballSpeed = speeds[this.gameConstants.speed++];
@@ -351,11 +372,10 @@ export class Game {
           break;
         }
         case GameMode.CLASSIC: {
-          const paddleCenter = this.p2y + this.paddleSize / 2;
+          const paddleCenter = this.p2y;
           const ballDistanceFromPaddleCenter = this.by - paddleCenter;
           const res =
-            Math.sign(ballDistanceFromPaddleCenter) * 45 -
-            (ballDistanceFromPaddleCenter / (this.paddleSize / 2)) * 45;
+            -(ballDistanceFromPaddleCenter / (this.paddleSize / 2)) * 45;
           this.ballAngle = 180 - res;
           if (this.gameConstants.speed < maxSpeed) {
             this.ballSpeed = speeds[this.gameConstants.speed++];

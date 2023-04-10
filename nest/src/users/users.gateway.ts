@@ -18,7 +18,9 @@ import { PrismaService } from '../prisma/prisma.service';
 
 // add some cors sanitazation here
 @WebSocketGateway(8888, {
-  cors: {},
+  cors: {
+	origin: "http://localhost:3000"
+  },
   parser: msgpack,
 })
 // add some guards here

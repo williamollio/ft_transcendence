@@ -17,7 +17,9 @@ import { gameSocketToUserId } from './socketToUserIdStorage.service';
 import { JwtUser } from 'src/users/interface/jwt-user.interface';
 
 @WebSocketGateway(4444, {
-  cors: {},
+  cors: {
+	origin: "http://localhost:3000"
+  },
   parser: msgpack,
 })
 @UseGuards(JwtGuard)
