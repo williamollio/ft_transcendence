@@ -20,7 +20,7 @@ import { PrismaService } from '../prisma/prisma.service';
 @WebSocketGateway(8888, {
   cors: {
     credentials: true,
-    origin: process.env.PATH_TO_FRONTEND,
+    origin: '*',
   },
   parser: msgpack,
 })
