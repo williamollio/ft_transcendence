@@ -18,7 +18,7 @@ import {
   InviteChannelDto,
   IncomingMessageDto,
 } from './dto';
-import { Channel, ChannelRole, ChannelType, ChannelUser } from '@prisma/client';
+import { Channel, ChannelRole, ChannelType } from '@prisma/client';
 import { socketToUserId } from 'src/users/socketToUserIdStorage.service';
 import { socketToChannelId } from 'src/channel/socketToChannelIdStorage.service';
 import { ModerateChannelDto } from './dto/moderateChannelUser.dto';
@@ -159,8 +159,8 @@ export class ChannelGateway {
   ) {
     messageInfo.userId = senderId;
     const userName = await this.userService.getUserName(senderId);
-    userName ? messageInfo.userName = userName : "missing";
-	const messageSaved = await this.channelService.storeMessage(
+    userName ? (messageInfo.userName = userName) : 'missing';
+    const messageSaved = await this.channelService.storeMessage(
       senderId,
       messageInfo,
     );

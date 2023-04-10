@@ -58,6 +58,7 @@ export class GameService {
     if (game !== null) {
       await client.leave(game.gameRoomId);
     }
+    client.emit('leftWatch');
   }
   /*
   Spectating mode logic:
@@ -88,7 +89,7 @@ export class GameService {
     return { playerNumber: 0 };
   }
 
-  sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+  lookForGameByMode(mode: GameMode) {}
 
   async join(
     client: Socket,
@@ -108,54 +109,44 @@ export class GameService {
       if (inviteGame.p2id !== userId) {
         throw new Error('Game is already full');
       }
+      this.schedulerRegistry.deleteTimeout(inviteGame.gameRoomId);
       game = inviteGame;
       game.p2id = userId;
       await client.join(game.gameRoomId);
       server.to(client.id).emit('gameJoined', { playerNumber: 2 });
-      await this.sleep(5000);
       this.mutateGameStatus(game, Status.PLAYING, server);
       this.addInterval(game.gameRoomId, userId, 30, server);
       return;
     } else {
       // Joining a random game
-      if (this.GameMap.size === 0) {
-        game = this.createGame(userId, mode);
+      if ((game = this.GameMap.rejoinGame(userId)) != null) {
         await client.join(game.gameRoomId);
-        server.to(client.id).emit('gameJoined', { playerNumber: 1 });
-        return;
-      } else {
-        if ((game = this.GameMap.rejoinGame(userId)) != null) {
-          await client.join(game.gameRoomId);
-          server
-            .to(client.id)
-            .emit(
-              'gameJoined',
-              game.p1id === userId ? { playerNumber: 1 } : { playerNumber: 2 },
-            );
-          if (game.status === Status.PAUSED) {
-            await this.sleep(5000);
-            this.mutateGameStatus(game, Status.PLAYING, server);
-            this.deleteTimeout(game.gameRoomId);
-            this.addInterval(game.gameRoomId, userId, 30, server);
-          } else if (game.status === Status.PENDING && game.p2id === userId) {
-            await this.sleep(5000);
-            this.mutateGameStatus(game, Status.PLAYING, server);
-            this.addInterval(game.gameRoomId, userId, 30, server);
-          } else server.to(client.id).emit('gameStarting');
-          return;
-        }
-        if ((game = this.GameMap.matchPlayer(userId))) {
-          await client.join(game.gameRoomId);
-          server.to(client.id).emit('gameJoined', { playerNumber: 2 });
-          await this.sleep(5000);
+        server
+          .to(client.id)
+          .emit(
+            'gameJoined',
+            game.p1id === userId ? { playerNumber: 1 } : { playerNumber: 2 },
+          );
+        if (game.status === Status.PAUSED) {
+          this.mutateGameStatus(game, Status.PLAYING, server);
+          this.deleteTimeout(game.gameRoomId);
+          this.addInterval(game.gameRoomId, userId, 30, server);
+        } else if (game.status === Status.PENDING && game.p2id === userId) {
           this.mutateGameStatus(game, Status.PLAYING, server);
           this.addInterval(game.gameRoomId, userId, 30, server);
-          return;
-        }
-        game = this.createGame(userId, mode);
-        await client.join(game.gameRoomId);
-        server.to(client.id).emit('gameJoined', { playerNumber: 1 });
+        } else server.to(client.id).emit('gameStarting');
+        return;
       }
+      if ((game = this.GameMap.matchPlayer(userId, mode))) {
+        await client.join(game.gameRoomId);
+        server.to(client.id).emit('gameJoined', { playerNumber: 2 });
+        this.mutateGameStatus(game, Status.PLAYING, server);
+        this.addInterval(game.gameRoomId, userId, 30, server);
+        return;
+      }
+      game = this.createGame(userId, mode);
+      await client.join(game.gameRoomId);
+      server.to(client.id).emit('gameJoined', { playerNumber: 1 });
     }
   }
 
@@ -220,6 +211,12 @@ export class GameService {
       server
         .to(invitedUserSocket)
         .emit('invitedToGame', { initiatingUser: initiatingUser, game: game });
+      this.addInvitationTimeout(
+        game.gameRoomId,
+        server,
+        initiatingSocket.id,
+        initiatingUserId,
+      );
       return 'gameJoined';
     } else {
       console.error(`Failed to retrieve socket for user ${invitedUserId}.`);
@@ -234,7 +231,14 @@ export class GameService {
   rejoin(userId: string) {
     let game: Game | null;
     if ((game = this.GameMap.getGame(userId))) {
-      return game.mode;
+      return {
+        mode: game.mode,
+        pos: {
+          p1y: game.p1y,
+          p2y: game.p2y,
+          ballPos: { x: game.bx, y: game.by },
+        },
+      };
     }
     return null;
   }
@@ -255,12 +259,9 @@ export class GameService {
       const game = this.GameMap.getGame(winnerId);
 
       if (!game) return;
-      if (winnerId === game.p1id) game.p1s = 10;
-      else game.p2s = 10;
       if (game.status !== Status.PAUSED) this.deleteInterval(name);
       this.mutateGameStatus(game, Status.OVER, server);
       this.addWinningTimeout(5000, server, winnerId);
-      server.to(game.gameRoomId).emit('matchFinished');
     };
 
     const timeout = setTimeout(callback, milliseconds);
@@ -277,7 +278,7 @@ export class GameService {
       this.GameMap.delete(userId);
       server
         .to(socketId)
-        .emit('inviteRefused', 'Your opponent is to slow for you');
+        .emit('inviteRefused', 'Your opponent is too slow for you');
     };
     const timeoutInMs = 10000;
     const timeout = setTimeout(callback, timeoutInMs);
@@ -288,7 +289,7 @@ export class GameService {
     const callback = () => {
       const game = this.GameMap.getGame(winnerId);
       if (!game) return;
-      void game.saveGameResults(this.prismaService);
+      void game.saveGameResults(this.prismaService, winnerId);
       this.mutateGameStatus(game, Status.DONE, server);
       server.to(game.gameRoomId).emit('matchFinished', winnerId);
     };
@@ -312,6 +313,26 @@ export class GameService {
           this.addTimeout(game.gameRoomId, 10000, server, game.p2id);
         } else if (game.p1id) {
           this.addTimeout(game.gameRoomId, 10000, server, game.p1id);
+        }
+      }
+    }
+  }
+
+  leave(id: string, server: Server) {
+    const game = this.GameMap.getGame(id);
+    if (
+      game &&
+      (game.status === Status.PAUSED || game.status === Status.PENDING)
+    ) {
+      if (game.status === Status.PAUSED) this.deleteTimeout(game.gameRoomId);
+      this.GameMap.delete(id);
+    } else if (game && game.status === Status.PLAYING) {
+      if (game.p1id === id || game.p2id === id) {
+        this.deleteInterval(game.gameRoomId);
+        if (id === game.p1id && game.p2id) {
+          this.addWinningTimeout(0, server, game.p2id);
+        } else if (game.p1id) {
+          this.addWinningTimeout(0, server, game.p1id);
         }
       }
     }
@@ -344,6 +365,9 @@ export class GameService {
     if (p2 !== undefined) {
       this.GameMap.setPlayer2(p2, game);
     }
+    if (mode === GameMode.CLASSIC)
+      game.resetBallForClassicMode(undefined, 5000);
+    else game.resetBallForMayhemMode(undefined, 5000);
     return game;
   }
 
@@ -362,12 +386,9 @@ export class GameService {
     milliseconds: number,
     server: Server,
   ) {
-    const callback = () => {
+    const callback = async () => {
       const payload = this.moveBall(userId, server);
       if (!payload) return;
-      //   this.gameInfo.verify(payload);
-      //   const message = this.gameInfo.create(payload);
-      //   const encoded = this.gameInfo.encode(message).finish();
       server.to(gameRoomId).volatile.timeout(5000).emit('GI', payload);
     };
 

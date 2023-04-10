@@ -16,7 +16,7 @@ export const translationKeys = {
     whisper: "Whisper",
   },
   errorMessages: {
-    channelNameEmpty: "Channel name can not be empty!",
+    channelNameEmpty: "Channel name can not be empty",
     passwordEmpty: "Password can not be empty",
     createRoomFailed: "Failed to create channel",
     joinRoomFailed: "Failed to join channel",
@@ -33,6 +33,7 @@ export const translationKeys = {
     playInviteFail: "Failed to invite to play",
     blockFail: "Failed to block User",
     unblockFail: "Failed to unblock User",
+    alreadyUsed: "This channel name is already in use",
   },
   chatInfo: {
     userLeft: "left the channel",

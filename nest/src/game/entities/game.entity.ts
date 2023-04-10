@@ -78,9 +78,6 @@ export enum GameMode {
   CLASSIC = 'CLASSIC',
   MAYHEM = 'MAYHEM',
 }
-const generateRandomNumber = (min: number, max: number) => {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-};
 
 export class DoubleKeyMap {
   playerMap = new Map<string, Game>();
@@ -107,9 +104,9 @@ export class DoubleKeyMap {
   of the second player in a game. The purpose of this function is to match
   up two players in a game.
   */
-  matchPlayer(player2Id: string) {
+  matchPlayer(player2Id: string, mode: GameMode) {
     for (const [_, game] of this.playerMap) {
-      if (game.p2id === undefined && _) {
+      if (game.p2id === undefined && game.mode === mode && _) {
         // the above is ugly but a linting rule is forcing me to add it
         game.p2id = player2Id;
         this.playerMap.set(player2Id, game);
@@ -147,7 +144,6 @@ export class Game {
   constructor(mode: GameMode) {
     this.status = Status.PENDING;
     this.gameRoomId = this.makeid(5);
-    this.status = Status.PENDING;
     this.mode = mode;
   }
   // those are the constants that are used in the game (Henric can adjust them)
@@ -160,16 +156,17 @@ export class Game {
     player2PaddlePosX: 642,
     paddleWidth: 20,
     ballHeight: 30,
-    maxSpeed: 0,
+    maxSpeed: 5,
     speed: 0,
-    speeds: [7, 8, 10, 12, 14, 15, 20],
+    speeds: [7, 8, 10, 12, 14, 15, 20, 25, 30],
   };
   gameRoomId: string;
   p1id: string | undefined = undefined;
   p2id: string | undefined = undefined;
   status: Status;
-  dirx = this.gameConstants.speeds[0];
-  diry = 0.0;
+  ballAngle = 0;
+  ballSpeed = this.gameConstants.speeds[0];
+  movementVector = { x: 0.0, y: 0.0 };
   p1y = 225;
   p2y = 225;
   bx = 336;
@@ -202,15 +199,78 @@ export class Game {
   }
 
   // Classic Game reset
-  resetBallForClassicMode(playerScored: number): void {
-    const MIN_RANDOM_Y_SPEED = -5;
-    const MAX_RANDOM_Y_SPEED = 5;
-    this.dirx = this.gameConstants.speeds[(this.gameConstants.speed = 0)];
-    if (playerScored === 1) this.dirx *= -1;
+  calculateMovementVector(
+    speed: number,
+    angle: number,
+  ): { x: number; y: number } {
+    const radians = (angle * Math.PI) / 180;
+    const x = speed * Math.cos(radians);
+    const y = speed * -Math.sin(radians);
+    return { x, y };
+  }
+
+  sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+  resetBallForClassicMode(
+    playerScored: number = 1,
+    initialSleep?: number,
+  ): void {
+    const angleRanges = { min: -30, max: 30 };
     this.bx = this.gameConstants.relativeMiddleX;
     this.by = this.gameConstants.relativeMiddleY;
-    this.diry = generateRandomNumber(MIN_RANDOM_Y_SPEED, MAX_RANDOM_Y_SPEED);
+    this.movementVector = { x: 0, y: 0 };
+    this.ballAngle =
+      Math.floor(Math.random() * (angleRanges.max - angleRanges.min + 1)) +
+      angleRanges.min;
+    if (playerScored === 1) this.ballAngle = 180 - this.ballAngle;
+    this.sleep(initialSleep ? initialSleep : 3000).then(() => {
+      this.movementVector = this.calculateMovementVector(
+        this.gameConstants.speeds[(this.gameConstants.speed = 0)],
+        this.ballAngle,
+      );
+    });
   }
+
+  resetBallForMayhemMode(
+    playerScored: number = 1,
+    initialSleep?: number,
+  ): void {
+    const angleRanges = { min: -45, max: 45 };
+    this.gameConstants.maxSpeed = 8;
+    this.bx = this.gameConstants.relativeMiddleX;
+    this.by =
+      Math.floor(
+        Math.random() * (this.gameConstants.relativeGameHeight - 15 - 15 + 1),
+      ) + 15;
+    this.ballAngle =
+      Math.floor(Math.random() * (angleRanges.max - angleRanges.min + 1)) +
+      angleRanges.min;
+    if (playerScored === 1) this.ballAngle = 180 - this.ballAngle;
+    this.sleep(initialSleep ? initialSleep : 1000).then(() => {
+      this.movementVector = this.calculateMovementVector(
+        this.gameConstants.speeds[(this.gameConstants.speed = 5)],
+        this.ballAngle,
+      );
+    });
+  }
+
+  //   bottomPaddleEdge = (
+  //     ballX: number,
+  //     ballY: number,
+  //     ballHeight: number,
+  //     paddleX: number,
+  //     paddleY: number,
+  //     paddleSize: number,
+  //     player: number,
+  //   ): boolean => {
+  // 	if (player === 1)
+  // 	{
+  // 		if (ballX < paddleX)
+  // 	}
+  // 	else if (player === 2)
+  //     {}
+  // 	return false;
+  //   };
 
   moveBall(gameService: GameService, server: Server) {
     const {
@@ -226,11 +286,19 @@ export class Game {
     if (this.by + ballHeight / 2 >= relativeGameHeight) {
       // bottom collision
       this.by = relativeGameHeight - ballHeight / 2;
-      this.diry = -this.diry;
+      this.ballAngle = -this.ballAngle;
+      this.movementVector = this.calculateMovementVector(
+        this.ballSpeed,
+        this.ballAngle,
+      );
     } else if (this.by - ballHeight / 2 <= 0) {
       // top collision
       this.by = 0 + ballHeight / 2;
-      this.diry = -this.diry;
+      this.ballAngle = -this.ballAngle;
+      this.movementVector = this.calculateMovementVector(
+        this.ballSpeed,
+        this.ballAngle,
+      );
     }
     // player paddle collision
     if (
@@ -246,26 +314,33 @@ export class Game {
     ) {
       switch (this.mode) {
         case GameMode.MAYHEM: {
-          if (this.dirx > 0) {
-            if (this.gameConstants.speed < maxSpeed) {
-              this.gameConstants.speed = 5;
-              this.dirx = speeds[5];
-            }
-          } else {
-            this.dirx = this.dirx * -1;
-            if (this.gameConstants.speed < maxSpeed) {
-              this.dirx = speeds[this.gameConstants.speed++];
-            }
+          const paddleCenter = this.p1y;
+          const ballDistanceFromPaddleCenter = this.by - paddleCenter;
+          const res =
+            -(ballDistanceFromPaddleCenter / (this.paddleSize / 2)) * 60;
+          this.ballAngle = res;
+          if (this.gameConstants.speed < maxSpeed) {
+            this.ballSpeed = speeds[this.gameConstants.speed++];
           }
-          this.diry = (this.by - this.p1y) / 2;
+          this.movementVector = this.calculateMovementVector(
+            this.ballSpeed,
+            this.ballAngle,
+          );
           break;
         }
         case GameMode.CLASSIC: {
-          this.dirx = this.dirx * -1;
+          const paddleCenter = this.p1y;
+          const ballDistanceFromPaddleCenter = this.by - paddleCenter;
+          const res =
+            -(ballDistanceFromPaddleCenter / (this.paddleSize / 2)) * 45;
+          this.ballAngle = res;
           if (this.gameConstants.speed < maxSpeed) {
-            this.dirx = speeds[this.gameConstants.speed++];
+            this.ballSpeed = speeds[this.gameConstants.speed++];
           }
-          this.diry = (this.by - this.p1y) / 2;
+          this.movementVector = this.calculateMovementVector(
+            this.ballSpeed,
+            this.ballAngle,
+          );
           break;
         }
       }
@@ -282,26 +357,33 @@ export class Game {
     ) {
       switch (this.mode) {
         case GameMode.MAYHEM: {
-          if (this.dirx < 0) {
-            if (this.gameConstants.speed < maxSpeed) {
-              this.gameConstants.speed = 5;
-              this.dirx = -speeds[5];
-            }
-          } else {
-            this.dirx = this.dirx * -1;
-            if (this.gameConstants.speed < maxSpeed) {
-              this.dirx = -speeds[this.gameConstants.speed++];
-            }
+          const paddleCenter = this.p2y;
+          const ballDistanceFromPaddleCenter = this.by - paddleCenter;
+          const res =
+            -(ballDistanceFromPaddleCenter / (this.paddleSize / 2)) * 60;
+          this.ballAngle = 180 - res;
+          if (this.gameConstants.speed < maxSpeed) {
+            this.ballSpeed = speeds[this.gameConstants.speed++];
           }
-          this.diry = this.by - this.p2y;
+          this.movementVector = this.calculateMovementVector(
+            this.ballSpeed,
+            this.ballAngle,
+          );
           break;
         }
         case GameMode.CLASSIC: {
-          this.dirx = this.dirx * -1;
+          const paddleCenter = this.p2y;
+          const ballDistanceFromPaddleCenter = this.by - paddleCenter;
+          const res =
+            -(ballDistanceFromPaddleCenter / (this.paddleSize / 2)) * 45;
+          this.ballAngle = 180 - res;
           if (this.gameConstants.speed < maxSpeed) {
-            this.dirx = -speeds[this.gameConstants.speed++];
+            this.ballSpeed = speeds[this.gameConstants.speed++];
           }
-          this.diry = this.by - this.p2y;
+          this.movementVector = this.calculateMovementVector(
+            this.ballSpeed,
+            this.ballAngle,
+          );
           break;
         }
       }
@@ -316,12 +398,11 @@ export class Game {
       }
       switch (this.mode) {
         case GameMode.CLASSIC: {
-          this.resetBallForClassicMode(1);
+          this.resetBallForClassicMode(0);
           break;
         }
         case GameMode.MAYHEM: {
-          this.bx = 0;
-          this.dirx = speeds[(this.gameConstants.speed = 1)];
+          this.resetBallForMayhemMode(0);
           break;
         }
       }
@@ -334,19 +415,18 @@ export class Game {
       }
       switch (this.mode) {
         case GameMode.CLASSIC: {
-          this.resetBallForClassicMode(2);
+          this.resetBallForClassicMode(1);
           break;
         }
         case GameMode.MAYHEM: {
-          this.bx = relativeGameWidth;
-          this.dirx = -speeds[(this.gameConstants.speed = 1)];
+          this.resetBallForMayhemMode(1);
           break;
         }
       }
     }
 
-    this.bx += this.dirx;
-    this.by += this.diry;
+    this.bx += this.movementVector.x;
+    this.by += this.movementVector.y;
     return this;
   }
 
@@ -467,7 +547,7 @@ export class Game {
     }
   }
 
-  async saveGameResults(prismaService: PrismaService) {
+  async saveGameResults(prismaService: PrismaService, winnerId: string) {
     if (this.p2id) {
       await prismaService.user.update({
         where: {
@@ -481,6 +561,7 @@ export class Game {
                 p1s: this.p1s,
                 p2s: this.p2s,
                 playerTwoId: this.p2id,
+                winnerId: winnerId,
               },
             ],
           },
@@ -488,7 +569,10 @@ export class Game {
       });
     }
 
-    const newElos = await this.getNewElos(prismaService, this.p1s >= 10);
+    const newElos = await this.getNewElos(
+      prismaService,
+      this.p1id === winnerId,
+    );
     if (newElos && this.p1id && this.p2id) {
       await this.updateUserElo(this.p1id, newElos.eloPlayer1, prismaService);
       await this.updateUserElo(this.p2id, newElos.eloPlayer2, prismaService);

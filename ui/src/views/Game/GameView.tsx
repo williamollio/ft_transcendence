@@ -16,7 +16,6 @@ import {
   ContentWrapper,
 } from "../../styles/MuiStyles";
 import { GameSocket } from "../../classes/GameSocket.class";
-import { GameMode } from "../../interfaces/chat.interface";
 import classes from "../../styles.module.scss";
 import Game from "../../components/game/Game";
 
@@ -50,53 +49,24 @@ export default function GameView(props: Props): React.ReactElement {
                 fontWeight={"bold"}
                 sx={{ textDecoration: "underline" }}
               >
-                {t(translationKeys.gameTitle)}
+                {t(translationKeys.title)}
               </Typography>
             </TitleWrapper>
             <ContentWrapper>
-              <Game gameSocket={gameSocket} userSocket={userSocket} />
+              <Grid container justifyContent="center">
+                <Grid item>
+                  <Game gameSocket={gameSocket} userSocket={userSocket} />
+                </Grid>
+                <Grid item>
+                  <Button variant="contained" onClick={gameSocket.leave}>
+                    {t(translationKeys.buttons.leaveGame)}
+                  </Button>
+                </Grid>
+              </Grid>
             </ContentWrapper>
           </CardContainer>
         </ProfileCard>
       </Background>
-      {/* for testing */}
-      <Grid container direction="row" marginLeft={"20rem"}>
-        <Grid item width={100}>
-          <Button
-            sx={{ width: 70 }}
-            onClick={() => gameSocket.joinGame(GameMode.CLASSIC)}
-          >
-            queue Up (mode: Classic)
-          </Button>
-        </Grid>
-        <Grid item width={100}>
-          <Button
-            sx={{ width: 70 }}
-            onClick={() => gameSocket.joinGame(GameMode.MAYHEM)}
-          >
-            queue Up (mode: Mayhem)
-          </Button>
-        </Grid>
-        <Grid item width={100}>
-          <Button
-            sx={{ width: 70 }}
-            onClick={() =>
-              gameSocket.joinAsSpectator("clfiqolxb0000obayrxl47r5s")
-            }
-          >
-            watch game
-          </Button>
-        </Grid>
-        <Grid item width={100}>
-          <Button
-            sx={{ width: 70 }}
-            onClick={() => gameSocket.leaveAsSpectator()}
-          >
-            leave watch game
-          </Button>
-        </Grid>
-      </Grid>
-      {/* for testing */}
     </>
   );
 }

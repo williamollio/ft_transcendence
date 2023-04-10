@@ -92,7 +92,7 @@ export default function AddChannelDialog(props: Props) {
   };
 
   return (
-    <Dialog open={open} onClose={handleClose}>
+    <Dialog open={open} onClose={handleClose} sx={{zIndex: (theme) => theme.zIndex.modal + 2}}>
       <>
         <Collapse in={alertOpen}>
           <Alert

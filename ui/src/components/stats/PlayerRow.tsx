@@ -1,10 +1,4 @@
-import {
-  Avatar,
-  Grid,
-  IconButton,
-  TableCell,
-  TableRow,
-} from "@mui/material";
+import { Avatar, Grid, IconButton, TableCell, TableRow } from "@mui/material";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import { useState } from "react";
@@ -36,7 +30,7 @@ export default function PlayerRow(props: Props) {
                   width: "45px",
                   height: "45px",
                 }}
-                src={player.image}
+                src=""
               />
             </Grid>
             <Grid item marginLeft="10px">

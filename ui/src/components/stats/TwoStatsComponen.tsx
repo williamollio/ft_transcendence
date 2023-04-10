@@ -1,4 +1,6 @@
 import { Grid, Typography, Divider } from "@mui/material";
+import classNames from "classnames";
+import classes from "../../styles.module.scss";
 
 interface Props {
   bottomBorder?: boolean;
@@ -15,18 +17,18 @@ export default function TwoStatsComponent(props: Props) {
     <>
       <Grid container justifyContent="space-around">
         <Grid item>
-          <Typography>{leftTitle}</Typography>
+          <Typography fontWeight="bold" color="white">{leftTitle}</Typography>
         </Grid>
         <Grid item>
-          <Typography>{rightTitle}</Typography>
+          <Typography fontWeight="bold" color="white">{rightTitle}</Typography>
         </Grid>
       </Grid>
       <Grid container justifyContent="space-around">
         <Grid item>
-          <Typography fontSize={"24px"}>{leftValue}</Typography>
+          <Typography color={classes.colorAccent} fontSize={"24px"}>{leftValue}</Typography>
         </Grid>
         <Grid item>
-          <Typography fontSize={"24px"}>{rightValue}</Typography>
+          <Typography color={classes.colorAccent} fontSize={"24px"}>{rightValue}</Typography>
         </Grid>
       </Grid>
       {bottomBorder !== false ? <Divider /> : false}

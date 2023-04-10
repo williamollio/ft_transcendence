@@ -13,6 +13,7 @@ import { ToastType } from "../../context/toast";
 import { TranscendanceContext } from "../../context/transcendance-context";
 import { TranscendanceStateActionType } from "../../context/transcendance-reducer";
 import {
+  GameConstants,
   GameState,
   failedEvents,
   scoreInfo,
@@ -24,24 +25,30 @@ import Player from "./Player";
 import ChannelService from "../../services/channel.service";
 import GameEndDisplay from "./GameEndDisplay";
 import { positionalData } from "../../classes/positionalData.class";
+import PauseOverlay from "./PauseOverlay";
+import PauseNotification from "./PauseNotification";
+import MainMenu from "./MainMenu";
 
 interface Props {
   gameLoop: GameLoop;
   gameSocket: GameSocket;
   setScoreInfo: React.Dispatch<SetStateAction<scoreInfo>>;
+  gameConstants: GameConstants;
 }
 
 export default function GameBoard(props: Props) {
-  const { gameLoop, gameSocket, setScoreInfo } = props;
+  const { gameLoop, gameSocket, setScoreInfo, gameConstants } = props;
   const { t } = useTranslation();
   const toast = useContext(TranscendanceContext);
-
-  const boardRef = useRef<HTMLDivElement>(null);
 
   const [zoom, toggleZoom] = useState<boolean>(false);
   const [gameStatus, setGameStatus] = useState<GameState>(GameState.WIN);
   const [gamePositions, setGamePositions] = useState<positionalData>(
-    new positionalData()
+    new positionalData(gameConstants)
+  );
+  const [pause, togglePause] = useState<boolean>(true);
+  const [pauseContent, setPauseContent] = useState<JSX.Element | boolean>(
+    <MainMenu gameSocket={gameSocket} />
   );
 
   const playerMoveHandler = (event: KeyboardEvent) => {
@@ -64,19 +71,26 @@ export default function GameBoard(props: Props) {
 
   const gameStartingListener = () => {
     setScoreInfo({ ...gameLoop.scoreInfo });
-    gameLoop.startLoop();
+    gameLoop.startLoop(togglePause);
   };
 
   const gameFinishListener = (data: any) => {
+    gameSocket.latestGame = null;
     const thisPlayer =
-      gameLoop.activePlayer === 1
+      gameLoop.activePlayer === 0
+        ? gameSocket.spectatingPlayerId
+        : gameLoop.activePlayer === 1
         ? gameLoop.scoreInfo.p1Id
         : gameLoop.scoreInfo.p2Id;
     if (thisPlayer === data) setGameStatus(GameState.WIN);
     else setGameStatus(GameState.LOSS);
     toggleZoom(true);
 
-    gameLoop.resetPositions();
+    setTimeout(resetGame, 4000);
+  };
+
+  const resetGame = () => {
+    gameLoop.resetPositions(togglePause);
     setGamePositions(gameLoop.positionalData);
     gameLoop.scoreInfo = {
       p1Id: "",
@@ -87,27 +101,35 @@ export default function GameBoard(props: Props) {
       p2s: 0,
     };
     setScoreInfo(gameLoop.scoreInfo);
+    setPauseContent(<MainMenu gameSocket={gameSocket} />);
   };
 
   const giListener = (data: any) => {
-    gameLoop.scoreInfo.p1s = data.p1s;
-    gameLoop.scoreInfo.p2s = data.p2s;
-    setGamePositions({
-      ...gamePositions,
-      ballOffset: { x: data.bx - 15, y: data.by - 15 },
-      playerRightYOffset:
-        gameLoop.activePlayer !== 2
-          ? data.p2y - 50
-          : gameLoop.positionalData.playerRightYOffset,
-      playerLeftYOffset:
-        gameLoop.activePlayer !== 1
-          ? data.p1y - 50
-          : gameLoop.positionalData.playerLeftYOffset,
-    });
+    if (gameLoop.scoreInfo.p1s !== data.p1s) gameLoop.scoreInfo.p1s = data.p1s;
+    if (gameLoop.scoreInfo.p2s !== data.p2s) gameLoop.scoreInfo.p2s = data.p2s;
+    setGamePositions(
+      new positionalData(gameConstants, {
+        ...gamePositions,
+        ballOffset: {
+          x: data.bx - gameConstants.ballSize / 2,
+          y: data.by - gameConstants.ballSize / 2,
+        },
+        playerRightYOffset:
+          gameLoop.activePlayer !== 2
+            ? data.p2y - gameConstants.paddleSize / 2
+            : gameLoop.positionalData.playerRightYOffset,
+        playerLeftYOffset:
+          gameLoop.activePlayer !== 1
+            ? data.p1y - gameConstants.paddleSize / 2
+            : gameLoop.positionalData.playerLeftYOffset,
+      })
+    );
     setScoreInfo({ ...gameLoop.scoreInfo });
   };
 
   const gameJoinedListener = (data: any) => {
+    if (data.playerNumber === 0) gameSocket.latestGame = "WATCH";
+    else gameSocket.latestGame = "PLAY";
     gameLoop.activePlayer = data.playerNumber;
   };
 
@@ -130,18 +152,38 @@ export default function GameBoard(props: Props) {
     setScoreInfo({ ...gameLoop.scoreInfo });
     if (gameLoop.scoreInfo.p1name === "" || gameLoop.scoreInfo.p2name === "")
       getPlayerNames(data.player1id, data.player2id);
-    if (data.status === "PLAYING") gameLoop.startLoop();
-  };
-
-  const tryRejoinListener = (data: any) => {
-    console.log("rejoined");
-    if (data) {
-      gameSocket.joinGame(data);
+    if (data.status === "PLAYING") gameLoop.startLoop(togglePause);
+    if (data.status === "PAUSED") {
+      setPauseContent(<PauseNotification />);
+      gameLoop.stopLoop(togglePause);
+    }
+    if (data.status === "DONE" || data.status === "OVER") {
+      setPauseContent(false);
     }
   };
 
+  const tryRejoinListener = (data: any) => {
+    if (data) {
+      gameSocket.joinGame(data.mode);
+      gameLoop.positionalData = new positionalData(gameConstants, {
+        ...gamePositions,
+        playerLeftYOffset: data.pos.p1y - gameConstants.paddleSize / 2,
+        playerRightYOffset: data.pos.p2y - gameConstants.paddleSize / 2,
+        ballOffset: {
+          x: data.pos.ballPos.x - gameConstants.ballSize / 2,
+          y: data.pos.ballPos.y - gameConstants.ballSize / 2,
+        },
+      });
+    }
+  };
+
+  const leftWatchListener = () => {
+    resetGame();
+    gameSocket.latestGame = null;
+  };
+
   const failedListener = (data: any) => {
-    gameLoop.resetPositions();
+    gameLoop.resetPositions(togglePause);
     toast.dispatchTranscendanceState({
       type: TranscendanceStateActionType.TOGGLE_TOAST,
       toast: {
@@ -166,6 +208,7 @@ export default function GameBoard(props: Props) {
         gameSocket.socket.on("gameJoined", gameJoinedListener);
         gameSocket.socket.on("gameStatus", mutateGameStatusListener);
         gameSocket.socket.on("GI", giListener);
+        gameSocket.socket.on("leftWatch", leftWatchListener);
         gameSocket.rejoin();
         return true;
       }
@@ -185,30 +228,34 @@ export default function GameBoard(props: Props) {
           gameSocket.socket.off("gameJoined", gameJoinedListener);
           gameSocket.socket.off("gameStatus", mutateGameStatusListener);
           gameSocket.socket.off("GI", giListener);
+          gameSocket.socket.off("leftWatch", leftWatchListener);
           return true;
         }
         return false;
       });
-      if (gameLoop.interval) gameLoop.stopLoop();
+      if (gameLoop.interval) gameLoop.stopLoop(togglePause);
     };
   }, [gameSocket]);
 
   return (
     <>
       <Paper
-        ref={boardRef}
         sx={{
-          width: 672,
-          height: 450,
+          position: "relative",
+          width: gameConstants.boardWidth,
+          height: gameConstants.boardHeight,
           backgroundColor: "white",
           display: "flex",
         }}
       >
+        <PauseOverlay open={pause}>
+          <>{pauseContent}</>
+        </PauseOverlay>
         <Divider
           orientation="vertical"
           sx={{
             position: "relative",
-            left: 335,
+            left: gameConstants.boardWidth / 2 - 1,
             height: "100%",
             bgcolor: "black",
           }}
@@ -216,28 +263,16 @@ export default function GameBoard(props: Props) {
         <Player
           lr={true}
           yPos={gamePositions.playerLeftYOffset}
-          posRef={
-            boardRef.current
-              ? boardRef.current
-              : { offsetLeft: 0, offsetTop: 0 }
-          }
+          gameConstants={gameConstants}
         ></Player>
         <Player
           lr={false}
           yPos={gamePositions.playerRightYOffset}
-          posRef={
-            boardRef.current
-              ? boardRef.current
-              : { offsetLeft: 0, offsetTop: 0 }
-          }
+          gameConstants={gameConstants}
         ></Player>
         <Ball
           ballPos={gamePositions.ballOffset}
-          posRef={
-            boardRef.current
-              ? boardRef.current
-              : { offsetLeft: 0, offsetTop: 0 }
-          }
+          gameConstants={gameConstants}
         ></Ball>
         <GameEndDisplay
           zoom={zoom}

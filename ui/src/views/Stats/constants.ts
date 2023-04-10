@@ -1,5 +1,5 @@
 export const translationKeys = {
-  stats: "stats",
+  stats: "Leaderboard",
   currRating: "Current Rating",
   leaderboardRank: "Leaderboard Rank",
   gamesWon: "Games Won",

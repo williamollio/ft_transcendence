@@ -7,10 +7,9 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { GameService } from './game.service';
-// import { JwtAuthGuard } from 'src/auth/guard/jwt.auth-guard';
 import { Body, UseGuards } from '@nestjs/common';
 import { GetCurrentUserId } from 'src/decorators/getCurrentUserId.decorator';
-import { FrontendUser, GameMode } from './entities/game.entity';
+import { GameMode } from './entities/game.entity';
 import * as msgpack from 'socket.io-msgpack-parser';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
 import { gameSocketToUserId } from './socketToUserIdStorage.service';
@@ -57,7 +56,7 @@ export class GameGateway {
   @SubscribeMessage('leaveGame')
   handleAbandon(@ConnectedSocket() client: Socket) {
     const id = this.socketToId.get(client.id);
-    if (id) this.gameService.pause(id, this.server);
+    if (id) this.gameService.leave(id, this.server);
   }
 
   @SubscribeMessage('reJoin')
@@ -108,6 +107,7 @@ export class GameGateway {
     @GetCurrentUserId() id: string,
     @MessageBody('inviteGameId') inviteGameId?: string,
   ) {
+    if (this.socketToId.has(client.id)) return;
     this.socketToId.set(client.id, id);
     try {
       this.gameService.join(client, id, this.server, mode, inviteGameId);
@@ -124,6 +124,9 @@ export class GameGateway {
     @GetCurrentUserId() playerOneId: string,
   ) {
     this.socketToId.set(client.id, playerOneId);
+    console.log(this.socketToId.get(client.id));
+    console.log(this.socketToId.has(client.id));
+    if (!this.socketToId.has(client.id)) return;
     const returnMessage = await this.gameService.createInvitationGame(
       client,
       this.server,

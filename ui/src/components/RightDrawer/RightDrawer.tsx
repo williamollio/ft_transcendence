@@ -78,7 +78,7 @@ export default function RightDrawer(props: Props) {
   };
 
   return (
-    <Box sx={{ display: "flex" }}>
+    <Box sx={{ display: "flex", zIndex: (theme) => theme.zIndex.modal + 2 }}>
       <AppBar position="fixed" open={open}>
         <Box
           display={"flex"}

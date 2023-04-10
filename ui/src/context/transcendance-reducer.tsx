@@ -6,7 +6,6 @@ export interface TranscendanceState {
     title?: string;
     message?: string;
     autoClose?: boolean;
-    autoCloseDelay?: number;
     onAccept?: (...args: any) => void;
     onRefuse?: (...args: any) => void;
   };
@@ -23,7 +22,6 @@ export type TranscendanceStateAction = {
     title?: string;
     message?: string;
     autoClose?: boolean;
-    autoCloseDelay?: number;
     onAccept?: (...args: any) => void;
     onRefuse?: (...args: any) => void;
   };

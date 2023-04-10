@@ -80,7 +80,9 @@ export default function UserContext(props: Props) {
   const handleProfile = () => {
     handleContextClose();
     if (contextMenu && contextMenu.user && contextMenu.user.id) {
-      navigate(`/profile/${contextMenu.user.id}`, { state: { userId: contextMenu.user.id } });
+      navigate(`/profile/${contextMenu.user.id}`, {
+        state: { userId: contextMenu.user.id },
+      });
     }
   };
 
@@ -166,6 +168,7 @@ export default function UserContext(props: Props) {
   return (
     <>
       <Menu
+        sx={{ zIndex: (theme) => theme.zIndex.modal + 2 }}
         open={contextMenu !== null}
         onClose={handleContextClose}
         anchorReference="anchorPosition"

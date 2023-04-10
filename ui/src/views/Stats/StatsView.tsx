@@ -22,6 +22,7 @@ import PersonalStatPanel from "../../components/stats/PersonalStatPanel";
 import RightDrawer from "../../components/RightDrawer/RightDrawer";
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { GameSocket } from "../../classes/GameSocket.class";
+import classes from "../../styles.module.scss";
 
 interface Props {
   userSocket: UserSocket;
@@ -65,7 +66,7 @@ export default function StatsView(props: Props): React.ReactElement {
           type={"General"}
           title={t(translationKeys.general)}
         />
-        <ProfileCard>
+        <ProfileCard sx={{ bgcolor: classes.colorPrimary }}>
           <CardContainer>
             <TitleWrapper>
               <Typography

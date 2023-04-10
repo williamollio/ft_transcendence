@@ -43,6 +43,7 @@ import { ToastType } from "../../context/toast";
 import { listenerWrapper } from "../../services/initSocket.service";
 import { RoutePath } from "../../interfaces/router.interface";
 import UserContext from "./UserContext";
+import { Identifier, IndexType } from "typescript";
 
 interface Props {
   channelSocket: ChannelSocket;
@@ -249,7 +250,6 @@ export default function Chat(props: Props) {
         }
             ${data.game.mode === "CLASSIC" ? "Classic" : "Mayhem"}`,
         autoClose: true,
-        autoCloseDelay: 9500,
         onAccept: () => {
           gameSocket.joinGame(data.game.mode, data.initiatingUser.id);
           navigate(RoutePath.GAME);
@@ -294,7 +294,11 @@ export default function Chat(props: Props) {
   const failedListener = (error: string, event: string) => {
     toast.dispatchTranscendanceState({
       type: TranscendanceStateActionType.TOGGLE_TOAST,
-      toast: { type: ToastType.ERROR, title: error, message: error },
+      toast: {
+        type: ToastType.ERROR,
+        title: error,
+        message: event,
+      },
     });
   };
 

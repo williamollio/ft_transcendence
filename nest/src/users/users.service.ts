@@ -7,6 +7,8 @@ import { Intra42User } from './interface/intra42-user.interface';
 import { Response } from 'express';
 import { MatchHistory } from 'src/game/interfaces/matchHistory.interface';
 import { Stat } from 'src/game/interfaces/stats.interface';
+import path = require('path');
+import * as fs from 'fs';
 // import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 
 // have to update this file and user response to display error
@@ -303,9 +305,9 @@ export class UsersService {
       where: {
         id: userId,
       },
-	  select: {
-		name: true,
-	  },
+      select: {
+        name: true,
+      },
     });
     return user ? user.name : null;
   }
@@ -338,20 +340,17 @@ export class UsersService {
     const currentUser = await this.findOneFromuserName(userId);
     let opponent: User | null;
     let matchWon: boolean;
-    let score: string;
 
     if (matchesList && currentUser) {
       try {
         for (const match of matchesList) {
           if (match.playerOneId === currentUser.id) {
             opponent = await this.getUserInfo(match.playerTwoId);
-            score = match.p1s.toString() + '-' + match.p2s.toString();
-            if (match.p1s == 10) matchWon = true;
+            if (match.winnerId === match.playerOneId) matchWon = true;
             else matchWon = false;
           } else {
             opponent = await this.getUserInfo(match.playerOneId);
-            score = match.p2s.toString() + '-' + match.p1s.toString();
-            if (match.p2s == 10) matchWon = true;
+            if (match.winnerId === match.playerTwoId) matchWon = true;
             else matchWon = false;
           }
           if (opponent) {
@@ -362,9 +361,10 @@ export class UsersService {
               currentUserId: currentUser.id,
               imageOpponent: imageOpponent,
               opponentId: opponent.id,
-              p1Score: match.p1s,
-              p2Score: match.p2s,
-              // score: score,
+              p1Score:
+                currentUser.id === match.playerOneId ? match.p1s : match.p2s,
+              p2Score:
+                currentUser.id === match.playerOneId ? match.p2s : match.p1s,
               matchWon: matchWon,
             });
           }

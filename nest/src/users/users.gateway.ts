@@ -35,9 +35,7 @@ export class UserGateway {
   ) {}
 
   @SubscribeMessage('connectUser')
-  userConnect(
-    @GetCurrentUserId() userId: string,
-  ) {
+  userConnect(@GetCurrentUserId() userId: string) {
     void this.usersService.updateConnectionStatus(
       String(userId),
       UserStatus.ONLINE,

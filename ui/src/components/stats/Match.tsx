@@ -34,7 +34,7 @@ export default function Match(props: Props) {
                   width: "25px",
                   height: "25px",
                 }}
-                src={match.player1.image ? match.player1.image : ""}
+                src=""
               />
             </Grid>
             <Grid item marginLeft="10px">
@@ -59,7 +59,7 @@ export default function Match(props: Props) {
                   width: "25px",
                   height: "25px",
                 }}
-                src={match.player2.image ? match.player2.image : ""}
+                src=""
               />
             </Grid>
             <Grid item marginLeft="10px">
