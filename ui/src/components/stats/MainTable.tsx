@@ -69,7 +69,7 @@ export default function MainTalbe(props: Props) {
 
   return (
     <Box className={classes.boxStyle}>
-      <Paper className={classes.paperStyle}>
+      <Paper className={classes.paperStyle} elevation={10}>
         <TableToolbar filter={filter} />
         <TableContainer className={classes.tableCont}>
           <Table className={classes.colorScheme} stickyHeader>
@@ -92,14 +92,9 @@ export default function MainTalbe(props: Props) {
 
 const useStyles = makeStyles()(() => ({
   colorScheme: {
-    backgroundColor: classes.colorPrimary,
-    color: classes.colorPrimary,
-    WebkitTextFillColor: classes.colorSecondary,
+    backgroundColor: "white",
   },
   tableCont: {
-    backgroundColor: classes.colorPrimary,
-    color: classes.colorPrimary,
-    WebkitTextFillColor: classes.colorSecondary,
     maxHeight: "88%",
     overflow: "auto",
   },
@@ -113,6 +108,5 @@ const useStyles = makeStyles()(() => ({
     mb: 2,
     overflow: "hidden",
     backgroundColor: classes.colorPrimary,
-    color: classes.colorPrimary,
   },
 }));

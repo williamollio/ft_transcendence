@@ -27,8 +27,7 @@ const useStyles = makeStyles()(() => ({
   tableHead: {
     "& .MuiTableCell-head": {
       backgroundColor: classes.colorPrimary,
-      color: classes.colorPrimary,
-      WebkitTextFillColor: classes.colorSecondary,
+	  WebkitTextFillColor: classes.colorAccent,
     },
   },
 }));

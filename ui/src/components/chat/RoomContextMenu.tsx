@@ -10,27 +10,13 @@ import ChannelInfoDialog from "./ChannelInfoDialog";
 import GetIdDialog from "./GetIdDialog";
 
 interface Props {
-  blockedUser: Array<string>;
-  refetchBlockedUsers: any;
-  userSocket: UserSocket;
-  setNewChannel: any;
   contextMenu: { mouseX: number; mouseY: number; channel: chatRoom } | null;
   setContextMenu: any;
   channelSocket: ChannelSocket;
-  gameSocket: GameSocket;
 }
 
 export default function RoomContextMenu(props: Props) {
-  const {
-    blockedUser,
-    refetchBlockedUsers,
-    userSocket,
-    setNewChannel,
-    contextMenu,
-    setContextMenu,
-    channelSocket,
-    gameSocket,
-  } = props;
+  const { contextMenu, setContextMenu, channelSocket } = props;
   const { t } = useTranslation();
 
   const [channelInfoOpen, toggleChannelInfo] = useState(false);
@@ -73,6 +59,7 @@ export default function RoomContextMenu(props: Props) {
   return (
     <>
       <Menu
+        sx={{ zIndex: (theme) => theme.zIndex.modal + 2 }}
         open={contextMenu !== null}
         onClose={handleContextClose}
         anchorReference="anchorPosition"
@@ -93,15 +80,10 @@ export default function RoomContextMenu(props: Props) {
         </MenuItem>
       </Menu>
       <ChannelInfoDialog
-        blockedUser={blockedUser}
-        refetchBlockedUsers={refetchBlockedUsers}
-        userSocket={userSocket}
-        setNewChannel={setNewChannel}
         channelInfoOpen={channelInfoOpen}
         toggleChannelInfo={toggleChannelInfo}
         channel={contextChannel}
         channelSocket={channelSocket}
-        gameSocket={gameSocket}
       ></ChannelInfoDialog>
       <GetIdDialog
         channelSocket={channelSocket}
