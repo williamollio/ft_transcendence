@@ -50,11 +50,12 @@ export default function PersonalStatPanel(props: Props) {
       <Box>
         <Paper
           sx={{
-			backgroundColor: classes.colorPrimary,
+            backgroundColor: classes.colorPrimary,
             position: "relative",
             height: "auto",
             width: 300,
             ...(!lr ? { left: "77px" } : { right: "77px" }),
+            borderRadius: "20px",
           }}
         >
           <Grid
@@ -105,6 +106,7 @@ export default function PersonalStatPanel(props: Props) {
                   100
                 ).toPrecision(3)}
                 postfix="%"
+                bottomBorder={false}
               ></SingleStatComponent>
             </>
           )}
