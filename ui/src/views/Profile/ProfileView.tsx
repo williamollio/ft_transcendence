@@ -174,6 +174,7 @@ export default function ProfileView(props: Props): React.ReactElement {
                         label={"Name"}
                         name="name"
                         value={currentUser ? currentUser.name : ""}
+                        disable
                       />
                     </Box>
                   </Box>
