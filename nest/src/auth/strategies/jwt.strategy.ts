@@ -4,6 +4,7 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { UsersService } from '../../users/users.service';
 import * as process from 'process';
 import { HandshakeRequest } from 'src/game/entities/game.entity';
+import { JwtRefreshStrategy } from './jwt-refresh.strategy';
 
 export type JwtPayload = {
   id: string;
@@ -20,7 +21,11 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
         return authHeader.split(' ')[1];
       }
       return null;
-    } else return ExtractJwt.fromAuthHeaderAsBearerToken()(handshake as any);
+    } else
+      return (
+        JwtRefreshStrategy.extractJwtFromCookie(handshake, 'access_token') ||
+        ExtractJwt.fromAuthHeaderAsBearerToken()(handshake as any)
+      );
   };
 
   constructor(private userService: UsersService) {

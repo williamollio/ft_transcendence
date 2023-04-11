@@ -24,6 +24,26 @@ export function initAuthToken(): string | null {
   }
 }
 
+export async function initAuthTokenAsync(): Promise<string | null> {
+  return new Promise<string | null>((resolve) => {
+    setTimeout(() => {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${Cookie.TOKEN}=`);
+      if (parts.length === 2) {
+        const token = parts.pop()?.split(";").shift();
+        if (token === undefined) {
+          resolve(null);
+        } else {
+          localStorage.setItem(LOCAL_STORAGE_KEY.TOKEN, token);
+          resolve(token);
+        }
+      } else {
+        resolve(null);
+      }
+    }, 1000);
+  });
+}
+
 export function getTokenData(token: string): tokenData {
   const tokenParts = token.split(".");
   const tokenPayload = JSON.parse(atob(tokenParts[1]));

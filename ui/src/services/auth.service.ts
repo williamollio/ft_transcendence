@@ -39,6 +39,14 @@ class AuthService {
         .then((res: AxiosResponse) => res.data)
     );
   }
+
+  async refreshToken(): Promise<Response<void>> {
+    return resolve<void>(
+      axiosInstance
+        .get(`${PATH}/refresh`)
+        .then((res: AxiosResponse) => res.data)
+    );
+  }
 }
 
 // eslint-disable-next-line import/no-anonymous-default-export
