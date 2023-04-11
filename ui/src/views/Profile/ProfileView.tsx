@@ -33,6 +33,7 @@ import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { GameSocket } from "../../classes/GameSocket.class";
 import CustomTextField from "../../components/shared/CustomTextField/CustomTextField";
 import { fetchProfilePicture } from "../../utils/picture-helper";
+import PersonalStatPanel from "../../components/stats/PersonalStatPanel";
 
 interface Props {
   userSocket: UserSocket;
@@ -122,6 +123,12 @@ export default function ProfileView(props: Props): React.ReactElement {
         gameSocket={gameSocket}
       />
       <Background>
+        <PersonalStatPanel
+          playerId={userId}
+          lr={true}
+          type={"General"}
+          title={t(translationKeys.general)}
+        />
         <ProfileCard>
           <CardContainer>
             <TitleWrapper>
@@ -175,6 +182,12 @@ export default function ProfileView(props: Props): React.ReactElement {
             </ContentWrapper>
           </CardContainer>
         </ProfileCard>
+        <PersonalStatPanel
+          playerId={userId}
+          lr={false}
+          type={"Ranked"}
+          title={t(translationKeys.ranked)}
+        />
       </Background>
     </>
   );
