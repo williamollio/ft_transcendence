@@ -6,6 +6,8 @@ import { useNavigate } from "react-router-dom";
 import { RoutePath } from "../../interfaces/router.interface";
 import authService from "../auth.service";
 
+let access_token = "";
+
 export const axiosInstance = axios.create({
   baseURL: `${getBaseUrl()}`,
 });
@@ -20,7 +22,8 @@ axiosInstance.interceptors.request.use((config) => {
 
 async function refreshAccessToken() {
   try {
-    const token = await authService.refreshToken();
+    access_token = (await authService.refreshToken()).data;
+    console.log("access_token " + access_token);
   } catch (err) {
     console.error(err);
     throw err;
@@ -39,10 +42,7 @@ axiosInstance.interceptors.response.use(
       try {
         console.log("initial token " + localStorage.getItem(Cookie.TOKEN));
         return refreshAccessToken().then(() => {
-          originalConfig.headers.Authorization = `Bearer ${localStorage.getItem(
-            Cookie.TOKEN
-          )}`;
-          console.log("new token " + localStorage.getItem(Cookie.TOKEN));
+          originalConfig.headers.Authorization = `Bearer ${access_token}`;
           return axiosInstance(originalConfig);
         });
       } catch (_error) {
