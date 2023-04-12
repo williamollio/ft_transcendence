@@ -80,6 +80,8 @@ export default function RightDrawer(props: Props) {
       location.pathname == RoutePath.LOGIN_2FA
     ) {
       setHidden(true);
+    } else {
+      setHidden(false);
     }
   }, [location.pathname]);
 

@@ -51,6 +51,8 @@ export default function NavBar(props: Props): React.ReactElement {
       location.pathname == RoutePath.LOGIN_2FA
     ) {
       setHidden(true);
+    } else {
+      setHidden(false);
     }
   }, [location.pathname]);
 
