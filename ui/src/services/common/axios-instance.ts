@@ -18,7 +18,16 @@ axiosInstance.interceptors.request.use((config) => {
   return config;
 });
 
-axios.interceptors.response.use(
+async function refreshAccessToken() {
+  try {
+    const token = await authService.refreshToken();
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+}
+
+axiosInstance.interceptors.response.use(
   (response) => {
     return response;
   },
@@ -29,16 +38,13 @@ axios.interceptors.response.use(
 
       try {
         console.log("initial token " + localStorage.getItem(Cookie.TOKEN));
-        await authService.refreshToken();
-        const token = await initAuthTokenAsync();
-
-        if (token) {
-          console.log("updated token " + token);
-          axiosInstance.defaults.headers.common["Authorization"] =
-            "Bearer " + token;
-        }
-
-        return axiosInstance(originalConfig);
+        return refreshAccessToken().then(() => {
+          originalConfig.headers.Authorization = `Bearer ${localStorage.getItem(
+            Cookie.TOKEN
+          )}`;
+          console.log("new token " + localStorage.getItem(Cookie.TOKEN));
+          return axiosInstance(originalConfig);
+        });
       } catch (_error) {
         return Promise.reject(_error);
       }

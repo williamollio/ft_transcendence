@@ -40,8 +40,8 @@ class AuthService {
     );
   }
 
-  async refreshToken(): Promise<Response<void>> {
-    return resolve<void>(
+  async refreshToken(): Promise<Response<string>> {
+    return resolve<string>(
       axiosInstance
         .get(`${PATH}/refresh`)
         .then((res: AxiosResponse) => res.data)
