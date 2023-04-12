@@ -21,12 +21,11 @@ export default function Player(props: Props) {
             ? {
                 left:
                   gameConstants.paddleRelativeOffset -
-                  gameConstants.paddleWidth
+                  gameConstants.paddleWidth,
               }
             : {
                 left:
-                  gameConstants.boardWidth -
-                  gameConstants.paddleRelativeOffset
+                  gameConstants.boardWidth - gameConstants.paddleRelativeOffset,
               }),
           ...(!lr
             ? {

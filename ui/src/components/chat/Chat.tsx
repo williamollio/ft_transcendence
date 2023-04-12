@@ -22,6 +22,7 @@ import {
   channelUser,
   ChannelInfoContextMenu,
   user,
+  GameMode,
 } from "../../interfaces/chat.interface";
 import { accessTypes, chatRoom } from "../../classes/chatRoom.class";
 import AddChannelDialog from "./AddChannelDialog";
@@ -246,9 +247,9 @@ export default function Chat(props: Props) {
         type: ToastType.INVITE,
         title: t(translationKeys.invite.gameInvite) as string,
         message: `${data.initiatingUser.name} ${
-          t(translationKeys.invite.inviteTo) as string
+          t(translationKeys.invite.inviteToGame) as string
         }
-            ${data.game.mode === "CLASSIC" ? "Classic" : "Mayhem"}`,
+            ${data.game.mode === GameMode.CLASSIC ? "Classic" : "Mayhem"}`,
         autoClose: true,
         onAccept: () => {
           gameSocket.joinGame(data.game.mode, data.initiatingUser.id);
@@ -297,7 +298,7 @@ export default function Chat(props: Props) {
       toast: {
         type: ToastType.ERROR,
         title: error,
-        message: event,
+        message: t(translationKeys.errorMessages.backendErrorMessage(event)) as string,
       },
     });
   };
@@ -429,14 +430,9 @@ export default function Chat(props: Props) {
           blockedUsers={blockedUsers}
         />
         <RoomContextMenu
-          blockedUser={blockedUsers}
-          refetchBlockedUsers={refetchBlockedUsers}
-          userSocket={userSocket}
-          setNewChannel={setNewChannel}
           contextMenu={contextMenu}
           setContextMenu={setContextMenu}
           channelSocket={channelSocket}
-          gameSocket={gameSocket}
         ></RoomContextMenu>
         <Divider></Divider>
         <Grid container height="100%">

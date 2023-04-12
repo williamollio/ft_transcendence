@@ -16,9 +16,13 @@ export class GameLoop {
   scoreInfo: scoreInfo;
   gameConstants: GameConstants;
 
-  constructor(gameSocket: GameSocket, userSocket: UserSocket, constants: GameConstants) {
+  constructor(
+    gameSocket: GameSocket,
+    userSocket: UserSocket,
+    constants: GameConstants
+  ) {
     this.interval = null;
-	this.gameConstants = constants;
+    this.gameConstants = constants;
     this.positionalData = new positionalData(constants);
     this.keyPressed = [];
     this.gameSocket = gameSocket;
@@ -35,7 +39,9 @@ export class GameLoop {
     };
   }
 
-  resetPositions = (togglePause: React.Dispatch<React.SetStateAction<boolean>>) => {
+  resetPositions = (
+    togglePause: React.Dispatch<React.SetStateAction<boolean>>
+  ) => {
     this.stopLoop(togglePause);
     this.positionalData.resetPositions();
   };
@@ -45,26 +51,38 @@ export class GameLoop {
       if (this.keyPressed.some((key) => key === "ArrowUp")) {
         if (
           this.activePlayer === 1 &&
-          this.positionalData.playerLeftYOffset - 5 > 0
+          this.positionalData.playerLeftYOffset -
+            this.gameConstants.playerSpeed >
+            0
         ) {
-          this.positionalData.playerLeftYOffset -= 5;
+          this.positionalData.playerLeftYOffset -=
+            this.gameConstants.playerSpeed;
         } else if (
           this.activePlayer === 2 &&
-          this.positionalData.playerRightYOffset - 5 > 0
+          this.positionalData.playerRightYOffset -
+            this.gameConstants.playerSpeed >
+            0
         ) {
-          this.positionalData.playerRightYOffset -= 5;
+          this.positionalData.playerRightYOffset -=
+            this.gameConstants.playerSpeed;
         }
       } else if (this.keyPressed.some((key) => key === "ArrowDown")) {
         if (
           this.activePlayer === 1 &&
-          this.positionalData.playerLeftYOffset + 5 < this.gameConstants.boardHeight - this.gameConstants.paddleSize
+          this.positionalData.playerLeftYOffset +
+            this.gameConstants.playerSpeed <
+            this.gameConstants.boardHeight - this.gameConstants.paddleSize
         ) {
-          this.positionalData.playerLeftYOffset += 5;
+          this.positionalData.playerLeftYOffset +=
+            this.gameConstants.playerSpeed;
         } else if (
           this.activePlayer === 2 &&
-          this.positionalData.playerRightYOffset + 5 < this.gameConstants.boardHeight - this.gameConstants.paddleSize
+          this.positionalData.playerRightYOffset +
+            this.gameConstants.playerSpeed <
+            this.gameConstants.boardHeight - this.gameConstants.paddleSize
         ) {
-          this.positionalData.playerRightYOffset += 5;
+          this.positionalData.playerRightYOffset +=
+            this.gameConstants.playerSpeed;
         }
       }
     }
@@ -79,15 +97,17 @@ export class GameLoop {
     );
   };
 
-  startLoop = async (togglePause: React.Dispatch<React.SetStateAction<boolean>>) => {
-	this.userSocket.joinGame();
+  startLoop = async (
+    togglePause: React.Dispatch<React.SetStateAction<boolean>>
+  ) => {
+    this.userSocket.joinGame();
     togglePause(false);
-	if (!this.interval) this.interval = setInterval(this.updateGame, 30);
+    if (!this.interval) this.interval = setInterval(this.updateGame, 30);
   };
 
   stopLoop = (togglePause: React.Dispatch<React.SetStateAction<boolean>>) => {
     this.userSocket.leaveGame();
-	togglePause(true);
+    togglePause(true);
     if (this.interval !== null) {
       clearInterval(this.interval);
       this.interval = null;

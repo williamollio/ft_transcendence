@@ -106,7 +106,7 @@ export class DoubleKeyMap {
   */
   matchPlayer(player2Id: string, mode: GameMode) {
     for (const [_, game] of this.playerMap) {
-      if (game.p2id === undefined && game.mode === mode && _) {
+      if (game.p2id === undefined && game.p1id !== player2Id && game.mode === mode && _) {
         // the above is ugly but a linting rule is forcing me to add it
         game.p2id = player2Id;
         this.playerMap.set(player2Id, game);
@@ -146,7 +146,6 @@ export class Game {
     this.gameRoomId = this.makeid(5);
     this.mode = mode;
   }
-  // those are the constants that are used in the game (Henric can adjust them)
   gameConstants = {
     relativeGameWidth: 672,
     relativeMiddleX: 336,
@@ -222,7 +221,7 @@ export class Game {
     this.ballAngle =
       Math.floor(Math.random() * (angleRanges.max - angleRanges.min + 1)) +
       angleRanges.min;
-    if (playerScored === 1) this.ballAngle = 180 - this.ballAngle;
+    if (playerScored === 2) this.ballAngle = 180 - this.ballAngle;
     this.sleep(initialSleep ? initialSleep : 3000).then(() => {
       this.movementVector = this.calculateMovementVector(
         this.gameConstants.speeds[(this.gameConstants.speed = 0)],
@@ -237,6 +236,7 @@ export class Game {
   ): void {
     const angleRanges = { min: -45, max: 45 };
     this.gameConstants.maxSpeed = 8;
+	this.movementVector = { x: 0, y: 0 };
     this.bx = this.gameConstants.relativeMiddleX;
     this.by =
       Math.floor(
@@ -245,7 +245,7 @@ export class Game {
     this.ballAngle =
       Math.floor(Math.random() * (angleRanges.max - angleRanges.min + 1)) +
       angleRanges.min;
-    if (playerScored === 1) this.ballAngle = 180 - this.ballAngle;
+    if (playerScored === 2) this.ballAngle = 180 - this.ballAngle;
     this.sleep(initialSleep ? initialSleep : 1000).then(() => {
       this.movementVector = this.calculateMovementVector(
         this.gameConstants.speeds[(this.gameConstants.speed = 5)],
@@ -253,24 +253,6 @@ export class Game {
       );
     });
   }
-
-  //   bottomPaddleEdge = (
-  //     ballX: number,
-  //     ballY: number,
-  //     ballHeight: number,
-  //     paddleX: number,
-  //     paddleY: number,
-  //     paddleSize: number,
-  //     player: number,
-  //   ): boolean => {
-  // 	if (player === 1)
-  // 	{
-  // 		if (ballX < paddleX)
-  // 	}
-  // 	else if (player === 2)
-  //     {}
-  // 	return false;
-  //   };
 
   moveBall(gameService: GameService, server: Server) {
     const {
@@ -286,7 +268,7 @@ export class Game {
     if (this.by + ballHeight / 2 >= relativeGameHeight) {
       // bottom collision
       this.by = relativeGameHeight - ballHeight / 2;
-      this.ballAngle = -this.ballAngle;
+      this.ballAngle *= -1;
       this.movementVector = this.calculateMovementVector(
         this.ballSpeed,
         this.ballAngle,
@@ -294,7 +276,7 @@ export class Game {
     } else if (this.by - ballHeight / 2 <= 0) {
       // top collision
       this.by = 0 + ballHeight / 2;
-      this.ballAngle = -this.ballAngle;
+      this.ballAngle *= -1;
       this.movementVector = this.calculateMovementVector(
         this.ballSpeed,
         this.ballAngle,
@@ -320,7 +302,7 @@ export class Game {
             -(ballDistanceFromPaddleCenter / (this.paddleSize / 2)) * 60;
           this.ballAngle = res;
           if (this.gameConstants.speed < maxSpeed) {
-            this.ballSpeed = speeds[this.gameConstants.speed++];
+            this.ballSpeed = speeds[++this.gameConstants.speed];
           }
           this.movementVector = this.calculateMovementVector(
             this.ballSpeed,
@@ -335,7 +317,7 @@ export class Game {
             -(ballDistanceFromPaddleCenter / (this.paddleSize / 2)) * 45;
           this.ballAngle = res;
           if (this.gameConstants.speed < maxSpeed) {
-            this.ballSpeed = speeds[this.gameConstants.speed++];
+            this.ballSpeed = speeds[++this.gameConstants.speed];
           }
           this.movementVector = this.calculateMovementVector(
             this.ballSpeed,
@@ -363,7 +345,7 @@ export class Game {
             -(ballDistanceFromPaddleCenter / (this.paddleSize / 2)) * 60;
           this.ballAngle = 180 - res;
           if (this.gameConstants.speed < maxSpeed) {
-            this.ballSpeed = speeds[this.gameConstants.speed++];
+            this.ballSpeed = speeds[++this.gameConstants.speed];
           }
           this.movementVector = this.calculateMovementVector(
             this.ballSpeed,
@@ -378,7 +360,7 @@ export class Game {
             -(ballDistanceFromPaddleCenter / (this.paddleSize / 2)) * 45;
           this.ballAngle = 180 - res;
           if (this.gameConstants.speed < maxSpeed) {
-            this.ballSpeed = speeds[this.gameConstants.speed++];
+            this.ballSpeed = speeds[++this.gameConstants.speed];
           }
           this.movementVector = this.calculateMovementVector(
             this.ballSpeed,
