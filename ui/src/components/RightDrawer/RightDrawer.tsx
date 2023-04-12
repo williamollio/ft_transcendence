@@ -15,6 +15,8 @@ import { navbarHeight } from "../Navbar";
 import { GameSocket } from "../../classes/GameSocket.class";
 import { useDrawersStore } from "../../store/drawers-store";
 import { Tooltip } from "@mui/material";
+import { RoutePath } from "../../interfaces/router.interface";
+import { useLocation } from "react-router-dom";
 
 const drawerWidth = 300;
 const drawerWidthClosed = "4rem";
@@ -62,12 +64,24 @@ interface Props {
 export default function RightDrawer(props: Props) {
   const { channelSocket, userSocket, gameSocket } = props;
   const theme = useTheme();
+  const location = useLocation();
   const [open, setOpen] = useDrawersStore(
     (state: { isRightOpen: any; setIsRightOpen: any }) => [
       state.isRightOpen,
       state.setIsRightOpen,
     ]
   );
+
+  const [hidden, setHidden] = React.useState<boolean>(false);
+
+  React.useEffect(() => {
+    if (
+      location.pathname == RoutePath.LOGIN ||
+      location.pathname == RoutePath.LOGIN_2FA
+    ) {
+      setHidden(true);
+    }
+  }, [location.pathname]);
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -78,65 +92,71 @@ export default function RightDrawer(props: Props) {
   };
 
   return (
-    <Box sx={{ display: "flex", zIndex: (theme) => theme.zIndex.modal + 2 }}>
-      <AppBar position="fixed" open={open}>
+    <>
+      {!hidden && (
         <Box
-          display={"flex"}
-          alignContent={"center"}
-          justifyContent={"center"}
-          width="100%"
-          height="100%"
+          sx={{ display: "flex", zIndex: (theme) => theme.zIndex.modal + 2 }}
         >
-          <Tooltip title="Chat">
-            <IconButton
-              onClick={handleDrawerOpen}
-              sx={{ ...(open && { display: "none" }) }}
+          <AppBar position="fixed" open={open}>
+            <Box
+              display={"flex"}
+              alignContent={"center"}
+              justifyContent={"center"}
+              width="100%"
+              height="100%"
             >
-              <ChatIcon
-                sx={{
-                  fill: theme.palette.secondary.main,
-                  width: "35px",
-                  height: "35px",
-                }}
-              />
-            </IconButton>
-          </Tooltip>
+              <Tooltip title="Chat">
+                <IconButton
+                  onClick={handleDrawerOpen}
+                  sx={{ ...(open && { display: "none" }) }}
+                >
+                  <ChatIcon
+                    sx={{
+                      fill: theme.palette.secondary.main,
+                      width: "35px",
+                      height: "35px",
+                    }}
+                  />
+                </IconButton>
+              </Tooltip>
+            </Box>
+          </AppBar>
+          <Drawer
+            variant="persistent"
+            open={open}
+            anchor="right"
+            sx={{
+              width: drawerWidth,
+              flexShrink: 0,
+              "& .MuiDrawer-paper": {
+                width: drawerWidth,
+                backgroundColor: theme.palette.secondary.light,
+              },
+            }}
+          >
+            <DrawerHeader>
+              <IconButton onClick={handleDrawerClose} color="secondary">
+                {theme.direction === "rtl" ? (
+                  <ChevronLeftIcon />
+                ) : (
+                  <ChevronRightIcon />
+                )}
+              </IconButton>
+            </DrawerHeader>
+            <Divider
+              variant="middle"
+              sx={{
+                marginBottom: "2.5rem",
+              }}
+            />
+            <Chat
+              channelSocket={channelSocket}
+              userSocket={userSocket}
+              gameSocket={gameSocket}
+            />
+          </Drawer>
         </Box>
-      </AppBar>
-      <Drawer
-        variant="persistent"
-        open={open}
-        anchor="right"
-        sx={{
-          width: drawerWidth,
-          flexShrink: 0,
-          "& .MuiDrawer-paper": {
-            width: drawerWidth,
-            backgroundColor: theme.palette.secondary.light,
-          },
-        }}
-      >
-        <DrawerHeader>
-          <IconButton onClick={handleDrawerClose} color="secondary">
-            {theme.direction === "rtl" ? (
-              <ChevronLeftIcon />
-            ) : (
-              <ChevronRightIcon />
-            )}
-          </IconButton>
-        </DrawerHeader>
-        <Divider
-          variant="middle"
-          sx={{
-            marginBottom: "2.5rem",
-          }}
-        />
-        <Chat
-          channelSocket={channelSocket}
-          userSocket={userSocket}
-          gameSocket={gameSocket}
-        />
-      </Drawer>
-    </Box>
+      )}
+    </>
   );
 }
