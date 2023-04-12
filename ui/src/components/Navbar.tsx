@@ -22,10 +22,11 @@ export const navbarHeight = "4rem";
 
 interface Props {
   userSocket: UserSocket;
+  setToken: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export default function NavBar(props: Props): React.ReactElement {
-  const { userSocket } = props;
+  const { userSocket, setToken } = props;
   const theme = useTheme();
   const state = useLocation().state;
   const navigate = useNavigate();
@@ -147,7 +148,7 @@ export default function NavBar(props: Props): React.ReactElement {
               }),
             }}
           >
-            <PictureMenu image={image} status={status} />
+            <PictureMenu image={image} status={status} setToken={setToken} />
           </Box>
           <Box
             sx={{

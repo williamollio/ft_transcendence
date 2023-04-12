@@ -120,7 +120,7 @@ export default function App() {
         sx={{ backgroundColor: classes.colorSecondary }}
       >
         <ThemeProvider theme={theme}>
-          <Navbar userSocket={userSocket} />
+          <Navbar userSocket={userSocket} setToken={setToken} />
           <LeftDrawer channelSocket={channelSocket} userSocket={userSocket} />
           <RightDrawer
             channelSocket={channelSocket}
