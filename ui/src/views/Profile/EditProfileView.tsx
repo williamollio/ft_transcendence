@@ -1,6 +1,5 @@
-import React, { ChangeEvent, Dispatch, SetStateAction, useState } from "react";
+import React, { ChangeEvent, useState } from "react";
 import { makeStyles } from "tss-react/mui";
-import Navbar from "../../components/Navbar";
 import {
   Box,
   Button,
@@ -34,23 +33,11 @@ import { Controller, FieldValues, useForm } from "react-hook-form";
 import CustomMultiSelect from "../../components/shared/CustomMultiSelect/CustomMultiselect";
 import CustomTextField from "../../components/shared/CustomTextField/CustomTextField";
 import { Cookie, getTokenData } from "../../utils/auth-helper";
-import LeftDrawer from "../../components/LeftDrawer/LeftDrawer";
 import friendshipsService from "../../services/friendships.service";
-import { UserSocket } from "../../classes/UserSocket.class";
-import RightDrawer from "../../components/RightDrawer/RightDrawer";
-import { ChannelSocket } from "../../classes/ChannelSocket.class";
-import { GameSocket } from "../../classes/GameSocket.class";
 import { useDrawersStore } from "../../store/drawers-store";
 import { useUserStore } from "../../store/users-store";
 
-interface Props {
-  userSocket: UserSocket;
-  channelSocket: ChannelSocket;
-  gameSocket: GameSocket;
-}
-
-export default function EditProfileView(props: Props): React.ReactElement {
-  const { userSocket, channelSocket, gameSocket } = props;
+export default function EditProfileView(): React.ReactElement {
   const { t } = useTranslation();
   const { classes } = useStyles();
   const navigate = useNavigate();
@@ -269,13 +256,6 @@ export default function EditProfileView(props: Props): React.ReactElement {
 
   return (
     <>
-      <Navbar userSocket={userSocket} />
-      <LeftDrawer channelSocket={channelSocket} userSocket={userSocket} />
-      <RightDrawer
-        channelSocket={channelSocket}
-        userSocket={userSocket}
-        gameSocket={gameSocket}
-      />
       <Background>
         <ProfileCard>
           <CardContainer>

@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { makeStyles } from "tss-react/mui";
-import Navbar from "../../components/Navbar";
 import {
   Box,
   Typography,
@@ -26,23 +25,14 @@ import {
   ContentWrapper,
 } from "../../styles/MuiStyles";
 import { Cookie, getTokenData } from "../../utils/auth-helper";
-import LeftDrawer from "../../components/LeftDrawer/LeftDrawer";
 import { UserSocket } from "../../classes/UserSocket.class";
-import RightDrawer from "../../components/RightDrawer/RightDrawer";
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { GameSocket } from "../../classes/GameSocket.class";
 import CustomTextField from "../../components/shared/CustomTextField/CustomTextField";
 import { fetchProfilePicture } from "../../utils/picture-helper";
 import PersonalStatPanel from "../../components/stats/PersonalStatPanel";
 
-interface Props {
-  userSocket: UserSocket;
-  channelSocket: ChannelSocket;
-  gameSocket: GameSocket;
-}
-
-export default function ProfileView(props: Props): React.ReactElement {
-  const { userSocket, channelSocket, gameSocket } = props;
+export default function ProfileView(): React.ReactElement {
   const userIdParam = useLocation().state;
   const { t } = useTranslation();
   const { classes } = useStyles();
@@ -115,13 +105,6 @@ export default function ProfileView(props: Props): React.ReactElement {
 
   return (
     <>
-      <Navbar userSocket={userSocket} />
-      <LeftDrawer channelSocket={channelSocket} userSocket={userSocket} />
-      <RightDrawer
-        channelSocket={channelSocket}
-        userSocket={userSocket}
-        gameSocket={gameSocket}
-      />
       <Background>
         <PersonalStatPanel
           playerId={userId}
