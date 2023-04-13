@@ -229,8 +229,6 @@ export default function EditProfileView(): React.ReactElement {
       }
     );
 
-    updateOptionsFriends(data);
-
     let responseFrienship;
     friendsList?.forEach(async function (friend) {
       responseFrienship = await friendshipsService.postRequest(userId, friend);
@@ -242,7 +240,8 @@ export default function EditProfileView(): React.ReactElement {
         showSuccessToast(
           t(translationKeys.message.success.friendRequestsSaved)
         );
-        setValue("friends", undefined);
+        setValue("friends", []);
+        updateOptionsFriends(data);
         setIsDrawerCacheInvalid(true);
       }
     });
