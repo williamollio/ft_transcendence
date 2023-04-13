@@ -58,6 +58,8 @@ export default function NavBar(props: Props): React.ReactElement {
       setIsNavbarCacheInvalid(true);
       setHidden(false);
     }
+
+    setSelectedTabId(state?.activeTabId ?? idTabs.PROFILE);
   }, [location.pathname]);
 
   React.useEffect(() => {

@@ -152,7 +152,9 @@ export default function ListFriends(props: Props) {
   }
 
   function navigateToUserProfile(userId: string) {
-    navigate(`/profile/${userId}`, { state: { userId: userId } });
+    navigate(`/profile/${userId}`, {
+      state: { userId: userId },
+    });
   }
 
   return (

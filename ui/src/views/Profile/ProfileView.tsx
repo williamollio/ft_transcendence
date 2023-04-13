@@ -25,9 +25,6 @@ import {
   ContentWrapper,
 } from "../../styles/MuiStyles";
 import { Cookie, getTokenData } from "../../utils/auth-helper";
-import { UserSocket } from "../../classes/UserSocket.class";
-import { ChannelSocket } from "../../classes/ChannelSocket.class";
-import { GameSocket } from "../../classes/GameSocket.class";
 import CustomTextField from "../../components/shared/CustomTextField/CustomTextField";
 import { fetchProfilePicture } from "../../utils/picture-helper";
 import PersonalStatPanel from "../../components/stats/PersonalStatPanel";
