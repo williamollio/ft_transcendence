@@ -141,6 +141,7 @@ export default function LeftDrawer(props: Props) {
     ) {
       setHidden(true);
     } else {
+      setIsDrawerCacheInvalid(true);
       setHidden(false);
     }
   }, [location.pathname]);

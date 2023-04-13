@@ -45,6 +45,8 @@ export default function NavBar(props: Props): React.ReactElement {
   );
   const [status, setStatus] = React.useState<UserStatus>(UserStatus.OFFLINE);
   const [hidden, setHidden] = React.useState<boolean>(false);
+  const [isNavbarCacheInvalid, setIsNavbarCacheInvalid] =
+    React.useState<boolean>(false);
 
   React.useEffect(() => {
     if (
@@ -53,6 +55,7 @@ export default function NavBar(props: Props): React.ReactElement {
     ) {
       setHidden(true);
     } else {
+      setIsNavbarCacheInvalid(true);
       setHidden(false);
     }
   }, [location.pathname]);
@@ -65,8 +68,9 @@ export default function NavBar(props: Props): React.ReactElement {
     }
     if (userId && image === null) {
       wrapperFetchProfilePicture(userId);
+      setIsNavbarCacheInvalid(false);
     }
-  }, [userId]);
+  }, [userId, isNavbarCacheInvalid]);
 
   const statusUpdateListener = (data: any) => {
     if (data.id === userId) setStatus(data.status);
