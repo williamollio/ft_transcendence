@@ -21,7 +21,6 @@ import { useUserStore } from "../../../store/users-store";
 import { UserSocket } from "../../../classes/UserSocket.class";
 import { listenerWrapper } from "../../../services/initSocket.service";
 import { useNavigate } from "react-router-dom";
-import { RoutePath } from "../../../interfaces/router.interface";
 
 interface Props {
   userId: string;
@@ -143,21 +142,23 @@ export default function ListRequested(props: Props) {
               px: 2.5,
             }}
           >
-            <ListItemIcon
-              onClick={() => navigateToUserProfile(user.id)}
-              sx={{
-                marginLeft: -1,
-              }}
-            >
-              <StyledAvatarBadge
-                overlap="circular"
-                anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-                variant="dot"
-                status={user.status}
+            <Tooltip title={user.name}>
+              <ListItemIcon
+                onClick={() => navigateToUserProfile(user.id)}
+                sx={{
+                  marginLeft: -1,
+                }}
               >
-                <Avatar key={user.id} src={profilePictures[user.id]} />
-              </StyledAvatarBadge>
-            </ListItemIcon>
+                <StyledAvatarBadge
+                  overlap="circular"
+                  anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                  variant="dot"
+                  status={user.status}
+                >
+                  <Avatar key={user.id} src={profilePictures[user.id]} />
+                </StyledAvatarBadge>
+              </ListItemIcon>
+            </Tooltip>
             <ListItemText primary={user.name} sx={{ opacity: open ? 1 : 0 }} />
             <Tooltip title="Cancel friendship request">
               <ListItemButton
