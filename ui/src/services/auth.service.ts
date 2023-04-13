@@ -1,5 +1,5 @@
 import { getBaseUrl } from "../utils/url-helper";
-import { axiosInstance } from "./common/axios-instance";
+import {axiosInstance, refreshAxios} from "./common/axios-instance";
 import { resolve, Response } from "./common/resolve";
 import { AxiosResponse } from "axios";
 
@@ -42,7 +42,7 @@ class AuthService {
 
   async refreshToken(): Promise<Response<string>> {
     return resolve<string>(
-      axiosInstance
+      refreshAxios
         .get(`${PATH}/refresh`)
         .then((res: AxiosResponse) => res.data)
     );

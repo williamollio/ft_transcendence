@@ -12,6 +12,10 @@ export const axiosInstance = axios.create({
   baseURL: `${getBaseUrl()}`,
 });
 
+export const refreshAxios = axios.create({
+  baseURL: `${getBaseUrl()}`,
+});
+
 axiosInstance.interceptors.request.use((config) => {
   const token = localStorage.getItem(Cookie.TOKEN);
   if (token) {
@@ -48,7 +52,7 @@ axiosInstance.interceptors.response.use(
       } catch (_error) {
         return Promise.reject(_error);
       }
-    } else if (error.response.status === 401 && originalConfig._retry) {
+    } /*else if (error.response.status === 401 && originalConfig._retry) {
       const token = localStorage.getItem(Cookie.TOKEN);
       if (token) {
         localStorage.removeItem(Cookie.TOKEN);
@@ -57,7 +61,7 @@ axiosInstance.interceptors.response.use(
       }
       const navigate = useNavigate();
       navigate(RoutePath.LOGIN);
-    }
+    }*/
     return Promise.reject(error);
   }
 );
