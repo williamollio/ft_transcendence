@@ -30,6 +30,13 @@ export class JwtRefreshStrategy extends PassportStrategy(
   };
 
   validate(req: any, payload: any) {
-    return payload;
+    return {
+      id: payload.id,
+      intraId: payload.intraId,
+      refreshToken: JwtRefreshStrategy.extractJwtFromCookie(
+        req,
+        'refresh_token',
+      ),
+    };
   }
 }

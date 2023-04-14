@@ -10,16 +10,16 @@ import {
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
-import { AuthService } from './auth.service';
-import { IntraGuard } from './guards/intra.guard';
+import {ApiTags} from '@nestjs/swagger';
+import {AuthService} from './auth.service';
+import {IntraGuard} from './guards/intra.guard';
 import * as process from 'process';
-import { Intra42User } from '../users/interface/intra42-user.interface';
-import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
-import { JwtGuard } from './guards/jwt.guard';
-import { CreateUserDto } from '../users/dto/create-user.dto';
-import { FullAuthGuard } from './guards/full-auth.guard';
-import { Response } from 'express';
+import {Intra42User} from '../users/interface/intra42-user.interface';
+import {JwtRefreshGuard} from './guards/jwt-refresh.guard';
+import {JwtGuard} from './guards/jwt.guard';
+import {CreateUserDto} from '../users/dto/create-user.dto';
+import {FullAuthGuard} from './guards/full-auth.guard';
+import {Response} from 'express';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -84,12 +84,8 @@ export class AuthController {
   @UseGuards(JwtRefreshGuard)
   async refreshTokens(@Req() req: any) {
     const userId = req.user.id;
-    console.log(`userId: ${userId}`);
-    const refreshToken = req.cookies['refresh_token'];
-    console.log(`refresh token: ${refreshToken}`);
-    const tokens = await this.authService.refreshTokens(userId, refreshToken);
-    console.log(`new tokens: ${tokens}`);
-    return tokens;
+    const refreshToken = req.user.refreshToken;
+    return await this.authService.refreshTokens(userId, refreshToken);
   }
 
   @Get('2fa/activate')
