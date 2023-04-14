@@ -1,4 +1,5 @@
-import { LOCAL_STORAGE_KEY } from "./localstorage-helper";
+import {LOCAL_STORAGE_KEY} from "./localstorage-helper";
+
 export enum Cookie {
   TOKEN = "access_token",
   REFRESH_TOKEN = "refresh_token",
@@ -7,6 +8,16 @@ export enum Cookie {
 interface tokenData {
   name: string;
   id: string;
+}
+
+export function extractRefreshToken(): string | null {
+  const cookies = document.cookie;
+  const begin = cookies.indexOf(Cookie.REFRESH_TOKEN);
+  if (begin < 0) {
+    return null;
+  }
+  const end = cookies.indexOf(';', begin);
+  return cookies.substring(cookies.indexOf('=', begin) + 1, end === -1 ? undefined : end);
 }
 
 export function initAuthToken(): string | null {

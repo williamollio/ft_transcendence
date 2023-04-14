@@ -40,7 +40,7 @@ class AuthService {
     );
   }
 
-  async refreshToken(): Promise<Response<string>> {
+  async refreshToken(): Promise<Response<any>> {
     return resolve<string>(
       refreshAxios
         .get(`${PATH}/refresh`)

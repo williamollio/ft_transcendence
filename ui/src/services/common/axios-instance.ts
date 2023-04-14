@@ -1,4 +1,4 @@
-import { Cookie, initAuthTokenAsync } from "../../utils/auth-helper";
+import {Cookie, extractRefreshToken, initAuthToken, initAuthTokenAsync} from "../../utils/auth-helper";
 import axios from "axios";
 import { getBaseUrl } from "../../utils/url-helper";
 import { eraseCookie } from "../../utils/auth-helper";
@@ -16,6 +16,14 @@ export const refreshAxios = axios.create({
   baseURL: `${getBaseUrl()}`,
 });
 
+refreshAxios.interceptors.request.use((config) => {
+  const token = extractRefreshToken();
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
 axiosInstance.interceptors.request.use((config) => {
   const token = localStorage.getItem(Cookie.TOKEN);
   if (token) {
@@ -26,7 +34,14 @@ axiosInstance.interceptors.request.use((config) => {
 
 async function refreshAccessToken() {
   try {
-    access_token = (await authService.refreshToken()).data;
+    // TODO: Somehow store the new tokens
+    const tokens = (await authService.refreshToken()).data;
+    access_token = tokens.accessToken;
+    eraseCookie(Cookie.REFRESH_TOKEN);
+    eraseCookie(Cookie.TOKEN);
+    document.cookie = `${Cookie.REFRESH_TOKEN}=${tokens.refreshToken};`
+    document.cookie = `${Cookie.TOKEN}=${tokens.accessToken};`
+    initAuthToken();
     console.log("access_token " + access_token);
   } catch (err) {
     console.error(err);
