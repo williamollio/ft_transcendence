@@ -51,11 +51,8 @@ export default function PersonalStatPanel(props: Props) {
         <Paper
           sx={{
             backgroundColor: classes.colorPrimary,
-            position: "relative",
-            height: "auto",
-            width: 300,
-            ...(!lr ? { left: "77px" } : { right: "77px" }),
             borderRadius: "20px",
+            width: "220px",
           }}
         >
           <Grid

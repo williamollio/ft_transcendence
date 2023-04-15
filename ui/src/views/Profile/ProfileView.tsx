@@ -51,10 +51,8 @@ export default function ProfileView(): React.ReactElement {
     wrapperSetUserId(token);
     if (userId) {
       fetchCurrentUser();
-      setIsLoading(false);
-    }
-    if (userId) {
       wrapperFetchProfilePicture(userId);
+      setIsLoading(false);
     }
   }, [userId, userIdParam]);
 
@@ -103,12 +101,6 @@ export default function ProfileView(): React.ReactElement {
   return (
     <>
       <Background>
-        <PersonalStatPanel
-          playerId={userId}
-          lr={true}
-          type={"General"}
-          title={t(translationKeys.general)}
-        />
         <ProfileCard>
           <CardContainer>
             <TitleWrapper>
@@ -160,15 +152,31 @@ export default function ProfileView(): React.ReactElement {
                   </Box>
                 </>
               )}
+              <Box
+                sx={{
+                  width: "100%",
+                  height: "100%",
+                  display: "flex",
+                  paddingTop: "4rem",
+                  justifyContent: "space-around",
+                }}
+              >
+                <PersonalStatPanel
+                  playerId={userId}
+                  lr={false}
+                  type={"Ranked"}
+                  title={t(translationKeys.ranked)}
+                />
+                <PersonalStatPanel
+                  playerId={userId}
+                  lr={true}
+                  type={"General"}
+                  title={t(translationKeys.general)}
+                />
+              </Box>
             </ContentWrapper>
           </CardContainer>
         </ProfileCard>
-        <PersonalStatPanel
-          playerId={userId}
-          lr={false}
-          type={"Ranked"}
-          title={t(translationKeys.ranked)}
-        />
       </Background>
     </>
   );
