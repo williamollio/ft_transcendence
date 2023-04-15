@@ -14,7 +14,7 @@ import theme from "./MuiTheme";
 import classes from "./styles.module.scss";
 import { useImageStore } from "./store/users-store";
 import { PrivateRoute } from "./components/Protection/PrivateRoute";
-import { Cookie, getIsAuthenticated, initAuthToken } from "./utils/auth-helper";
+import { Cookie, getIsAuthenticated, initAuthToken, initRefreshToken } from "./utils/auth-helper";
 import { UserSocket } from "./classes/UserSocket.class";
 import { ChannelSocket } from "./classes/ChannelSocket.class";
 import GameView from "./views/Game/GameView";
@@ -86,6 +86,7 @@ export default function App() {
 
   const RedirectWrapper = () => {
     initAuthToken();
+    initRefreshToken();
     return <Navigate to={RoutePath.EDITPROFILE} />;
   };
 

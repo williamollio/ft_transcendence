@@ -20,6 +20,14 @@ export function extractRefreshToken(): string | null {
   return cookies.substring(cookies.indexOf('=', begin) + 1, end === -1 ? undefined : end);
 }
 
+export function initRefreshToken(): string | null {
+  const token = extractRefreshToken();
+  if (token) {
+    localStorage.setItem(LOCAL_STORAGE_KEY.REFRESH_TOKEN, token);
+  }
+  return token;
+}
+
 export function initAuthToken(): string | null {
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${Cookie.TOKEN}=`);

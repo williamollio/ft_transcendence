@@ -17,7 +17,7 @@ export const refreshAxios = axios.create({
 });
 
 refreshAxios.interceptors.request.use((config) => {
-  const token = extractRefreshToken();
+  const token = localStorage.getItem(Cookie.REFRESH_TOKEN);
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -36,13 +36,10 @@ async function refreshAccessToken() {
   try {
     // TODO: Somehow store the new tokens
     const tokens = (await authService.refreshToken()).data;
+    localStorage.setItem(Cookie.TOKEN, tokens.accessToken);
+    localStorage.setItem(Cookie.REFRESH_TOKEN, tokens.refreshToken);
     access_token = tokens.accessToken;
-    eraseCookie(Cookie.REFRESH_TOKEN);
-    eraseCookie(Cookie.TOKEN);
-    document.cookie = `${Cookie.REFRESH_TOKEN}=${tokens.refreshToken};`
-    document.cookie = `${Cookie.TOKEN}=${tokens.accessToken};`
-    initAuthToken();
-    console.log("access_token " + access_token);
+    console.log("access_token: " + access_token);
   } catch (err) {
     console.error(err);
     throw err;
