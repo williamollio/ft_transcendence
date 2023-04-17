@@ -8,6 +8,7 @@ import {
   Avatar,
   CircularProgress,
   Divider,
+  Tooltip,
 } from "@mui/material";
 import usersService from "../../services/users.service";
 import { User } from "../../interfaces/user.interface";
@@ -45,10 +46,11 @@ export default function EditProfileView(): React.ReactElement {
   const [image, setImage] = useImageStore(
     (state: { image: any; setImage: any }) => [state.image, state.setImage]
   );
-  const [picture, setPicture] = useState<any>(image);
+  const [picture, setPicture] = useState<any>();
   const [users, setUsers] = useState<LabelValue[]>([]);
   const [userId, setUserId] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isImageLoading, setIsImageLoading] = useState<boolean>(true);
   const [currentUser, setCurrentUser] = useState<User | null>();
   const [initialName, setInitialName] = useState<string>();
   const [token] = useState<string | null>(localStorage.getItem(Cookie.TOKEN));
@@ -83,8 +85,10 @@ export default function EditProfileView(): React.ReactElement {
       if (userId) {
         fetchCurrentUser();
         fetchUsersWithoutFriendship();
+        setImage(picture);
         setIsLoading(false);
         setIsUserCacheInvalid(false);
+        setIsImageLoading(false);
       }
     }
   }, [userId, isUserCacheInvalid]);
@@ -286,13 +290,19 @@ export default function EditProfileView(): React.ReactElement {
                     }}
                   >
                     <Box className={classes.avatarWrapper}>
-                      <Avatar
-                        src={picture ? URL.createObjectURL(picture) : ""}
-                        style={{
-                          width: "100px",
-                          height: "100px",
-                        }}
-                      />
+                      {isImageLoading ? (
+                        <CircularProgress />
+                      ) : (
+                        <Tooltip title="Profile picture">
+                          <Avatar
+                            src={picture ? URL.createObjectURL(picture) : ""}
+                            style={{
+                              width: "100px",
+                              height: "100px",
+                            }}
+                          />
+                        </Tooltip>
+                      )}
                     </Box>
                     <Box className={classes.uploadButtonWrapper}>
                       <Button

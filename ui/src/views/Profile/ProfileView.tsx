@@ -38,6 +38,7 @@ export default function ProfileView(): React.ReactElement {
   const [image, setImage] = useState<any>(null);
   const [userId, setUserId] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isImageLoading, setIsImageLoading] = useState<boolean>(true);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [token] = useState<string | null>(localStorage.getItem(Cookie.TOKEN));
 
@@ -49,17 +50,22 @@ export default function ProfileView(): React.ReactElement {
 
   React.useEffect(() => {
     wrapperSetUserId(token);
+  }, [userIdParam]);
+
+  React.useEffect(() => {
+    wrapperSetUserId(token);
     if (userId) {
       fetchCurrentUser();
       wrapperFetchProfilePicture(userId);
       setIsLoading(false);
     }
-  }, [userId, userIdParam]);
+  }, [userId]);
 
   async function wrapperFetchProfilePicture(userId: string) {
     const pictureFetched = await fetchProfilePicture(userId);
     if (pictureFetched) setImage(pictureFetched);
     else setImage("");
+    setIsImageLoading(false);
   }
 
   function wrapperSetUserId(token: string | null) {
@@ -127,15 +133,19 @@ export default function ProfileView(): React.ReactElement {
                     }}
                   >
                     <Box className={classes.avatarWrapper}>
-                      <Tooltip title="Profile picture">
-                        <Avatar
-                          src={image ? URL.createObjectURL(image) : ""}
-                          style={{
-                            width: "100px",
-                            height: "100px",
-                          }}
-                        />
-                      </Tooltip>
+                      {isImageLoading ? (
+                        <CircularProgress />
+                      ) : (
+                        <Tooltip title="Profile picture">
+                          <Avatar
+                            src={image ? URL.createObjectURL(image) : ""}
+                            style={{
+                              width: "100px",
+                              height: "100px",
+                            }}
+                          />
+                        </Tooltip>
+                      )}
                     </Box>
                     <Box sx={{ width: "40%" }}>
                       <CustomTextField
