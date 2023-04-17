@@ -63,15 +63,11 @@ export default function ProfileView(): React.ReactElement {
   }
 
   function wrapperSetUserId(token: string | null) {
-    if (
-      !userIdParam ||
-      !userIdParam.userId ||
-      userIdParam.userId === ":userId"
-    ) {
+    if (!userIdParam || !userIdParam.user || userIdParam.user === ":user") {
       if (token) setUserId(getTokenData(token).id);
       else navigate(RoutePath.LOGIN);
     } else {
-      setUserId(userIdParam.userId);
+      setUserId(userIdParam.user);
     }
   }
 

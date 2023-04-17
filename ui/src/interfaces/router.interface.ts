@@ -2,7 +2,7 @@ export enum RoutePath {
   LOGIN = "/login",
   LOGIN_2FA = "/login2fa",
   EDITPROFILE = "/edit-profile",
-  PROFILE = "/profile/:userId",
+  PROFILE = "/profile/:user",
   GAME = "/game",
   LOGIN_CALLBACK = "/login/callback",
   REDIRECT = "/redirect",

@@ -78,7 +78,7 @@ export default function App() {
   const AuthWrapper = (): ReactElement => {
     const isAuthenticated = getIsAuthenticated();
     return isAuthenticated ? (
-      <Navigate to={RoutePath.EDITPROFILE} replace />
+      <Navigate to={RoutePath.PROFILE} replace />
     ) : (
       <Navigate to={RoutePath.LOGIN} replace />
     );
