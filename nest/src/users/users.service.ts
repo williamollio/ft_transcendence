@@ -7,9 +7,6 @@ import { Intra42User } from './interface/intra42-user.interface';
 import { Response } from 'express';
 import { MatchHistory } from 'src/game/interfaces/matchHistory.interface';
 import { Stat } from 'src/game/interfaces/stats.interface';
-import path = require('path');
-import * as fs from 'fs';
-// import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 
 // have to update this file and user response to display error
 

@@ -241,7 +241,6 @@ export class FriendshipService {
     }
   }
 
-  // TODO : William requested can accept friendship
   public async acceptFriendship(
     userId: string,
     friendId: string,

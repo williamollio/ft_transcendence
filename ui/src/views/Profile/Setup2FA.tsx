@@ -130,9 +130,6 @@ export default function Setup2FA(): React.ReactElement {
       }
     }
     setIs2faEnabled(!is2faEnabled);
-    // if (response.error) {
-    //   showErrorToast(response.error);
-    // }
   }
 
   async function onSubmitCode() {
