@@ -82,10 +82,12 @@ export class AuthController {
 
   @Get('refresh')
   @UseGuards(JwtRefreshGuard)
-  async refreshTokens(@Req() req: any) {
+  async refreshTokens(@Req() req: any, @Res() res: any) {
     const userId = req.user.id;
     const refreshToken = req.user.refreshToken;
-    return await this.authService.refreshTokens(userId, refreshToken);
+    const tokens = await this.authService.refreshTokens(userId, refreshToken);
+    this.setCookieTokens(tokens, res);
+    return tokens;
   }
 
   @Get('2fa/activate')
