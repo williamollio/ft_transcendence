@@ -55,7 +55,6 @@ export default function NavBar(props: Props): React.ReactElement {
     ) {
       setHidden(true);
     } else {
-      setIsNavbarCacheInvalid(true);
       setHidden(false);
     }
 
@@ -70,9 +69,8 @@ export default function NavBar(props: Props): React.ReactElement {
     }
     if (userId && image === null) {
       wrapperFetchProfilePicture(userId);
-      setIsNavbarCacheInvalid(false);
     }
-  }, [userId, isNavbarCacheInvalid]);
+  }, [userId, location.pathname]);
 
   const statusUpdateListener = (data: any) => {
     if (data.id === userId) setStatus(data.status);
@@ -96,7 +94,7 @@ export default function NavBar(props: Props): React.ReactElement {
         return false;
       });
     };
-  }, [userSocket, userId]);
+  }, [userSocket, userId, location.pathname]);
 
   async function wrapperFetchProfilePicture(userId: string) {
     const pictureFetched = await fetchProfilePicture(userId);

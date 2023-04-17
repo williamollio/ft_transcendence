@@ -141,7 +141,6 @@ export default function LeftDrawer(props: Props) {
     ) {
       setHidden(true);
     } else {
-      setIsDrawerCacheInvalid(true);
       setHidden(false);
     }
   }, [location.pathname]);
@@ -152,13 +151,14 @@ export default function LeftDrawer(props: Props) {
     if (token) {
       setUserId(getTokenData(token).id.toString());
     }
+
     if (userId) {
       fetchFriends();
       fetchRequested();
       fetchReceived();
       setIsDrawerCacheInvalid(false);
     }
-  }, [userId, isDrawerCacheInvalid]);
+  }, [userId, location.pathname, isDrawerCacheInvalid]);
 
   function showErrorToast(error?: AxiosError) {
     const message = error?.response?.data as any;
