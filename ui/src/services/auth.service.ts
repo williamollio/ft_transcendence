@@ -41,7 +41,7 @@ class AuthService {
   }
 
   async refreshToken(): Promise<Response<any>> {
-    return resolve<string>(
+    return resolve<any>(
       refreshAxios
         .get(`${PATH}/refresh`)
         .then((res: AxiosResponse) => res.data)
