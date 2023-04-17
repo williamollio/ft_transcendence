@@ -161,7 +161,7 @@ export default function ProfileView(): React.ReactElement {
               <Box
                 sx={{
                   width: "100%",
-                  height: "100%",
+                  height: "50%",
                   display: "flex",
                   paddingTop: "4rem",
                   justifyContent: "space-around",

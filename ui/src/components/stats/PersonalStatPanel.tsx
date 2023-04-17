@@ -63,7 +63,7 @@ export default function PersonalStatPanel(props: Props) {
           >
             <Grid item>
               <Typography
-                variant="h4"
+                variant="h5"
                 color={classes.colorAccent}
                 fontWeight="bold"
                 sx={{ textDecoration: "underline" }}
