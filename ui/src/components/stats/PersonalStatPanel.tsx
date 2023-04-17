@@ -21,7 +21,7 @@ export default function PersonalStatPanel(props: Props) {
   const { lr, title, playerId, type } = props;
   const { t } = useTranslation();
 
-  const { data, isLoading, isError, isRefetching } = useQuery(
+  const { data, isLoading, isError, isRefetching, refetch } = useQuery(
     ["personalStats"],
     () => StatsService.fetchPersonalStats(playerId)
   );
@@ -32,6 +32,10 @@ export default function PersonalStatPanel(props: Props) {
     gamesWon: 0,
     gamesLost: 0,
   });
+
+  useEffect(() => {
+    refetch();
+  }, [playerId]);
 
   useEffect(() => {
     if (data && !isLoading && !isError && !isRefetching) {
