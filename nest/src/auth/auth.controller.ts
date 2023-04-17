@@ -87,7 +87,7 @@ export class AuthController {
     const refreshToken = req.user.refreshToken;
     const tokens = await this.authService.refreshTokens(userId, refreshToken);
     this.setCookieTokens(tokens, res);
-    return tokens;
+    return res.status(200).send(tokens);
   }
 
   @Get('2fa/activate')
