@@ -6,8 +6,6 @@ export const translationKeys = {
   gamesLost: "Games Lost",
   totalGames: "Total Games",
   winPerc: "Win %",
-  general: "General",
-  ranked: "Ranked",
   rank: "Rank",
   player: "Player",
   rating: "Rating",

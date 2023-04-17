@@ -17,18 +17,26 @@ export default function TwoStatsComponent(props: Props) {
     <>
       <Grid container justifyContent="space-around">
         <Grid item>
-          <Typography fontWeight="bold" color="white">{leftTitle}</Typography>
+          <Typography fontWeight="bold" color="white">
+            {leftTitle}
+          </Typography>
         </Grid>
         <Grid item>
-          <Typography fontWeight="bold" color="white">{rightTitle}</Typography>
+          <Typography fontWeight="bold" color="white">
+            {rightTitle}
+          </Typography>
         </Grid>
       </Grid>
       <Grid container justifyContent="space-around">
         <Grid item>
-          <Typography color={classes.colorAccent} fontSize={"24px"}>{leftValue}</Typography>
+          <Typography color={classes.colorAccent} fontSize={"24px"}>
+            {leftValue}
+          </Typography>
         </Grid>
         <Grid item>
-          <Typography color={classes.colorAccent} fontSize={"24px"}>{rightValue}</Typography>
+          <Typography color={classes.colorAccent} fontSize={"24px"}>
+            {rightValue}
+          </Typography>
         </Grid>
       </Grid>
       {bottomBorder !== false ? <Divider /> : false}

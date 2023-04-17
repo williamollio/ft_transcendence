@@ -39,6 +39,11 @@ const theme = createTheme({
           borderRadius: "2px",
           height: "auto",
         },
+        input: {
+          "&.Mui-disabled": {
+            WebkitTextFillColor: "black !important",
+          },
+        },
       },
     },
     MuiFormLabel: {
@@ -46,6 +51,9 @@ const theme = createTheme({
         root: {
           fontSize: "11px",
           fontWeight: "500",
+          "&.Mui-disabled": {
+            color: "rgba(0, 0, 0, 0.6)",
+          },
         },
       },
     },

@@ -146,7 +146,7 @@ export default function ListReceived(props: Props) {
   }
 
   function navigateToUserProfile(userId: string) {
-    navigate(`/profile/${userId}`, { state: { userId: userId } });
+    navigate(`/profile/${userId}`, { state: { user: userId } });
   }
 
   return (
@@ -159,21 +159,23 @@ export default function ListReceived(props: Props) {
               px: 2.5,
             }}
           >
-            <ListItemIcon
-              onClick={() => navigateToUserProfile(user.id)}
-              sx={{
-                marginLeft: -1,
-              }}
-            >
-              <StyledAvatarBadge
-                overlap="circular"
-                anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-                variant="dot"
-                status={user.status}
+            <Tooltip title={user.name}>
+              <ListItemIcon
+                onClick={() => navigateToUserProfile(user.id)}
+                sx={{
+                  marginLeft: -1,
+                }}
               >
-                <Avatar key={user.id} src={profilePictures[user.id]} />
-              </StyledAvatarBadge>
-            </ListItemIcon>
+                <StyledAvatarBadge
+                  overlap="circular"
+                  anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                  variant="dot"
+                  status={user.status}
+                >
+                  <Avatar key={user.id} src={profilePictures[user.id]} />
+                </StyledAvatarBadge>
+              </ListItemIcon>
+            </Tooltip>
             <ListItemText primary={user.name} sx={{ opacity: open ? 1 : 0 }} />
             <Tooltip title="Accept friendship received">
               <ListItemButton
