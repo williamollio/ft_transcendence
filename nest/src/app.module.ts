@@ -20,7 +20,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     ChannelModule,
     ThrottlerModule.forRoot({
       ttl: 60,
-      limit: 200, // TODO : find right one
+      limit: 200,
     }),
     FriendshipModule,
     GameModule,

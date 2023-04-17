@@ -411,7 +411,7 @@ export default function Chat(props: Props) {
       <Box
         sx={{
           width: "300px",
-          height: "85.9%", // TODO : responsiveness to be adapted
+          height: "85.9%", // TODO : responsiveness to be adapted at 42
         }}
       >
         <ChannelTabs

@@ -6,10 +6,6 @@ import { GetFriendDto } from './dto/friend.dto';
 
 const MESSAGE_ERROR_UPDATE_REQUEST = "This friendship can't be updated";
 
-// TODO : william return correct error message/code
-// TODO : william add more safety conditions
-// TODO : william work with entity
-
 @Injectable()
 export class FriendshipService {
   constructor(private prisma: PrismaService) {}
