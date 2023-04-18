@@ -87,7 +87,6 @@ export class UsersService {
         id: true,
         intraId: true,
         secondFactorSecret: true,
-        refreshToken: true,
         name: true,
         filename: true,
         status: true,
@@ -107,17 +106,6 @@ export class UsersService {
     return this.prisma.user.findUnique({
       where: { name },
     });
-  }
-
-  public async updateRefreshToken(userId: string, refreshToken: string) {
-    try {
-      return await this.prisma.user.update({
-        where: { id: userId },
-        data: { refreshToken },
-      });
-    } catch (e) {
-      throw e;
-    }
   }
 
   public async set2FA(userId: string, secret: string | null) {

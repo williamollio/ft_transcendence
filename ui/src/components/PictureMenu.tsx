@@ -41,7 +41,6 @@ export default function PictureMenu(props: Props) {
         localStorage.removeItem(Cookie.TOKEN);
         setToken(false);
         eraseCookie(Cookie.TOKEN);
-        eraseCookie(Cookie.REFRESH_TOKEN);
         navigate(RoutePath.LOGIN);
         break;
       }
