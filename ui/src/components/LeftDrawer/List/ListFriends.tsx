@@ -24,7 +24,6 @@ import { ChannelSocket } from "../../../classes/ChannelSocket.class";
 import { UserSocket } from "../../../classes/UserSocket.class";
 import { listenerWrapper } from "../../../services/initSocket.service";
 import { useNavigate } from "react-router-dom";
-import { RoutePath } from "../../../interfaces/router.interface";
 
 interface Props {
   userId: string;
@@ -131,6 +130,7 @@ export default function ListFriends(props: Props) {
     const image = await fetchProfilePicture(friendId);
     return URL.createObjectURL(image);
   }
+
   function createDmChat(user: User) {
     setIsRightOpen(true);
     channelSocket.createDm(user);
