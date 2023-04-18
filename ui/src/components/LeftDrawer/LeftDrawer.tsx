@@ -131,7 +131,6 @@ export default function LeftDrawer(props: Props) {
       state.setisFriendsCacheUnvalid,
     ]
   );
-
   const [hidden, setHidden] = React.useState<boolean>(false);
 
   React.useEffect(() => {

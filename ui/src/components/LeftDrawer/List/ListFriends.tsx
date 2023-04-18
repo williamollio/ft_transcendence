@@ -75,23 +75,22 @@ export default function ListFriends(props: Props) {
   );
 
   React.useEffect(() => {
-    async function loadProfilePictures() {
-      const pictures: { [key: string]: string } = {};
-      for (const user of users) {
-        if (user.filename) {
-          const picture = await getProfilePicture(user.id);
-          pictures[user.id] = picture;
-        } else {
-          pictures[user.id] = "";
-        }
-      }
-
-      setProfilePictures(pictures);
-      setUsersState(users);
-    }
-
     loadProfilePictures();
   }, [users]);
+
+  async function loadProfilePictures() {
+    const pictures: { [key: string]: string } = {};
+    for (const user of users) {
+      if (user.filename) {
+        const picture = await getProfilePicture(user.id);
+        pictures[user.id] = picture;
+      } else {
+        pictures[user.id] = "";
+      }
+    }
+    setProfilePictures(pictures);
+    setUsersState(users);
+  }
 
   const statusUpdateListener = (data: any) => {
     const newList: User[] = new Array<User>();
