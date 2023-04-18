@@ -115,7 +115,7 @@ export class AuthService {
 
   async enable2FA(userId: string): Promise<string> {
     const secret = authenticator.generateSecret();
-    const otpAuthUrl = authenticator.keyuri(userId, 'TODO', secret);
+    const otpAuthUrl = authenticator.keyuri(userId, 'ft_transcendence', secret);
     await this.userService.set2FA(userId, secret);
 
     return toDataURL(otpAuthUrl);
