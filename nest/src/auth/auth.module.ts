@@ -17,11 +17,6 @@ import { FullAuthStrategy } from './strategies/full-auth-strategy';
     UsersModule,
   ],
   controllers: [AuthController],
-  providers: [
-    AuthService,
-    JwtStrategy,
-    Intra42Strategy,
-    FullAuthStrategy,
-  ],
+  providers: [AuthService, JwtStrategy, Intra42Strategy, FullAuthStrategy],
 })
 export class AuthModule {}
