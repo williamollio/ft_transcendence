@@ -17,7 +17,6 @@ model User {
     createdAt               DateTime        @default(now())
     updatedAt               DateTime        @updatedAt
     filename                String?
-    refreshToken            String?
     creationMode            Boolean         @default(true)
     status                  UserStatus      @default(OFFLINE)
     messagesSent            Message[]       @relation("messageSender")
