@@ -27,7 +27,6 @@ axiosInstance.interceptors.response.use(
       if (token) {
         localStorage.removeItem(Cookie.TOKEN);
         eraseCookie(Cookie.TOKEN);
-        eraseCookie(Cookie.REFRESH_TOKEN);
       }
       const navigate = useNavigate();
       navigate(RoutePath.LOGIN);
