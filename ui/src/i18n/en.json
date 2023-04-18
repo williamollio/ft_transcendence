@@ -22,7 +22,8 @@
   "chooseName": "Choose an unique name",
   "addFriends": "Request Frienships",
   "errorMessages": {
-    "required": "This field is required"
+    "required": "This field is required",
+    "default": "The length is too long"
   },
   "friends": "Friends",
   "requested": "Requested",
