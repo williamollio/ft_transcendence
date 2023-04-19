@@ -1,13 +1,8 @@
 import React from "react";
-import Navbar from "../../components/Navbar";
 import { Button, Grid, Typography } from "@mui/material";
 import { translationKeys } from "./constants";
 import { useTranslation } from "react-i18next";
-import LeftDrawer from "../../components/LeftDrawer/LeftDrawer";
-import RightDrawer from "../../components/RightDrawer/RightDrawer";
 import { UserSocket } from "../../classes/UserSocket.class";
-import { ChannelSocket } from "../../classes/ChannelSocket.class";
-// import { makeStyles } from "tss-react/mui";
 import {
   Background,
   ProfileCard,
@@ -22,14 +17,11 @@ import Game from "../../components/game/Game";
 interface Props {
   gameSocket: GameSocket;
   userSocket: UserSocket;
-  channelSocket: ChannelSocket;
 }
 
 export default function GameView(props: Props): React.ReactElement {
-  const { gameSocket, userSocket, channelSocket } = props;
+  const { gameSocket, userSocket } = props;
   const { t } = useTranslation();
-
-  //   const { classes } = useStyles();
 
   const handleLeave = () => {
     gameSocket.leave();
@@ -37,13 +29,6 @@ export default function GameView(props: Props): React.ReactElement {
 
   return (
     <>
-      <Navbar userSocket={userSocket} />
-      <LeftDrawer channelSocket={channelSocket} userSocket={userSocket} />
-      <RightDrawer
-        channelSocket={channelSocket}
-        userSocket={userSocket}
-        gameSocket={gameSocket}
-      />
       <Background>
         <ProfileCard sx={{ bgcolor: classes.colorPrimary }}>
           <CardContainer>
@@ -75,5 +60,3 @@ export default function GameView(props: Props): React.ReactElement {
     </>
   );
 }
-
-// const useStyles = makeStyles()(() => ({}));

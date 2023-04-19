@@ -7,9 +7,6 @@ import { Intra42User } from './interface/intra42-user.interface';
 import { Response } from 'express';
 import { MatchHistory } from 'src/game/interfaces/matchHistory.interface';
 import { Stat } from 'src/game/interfaces/stats.interface';
-import path = require('path');
-import * as fs from 'fs';
-// import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 
 // have to update this file and user response to display error
 
@@ -90,7 +87,6 @@ export class UsersService {
         id: true,
         intraId: true,
         secondFactorSecret: true,
-        refreshToken: true,
         name: true,
         filename: true,
         status: true,
@@ -110,17 +106,6 @@ export class UsersService {
     return this.prisma.user.findUnique({
       where: { name },
     });
-  }
-
-  public async updateRefreshToken(userId: string, refreshToken: string) {
-    try {
-      return await this.prisma.user.update({
-        where: { id: userId },
-        data: { refreshToken },
-      });
-    } catch (e) {
-      throw e;
-    }
   }
 
   public async set2FA(userId: string, secret: string | null) {

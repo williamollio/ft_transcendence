@@ -1,7 +1,5 @@
 import {
   Box,
-  Button,
-  ClickAwayListener,
   Divider,
   Grid,
   List,
@@ -10,7 +8,6 @@ import {
   ListItemText,
   Paper,
   TextField,
-  Tooltip,
   Typography,
 } from "@mui/material";
 import { useContext, useEffect, useRef, useState } from "react";
@@ -19,7 +16,6 @@ import {
   failEvents,
   ContextMenu,
   RoomInvite,
-  channelUser,
   ChannelInfoContextMenu,
   user,
   GameMode,
@@ -44,7 +40,6 @@ import { ToastType } from "../../context/toast";
 import { listenerWrapper } from "../../services/initSocket.service";
 import { RoutePath } from "../../interfaces/router.interface";
 import UserContext from "./UserContext";
-import { Identifier, IndexType } from "typescript";
 
 interface Props {
   channelSocket: ChannelSocket;
@@ -417,7 +412,7 @@ export default function Chat(props: Props) {
       <Box
         sx={{
           width: "300px",
-          height: "85.9%", // TODO : responsiveness to be adapted
+          height: "85.9%", // TODO : responsiveness to be adapted at 42
         }}
       >
         <ChannelTabs

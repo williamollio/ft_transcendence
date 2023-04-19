@@ -28,15 +28,6 @@ export default function Match(props: Props) {
         </TableCell>
         <TableCell align="right" sx={{ borderBottom: "unset" }}>
           <Grid container alignItems="center" justifyContent="right">
-            <Grid item>
-              <Avatar
-                style={{
-                  width: "25px",
-                  height: "25px",
-                }}
-                src=""
-              />
-            </Grid>
             <Grid item marginLeft="10px">
               {findName(match.player1.id)}
             </Grid>
@@ -53,15 +44,6 @@ export default function Match(props: Props) {
         </TableCell>
         <TableCell align="left" sx={{ borderBottom: "unset" }}>
           <Grid container alignItems="center" justifyContent="left">
-            <Grid item>
-              <Avatar
-                style={{
-                  width: "25px",
-                  height: "25px",
-                }}
-                src=""
-              />
-            </Grid>
             <Grid item marginLeft="10px">
               {findName(match.player2.id)}
             </Grid>

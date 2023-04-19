@@ -18,7 +18,7 @@ import {
   InviteChannelDto,
   IncomingMessageDto,
 } from './dto';
-import { Channel, ChannelRole, ChannelType, ChannelUser } from '@prisma/client';
+import { Channel, ChannelRole, ChannelType } from '@prisma/client';
 import { socketToUserId } from 'src/users/socketToUserIdStorage.service';
 import { socketToChannelId } from 'src/channel/socketToChannelIdStorage.service';
 import { ModerateChannelDto } from './dto/moderateChannelUser.dto';
@@ -34,7 +34,8 @@ enum acknoledgementStatus {
 
 @WebSocketGateway(3333, {
   cors: {
-	origin: "http://localhost:3000"
+    credentials: true,
+    origin: process.env.PATH_TO_FRONTEND,
   },
   parser: msgpack,
 })
