@@ -224,7 +224,9 @@ export default function LeftDrawer(props: Props) {
   return (
     <>
       {!hidden && (
-        <Box sx={{ display: "flex" }}>
+        <Box
+          sx={{ display: "flex", zIndex: (theme) => theme.zIndex.modal + 2 }}
+        >
           <AppBar position="fixed" open={open}>
             <Toolbar>
               <Tooltip title="Friendships">

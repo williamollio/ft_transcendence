@@ -133,7 +133,10 @@ export default function NavBar(props: Props): React.ReactElement {
   return (
     <>
       {!hidden && (
-        <AppBar className={classes.menuBar}>
+        <AppBar
+          className={classes.menuBar}
+          sx={{ zIndex: (theme) => theme.zIndex.modal + 2 }}
+        >
           <Box
             className={classes.picture}
             sx={{
