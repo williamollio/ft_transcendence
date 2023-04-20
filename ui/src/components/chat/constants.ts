@@ -59,5 +59,7 @@ export const translationKeys = {
     userName: "invite.userName",
     gameInvite: "invite.gameInvite",
     inviteToGame: "invite.inviteToGame",
+	failed: "invite.failed",
+	notFound: "invite.notFound",
   },
 };

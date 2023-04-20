@@ -86,7 +86,6 @@ export class GameGateway {
     return this.gameService.leaveWatch(client, playerId);
   }
 
-  // spectating still under tests
   @SubscribeMessage('watchGame')
   async watchGame(
     @MessageBody('playerId') playerId: string,
@@ -108,15 +107,6 @@ export class GameGateway {
     @GetCurrentUserId() id: string,
     @MessageBody('inviteGameId') inviteGameId?: string,
   ) {
-    // const existingGame = this.gameService.GameMap.getGame(id);
-    // if (existingGame) {
-    //   if (
-    //     inviteGameId &&
-    //     existingGame.p1id === inviteGameId &&
-    //     existingGame.p2id === id
-    //   ) {
-    //   } else return;
-    // }
     if (!this.socketToId.has(client.id)) this.socketToId.set(client.id, id);
     try {
       this.gameService.join(client, id, this.server, mode, inviteGameId);
