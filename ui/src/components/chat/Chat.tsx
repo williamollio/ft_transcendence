@@ -179,36 +179,40 @@ export default function Chat(props: Props) {
   };
 
   const roomLeftListener = (data: { userId: string; channelId: string }) => {
-    let index = channelSocket.channels.findIndex(
-      (element) => element.id === data.channelId
-    );
-    if (index >= 0) {
-      ChannelService.getUserName(data.userId).then((res) => {
-        channelSocket.channels[index].messages.push({
-          userId: data.userId,
-          userName: res.data.name,
-          content: `${t(translationKeys.chatInfo.userLeft)}`,
-          channelId: data.channelId,
+    if (data.userId !== channelSocket.user.id) {
+      let index = channelSocket.channels.findIndex(
+        (element) => element.id === data.channelId
+      );
+      if (index >= 0) {
+        ChannelService.getUserName(data.userId).then((res) => {
+          channelSocket.channels[index].messages.push({
+            userId: data.userId,
+            userName: res.data.name,
+            content: `${t(translationKeys.chatInfo.userLeft)}`,
+            channelId: data.channelId,
+          });
+          updateMessages(channelSocket.channels[index], data.channelId);
         });
-        updateMessages(channelSocket.channels[index], data.channelId);
-      });
+      }
     }
   };
 
   const roomJoinedListener = (data: { userId: string; channelId: string }) => {
-    let index = channelSocket.channels.findIndex(
-      (element) => element.id === data.channelId
-    );
-    if (index >= 0) {
-      ChannelService.getUserName(data.userId).then((res) => {
-        channelSocket.channels[index].messages.push({
-          userId: data.userId,
-          userName: res.data.name,
-          content: `${t(translationKeys.chatInfo.userJoined)}`,
-          channelId: data.channelId,
+    if (data.userId !== channelSocket.user.id) {
+      let index = channelSocket.channels.findIndex(
+        (element) => element.id === data.channelId
+      );
+      if (index >= 0) {
+        ChannelService.getUserName(data.userId).then((res) => {
+          channelSocket.channels[index].messages.push({
+            userId: data.userId,
+            userName: res.data.name,
+            content: `${t(translationKeys.chatInfo.userJoined)}`,
+            channelId: data.channelId,
+          });
+          updateMessages(channelSocket.channels[index], data.channelId);
         });
-        updateMessages(channelSocket.channels[index], data.channelId);
-      });
+      }
     }
   };
 
@@ -293,7 +297,9 @@ export default function Chat(props: Props) {
       toast: {
         type: ToastType.ERROR,
         title: error,
-        message: t(translationKeys.errorMessages.backendErrorMessage(event)) as string,
+        message: t(
+          translationKeys.errorMessages.backendErrorMessage(event)
+        ) as string,
       },
     });
   };

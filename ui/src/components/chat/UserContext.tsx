@@ -1,4 +1,12 @@
-import { Menu, MenuItem, Select, SelectChangeEvent } from "@mui/material";
+import {
+  Grid,
+  Menu,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+  Switch,
+  Typography,
+} from "@mui/material";
 import React, {
   Dispatch,
   SetStateAction,
@@ -19,6 +27,8 @@ import {
 import ChannelService from "../../services/channel.service";
 import { translationKeys } from "./constants";
 import { useNavigate } from "react-router-dom";
+import classes from "../../styles.module.scss";
+import { bgcolor } from "@mui/system";
 
 interface Props {
   blockedUser: Array<string>;
@@ -44,9 +54,7 @@ export default function UserContext(props: Props) {
 
   const [blockStatus, setBlockStatus] = useState<"Block" | "Unblock">("Block");
   const [self, setSelf] = useState<boolean>(false);
-  const [gameModeSelect, setGameModeSelect] = useState<GameMode>(
-    GameMode.CLASSIC
-  );
+  const [checked, toggleChecked] = useState<boolean>(false);
 
   useEffect(() => {
     if (contextMenu) {
@@ -89,7 +97,10 @@ export default function UserContext(props: Props) {
   const handleInviteGame = (_event: React.MouseEvent<HTMLLIElement>) => {
     handleContextClose();
     if (contextMenu && contextMenu.user && contextMenu.user.id) {
-      gameSocket.inviteToGame(gameModeSelect, contextMenu.user.id);
+      gameSocket.inviteToGame(
+        checked ? GameMode.MAYHEM : GameMode.CLASSIC,
+        contextMenu.user.id
+      );
     }
   };
 
@@ -104,7 +115,9 @@ export default function UserContext(props: Props) {
             toast: {
               type: ToastType.ERROR,
               title: ret,
-              message: t(translationKeys.errorMessages.unblockFail) as string,
+              message: t(
+                translationKeys.errorMessages.backendErrorMessage("blockFail")
+              ) as string,
             },
           });
         } else refetchBlockedUsers();
@@ -117,7 +130,9 @@ export default function UserContext(props: Props) {
             toast: {
               type: ToastType.ERROR,
               title: ret,
-              message: t(translationKeys.errorMessages.unblockFail) as string,
+              message: t(
+                translationKeys.errorMessages.backendErrorMessage("unblockFail")
+              ) as string,
             },
           });
         } else refetchBlockedUsers();
@@ -161,14 +176,13 @@ export default function UserContext(props: Props) {
     }
   };
 
-  const handleGameModeChange = (event: SelectChangeEvent) => {
-    setGameModeSelect(event.target.value as GameMode);
-  };
-
   return (
     <>
       <Menu
-        sx={{ zIndex: (theme) => theme.zIndex.modal + 2 }}
+        PaperProps={{ sx: { bgcolor: classes.colorPrimary } }}
+        sx={{
+          zIndex: (theme) => theme.zIndex.modal + 3,
+        }}
         open={contextMenu !== null}
         onClose={handleContextClose}
         anchorReference="anchorPosition"
@@ -178,41 +192,75 @@ export default function UserContext(props: Props) {
             : undefined
         }
       >
-        <MenuItem disabled={self} onClick={handleDM}>
+        <MenuItem
+          disabled={self}
+          onClick={handleDM}
+          sx={{ WebkitTextFillColor: "white" }}
+        >
           {t(translationKeys.buttons.whisper)}
         </MenuItem>
-        <MenuItem disabled={self} onClick={handlePromote}>
+        <MenuItem
+          disabled={self}
+          onClick={handlePromote}
+          sx={{ WebkitTextFillColor: "white" }}
+        >
           {t(translationKeys.buttons.promote)}
         </MenuItem>
-        <MenuItem disabled={self} onClick={handleProfile}>
+        <MenuItem
+          disabled={self}
+          onClick={handleProfile}
+          sx={{ WebkitTextFillColor: "white" }}
+        >
           {t(translationKeys.buttons.viewProfile)}
         </MenuItem>
-        <MenuItem disabled={self} onClick={handleInviteGame}>
+        <MenuItem
+          disabled={self}
+          onClick={handleInviteGame}
+          sx={{ WebkitTextFillColor: "white" }}
+        >
           {t(translationKeys.buttons.inviteToGame)}
         </MenuItem>
-        <Select
-          sx={{ width: "100%" }}
-          size="small"
-          onChange={handleGameModeChange}
-          placeholder={t(translationKeys.buttons.gameMode) as string}
-          value={gameModeSelect}
+        <MenuItem disabled={self}>
+          <Grid
+            container
+            alignItems="center"
+            justifyContent="center"
+            direction="row"
+          >
+            <Typography fontSize={12} color={checked ? "grey" : classes.colorAccent}>
+              {t(translationKeys.invite.classic)}
+            </Typography>
+            <Switch
+              checked={checked}
+              onChange={() => toggleChecked(!checked)}
+              color="default"
+            ></Switch>
+            <Typography fontSize={12} color={checked ? classes.colorAccent : "grey"}>
+              {t(translationKeys.invite.mayhem)}
+            </Typography>
+          </Grid>
+        </MenuItem>
+        <MenuItem
+          disabled={self}
+          onClick={handleBlock}
+          sx={{ WebkitTextFillColor: "white" }}
         >
-          <MenuItem value={GameMode.CLASSIC}>
-            {t(translationKeys.invite.classic)}
-          </MenuItem>
-          <MenuItem value={GameMode.MAYHEM}>
-            {t(translationKeys.invite.mayhem)}
-          </MenuItem>
-        </Select>
-        <MenuItem disabled={self} onClick={handleBlock}>
           {blockStatus === "Block"
             ? t(translationKeys.buttons.block)
             : t(translationKeys.buttons.unblock)}
         </MenuItem>
-        <MenuItem disabled={self} onClick={handleMute}>
+        <MenuItem
+          disabled={self}
+          onClick={handleMute}
+          sx={{ WebkitTextFillColor: "white" }}
+        >
           {t(translationKeys.buttons.mute)}
         </MenuItem>
-        <MenuItem disabled={self} onClick={handleKick}>
+        <MenuItem
+          disabled={self}
+          onClick={handleKick}
+          sx={{ WebkitTextFillColor: "white" }}
+        >
           {t(translationKeys.buttons.ban)}
         </MenuItem>
       </Menu>

@@ -62,7 +62,11 @@ export default function GetNameDialog(props: Props) {
               type: ToastType.ERROR,
               title: t(translationKeys.createInfo.name) as string,
               message: `${
-                t(translationKeys.errorMessages.channelNameEmpty) as string
+                t(
+                  translationKeys.errorMessages.backendErrorMessage(
+                    "channelNameEmpty"
+                  )
+                ) as string
               }`,
             },
           });
@@ -74,28 +78,41 @@ export default function GetNameDialog(props: Props) {
             type: ToastType.ERROR,
             title: t(translationKeys.createInfo.password) as string,
             message: `${
-              t(translationKeys.errorMessages.passwordEmpty) as string
+              t(
+                translationKeys.errorMessages.backendErrorMessage(
+                  "passwordEmpty"
+                )
+              ) as string
+            }`,
+          },
+        });
+      } else if (channel && channel.access === "PROTECTED" && input === "") {
+        toast.dispatchTranscendanceState({
+          type: TranscendanceStateActionType.TOGGLE_TOAST,
+          toast: {
+            type: ToastType.ERROR,
+            title: t(translationKeys.createInfo.password) as string,
+            message: `${
+              t(
+                translationKeys.errorMessages.backendErrorMessage(
+                  "passwordEmpty"
+                )
+              ) as string
             }`,
           },
         });
       }
-	  else if (channel && channel.access === "PROTECTED" && input === "")
-	  {
-		toast.dispatchTranscendanceState({
-			type: TranscendanceStateActionType.TOGGLE_TOAST,
-			toast: {
-			  type: ToastType.ERROR,
-			  title: t(translationKeys.createInfo.password) as string,
-			  message: `${t(translationKeys.errorMessages.passwordEmpty) as string}`
-			},
-		  });
-	  }
       handleClose();
     }
   };
 
   return (
-    <Dialog open={open} onClose={handleClose} onKeyDown={handleSubmit}>
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      onKeyDown={handleSubmit}
+      sx={{ zIndex: (theme) => theme.zIndex.modal + 3 }}
+    >
       <DialogContent>
         {t(translationKeys.roomContext.newNameOfChannel)}
       </DialogContent>

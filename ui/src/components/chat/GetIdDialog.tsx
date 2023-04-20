@@ -42,7 +42,11 @@ export default function GetIdDialog(props: Props) {
   };
 
   return (
-    <Dialog open={open} onClose={handleClose}>
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      sx={{ zIndex: (theme) => theme.zIndex.modal + 3 }}
+    >
       <TextField
         label={t(translationKeys.invite.userName)}
         value={input}

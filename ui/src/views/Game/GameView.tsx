@@ -54,7 +54,6 @@ export default function GameView(props: Props): React.ReactElement {
                 </Grid>
               </Grid>
             </ContentWrapper>
-			<Typography>{process.env.REACT_APP_USER_GATEWAY_URI}</Typography>
           </CardContainer>
         </ProfileCard>
       </Background>

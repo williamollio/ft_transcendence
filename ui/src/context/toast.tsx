@@ -39,11 +39,16 @@ export default function Toast(props: Props): React.ReactElement {
   const isError = type === ToastType.ERROR;
   const isInvite = type === ToastType.INVITE;
 
+  var timer: null | NodeJS.Timeout = null;
+
   React.useEffect(() => {
-    if (autoClose) {
-      setTimeout(() => {
-        onClose();
-      }, isInvite ? 9500 : 4000);
+    if (autoClose && !timer) {
+      timer = setTimeout(
+        () => {
+          onClose();
+        },
+        isInvite ? 9500 : 4000
+      );
     }
   });
 
@@ -67,6 +72,10 @@ export default function Toast(props: Props): React.ReactElement {
                 color="inherit"
                 size="small"
                 onClick={() => {
+                  if (timer) {
+                    clearTimeout(timer);
+                    timer = null;
+                  }
                   onClose();
                   onAccept ? onAccept() : false;
                 }}
@@ -78,6 +87,10 @@ export default function Toast(props: Props): React.ReactElement {
                 color="inherit"
                 size="small"
                 onClick={() => {
+                  if (timer) {
+                    clearTimeout(timer);
+                    timer = null;
+                  }
                   onClose();
                   onRefuse ? onRefuse() : false;
                 }}

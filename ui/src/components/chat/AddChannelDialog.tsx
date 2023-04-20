@@ -34,15 +34,25 @@ export default function AddChannelDialog(props: Props) {
     password: "",
   });
   const [alert, setAlert] = useState<string>(
-    t(translationKeys.errorMessages.channelNameEmpty) as string
+    t(
+      translationKeys.errorMessages.backendErrorMessage("channelNameEmpty")
+    ) as string
   );
   const [alertOpen, setAlertOpen] = useState<boolean>(false);
 
   useEffect(() => {
     if (dialogValue.key === "")
-      setAlert(t(translationKeys.errorMessages.channelNameEmpty) as string);
+      setAlert(
+        t(
+          translationKeys.errorMessages.backendErrorMessage("channelNameEmpty")
+        ) as string
+      );
     else if (dialogValue.access === "PROTECTED" && dialogValue.password === "")
-      setAlert(t(translationKeys.errorMessages.passwordEmpty) as string);
+      setAlert(
+        t(
+          translationKeys.errorMessages.backendErrorMessage("passwordEmpty")
+        ) as string
+      );
     else setAlertOpen(false);
   }, [dialogValue]);
 
@@ -92,7 +102,11 @@ export default function AddChannelDialog(props: Props) {
   };
 
   return (
-    <Dialog open={open} onClose={handleClose} sx={{zIndex: (theme) => theme.zIndex.modal + 2}}>
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      sx={{ zIndex: (theme) => theme.zIndex.modal + 3 }}
+    >
       <>
         <Collapse in={alertOpen}>
           <Alert
