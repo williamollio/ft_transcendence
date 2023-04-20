@@ -133,10 +133,7 @@ export default function NavBar(props: Props): React.ReactElement {
   return (
     <>
       {!hidden && (
-        <AppBar
-          className={classes.menuBar}
-          sx={{ zIndex: (theme) => theme.zIndex.modal + 2 }}
-        >
+        <AppBar className={classes.menuBar} sx={{  zIndex: (theme) => theme.zIndex.modal + 3}}>
           <Box
             className={classes.picture}
             sx={{
@@ -167,7 +164,6 @@ export default function NavBar(props: Props): React.ReactElement {
           >
             <Tabs
               value={selectedTabId}
-              sx={{ width: "90%" }}
               centered={true}
               TabIndicatorProps={{
                 style: { marginBottom: "5px", marginLeft: "-8px" },
