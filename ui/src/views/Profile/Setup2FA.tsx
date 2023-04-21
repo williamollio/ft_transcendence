@@ -1,5 +1,4 @@
 import React, { useRef } from "react";
-import Navbar from "../../components/Navbar";
 import { Box, Button, CircularProgress, Grid, Typography } from "@mui/material";
 import { translationKeys } from "./constants";
 import { useTranslation } from "react-i18next";
@@ -13,7 +12,6 @@ import {
 } from "../../styles/MuiStyles";
 import { useNavigate } from "react-router-dom";
 import { TextField } from "@mui/material";
-import LeftDrawer from "../../components/LeftDrawer/LeftDrawer";
 import { Cookie, getTokenData } from "../../utils/auth-helper";
 import { RoutePath } from "../../interfaces/router.interface";
 import usersService from "../../services/users.service";
@@ -22,18 +20,10 @@ import { ToastType } from "../../context/toast";
 import { TranscendanceStateActionType } from "../../context/transcendance-reducer";
 import { TranscendanceContext } from "../../context/transcendance-context";
 import authService from "../../services/auth.service";
-import { UserSocket } from "../../classes/UserSocket.class";
-import { ChannelSocket } from "../../classes/ChannelSocket.class";
 
 const CODE_LENGTH = 6; // number of input fields to render
 
-interface Props {
-  userSocket: UserSocket;
-  channelSocket: ChannelSocket;
-}
-
-export default function Setup2FA(props: Props): React.ReactElement {
-  const { userSocket, channelSocket } = props;
+export default function Setup2FA(): React.ReactElement {
   const navigate = useNavigate();
   const [QRCodeUrl, setQRCodeUrl] = React.useState<string>("");
   const { t } = useTranslation();
@@ -140,9 +130,6 @@ export default function Setup2FA(props: Props): React.ReactElement {
       }
     }
     setIs2faEnabled(!is2faEnabled);
-    // if (response.error) {
-    //   showErrorToast(response.error);
-    // }
   }
 
   async function onSubmitCode() {
@@ -179,8 +166,6 @@ export default function Setup2FA(props: Props): React.ReactElement {
 
   return (
     <>
-      <Navbar userSocket={userSocket} />
-      <LeftDrawer channelSocket={channelSocket} userSocket={userSocket} />
       <Background>
         <ProfileCard>
           <CardContainer>

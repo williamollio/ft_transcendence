@@ -30,6 +30,8 @@ import { useDrawersStore } from "../../store/drawers-store";
 import { navbarHeight } from "../Navbar";
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { UserSocket } from "../../classes/UserSocket.class";
+import { RoutePath } from "../../interfaces/router.interface";
+import { useLocation } from "react-router-dom";
 
 const drawerWidth = 240;
 const drawerWidthClosed = "4rem";
@@ -122,6 +124,7 @@ export default function LeftDrawer(props: Props) {
   const [userId, setUserId] = React.useState<string>("");
   const { dispatchTranscendanceState } = React.useContext(TranscendanceContext);
   const [open, setOpen] = React.useState(false);
+  const location = useLocation();
   const [isDrawerCacheInvalid, setIsDrawerCacheInvalid] = useDrawersStore(
     (state: { isFriendsCacheUnvalid: any; setisFriendsCacheUnvalid: any }) => [
       state.isFriendsCacheUnvalid,
@@ -129,19 +132,33 @@ export default function LeftDrawer(props: Props) {
     ]
   );
 
+  const [hidden, setHidden] = React.useState<boolean>(false);
+
+  React.useEffect(() => {
+    if (
+      location.pathname == RoutePath.LOGIN ||
+      location.pathname == RoutePath.LOGIN_2FA
+    ) {
+      setHidden(true);
+    } else {
+      setHidden(false);
+    }
+  }, [location.pathname]);
+
   React.useEffect(() => {
     let token = localStorage.getItem(Cookie.TOKEN);
 
     if (token) {
       setUserId(getTokenData(token).id.toString());
     }
+
     if (userId) {
       fetchFriends();
       fetchRequested();
       fetchReceived();
       setIsDrawerCacheInvalid(false);
     }
-  }, [userId, isDrawerCacheInvalid]);
+  }, [userId, location.pathname, isDrawerCacheInvalid]);
 
   function showErrorToast(error?: AxiosError) {
     const message = error?.response?.data as any;
@@ -205,139 +222,146 @@ export default function LeftDrawer(props: Props) {
   };
 
   return (
-    <Box sx={{ display: "flex" }}>
-      <AppBar position="fixed" open={open}>
-        <Toolbar>
-          <Tooltip title="Friendships">
+    <>
+      {!hidden && (
+        <Box
+          width="min-content"
+          sx={{ display: "flex", zIndex: (theme) => theme.zIndex.modal + 3 }}
+        >
+          <AppBar position="fixed" open={open}>
+            <Toolbar>
+              <Tooltip title="Friendships">
+                <Box
+                  display={"flex"}
+                  alignContent={"center"}
+                  justifyContent={"center"}
+                  width="100%"
+                  height="100%"
+                >
+                  <IconButton
+                    onClick={triggerDrawerOpen}
+                    sx={{
+                      ...(open && { display: "none" }),
+                    }}
+                  >
+                    <MenuIcon
+                      sx={{
+                        fill: theme.palette.secondary.main,
+                        width: "35px",
+                        height: "35px",
+                      }}
+                    />
+                  </IconButton>
+                </Box>
+              </Tooltip>
+            </Toolbar>
+          </AppBar>
+          <Drawer
+            variant="permanent"
+            open={open}
+            sx={{
+              "& .MuiDrawer-paper": {
+                backgroundColor: theme.palette.secondary.light,
+              },
+            }}
+          >
+            <DrawerHeader>
+              <IconButton onClick={triggerDrawerOpen} color={"secondary"}>
+                {theme.direction === "rtl" ? (
+                  <ChevronRightIcon />
+                ) : (
+                  <ChevronLeftIcon />
+                )}
+              </IconButton>
+            </DrawerHeader>
+            <Divider
+              variant="middle"
+              sx={{
+                marginBottom: "2.5rem",
+              }}
+            />
             <Box
               display={"flex"}
-              alignContent={"center"}
-              justifyContent={"center"}
-              width="100%"
-              height="100%"
+              justifyContent="center"
+              width={"calc(64px + 1px)"}
             >
-              <IconButton
-                onClick={triggerDrawerOpen}
-                sx={{
-                  ...(open && { display: "none" }),
-                }}
+              <Typography
+                fontSize="11px"
+                color={"#8A8A8A"}
+                sx={{ textDecoration: "underline" }}
               >
-                <MenuIcon
-                  sx={{
-                    fill: theme.palette.secondary.main,
-                    width: "35px",
-                    height: "35px",
-                  }}
-                />
-              </IconButton>
+                {t(translationKeys.friends)}
+              </Typography>
             </Box>
-          </Tooltip>
-        </Toolbar>
-      </AppBar>
-      <Drawer
-        variant="permanent"
-        open={open}
-        sx={{
-          "& .MuiDrawer-paper": {
-            backgroundColor: theme.palette.secondary.light,
-          },
-        }}
-      >
-        <DrawerHeader>
-          <IconButton onClick={triggerDrawerOpen} color={"secondary"}>
-            {theme.direction === "rtl" ? (
-              <ChevronRightIcon />
-            ) : (
-              <ChevronLeftIcon />
-            )}
-          </IconButton>
-        </DrawerHeader>
-        <Divider
-          variant="middle"
-          sx={{
-            marginBottom: "2.5rem",
-          }}
-        />
-        <Box
-          display={"flex"}
-          justifyContent="center"
-          width={"calc(64px + 1px)"}
-        >
-          <Typography
-            fontSize="11px"
-            color={"#8A8A8A"}
-            sx={{ textDecoration: "underline" }}
-          >
-            {t(translationKeys.friends)}
-          </Typography>
+            <ListFriends
+              userId={userId}
+              open={open}
+              users={friends}
+              channelSocket={channelSocket}
+              userSocket={userSocket}
+              showErrorToast={showErrorToast}
+              showSuccessToast={showSuccessToast}
+            />
+            <Divider
+              variant="middle"
+              sx={{
+                marginTop: "2.5rem",
+                marginBottom: "2.5rem",
+              }}
+            ></Divider>
+            <Box
+              display={"flex"}
+              justifyContent="center"
+              width={"calc(64px + 1px)"}
+            >
+              <Typography
+                fontSize="11px"
+                color={"#8A8A8A"}
+                sx={{ textDecoration: "underline" }}
+              >
+                {t(translationKeys.requested)}
+              </Typography>
+            </Box>
+            <ListRequested
+              userId={userId}
+              open={open}
+              users={requests}
+              userSocket={userSocket}
+              showErrorToast={showErrorToast}
+              showSuccessToast={showSuccessToast}
+            />
+            <Divider
+              variant="middle"
+              sx={{
+                marginTop: "2.5rem",
+                marginBottom: "2.5rem",
+              }}
+            ></Divider>
+            <Box
+              display={"flex"}
+              justifyContent="center"
+              width={"calc(64px + 1px)"}
+            >
+              <Typography
+                fontSize="11px"
+                color={"#8A8A8A"}
+                sx={{ textDecoration: "underline" }}
+              >
+                {t(translationKeys.received)}
+              </Typography>
+            </Box>
+            <ListReceived
+              userId={userId}
+              open={open}
+              users={requestsReceived}
+              userSocket={userSocket}
+              showErrorToast={showErrorToast}
+              showSuccessToast={showSuccessToast}
+            />
+          </Drawer>
+          <Box component="main" sx={{ flexGrow: 1, p: 3 }}></Box>
         </Box>
-        <ListFriends
-          userId={userId}
-          open={open}
-          users={friends}
-          channelSocket={channelSocket}
-          userSocket={userSocket}
-          showErrorToast={showErrorToast}
-          showSuccessToast={showSuccessToast}
-        />
-        <Divider
-          variant="middle"
-          sx={{
-            marginTop: "2.5rem",
-            marginBottom: "2.5rem",
-          }}
-        ></Divider>
-        <Box
-          display={"flex"}
-          justifyContent="center"
-          width={"calc(64px + 1px)"}
-        >
-          <Typography
-            fontSize="11px"
-            color={"#8A8A8A"}
-            sx={{ textDecoration: "underline" }}
-          >
-            {t(translationKeys.requested)}
-          </Typography>
-        </Box>
-        <ListRequested
-          userId={userId}
-          open={open}
-          users={requests}
-          userSocket={userSocket}
-          showErrorToast={showErrorToast}
-          showSuccessToast={showSuccessToast}
-        />
-        <Divider
-          variant="middle"
-          sx={{
-            marginTop: "2.5rem",
-            marginBottom: "2.5rem",
-          }}
-        ></Divider>
-        <Box
-          display={"flex"}
-          justifyContent="center"
-          width={"calc(64px + 1px)"}
-        >
-          <Typography
-            fontSize="11px"
-            color={"#8A8A8A"}
-            sx={{ textDecoration: "underline" }}
-          >
-            {t(translationKeys.received)}
-          </Typography>
-        </Box>
-        <ListReceived
-          userId={userId}
-          open={open}
-          users={requestsReceived}
-          userSocket={userSocket}
-          showErrorToast={showErrorToast}
-          showSuccessToast={showSuccessToast}
-        />
-      </Drawer>
-      <Box component="main" sx={{ flexGrow: 1, p: 3 }}></Box>
-    </Box>
+      )}
+    </>
   );
 }

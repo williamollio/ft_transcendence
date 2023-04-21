@@ -1,6 +1,7 @@
 import { Grid, Typography } from "@mui/material";
 import BoltIcon from "@mui/icons-material/Bolt";
 import { scoreInfo } from "../../interfaces/game.interface";
+import classes from "../../styles.module.scss";
 
 interface Props {
   scoreInfo: scoreInfo;
@@ -17,10 +18,10 @@ export default function ScoreDisplay(props: Props) {
       sx={{ width: "100%", height: 80 }}
     >
       <Grid item>
-        <Typography fontSize={30}>{scoreInfo.p1s}</Typography>
+        <Typography color={classes.colorAccent} fontSize={30}>{scoreInfo.p1s}</Typography>
       </Grid>
       <Grid item marginLeft={10} sx={{ width: 100 }}>
-        <Typography fontSize={20}>{scoreInfo.p1name}</Typography>
+        <Typography color="white" fontSize={20}>{scoreInfo.p1name}</Typography>
       </Grid>
       <Grid container direction="column" flex={0}>
         <Grid item>
@@ -35,11 +36,11 @@ export default function ScoreDisplay(props: Props) {
           <BoltIcon sx={{ color: "yellow" }} />
         </Grid>
       </Grid>
-      <Grid item marginRight={10} sx={{ width: 100 }}>
-        <Typography fontSize={20}>{scoreInfo.p2name}</Typography>
+      <Grid item marginLeft={10} sx={{ width: 100 }}>
+        <Typography color="white" fontSize={20}>{scoreInfo.p2name}</Typography>
       </Grid>
       <Grid item>
-        <Typography fontSize={30}>{scoreInfo.p2s}</Typography>
+        <Typography color={classes.colorAccent} fontSize={30}>{scoreInfo.p2s}</Typography>
       </Grid>
     </Grid>
   );

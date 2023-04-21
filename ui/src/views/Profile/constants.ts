@@ -14,6 +14,8 @@ export const translationKeys = {
   addFriends: "addFriends",
   setup2fa: "setup2fa",
   enterNumber: "enterNumber",
+  general: "General",
+  ranked: "Ranked",
   message: {
     success: {
       nameSaved: "message.success.nameSaved",

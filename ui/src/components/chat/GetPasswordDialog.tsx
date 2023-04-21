@@ -54,7 +54,12 @@ export default function GetPasswordDialog(props: Props) {
   };
 
   return (
-    <Dialog open={open} onClose={handleClose} onKeyDown={handleSubmit}>
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      onKeyDown={handleSubmit}
+      sx={{ zIndex: (theme) => theme.zIndex.modal + 3 }}
+    >
       <DialogContent>
         {t(translationKeys.roomContext.leavePasswordEmpty)}
       </DialogContent>

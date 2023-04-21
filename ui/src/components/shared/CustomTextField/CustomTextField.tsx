@@ -19,6 +19,7 @@ interface Props {
   placeholder?: string;
   defaultValue?: string;
   value?: string | number;
+  disable?: boolean;
 }
 
 const CustomTextField: FC<Props> = forwardRef<HTMLInputElement, Props>(
@@ -33,6 +34,7 @@ const CustomTextField: FC<Props> = forwardRef<HTMLInputElement, Props>(
       error,
       register,
       value,
+      disable = false,
     } = props;
 
     const { getErrorMessage } = useReactHookFormHelper();
@@ -52,6 +54,7 @@ const CustomTextField: FC<Props> = forwardRef<HTMLInputElement, Props>(
           variant={"outlined"}
           helperText={error && getErrorMessage(error)}
           InputLabelProps={{ shrink: true }}
+          disabled={disable}
         />
       </Box>
     );

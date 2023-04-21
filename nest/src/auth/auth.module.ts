@@ -6,7 +6,6 @@ import { UsersModule } from '../users/users.module';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { Intra42Strategy } from './strategies/intra42.strategy';
 import * as process from 'process';
-import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
 import { FullAuthStrategy } from './strategies/full-auth-strategy';
 
 @Module({
@@ -18,12 +17,6 @@ import { FullAuthStrategy } from './strategies/full-auth-strategy';
     UsersModule,
   ],
   controllers: [AuthController],
-  providers: [
-    AuthService,
-    JwtStrategy,
-    Intra42Strategy,
-    JwtRefreshStrategy,
-    FullAuthStrategy,
-  ],
+  providers: [AuthService, JwtStrategy, Intra42Strategy, FullAuthStrategy],
 })
 export class AuthModule {}

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { GameLoop } from "../../classes/GameLoop.class";
 import GameBoard from "./GameBoard";
 import ScoreDisplay from "./ScoreDisplay";

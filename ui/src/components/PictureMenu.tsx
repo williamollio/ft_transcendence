@@ -18,6 +18,7 @@ import { UserStatus } from "../interfaces/user.interface";
 interface Props {
   image: Blob | File | null;
   status: UserStatus;
+  setToken: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 enum AnchorEnum {
@@ -27,7 +28,7 @@ enum AnchorEnum {
 }
 
 export default function PictureMenu(props: Props) {
-  const { image, status } = props;
+  const { image, status, setToken } = props;
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -38,8 +39,8 @@ export default function PictureMenu(props: Props) {
     switch (type) {
       case AnchorEnum.LOGOUT: {
         localStorage.removeItem(Cookie.TOKEN);
+        setToken(false);
         eraseCookie(Cookie.TOKEN);
-        eraseCookie(Cookie.REFRESH_TOKEN);
         navigate(RoutePath.LOGIN);
         break;
       }

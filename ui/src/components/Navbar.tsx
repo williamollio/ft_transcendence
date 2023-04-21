@@ -16,18 +16,21 @@ import { useTheme } from "@mui/material";
 import { UserStatus } from "../interfaces/user.interface";
 import { UserSocket } from "../classes/UserSocket.class";
 import { listenerWrapper } from "../services/initSocket.service";
+import { RoutePath } from "../interfaces/router.interface";
 
 export const navbarHeight = "4rem";
 
 interface Props {
   userSocket: UserSocket;
+  setToken: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export default function NavBar(props: Props): React.ReactElement {
-  const { userSocket } = props;
+  const { userSocket, setToken } = props;
   const theme = useTheme();
   const state = useLocation().state;
   const navigate = useNavigate();
+  const location = useLocation();
   const { classes } = useStyles();
   const [userId, setUserId] = useState<string>("");
   const [image, setImage] = useImageStore((state) => [
@@ -41,6 +44,22 @@ export default function NavBar(props: Props): React.ReactElement {
     ]
   );
   const [status, setStatus] = React.useState<UserStatus>(UserStatus.OFFLINE);
+  const [hidden, setHidden] = React.useState<boolean>(false);
+  const [isNavbarCacheInvalid, setIsNavbarCacheInvalid] =
+    React.useState<boolean>(false);
+
+  React.useEffect(() => {
+    if (
+      location.pathname == RoutePath.LOGIN ||
+      location.pathname == RoutePath.LOGIN_2FA
+    ) {
+      setHidden(true);
+    } else {
+      setHidden(false);
+    }
+
+    setSelectedTabId(state?.activeTabId ?? idTabs.PROFILE);
+  }, [location.pathname]);
 
   React.useEffect(() => {
     let token = localStorage.getItem(Cookie.TOKEN);
@@ -51,7 +70,7 @@ export default function NavBar(props: Props): React.ReactElement {
     if (userId && image === null) {
       wrapperFetchProfilePicture(userId);
     }
-  }, [userId]);
+  }, [userId, location.pathname]);
 
   const statusUpdateListener = (data: any) => {
     if (data.id === userId) setStatus(data.status);
@@ -75,7 +94,7 @@ export default function NavBar(props: Props): React.ReactElement {
         return false;
       });
     };
-  }, [userSocket, userId]);
+  }, [userSocket, userId, location.pathname]);
 
   async function wrapperFetchProfilePicture(userId: string) {
     const pictureFetched = await fetchProfilePicture(userId);
@@ -113,59 +132,60 @@ export default function NavBar(props: Props): React.ReactElement {
 
   return (
     <>
-      <AppBar className={classes.menuBar}>
-        <Box
-          className={classes.picture}
-          sx={{
-            right: isRightOpen ? 320 : 70,
-            transition: (theme) =>
-              theme.transitions.create("right", {
-                easing: theme.transitions.easing.sharp,
-                duration: theme.transitions.duration.leavingScreen,
-              }),
-            ...(isRightOpen && {
+      {!hidden && (
+        <AppBar className={classes.menuBar} sx={{  zIndex: (theme) => theme.zIndex.modal + 3}}>
+          <Box
+            className={classes.picture}
+            sx={{
+              right: isRightOpen ? 320 : 70,
               transition: (theme) =>
                 theme.transitions.create("right", {
-                  easing: theme.transitions.easing.easeOut,
-                  duration: theme.transitions.duration.enteringScreen,
+                  easing: theme.transitions.easing.sharp,
+                  duration: theme.transitions.duration.leavingScreen,
                 }),
-            }),
-          }}
-        >
-          <PictureMenu image={image} status={status} />
-        </Box>
-        <Box
-          sx={{
-            width: "100%",
-            height: "100%",
-            display: "flex",
-            justifyContent: "center",
-          }}
-        >
-          <Tabs
-            value={selectedTabId}
-            sx={{ width: "90%" }}
-            centered={true}
-            TabIndicatorProps={{
-              style: { marginBottom: "5px", marginLeft: "-8px" },
+              ...(isRightOpen && {
+                transition: (theme) =>
+                  theme.transitions.create("right", {
+                    easing: theme.transitions.easing.easeOut,
+                    duration: theme.transitions.duration.enteringScreen,
+                  }),
+              }),
             }}
           >
-            {tabsWithId.map((tab) => {
-              return (
-                <Tab
-                  key={`navbar-${tab.id}`}
-                  label={tab.label}
-                  value={tab.id}
-                  onClick={() => {
-                    navigateToSelectedTab(tab.id);
-                  }}
-                  className={classes.tab}
-                />
-              );
-            })}
-          </Tabs>
-        </Box>
-      </AppBar>
+            <PictureMenu image={image} status={status} setToken={setToken} />
+          </Box>
+          <Box
+            sx={{
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
+            <Tabs
+              value={selectedTabId}
+              centered={true}
+              TabIndicatorProps={{
+                style: { marginBottom: "5px", marginLeft: "-8px" },
+              }}
+            >
+              {tabsWithId.map((tab) => {
+                return (
+                  <Tab
+                    key={`navbar-${tab.id}`}
+                    label={tab.label}
+                    value={tab.id}
+                    onClick={() => {
+                      navigateToSelectedTab(tab.id);
+                    }}
+                    className={classes.tab}
+                  />
+                );
+              })}
+            </Tabs>
+          </Box>
+        </AppBar>
+      )}
     </>
   );
 }

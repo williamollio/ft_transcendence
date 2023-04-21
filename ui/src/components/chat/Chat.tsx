@@ -1,7 +1,5 @@
 import {
   Box,
-  Button,
-  ClickAwayListener,
   Divider,
   Grid,
   List,
@@ -10,7 +8,6 @@ import {
   ListItemText,
   Paper,
   TextField,
-  Tooltip,
   Typography,
 } from "@mui/material";
 import { useContext, useEffect, useRef, useState } from "react";
@@ -19,9 +16,9 @@ import {
   failEvents,
   ContextMenu,
   RoomInvite,
-  channelUser,
   ChannelInfoContextMenu,
   user,
+  GameMode,
 } from "../../interfaces/chat.interface";
 import { accessTypes, chatRoom } from "../../classes/chatRoom.class";
 import AddChannelDialog from "./AddChannelDialog";
@@ -43,7 +40,6 @@ import { ToastType } from "../../context/toast";
 import { listenerWrapper } from "../../services/initSocket.service";
 import { RoutePath } from "../../interfaces/router.interface";
 import UserContext from "./UserContext";
-import { Identifier, IndexType } from "typescript";
 
 interface Props {
   channelSocket: ChannelSocket;
@@ -183,36 +179,40 @@ export default function Chat(props: Props) {
   };
 
   const roomLeftListener = (data: { userId: string; channelId: string }) => {
-    let index = channelSocket.channels.findIndex(
-      (element) => element.id === data.channelId
-    );
-    if (index >= 0) {
-      ChannelService.getUserName(data.userId).then((res) => {
-        channelSocket.channels[index].messages.push({
-          userId: data.userId,
-          userName: res.data.name,
-          content: `${t(translationKeys.chatInfo.userLeft)}`,
-          channelId: data.channelId,
+    if (data.userId !== channelSocket.user.id) {
+      let index = channelSocket.channels.findIndex(
+        (element) => element.id === data.channelId
+      );
+      if (index >= 0) {
+        ChannelService.getUserName(data.userId).then((res) => {
+          channelSocket.channels[index].messages.push({
+            userId: data.userId,
+            userName: res.data.name,
+            content: `${t(translationKeys.chatInfo.userLeft)}`,
+            channelId: data.channelId,
+          });
+          updateMessages(channelSocket.channels[index], data.channelId);
         });
-        updateMessages(channelSocket.channels[index], data.channelId);
-      });
+      }
     }
   };
 
   const roomJoinedListener = (data: { userId: string; channelId: string }) => {
-    let index = channelSocket.channels.findIndex(
-      (element) => element.id === data.channelId
-    );
-    if (index >= 0) {
-      ChannelService.getUserName(data.userId).then((res) => {
-        channelSocket.channels[index].messages.push({
-          userId: data.userId,
-          userName: res.data.name,
-          content: `${t(translationKeys.chatInfo.userJoined)}`,
-          channelId: data.channelId,
+    if (data.userId !== channelSocket.user.id) {
+      let index = channelSocket.channels.findIndex(
+        (element) => element.id === data.channelId
+      );
+      if (index >= 0) {
+        ChannelService.getUserName(data.userId).then((res) => {
+          channelSocket.channels[index].messages.push({
+            userId: data.userId,
+            userName: res.data.name,
+            content: `${t(translationKeys.chatInfo.userJoined)}`,
+            channelId: data.channelId,
+          });
+          updateMessages(channelSocket.channels[index], data.channelId);
         });
-        updateMessages(channelSocket.channels[index], data.channelId);
-      });
+      }
     }
   };
 
@@ -246,9 +246,9 @@ export default function Chat(props: Props) {
         type: ToastType.INVITE,
         title: t(translationKeys.invite.gameInvite) as string,
         message: `${data.initiatingUser.name} ${
-          t(translationKeys.invite.inviteTo) as string
+          t(translationKeys.invite.inviteToGame) as string
         }
-            ${data.game.mode === "CLASSIC" ? "Classic" : "Mayhem"}`,
+            ${data.game.mode === GameMode.CLASSIC ? "Classic" : "Mayhem"}`,
         autoClose: true,
         onAccept: () => {
           gameSocket.joinGame(data.game.mode, data.initiatingUser.id);
@@ -297,7 +297,9 @@ export default function Chat(props: Props) {
       toast: {
         type: ToastType.ERROR,
         title: error,
-        message: event,
+        message: t(
+          translationKeys.errorMessages.backendErrorMessage(event)
+        ) as string,
       },
     });
   };
@@ -416,7 +418,7 @@ export default function Chat(props: Props) {
       <Box
         sx={{
           width: "300px",
-          height: "85.9%", // TODO : responsiveness to be adapted
+          height: "85.9%", // TODO : responsiveness to be adapted at 42
         }}
       >
         <ChannelTabs
@@ -429,14 +431,9 @@ export default function Chat(props: Props) {
           blockedUsers={blockedUsers}
         />
         <RoomContextMenu
-          blockedUser={blockedUsers}
-          refetchBlockedUsers={refetchBlockedUsers}
-          userSocket={userSocket}
-          setNewChannel={setNewChannel}
           contextMenu={contextMenu}
           setContextMenu={setContextMenu}
           channelSocket={channelSocket}
-          gameSocket={gameSocket}
         ></RoomContextMenu>
         <Divider></Divider>
         <Grid container height="100%">

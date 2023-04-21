@@ -21,6 +21,9 @@ import GameView from "./views/Game/GameView";
 import StatsView from "./views/Stats/StatsView";
 import { GameSocket } from "./classes/GameSocket.class";
 import ProfileView from "./views/Profile/ProfileView";
+import LeftDrawer from "./components/LeftDrawer/LeftDrawer";
+import Navbar from "./components/Navbar";
+import RightDrawer from "./components/RightDrawer/RightDrawer";
 
 export default function App() {
   const [userSocket] = useState<UserSocket>(new UserSocket());
@@ -75,7 +78,7 @@ export default function App() {
   const AuthWrapper = (): ReactElement => {
     const isAuthenticated = getIsAuthenticated();
     return isAuthenticated ? (
-      <Navigate to={RoutePath.EDITPROFILE} replace />
+      <Navigate to={RoutePath.PROFILE} replace />
     ) : (
       <Navigate to={RoutePath.LOGIN} replace />
     );
@@ -117,6 +120,13 @@ export default function App() {
         sx={{ backgroundColor: classes.colorSecondary }}
       >
         <ThemeProvider theme={theme}>
+          <Navbar userSocket={userSocket} setToken={setToken} />
+          <LeftDrawer channelSocket={channelSocket} userSocket={userSocket} />
+          <RightDrawer
+            channelSocket={channelSocket}
+            userSocket={userSocket}
+            gameSocket={gameSocket}
+          />
           <Routes>
             <Route path="*" element={<AuthWrapper />} />
             <Route
@@ -136,11 +146,7 @@ export default function App() {
               path={RoutePath.EDITPROFILE}
               element={
                 <PrivateRoute setToken={setToken}>
-                  <EditProfileView
-                    userSocket={userSocket}
-                    channelSocket={channelSocket}
-                    gameSocket={gameSocket}
-                  />
+                  <EditProfileView />
                 </PrivateRoute>
               }
             />
@@ -150,11 +156,7 @@ export default function App() {
                 <PrivateRoute
                   setToken={setToken}
                   children={
-                    <GameView
-                      userSocket={userSocket}
-                      channelSocket={channelSocket}
-                      gameSocket={gameSocket}
-                    />
+                    <GameView userSocket={userSocket} gameSocket={gameSocket} />
                   }
                 ></PrivateRoute>
               }
@@ -164,12 +166,7 @@ export default function App() {
               element={
                 <PrivateRoute
                   setToken={setToken}
-                  children={
-                    <Setup2FA
-                      userSocket={userSocket}
-                      channelSocket={channelSocket}
-                    />
-                  }
+                  children={<Setup2FA />}
                 ></PrivateRoute>
               }
             />
@@ -177,11 +174,7 @@ export default function App() {
               path={RoutePath.STATS}
               element={
                 <PrivateRoute setToken={setToken}>
-                  <StatsView
-                    userSocket={userSocket}
-                    channelSocket={channelSocket}
-                    gameSocket={gameSocket}
-                  />
+                  <StatsView />
                 </PrivateRoute>
               }
             />
@@ -190,11 +183,7 @@ export default function App() {
               path={RoutePath.PROFILE}
               element={
                 <PrivateRoute setToken={setToken}>
-                  <ProfileView
-                    userSocket={userSocket}
-                    channelSocket={channelSocket}
-                    gameSocket={gameSocket}
-                  />
+                  <ProfileView />
                 </PrivateRoute>
               }
             />

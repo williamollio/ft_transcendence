@@ -24,7 +24,6 @@ import { ChannelSocket } from "../../../classes/ChannelSocket.class";
 import { UserSocket } from "../../../classes/UserSocket.class";
 import { listenerWrapper } from "../../../services/initSocket.service";
 import { useNavigate } from "react-router-dom";
-import { RoutePath } from "../../../interfaces/router.interface";
 
 interface Props {
   userId: string;
@@ -131,6 +130,7 @@ export default function ListFriends(props: Props) {
     const image = await fetchProfilePicture(friendId);
     return URL.createObjectURL(image);
   }
+
   function createDmChat(user: User) {
     setIsRightOpen(true);
     channelSocket.createDm(user);
@@ -152,7 +152,9 @@ export default function ListFriends(props: Props) {
   }
 
   function navigateToUserProfile(userId: string) {
-    navigate(`/profile/${userId}`, { state: { userId: userId } });
+    navigate(`/profile/${userId}`, {
+      state: { user: userId },
+    });
   }
 
   return (
@@ -165,24 +167,26 @@ export default function ListFriends(props: Props) {
               px: 2.5,
             }}
           >
-            <ListItemIcon
-              onClick={() => navigateToUserProfile(user.id)}
-              sx={{
-                marginLeft: -1,
-              }}
-            >
-              <StyledAvatarBadge
-                overlap="circular"
-                anchorOrigin={{
-                  vertical: "bottom",
-                  horizontal: "right",
+            <Tooltip title={user.name}>
+              <ListItemIcon
+                onClick={() => navigateToUserProfile(user.id)}
+                sx={{
+                  marginLeft: -1,
                 }}
-                variant="dot"
-                status={user.status}
               >
-                <Avatar key={user.id} src={profilePictures[user.id]} />
-              </StyledAvatarBadge>
-            </ListItemIcon>
+                <StyledAvatarBadge
+                  overlap="circular"
+                  anchorOrigin={{
+                    vertical: "bottom",
+                    horizontal: "right",
+                  }}
+                  variant="dot"
+                  status={user.status}
+                >
+                  <Avatar key={user.id} src={profilePictures[user.id]} />
+                </StyledAvatarBadge>
+              </ListItemIcon>
+            </Tooltip>
             <ListItemText primary={user.name} sx={{ opacity: open ? 1 : 0 }} />
             <Tooltip title="Create DM Chat">
               <ListItemButton

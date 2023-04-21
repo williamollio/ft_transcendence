@@ -1,6 +1,5 @@
-import React, { ChangeEvent, Dispatch, SetStateAction, useState } from "react";
+import React, { ChangeEvent, useState } from "react";
 import { makeStyles } from "tss-react/mui";
-import Navbar from "../../components/Navbar";
 import {
   Box,
   Button,
@@ -9,6 +8,7 @@ import {
   Avatar,
   CircularProgress,
   Divider,
+  Tooltip,
 } from "@mui/material";
 import usersService from "../../services/users.service";
 import { User } from "../../interfaces/user.interface";
@@ -34,23 +34,11 @@ import { Controller, FieldValues, useForm } from "react-hook-form";
 import CustomMultiSelect from "../../components/shared/CustomMultiSelect/CustomMultiselect";
 import CustomTextField from "../../components/shared/CustomTextField/CustomTextField";
 import { Cookie, getTokenData } from "../../utils/auth-helper";
-import LeftDrawer from "../../components/LeftDrawer/LeftDrawer";
 import friendshipsService from "../../services/friendships.service";
-import { UserSocket } from "../../classes/UserSocket.class";
-import RightDrawer from "../../components/RightDrawer/RightDrawer";
-import { ChannelSocket } from "../../classes/ChannelSocket.class";
-import { GameSocket } from "../../classes/GameSocket.class";
 import { useDrawersStore } from "../../store/drawers-store";
 import { useUserStore } from "../../store/users-store";
 
-interface Props {
-  userSocket: UserSocket;
-  channelSocket: ChannelSocket;
-  gameSocket: GameSocket;
-}
-
-export default function EditProfileView(props: Props): React.ReactElement {
-  const { userSocket, channelSocket, gameSocket } = props;
+export default function EditProfileView(): React.ReactElement {
   const { t } = useTranslation();
   const { classes } = useStyles();
   const navigate = useNavigate();
@@ -58,10 +46,11 @@ export default function EditProfileView(props: Props): React.ReactElement {
   const [image, setImage] = useImageStore(
     (state: { image: any; setImage: any }) => [state.image, state.setImage]
   );
-  const [picture, setPicture] = useState<any>(image);
+  const [picture, setPicture] = useState<any>();
   const [users, setUsers] = useState<LabelValue[]>([]);
   const [userId, setUserId] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isImageLoading, setIsImageLoading] = useState<boolean>(true);
   const [currentUser, setCurrentUser] = useState<User | null>();
   const [initialName, setInitialName] = useState<string>();
   const [token] = useState<string | null>(localStorage.getItem(Cookie.TOKEN));
@@ -96,8 +85,10 @@ export default function EditProfileView(props: Props): React.ReactElement {
       if (userId) {
         fetchCurrentUser();
         fetchUsersWithoutFriendship();
+        setImage(picture);
         setIsLoading(false);
         setIsUserCacheInvalid(false);
+        setIsImageLoading(false);
       }
     }
   }, [userId, isUserCacheInvalid]);
@@ -242,8 +233,6 @@ export default function EditProfileView(props: Props): React.ReactElement {
       }
     );
 
-    updateOptionsFriends(data);
-
     let responseFrienship;
     friendsList?.forEach(async function (friend) {
       responseFrienship = await friendshipsService.postRequest(userId, friend);
@@ -255,7 +244,8 @@ export default function EditProfileView(props: Props): React.ReactElement {
         showSuccessToast(
           t(translationKeys.message.success.friendRequestsSaved)
         );
-        setValue("friends", undefined);
+        setValue("friends", []);
+        updateOptionsFriends(data);
         setIsDrawerCacheInvalid(true);
       }
     });
@@ -269,13 +259,6 @@ export default function EditProfileView(props: Props): React.ReactElement {
 
   return (
     <>
-      <Navbar userSocket={userSocket} />
-      <LeftDrawer channelSocket={channelSocket} userSocket={userSocket} />
-      <RightDrawer
-        channelSocket={channelSocket}
-        userSocket={userSocket}
-        gameSocket={gameSocket}
-      />
       <Background>
         <ProfileCard>
           <CardContainer>
@@ -307,13 +290,19 @@ export default function EditProfileView(props: Props): React.ReactElement {
                     }}
                   >
                     <Box className={classes.avatarWrapper}>
-                      <Avatar
-                        src={picture ? URL.createObjectURL(picture) : ""}
-                        style={{
-                          width: "100px",
-                          height: "100px",
-                        }}
-                      />
+                      {isImageLoading ? (
+                        <CircularProgress />
+                      ) : (
+                        <Tooltip title="Profile picture">
+                          <Avatar
+                            src={picture ? URL.createObjectURL(picture) : ""}
+                            style={{
+                              width: "100px",
+                              height: "100px",
+                            }}
+                          />
+                        </Tooltip>
+                      )}
                     </Box>
                     <Box className={classes.uploadButtonWrapper}>
                       <Button

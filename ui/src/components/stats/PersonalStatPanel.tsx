@@ -21,7 +21,7 @@ export default function PersonalStatPanel(props: Props) {
   const { lr, title, playerId, type } = props;
   const { t } = useTranslation();
 
-  const { data, isLoading, isError, isRefetching } = useQuery(
+  const { data, isLoading, isError, isRefetching, refetch } = useQuery(
     ["personalStats"],
     () => StatsService.fetchPersonalStats(playerId)
   );
@@ -32,6 +32,10 @@ export default function PersonalStatPanel(props: Props) {
     gamesWon: 0,
     gamesLost: 0,
   });
+
+  useEffect(() => {
+    refetch();
+  }, [playerId]);
 
   useEffect(() => {
     if (data && !isLoading && !isError && !isRefetching) {
@@ -50,11 +54,9 @@ export default function PersonalStatPanel(props: Props) {
       <Box>
         <Paper
           sx={{
-			backgroundColor: classes.colorPrimary,
-            position: "relative",
-            height: "auto",
-            width: 300,
-            ...(!lr ? { left: "77px" } : { right: "77px" }),
+            backgroundColor: classes.colorPrimary,
+            borderRadius: "20px",
+            width: "220px",
           }}
         >
           <Grid
@@ -65,7 +67,7 @@ export default function PersonalStatPanel(props: Props) {
           >
             <Grid item>
               <Typography
-                variant="h4"
+                variant="h5"
                 color={classes.colorAccent}
                 fontWeight="bold"
                 sx={{ textDecoration: "underline" }}
@@ -105,6 +107,7 @@ export default function PersonalStatPanel(props: Props) {
                   100
                 ).toPrecision(3)}
                 postfix="%"
+                bottomBorder={false}
               ></SingleStatComponent>
             </>
           )}
