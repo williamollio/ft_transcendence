@@ -26,7 +26,7 @@ import ChannelService from "../../services/channel.service";
 import GameEndDisplay from "./GameEndDisplay";
 import { positionalData } from "../../classes/positionalData.class";
 import PauseOverlay from "./PauseOverlay";
-import PauseNotification from "./PauseNotification";
+import PauseNotification, { PauseState } from "./PauseNotification";
 import MainMenu from "./MainMenu";
 
 interface Props {
@@ -47,8 +47,8 @@ export default function GameBoard(props: Props) {
     new positionalData(gameConstants)
   );
   const [pause, togglePause] = useState<boolean>(true);
-  const [pauseContent, setPauseContent] = useState<JSX.Element | boolean>(
-    <MainMenu gameSocket={gameSocket} />
+  const [pauseContent, setPauseContent] = useState<PauseState | false>(
+    PauseState.main
   );
 
   const playerMoveHandler = (event: KeyboardEvent) => {
@@ -101,7 +101,7 @@ export default function GameBoard(props: Props) {
       p2s: 0,
     };
     setScoreInfo(gameLoop.scoreInfo);
-    setPauseContent(<MainMenu gameSocket={gameSocket} />);
+    setPauseContent(PauseState.main);
   };
 
   const giListener = (data: any) => {
@@ -136,16 +136,14 @@ export default function GameBoard(props: Props) {
   const getPlayerNames = async (p1Id: string, p2Id: string) => {
     gameLoop.scoreInfo.p1Id = p1Id;
     gameLoop.scoreInfo.p2Id = p2Id;
-    ChannelService.getUserName(p1Id)
-      .then((resolve) => (gameLoop.scoreInfo.p1name = resolve.data.name))
-      .catch(() => {
-        console.log("failed to get player 1 name");
-      });
-    ChannelService.getUserName(p2Id)
-      .then((resolve) => (gameLoop.scoreInfo.p2name = resolve.data.name))
-      .catch(() => {
-        console.log("failed to get player 2 name");
-      });
+    ChannelService.getUserName(p1Id).then((resolve) => {
+      if (resolve.data) gameLoop.scoreInfo.p1name = resolve.data.name;
+      else gameLoop.scoreInfo.p1name = "missing";
+    });
+    ChannelService.getUserName(p2Id).then((resolve) => {
+      if (resolve.data) gameLoop.scoreInfo.p2name = resolve.data.name;
+      else gameLoop.scoreInfo.p2name = "missing";
+    });
   };
 
   const mutateGameStatusListener = (data: any) => {
@@ -154,7 +152,7 @@ export default function GameBoard(props: Props) {
       getPlayerNames(data.player1id, data.player2id);
     if (data.status === "PLAYING") gameLoop.startLoop(togglePause);
     if (data.status === "PAUSED") {
-      setPauseContent(<PauseNotification />);
+      setPauseContent(PauseState.paused);
       gameLoop.stopLoop(togglePause);
     }
     if (data.status === "DONE" || data.status === "OVER") {
@@ -182,6 +180,10 @@ export default function GameBoard(props: Props) {
     gameSocket.latestGame = null;
   };
 
+  const leftGameListener = () => {
+    setPauseContent(PauseState.main);
+  };
+
   const failedListener = (data: any) => {
     gameLoop.resetPositions(togglePause);
     toast.dispatchTranscendanceState({
@@ -202,6 +204,7 @@ export default function GameBoard(props: Props) {
         failedEvents.forEach((event) =>
           gameSocket.socket.on(event, failedListener)
         );
+        gameSocket.socket.on("leftGame", leftGameListener);
         gameSocket.socket.on("tryRejoin", tryRejoinListener);
         gameSocket.socket.on("matchFinished", gameFinishListener);
         gameSocket.socket.on("gameStarting", gameStartingListener);
@@ -222,6 +225,7 @@ export default function GameBoard(props: Props) {
           failedEvents.forEach((event) =>
             gameSocket.socket.off(event, failedListener)
           );
+          gameSocket.socket.off("leftGame", leftGameListener);
           gameSocket.socket.off("tryRejoin", tryRejoinListener);
           gameSocket.socket.off("matchFinished", gameFinishListener);
           gameSocket.socket.off("gameStarting", gameStartingListener);
@@ -249,7 +253,18 @@ export default function GameBoard(props: Props) {
         }}
       >
         <PauseOverlay open={pause}>
-          <>{pauseContent}</>
+          <>
+            {pauseContent !== false ? (
+              <MainMenu
+                gameSocket={gameSocket}
+                gameLoop={gameLoop}
+                pauseContent={pauseContent}
+                setPauseContent={setPauseContent}
+              />
+            ) : (
+              false
+            )}
+          </>
         </PauseOverlay>
         <Divider
           orientation="vertical"

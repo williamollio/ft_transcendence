@@ -23,6 +23,10 @@ export default function GameView(props: Props): React.ReactElement {
   const { gameSocket, userSocket } = props;
   const { t } = useTranslation();
 
+  const handleLeave = () => {
+    gameSocket.leave();
+  };
+
   return (
     <>
       <Background>
@@ -44,7 +48,7 @@ export default function GameView(props: Props): React.ReactElement {
                   <Game gameSocket={gameSocket} userSocket={userSocket} />
                 </Grid>
                 <Grid item>
-                  <Button variant="contained" onClick={gameSocket.leave}>
+                  <Button variant="contained" onClick={handleLeave}>
                     {t(translationKeys.buttons.leaveGame)}
                   </Button>
                 </Grid>

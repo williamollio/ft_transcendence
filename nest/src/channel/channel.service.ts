@@ -519,7 +519,7 @@ export class ChannelService {
       );
       if (conversationAlreadyExist) {
         conversationAlreadyExist.passwordHash = '';
-        return conversationAlreadyExist;
+        return 'conversationAlreadyExist';
       }
 
       /* Create a DM between the 2 users */

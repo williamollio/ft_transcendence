@@ -127,26 +127,30 @@ export class GameService {
             'gameJoined',
             game.p1id === userId ? { playerNumber: 1 } : { playerNumber: 2 },
           );
-        if (game.status === Status.PAUSED) {
-          this.mutateGameStatus(game, Status.PLAYING, server);
-          this.deleteTimeout(game.gameRoomId);
-          this.addInterval(game.gameRoomId, userId, 30, server);
-        } else if (game.status === Status.PENDING && game.p2id === userId) {
-          this.mutateGameStatus(game, Status.PLAYING, server);
-          this.addInterval(game.gameRoomId, userId, 30, server);
-        } else server.to(client.id).emit('gameStarting');
+        if (game.p1id !== undefined && game.p2id !== undefined) {
+          if (game.status === Status.PAUSED) {
+            this.mutateGameStatus(game, Status.PLAYING, server);
+            this.deleteTimeout(game.gameRoomId);
+            this.addInterval(game.gameRoomId, userId, 30, server);
+          } else if (game.status === Status.PENDING && game.p2id === userId) {
+            this.mutateGameStatus(game, Status.PLAYING, server);
+            this.addInterval(game.gameRoomId, userId, 30, server);
+          } else server.to(client.id).emit('gameStarting');
+        }
         return;
       }
-      if ((game = this.GameMap.matchPlayer(userId, mode))) {
+      if (!this.GameMap.getGame(userId)) {
+        if ((game = this.GameMap.matchPlayer(userId, mode))) {
+          await client.join(game.gameRoomId);
+          server.to(client.id).emit('gameJoined', { playerNumber: 2 });
+          this.mutateGameStatus(game, Status.PLAYING, server);
+          this.addInterval(game.gameRoomId, userId, 30, server);
+          return;
+        }
+        game = this.createGame(userId, mode);
         await client.join(game.gameRoomId);
-        server.to(client.id).emit('gameJoined', { playerNumber: 2 });
-        this.mutateGameStatus(game, Status.PLAYING, server);
-        this.addInterval(game.gameRoomId, userId, 30, server);
-        return;
+        server.to(client.id).emit('gameJoined', { playerNumber: 1 });
       }
-      game = this.createGame(userId, mode);
-      await client.join(game.gameRoomId);
-      server.to(client.id).emit('gameJoined', { playerNumber: 1 });
     }
   }
 
@@ -365,9 +369,6 @@ export class GameService {
     if (p2 !== undefined) {
       this.GameMap.setPlayer2(p2, game);
     }
-    if (mode === GameMode.CLASSIC)
-      game.resetBallForClassicMode(undefined, 5000);
-    else game.resetBallForMayhemMode(undefined, 5000);
     return game;
   }
 
@@ -397,6 +398,11 @@ export class GameService {
     } catch (err) {
       const interval = setInterval(callback, milliseconds);
       this.schedulerRegistry.addInterval(gameRoomId, interval);
+      const game = this.GameMap.getGame(userId);
+      if (game && game.mode === GameMode.CLASSIC)
+        game.resetBallForClassicMode();
+      else if (game && game.mode === GameMode.MAYHEM)
+        game.resetBallForMayhemMode();
     }
   }
 

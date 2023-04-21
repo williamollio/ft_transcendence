@@ -1,3 +1,5 @@
+import { GameMode } from "../entities/game.entity";
+
 export interface MatchHistory {
     id: string;
     imageCurrentUser: string | null;

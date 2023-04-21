@@ -5,7 +5,7 @@ export class UserSocket {
   socket: Socket;
 
   constructor() {
-    this.socket = initSocket("http://localhost:8888", null);
+    this.socket = initSocket(`http://${window.location.hostname}:8888`, null);
   }
 
   logIn = () => {

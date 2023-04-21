@@ -31,6 +31,7 @@ export default function GetTextInputDialog(props: Props) {
 
   return (
     <Dialog
+      sx={{ zIndex: (theme) => theme.zIndex.modal + 3 }}
       open={open}
       onClose={handleClose}
       onKeyDown={(event: KeyboardEvent<HTMLDivElement>) => {
