@@ -90,7 +90,6 @@ export default function AddChannelDialog(props: Props) {
       } else setAlertOpen(true);
     } else {
       ChannelService.getChannelByName(dialogJoinValue.name).then((resolve) => {
-        console.log(resolve);
         channelSocket.joinRoom(
           resolve.id,
           dialogJoinValue.password !== "" ? dialogJoinValue.password : undefined

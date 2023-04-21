@@ -42,14 +42,21 @@ export default function Toast(props: Props): React.ReactElement {
   var timer: null | NodeJS.Timeout = null;
 
   React.useEffect(() => {
-    if (autoClose && !timer) {
+    if (autoClose) {
       timer = setTimeout(
         () => {
+          timer = null;
           onClose();
         },
         isInvite ? 9500 : 4000
       );
     }
+    return () => {
+      if (timer) {
+        clearTimeout(timer);
+        timer = null;
+      }
+    };
   });
 
   const toastBoxClasses = classNames({
@@ -72,10 +79,6 @@ export default function Toast(props: Props): React.ReactElement {
                 color="inherit"
                 size="small"
                 onClick={() => {
-                  if (timer) {
-                    clearTimeout(timer);
-                    timer = null;
-                  }
                   onClose();
                   onAccept ? onAccept() : false;
                 }}
@@ -87,10 +90,6 @@ export default function Toast(props: Props): React.ReactElement {
                 color="inherit"
                 size="small"
                 onClick={() => {
-                  if (timer) {
-                    clearTimeout(timer);
-                    timer = null;
-                  }
                   onClose();
                   onRefuse ? onRefuse() : false;
                 }}

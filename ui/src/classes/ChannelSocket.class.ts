@@ -14,7 +14,7 @@ export class ChannelSocket {
   error: any;
 
   constructor() {
-    this.socket = initSocket(`${import.meta.env.VITE_BASE_URL}:3333`, null);
+    this.socket = initSocket(`http://${window.location.hostname}:3333`, null);
     this.user = { id: "", name: "" };
     this.error = false;
     this.channels = new Array<chatRoom>();

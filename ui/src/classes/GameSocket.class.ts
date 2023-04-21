@@ -8,7 +8,7 @@ export class GameSocket {
   spectatingPlayerId: string;
 
   constructor() {
-    this.socket = initSocket(`${import.meta.env.VITE_BASE_URL}:4444`, null);
+    this.socket = initSocket(`http://${window.location.hostname}:4444`, null);
     this.latestGame = null;
     this.spectatingPlayerId = "";
   }

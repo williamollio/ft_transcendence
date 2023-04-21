@@ -7,6 +7,7 @@ import { Intra42User } from './interface/intra42-user.interface';
 import { Response } from 'express';
 import { MatchHistory } from 'src/game/interfaces/matchHistory.interface';
 import { Stat } from 'src/game/interfaces/stats.interface';
+import { GameService } from 'src/game/game.service';
 
 // have to update this file and user response to display error
 
@@ -255,8 +256,8 @@ export class UsersService {
       if (matchesList) {
         for (const match of matchesList) {
           if (
-            (match.playerOneId === user.id && match.p1s == 10) ||
-            (match.playerTwoId === user.id && match.p2s == 10)
+            (match.playerOneId === user.id && match.winnerId == user.id) ||
+            (match.playerTwoId === user.id && match.winnerId == user.id)
           )
             stats.numberOfWin++;
         }
@@ -315,9 +316,6 @@ export class UsersService {
     }
     return userRank;
   }
-
-  // still have to implement the services for the history and the leaderboard
-  // game won / game lost / points ???
 
   async getUserMatchHistory(userId: string, res: Response) {
     const matchesList = await this.getUserMatches(userId);

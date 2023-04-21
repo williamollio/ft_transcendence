@@ -79,33 +79,32 @@ export default function UserContext(props: Props) {
   };
 
   const handleDM = () => {
-    handleContextClose();
     if (contextMenu && contextMenu.user) {
       channelSocket.createDm(contextMenu.user);
     }
+    handleContextClose();
   };
 
   const handleProfile = () => {
-    handleContextClose();
     if (contextMenu && contextMenu.user && contextMenu.user.id) {
       navigate(`/profile/${contextMenu.user.id}`, {
-        state: { userId: contextMenu.user.id },
+        state: { user: contextMenu.user.id },
       });
     }
+    handleContextClose();
   };
 
   const handleInviteGame = (_event: React.MouseEvent<HTMLLIElement>) => {
-    handleContextClose();
     if (contextMenu && contextMenu.user && contextMenu.user.id) {
       gameSocket.inviteToGame(
         checked ? GameMode.MAYHEM : GameMode.CLASSIC,
         contextMenu.user.id
       );
     }
+    handleContextClose();
   };
 
   const handleBlock = async () => {
-    handleContextClose();
     if (contextMenu && contextMenu.user && contextMenu.user.id) {
       if (blockStatus === "Block") {
         let ret = await ChannelService.blockUser(contextMenu.user.id);
@@ -138,10 +137,10 @@ export default function UserContext(props: Props) {
         } else refetchBlockedUsers();
       }
     }
+    handleContextClose();
   };
 
   const handleMute = () => {
-    handleContextClose();
     if (
       contextMenu &&
       contextMenu.channelId &&
@@ -150,10 +149,10 @@ export default function UserContext(props: Props) {
     ) {
       channelSocket.muteUser(contextMenu.channelId, contextMenu.user.id);
     }
+    handleContextClose();
   };
 
   const handleKick = () => {
-    handleContextClose();
     if (
       contextMenu &&
       contextMenu.channelId &&
@@ -162,10 +161,10 @@ export default function UserContext(props: Props) {
     ) {
       channelSocket.banUser(contextMenu.channelId, contextMenu.user.id);
     }
+    handleContextClose();
   };
 
   const handlePromote = () => {
-    handleContextClose();
     if (
       contextMenu &&
       contextMenu.channelId &&
@@ -174,6 +173,7 @@ export default function UserContext(props: Props) {
     ) {
       channelSocket.editRole(contextMenu.channelId, contextMenu.user.id);
     }
+    handleContextClose();
   };
 
   return (
@@ -227,7 +227,10 @@ export default function UserContext(props: Props) {
             justifyContent="center"
             direction="row"
           >
-            <Typography fontSize={12} color={checked ? "grey" : classes.colorAccent}>
+            <Typography
+              fontSize={12}
+              color={checked ? "grey" : classes.colorAccent}
+            >
               {t(translationKeys.invite.classic)}
             </Typography>
             <Switch
@@ -235,7 +238,10 @@ export default function UserContext(props: Props) {
               onChange={() => toggleChecked(!checked)}
               color="default"
             ></Switch>
-            <Typography fontSize={12} color={checked ? classes.colorAccent : "grey"}>
+            <Typography
+              fontSize={12}
+              color={checked ? classes.colorAccent : "grey"}
+            >
               {t(translationKeys.invite.mayhem)}
             </Typography>
           </Grid>

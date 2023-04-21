@@ -136,16 +136,14 @@ export default function GameBoard(props: Props) {
   const getPlayerNames = async (p1Id: string, p2Id: string) => {
     gameLoop.scoreInfo.p1Id = p1Id;
     gameLoop.scoreInfo.p2Id = p2Id;
-    ChannelService.getUserName(p1Id)
-      .then((resolve) => (gameLoop.scoreInfo.p1name = resolve.data.name))
-      .catch(() => {
-        console.log("failed to get player 1 name");
-      });
-    ChannelService.getUserName(p2Id)
-      .then((resolve) => (gameLoop.scoreInfo.p2name = resolve.data.name))
-      .catch(() => {
-        console.log("failed to get player 2 name");
-      });
+    ChannelService.getUserName(p1Id).then((resolve) => {
+      if (resolve.data) gameLoop.scoreInfo.p1name = resolve.data.name;
+      else gameLoop.scoreInfo.p1name = "missing";
+    });
+    ChannelService.getUserName(p2Id).then((resolve) => {
+      if (resolve.data) gameLoop.scoreInfo.p2name = resolve.data.name;
+      else gameLoop.scoreInfo.p2name = "missing";
+    });
   };
 
   const mutateGameStatusListener = (data: any) => {

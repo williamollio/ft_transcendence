@@ -38,7 +38,7 @@
   "enterNumber": "Enter your phone number",
   "updloadPicture": "Upload Picture",
   "profile": "Profile",
-  "chooseName": "Choose an unique name",
+  "chooseName": "Choose a unique name",
   "addFriends": "Request Frienships",
   "errorMessages": {
     "required": "This field is required",
@@ -49,7 +49,7 @@
     "joinRoomError": "Can't join this channel",
     "inviteFailed": "Failed to invite user",
     "editRoomFailed": "Failed to change room info",
-    "messageSendFail": "Failed to send message",
+    "messageRoomFailed": "Failed to send message",
     "leaveRoomFailed": "Failed to remove channel",
     "banFailed": "Failed to ban user",
     "muteFailed": "Failed to mute user",

@@ -297,6 +297,7 @@ async function main() {
       playerTwoId: 'user2',
       p1s: 10,
       p2s: 9,
+      winnerId: 'user1',
     },
   });
 
@@ -309,6 +310,7 @@ async function main() {
       playerTwoId: 'user3',
       p1s: 8,
       p2s: 10,
+	  winnerId: 'user3',
     },
   });
 
@@ -321,6 +323,7 @@ async function main() {
       playerTwoId: 'user4',
       p1s: 10,
       p2s: 5,
+	  winnerId: 'user3',
     },
   });
 
@@ -333,6 +336,7 @@ async function main() {
       playerTwoId: 'user1',
       p1s: 10,
       p2s: 3,
+	  winnerId: 'user4',
     },
   });
 
@@ -345,6 +349,7 @@ async function main() {
       playerTwoId: 'user4',
       p1s: 2,
       p2s: 10,
+	  winnerId: 'user4',
     },
   });
 
