@@ -5,8 +5,8 @@ import { GetCurrentUserId } from 'src/decorators/getCurrentUserId.decorator';
 import { BlockService } from './block.service';
 import { ApiTags } from '@nestjs/swagger';
 
-@UseGuards(JwtGuard)
 @Controller('block')
+@UseGuards(JwtGuard)
 @ApiTags('user-block')
 export class BlockController {
   constructor(private blockService: BlockService) {}
