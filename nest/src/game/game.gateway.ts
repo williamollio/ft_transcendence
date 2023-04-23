@@ -57,6 +57,7 @@ export class GameGateway {
   handleAbandon(@ConnectedSocket() client: Socket) {
     const id = this.socketToId.get(client.id);
     if (id) this.gameService.leave(id, this.server);
+    client.emit('leftGame');
   }
 
   @SubscribeMessage('reJoin')
@@ -85,7 +86,6 @@ export class GameGateway {
     return this.gameService.leaveWatch(client, playerId);
   }
 
-  // spectating still under tests
   @SubscribeMessage('watchGame')
   async watchGame(
     @MessageBody('playerId') playerId: string,
@@ -107,8 +107,7 @@ export class GameGateway {
     @GetCurrentUserId() id: string,
     @MessageBody('inviteGameId') inviteGameId?: string,
   ) {
-    if (this.socketToId.has(client.id)) return;
-    this.socketToId.set(client.id, id);
+    if (!this.socketToId.has(client.id)) this.socketToId.set(client.id, id);
     try {
       this.gameService.join(client, id, this.server, mode, inviteGameId);
     } catch (err) {
@@ -123,8 +122,9 @@ export class GameGateway {
     @ConnectedSocket() client: Socket,
     @GetCurrentUserId() playerOneId: string,
   ) {
-    this.socketToId.set(client.id, playerOneId);
-    if (!this.socketToId.has(client.id)) return;
+    if (this.gameService.GameMap.getGame(playerOneId)) return;
+    if (!this.socketToId.has(client.id))
+      this.socketToId.set(client.id, playerOneId);
     const returnMessage = await this.gameService.createInvitationGame(
       client,
       this.server,
@@ -132,8 +132,9 @@ export class GameGateway {
       playerTwoId,
       mode,
     );
-    if (returnMessage === 'gameJoined')
+    if (returnMessage === 'gameJoined') {
       this.server.emit('gameJoined', { playerNumber: 1 });
+    }
     return returnMessage;
   }
 }

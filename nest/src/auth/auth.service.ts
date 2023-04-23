@@ -1,6 +1,5 @@
 import {
   BadRequestException,
-  ForbiddenException,
   HttpStatus,
   Injectable,
   InternalServerErrorException,
@@ -11,7 +10,6 @@ import { UsersService } from '../users/users.service';
 import { JwtUser } from '../users/interface/jwt-user.interface';
 import { Intra42User } from '../users/interface/intra42-user.interface';
 import * as process from 'process';
-import * as argon2 from 'argon2';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { authenticator } from 'otplib';
 import { toDataURL } from 'qrcode';
@@ -25,21 +23,10 @@ export class AuthService {
   ) {}
 
   private async generateTokens(payload: JwtUser) {
-    const [accessToken, refreshToken] = await Promise.all([
-      this.jwtService.signAsync(payload, {
-        secret: process.env.JWT_SECRET,
-        // expiresIn: '15m', // TODO : William set in FE
-      }),
-      this.jwtService.signAsync(payload, {
-        secret: process.env.JWT_REFRESH_SECRET,
-        // expiresIn: '7d', // TODO : William set in FE
-      }),
-    ]);
-
-    return {
-      accessToken,
-      refreshToken,
-    };
+    return await this.jwtService.signAsync(payload, {
+      secret: process.env.JWT_SECRET,
+      expiresIn: '7d',
+    });
   }
 
   async signIn(user: Intra42User) {
@@ -77,11 +64,6 @@ export class AuthService {
       intraId: foundUser.intraId,
     });
 
-    await this.userService.updateRefreshToken(
-      foundUser.id,
-      await argon2.hash(tokens.refreshToken),
-    );
-
     await this.userService.set2FALogged(foundUser.id, false);
 
     return tokens;
@@ -96,26 +78,9 @@ export class AuthService {
     }
   }
 
-  async refreshTokens(userId: string, refreshToken: string) {
-    const user = await this.userService.findOne(userId);
-    if (!user || !user.refreshToken)
-      throw new ForbiddenException('Access denied');
-    if (!(await argon2.verify(user.refreshToken, refreshToken)))
-      throw new ForbiddenException('Access denied');
-    const tokens = await this.generateTokens({
-      id: user.id,
-      intraId: user.intraId,
-    });
-    await this.userService.updateRefreshToken(
-      user.id,
-      await argon2.hash(tokens.refreshToken),
-    );
-    return tokens;
-  }
-
   async enable2FA(userId: string): Promise<string> {
     const secret = authenticator.generateSecret();
-    const otpAuthUrl = authenticator.keyuri(userId, 'TODO', secret);
+    const otpAuthUrl = authenticator.keyuri(userId, 'ft_transcendence', secret);
     await this.userService.set2FA(userId, secret);
 
     return toDataURL(otpAuthUrl);
@@ -144,6 +109,5 @@ export class AuthService {
     const user = await this.userService.findOne(userId);
     if (!user) throw new UnauthorizedException('Unauthorized');
     await this.userService.set2FALogged(userId, false);
-    await this.userService.updateRefreshToken(user.id, '');
   }
 }

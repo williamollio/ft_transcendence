@@ -39,12 +39,24 @@ export default function Toast(props: Props): React.ReactElement {
   const isError = type === ToastType.ERROR;
   const isInvite = type === ToastType.INVITE;
 
+  var timer: null | NodeJS.Timeout = null;
+
   React.useEffect(() => {
     if (autoClose) {
-      setTimeout(() => {
-        onClose();
-      }, isInvite ? 9500 : 4000);
+      timer = setTimeout(
+        () => {
+          timer = null;
+          onClose();
+        },
+        isInvite ? 9500 : 4000
+      );
     }
+    return () => {
+      if (timer) {
+        clearTimeout(timer);
+        timer = null;
+      }
+    };
   });
 
   const toastBoxClasses = classNames({

@@ -104,7 +104,7 @@ export class ChannelGateway {
         clientSocket,
       );
       /** Get the second user's socketId and make it join the channel's room */
-      if (typeof dto.userId === 'string') {
+      if (typeof dto.userId === 'string' && typeof channel !== 'string') {
         const secondUserSocket = socketToChannelId.getFromUserId(dto.userId);
         if (secondUserSocket && channel && typeof channel !== 'string') {
           this.server.in([secondUserSocket]).socketsJoin(channel.id);

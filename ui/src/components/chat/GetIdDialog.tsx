@@ -1,10 +1,13 @@
 import { Dialog, TextField } from "@mui/material";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useContext, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ChannelSocket } from "../../classes/ChannelSocket.class";
 import { chatRoom } from "../../classes/chatRoom.class";
 import ChannelService from "../../services/channel.service";
 import { translationKeys } from "./constants";
+import { TranscendanceContext } from "../../context/transcendance-context";
+import { TranscendanceStateActionType } from "../../context/transcendance-reducer";
+import { ToastType } from "../../context/toast";
 
 interface Props {
   open: boolean;
@@ -16,6 +19,7 @@ interface Props {
 export default function GetIdDialog(props: Props) {
   const { open, toggleOpen, channel, channelSocket } = props;
   const { t } = useTranslation();
+  const toast = useContext(TranscendanceContext);
 
   const [input, setInput] = useState<string>("");
 
@@ -32,17 +36,31 @@ export default function GetIdDialog(props: Props) {
     if (e.key === "Enter") {
       ChannelService.getUserByName(input)
         .then((resolve) => {
-          channelSocket.inviteToChannel(channel, resolve.data.id);
+          if (resolve.data)
+            channelSocket.inviteToChannel(channel, resolve.data.id);
+          else {
+            toast.dispatchTranscendanceState({
+              type: TranscendanceStateActionType.TOGGLE_TOAST,
+              toast: {
+                type: ToastType.ERROR,
+                title: t(translationKeys.invite.failed) as string,
+                message: t(
+                  translationKeys.invite.notFound
+                ) as string,
+              },
+            });
+          }
         })
-        .catch(() => {
-          channelSocket.inviteToChannel(channel, undefined);
-        });
       handleClose();
     }
   };
 
   return (
-    <Dialog open={open} onClose={handleClose}>
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      sx={{ zIndex: (theme) => theme.zIndex.modal + 3 }}
+    >
       <TextField
         label={t(translationKeys.invite.userName)}
         value={input}

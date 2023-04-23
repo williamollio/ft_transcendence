@@ -59,7 +59,7 @@ export default function RoomContextMenu(props: Props) {
   return (
     <>
       <Menu
-        sx={{ zIndex: (theme) => theme.zIndex.modal + 2 }}
+        sx={{ zIndex: (theme) => theme.zIndex.modal + 3 }}
         open={contextMenu !== null}
         onClose={handleContextClose}
         anchorReference="anchorPosition"

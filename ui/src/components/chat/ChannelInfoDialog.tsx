@@ -36,12 +36,7 @@ interface Props {
 }
 
 export default function ChannelInfoDialog(props: Props) {
-  const {
-    channelInfoOpen,
-    toggleChannelInfo,
-    channel,
-    channelSocket,
-  } = props;
+  const { channelInfoOpen, toggleChannelInfo, channel, channelSocket } = props;
   const { t } = useTranslation();
 
   const [selected, setSelected] = useState<user | null>(null);
@@ -151,6 +146,7 @@ export default function ChannelInfoDialog(props: Props) {
 
   return (
     <Dialog
+      sx={{ zIndex: (theme) => theme.zIndex.modal + 3 }}
       open={channelInfoOpen}
       onClose={handleClose}
       PaperProps={{ sx: { bgcolor: "grey.500" } }}

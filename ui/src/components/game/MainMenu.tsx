@@ -2,7 +2,6 @@ import {
   Button,
   Grid,
   Paper,
-  Slide,
   Switch,
   Tooltip,
   Typography,
@@ -14,18 +13,23 @@ import { FieldValues, useForm } from "react-hook-form";
 import { GameSocket } from "../../classes/GameSocket.class";
 import { GameMode } from "../../interfaces/chat.interface";
 import ChannelService from "../../services/channel.service";
-import { useContext, useState } from "react";
+import React, { useContext, useState } from "react";
 import { ToastType } from "../../context/toast";
 import { TranscendanceContext } from "../../context/transcendance-context";
 import { TranscendanceStateActionType } from "../../context/transcendance-reducer";
 import classes from "../../styles.module.scss";
+import { GameLoop } from "../../classes/GameLoop.class";
+import PauseNotification, { PauseState } from "./PauseNotification";
 
 interface Props {
   gameSocket: GameSocket;
+  gameLoop: GameLoop;
+  pauseContent: PauseState;
+  setPauseContent: React.Dispatch<React.SetStateAction<PauseState | false>>;
 }
 
 export default function MainMenu(props: Props) {
-  const { gameSocket } = props;
+  const { gameSocket, gameLoop, pauseContent, setPauseContent } = props;
   const { t } = useTranslation();
   const { handleSubmit, register } = useForm({
     mode: "onChange",
@@ -35,23 +39,26 @@ export default function MainMenu(props: Props) {
   const [checked, toggleChecked] = useState<boolean>(false);
 
   const handleClassic = () => {
+    gameLoop.gameConstants.playerSpeed = 7;
     gameSocket.joinGame(GameMode.CLASSIC);
   };
 
   const handleMayhem = () => {
+    gameLoop.gameConstants.playerSpeed = 12;
     gameSocket.joinGame(GameMode.MAYHEM);
   };
 
   const handleQueue = () => {
     if (checked) handleMayhem();
     else handleClassic();
+    setPauseContent(PauseState.queued);
   };
 
   const handleInvite = (data: FieldValues) => {
     ChannelService.getUserByName(data.playerName).then((resolve) => {
       if (resolve.data)
         gameSocket.inviteToGame(
-          checked ? GameMode.MAYHEM : GameMode.MAYHEM,
+          checked ? GameMode.MAYHEM : GameMode.CLASSIC,
           resolve.data.id
         );
       else {
@@ -89,7 +96,9 @@ export default function MainMenu(props: Props) {
         <Typography fontWeight="bold" fontSize={12}>
           {t(translationKeys.buttons.classic)}
         </Typography>
-        <Typography fontSize={12}>{t(translationKeys.tooltips.classic)}</Typography>
+        <Typography fontSize={12}>
+          {t(translationKeys.tooltips.classic)}
+        </Typography>
       </>
     );
   };
@@ -100,7 +109,9 @@ export default function MainMenu(props: Props) {
         <Typography fontWeight="bold" fontSize={12}>
           {t(translationKeys.buttons.mayhem)}
         </Typography>
-        <Typography fontSize={12}>{t(translationKeys.tooltips.mayhem)}</Typography>
+        <Typography fontSize={12}>
+          {t(translationKeys.tooltips.mayhem)}
+        </Typography>
       </>
     );
   };
@@ -111,7 +122,9 @@ export default function MainMenu(props: Props) {
         <Typography fontWeight="bold" fontSize={12}>
           {t(translationKeys.buttons.queue)}
         </Typography>
-        <Typography fontSize={12}>{t(translationKeys.tooltips.queue)}</Typography>
+        <Typography fontSize={12}>
+          {t(translationKeys.tooltips.queue)}
+        </Typography>
       </>
     );
   };
@@ -122,7 +135,9 @@ export default function MainMenu(props: Props) {
         <Typography fontWeight="bold" fontSize={12}>
           {t(translationKeys.buttons.invite)}
         </Typography>
-        <Typography fontSize={12}>{t(translationKeys.tooltips.invite)}</Typography>
+        <Typography fontSize={12}>
+          {t(translationKeys.tooltips.invite)}
+        </Typography>
       </>
     );
   };
@@ -133,7 +148,9 @@ export default function MainMenu(props: Props) {
         <Typography fontWeight="bold" fontSize={12}>
           {t(translationKeys.buttons.watch)}
         </Typography>
-        <Typography fontSize={12}>{t(translationKeys.tooltips.spectate)}</Typography>
+        <Typography fontSize={12}>
+          {t(translationKeys.tooltips.spectate)}
+        </Typography>
       </>
     );
   };
@@ -144,7 +161,9 @@ export default function MainMenu(props: Props) {
         <Typography fontWeight="bold" fontSize={12}>
           {t(translationKeys.buttons.playerName)}
         </Typography>
-        <Typography fontSize={12}>{t(translationKeys.tooltips.playerName)}</Typography>
+        <Typography fontSize={12}>
+          {t(translationKeys.tooltips.playerName)}
+        </Typography>
       </>
     );
   };
@@ -158,89 +177,97 @@ export default function MainMenu(props: Props) {
         justifyContent="center"
         sx={{ zIndex: (theme) => theme.zIndex.modal + 2 }}
       >
-        <Grid item>
-          <Paper
-            sx={{
-              backgroundColor: classes.colorPrimary,
-              width: 300,
-            }}
-          >
-            <Grid
-              container
-              alignItems="center"
-              justifyContent="center"
-              direction="row"
-            >
-              <Tooltip title={tooltipClassic()}>
-                <Typography color={checked ? "grey" : classes.colorAccent}>
-                  {t(translationKeys.buttons.classic)}
-                </Typography>
-              </Tooltip>
-              <Switch
-                checked={checked}
-                onChange={() => toggleChecked(!checked)}
-                color="default"
-              ></Switch>
-              <Tooltip title={tooltipMayhem()}>
-                <Typography color={checked ? classes.colorAccent : "grey"}>
-                  {t(translationKeys.buttons.mayhem)}
-                </Typography>
+        {pauseContent === PauseState.main ? (
+          <>
+            <Grid item>
+              <Paper
+                sx={{
+                  backgroundColor: classes.colorPrimary,
+                  width: 300,
+                }}
+              >
+                <Grid
+                  container
+                  alignItems="center"
+                  justifyContent="center"
+                  direction="row"
+                >
+                  <Tooltip title={tooltipClassic()}>
+                    <Typography color={checked ? "grey" : classes.colorAccent}>
+                      {t(translationKeys.buttons.classic)}
+                    </Typography>
+                  </Tooltip>
+                  <Switch
+                    checked={checked}
+                    onChange={() => toggleChecked(!checked)}
+                    color="default"
+                  ></Switch>
+                  <Tooltip title={tooltipMayhem()}>
+                    <Typography color={checked ? classes.colorAccent : "grey"}>
+                      {t(translationKeys.buttons.mayhem)}
+                    </Typography>
+                  </Tooltip>
+                </Grid>
+              </Paper>
+            </Grid>
+            <Grid item>
+              <Tooltip title={tooltipQueue()}>
+                <Button
+                  sx={{ width: 300 }}
+                  variant="contained"
+                  onClick={handleQueue}
+                >
+                  <Typography>{t(translationKeys.buttons.queue)}</Typography>
+                </Button>
               </Tooltip>
             </Grid>
-          </Paper>
-        </Grid>
-        <Grid item>
-          <Tooltip title={tooltipQueue()}>
-            <Button
-              sx={{ width: 300 }}
-              variant="contained"
-              onClick={handleQueue}
-            >
-              <Typography>{t(translationKeys.buttons.queue)}</Typography>
-            </Button>
-          </Tooltip>
-        </Grid>
-        <Grid container direction="row" justifyContent="center" spacing={1}>
-          <Grid item>
-            <Tooltip title={tooltipInvite()}>
-              <Button
-                onClick={handleSubmit(handleInvite)}
-                variant="contained"
-                sx={{
-                  width: 146,
-                  paddingLeft: 0,
-                  paddingRight: 0,
-                }}
-              >
-                <Typography>{t(translationKeys.buttons.invite)}</Typography>
-              </Button>
+            <Grid container direction="row" justifyContent="center" spacing={1}>
+              <Grid item>
+                <Tooltip title={tooltipInvite()}>
+                  <Button
+                    onClick={handleSubmit(handleInvite)}
+                    variant="contained"
+                    sx={{
+                      width: 146,
+                      paddingLeft: 0,
+                      paddingRight: 0,
+                    }}
+                  >
+                    <Typography>{t(translationKeys.buttons.invite)}</Typography>
+                  </Button>
+                </Tooltip>
+              </Grid>
+              <Grid item>
+                <Tooltip title={tooltipSpectate()}>
+                  <Button
+                    onClick={handleSubmit(handleSpectate)}
+                    variant="contained"
+                    sx={{
+                      width: 146,
+                      paddingLeft: 0,
+                      paddingRight: 0,
+                    }}
+                  >
+                    <Typography>{t(translationKeys.buttons.watch)}</Typography>
+                  </Button>
+                </Tooltip>
+              </Grid>
+            </Grid>
+            <Tooltip title={tooltipPlayerName()}>
+              <Grid item sx={{ marginTop: 1, width: 300 }}>
+                <CustomTextField
+                  register={register}
+                  name="playerName"
+                  label={t(translationKeys.buttons.playerName) as string}
+                />
+              </Grid>
             </Tooltip>
-          </Grid>
+          </>
+        ) : (
           <Grid item>
-            <Tooltip title={tooltipSpectate()}>
-              <Button
-                onClick={handleSubmit(handleSpectate)}
-                variant="contained"
-                sx={{
-                  width: 146,
-                  paddingLeft: 0,
-                  paddingRight: 0,
-                }}
-              >
-                <Typography>{t(translationKeys.buttons.watch)}</Typography>
-              </Button>
-            </Tooltip>
+            <PauseNotification variant={pauseContent} />
           </Grid>
-        </Grid>
-        <Tooltip title={tooltipPlayerName()}>
-          <Grid item sx={{ marginTop: 1, width: 300 }}>
-            <CustomTextField
-              register={register}
-              name="playerName"
-              label={t(translationKeys.buttons.playerName) as string}
-            />
-          </Grid>
-        </Tooltip>
+        )}
       </Grid>
     </>
   );
