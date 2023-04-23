@@ -7,13 +7,16 @@ import {
   Post,
   Delete,
   Res,
+  UseGuards,
 } from '@nestjs/common';
 import { FriendshipService } from './friendship.service';
 import { ApiTags } from '@nestjs/swagger';
 import { PatchFriendDto } from './dto/friend.dto';
 import { Response } from 'express';
+import { JwtGuard } from 'src/auth/guards/jwt.guard';
 
 @Controller('friendship')
+@UseGuards(JwtGuard)
 @ApiTags('user-friendship')
 export class FriendshipController {
   constructor(private friendshipService: FriendshipService) {}
