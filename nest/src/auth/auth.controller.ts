@@ -45,7 +45,7 @@ export class AuthController {
 
     this.setCookieToken(tokens, response);
 
-    response.redirect(`${process.env.PATH_TO_FRONTEND}/redirect`);
+    response.redirect(`http://${process.env.DOMAIN_IP}:3000/redirect`);
   }
 
   @Post('createBypassAuth')
