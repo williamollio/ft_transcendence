@@ -6,7 +6,6 @@ export const initSocket = (uri: string, tokenPart: string | null) => {
   const socket = io(uri, {
     autoConnect: false,
     parser: msgpack,
-    withCredentials: true,
     auth: {
       token: tokenFull,
     },
