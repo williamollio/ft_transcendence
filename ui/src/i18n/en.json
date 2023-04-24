@@ -59,7 +59,8 @@
     "playInviteFail": "Failed to invite to play",
     "blockFail": "Failed to block User",
     "unblockFail": "Failed to unblock User",
-    "alreadyUsed": "This channel name is already in use"
+    "alreadyUsed": "This channel name is already in use",
+    "default": "The length is too long"
   },
   "friends": "Friends",
   "requested": "Requested",

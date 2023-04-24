@@ -109,10 +109,7 @@ export default function RightDrawer(props: Props) {
               height="100%"
             >
               <Tooltip title="Chat">
-                <IconButton
-                  onClick={handleDrawerOpen}
-                  sx={{ ...(open && { display: "none" }) }}
-                >
+                <IconButton onClick={handleDrawerOpen}>
                   <ChatIcon
                     sx={{
                       fill: theme.palette.secondary.main,

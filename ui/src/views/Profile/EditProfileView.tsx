@@ -339,6 +339,7 @@ export default function EditProfileView(): React.ReactElement {
                           name="name"
                           rules={{
                             required: true,
+                            maxLength: 10,
                           }}
                           error={errors.name}
                           register={register}

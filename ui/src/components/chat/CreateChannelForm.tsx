@@ -71,8 +71,8 @@ export default function CreateForm(props: Props) {
             </Grid>
             <Grid item>
               <Select
+                MenuProps={{sx: {zIndex : 99999, position: "absolute"}}}
                 size="small"
-                label={t(translationKeys.createInfo.access)}
                 type="string"
                 variant="outlined"
                 value={dialogValue.access}

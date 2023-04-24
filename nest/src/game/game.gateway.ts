@@ -56,7 +56,7 @@ export class GameGateway {
   handleAbandon(@ConnectedSocket() client: Socket) {
     const id = this.socketToId.get(client.id);
     if (id) this.gameService.leave(id, this.server);
-	client.emit("leftGame");
+    client.emit('leftGame');
   }
 
   @SubscribeMessage('reJoin')

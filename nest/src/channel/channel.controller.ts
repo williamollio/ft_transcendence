@@ -15,11 +15,8 @@ import { ChannelService } from './channel.service';
 import { ModerateChannelDto } from './dto/moderateChannelUser.dto';
 import { ApiTags } from '@nestjs/swagger';
 
-// TODO: add channel entities
-
-// TODO: ADD GUARDS
-@UseGuards(JwtGuard)
 @Controller('channels')
+@UseGuards(JwtGuard)
 @ApiTags('channel')
 export class ChannelController {
   constructor(private channelService: ChannelService) {}
@@ -33,21 +30,6 @@ export class ChannelController {
   getGroupChannels() {
     return this.channelService.getGroupChannels();
   }
-
-  // nest      | src/channel/channel.service.ts:77:15 - error TS2322: Type '{ id: string; status: UserStatus; }[] | undefined' is not assignable to type '{ id: string; name: string; status: UserStatus; }[] | undefined'.
-  // nest      |   Type '{ id: string; status: UserStatus; }[]' is not assignable to type '{ id: string; name: string; status: UserStatus; }[]'.
-  // nest      |     Property 'name' is missing in type '{ id: string; status: UserStatus; }' but required in type '{ id: string; name: string; status: UserStatus; }'.
-  // nest      |
-  // nest      | 77         const channelUser:
-  // nest      |                  ~~~~~~~~~~~
-  // nest      |
-  // nest      |   src/channel/channel.service.ts:80:15
-  // nest      |     80               name: string;
-  // nest      |                      ~~~~
-  // nest      |     'name' is declared here.
-  // nest      |
-  // nest      | [6:35:18 PM] Found 1 error. Watching for file changes.
-  // nest      |
 
   @Get('get-all-channels-by-user-id')
   getAllChannelsByUserId(@GetCurrentUserId() userId: string) {
@@ -111,7 +93,7 @@ export class ChannelController {
   ) {
     return this.channelService.getMessagesFromChannel(channelId, userId, res);
   }
-  
+
   @Get('get-authors-from-channel/:id')
   getAuthorsFromAChannel(@Param('id') channelId: string) {
     return this.channelService.getChannelAuthors(channelId);
