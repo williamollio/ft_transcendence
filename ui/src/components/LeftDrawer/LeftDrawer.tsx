@@ -131,7 +131,6 @@ export default function LeftDrawer(props: Props) {
       state.setisFriendsCacheUnvalid,
     ]
   );
-
   const [hidden, setHidden] = React.useState<boolean>(false);
 
   React.useEffect(() => {
@@ -152,7 +151,7 @@ export default function LeftDrawer(props: Props) {
       setUserId(getTokenData(token).id.toString());
     }
 
-    if (userId) {
+    if (userId && location.pathname != RoutePath.LOGIN && location.pathname != RoutePath.LOGIN_2FA) {
       fetchFriends();
       fetchRequested();
       fetchReceived();
