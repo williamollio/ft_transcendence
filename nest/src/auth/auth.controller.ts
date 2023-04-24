@@ -28,8 +28,8 @@ export class AuthController {
   private setCookieToken(token: string, res: any) {
     res.cookie('access_token', token, {
       maxAge: 2592000000,
-      sameSite: 'none',
-      secure: true,
+      sameSite: true,
+      secure: false,
     });
   }
 
@@ -45,7 +45,7 @@ export class AuthController {
 
     this.setCookieToken(tokens, response);
 
-    response.redirect(`${process.env.PATH_TO_FRONTEND}/redirect`);
+    response.redirect(`http://${process.env.DOMAIN_IP}:3000/redirect`);
   }
 
   @Post('createBypassAuth')

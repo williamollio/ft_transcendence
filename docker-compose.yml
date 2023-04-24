@@ -25,9 +25,7 @@ services:
       - ./nest/:/app/nest
     ports:
       - "8080:8080"
-      - "8888:8888"
       - "3333:3333"
-      - "4444:4444"
     depends_on:
       - postgres
     restart: always
@@ -45,6 +43,19 @@ services:
     ports:
       - "3000:3000"
     restart: always
+    networks:
+      - ft_transcendance
+
+  nginx:
+    build: ./reverse_proxy/
+    container_name: reverse_proxy
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./ui/:/usr/share/nginx/html
+      - ./reverse_proxy/conf/:/etc/nginx/conf.d
+      - ./reverse_proxy/certs/:/etc/certs/
     networks:
       - ft_transcendance
 
