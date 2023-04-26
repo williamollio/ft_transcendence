@@ -4,6 +4,8 @@
 
 ## Presentation ft_transcendence
 
+The project aims to learn about web development and SPA. The goal of this web app is to play ping pong game with other users and to socialize with them.
+
 ## Launch ft_transcendence
 
 - `make up` for building the images and for spinning up the containers.
