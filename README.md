@@ -2,7 +2,7 @@
 
 [Subject PDF](https://github.com/williamollio/ft_transcendence/blob/master/ressources/ft_transcendence.pdf)
 
-[login-as-wollio.gif](https://github.com/williamollio/ft_transcendence/blob/master/ressources/gif/login-as-wollio.gif)
+![login-as-wollio.gif](https://github.com/williamollio/ft_transcendence/blob/master/ressources/gif/login-as-wollio.gif)
 
 ## Presentation ft_transcendence
 
