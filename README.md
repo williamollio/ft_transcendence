@@ -2,6 +2,14 @@
 
 [Subject PDF](https://github.com/williamollio/ft_transcendence/blob/master/ressources/ft_transcendence.pdf)
 
+![login-as-wollio.gif](https://github.com/williamollio/ft_transcendence/blob/master/ressources/gif/login-as-wollio.gif)
+![ask-friends-as-wollio.gif](https://github.com/williamollio/ft_transcendence/blob/master/ressources/gif/ask-friends-as-wollio.gif)
+![send-msg-as-manuel.gif](https://github.com/williamollio/ft_transcendence/blob/master/ressources/gif/send-msg-as-manuel.gif)
+![wollio-against-manuel.gif](https://github.com/williamollio/ft_transcendence/blob/master/ressources/gif/wollio-against-manuel.gif)
+![public-channel-creation-as-manuel.gif](https://github.com/williamollio/ft_transcendence/blob/master/ressources/gif/public-channel-creation-as-manuel.gif)
+![wollio-wanna-play-again.gif](https://github.com/williamollio/ft_transcendence/blob/master/ressources/gif/wollio-wanna-play-again.gif)
+![from-public-to-private.gif](https://github.com/williamollio/ft_transcendence/blob/master/ressources/gif/from-public-to-private.gif)
+
 ## Presentation ft_transcendence
 
 The project aims to learn about web development and SPA. The goal of this web app is to play ping pong game with other users and to socialize with them.
