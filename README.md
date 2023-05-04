@@ -4,8 +4,6 @@
 
 [![wollio-wanna-plain-again](https://github.com/williamollio/ft_transcendence/blob/master/ressources/Screenshot 2023-05-04 at 20.55.31.png)](https://youtu.be/-wzREvnItVo "wollio-wanna-plain-again")
 
-[![Everything Is AWESOME](http://i.imgur.com/Ot5DWAW.png)](https://youtu.be/StTqXEQ2l-Y?t=35s "Everything Is AWESOME")
-
 ## Presentation ft_transcendence
 
 The project aims to learn about web development and SPA. The goal of this web app is to play ping pong game with other users and to socialize with them.
