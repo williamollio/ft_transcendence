@@ -3,10 +3,11 @@
 [Subject PDF](https://github.com/williamollio/ft_transcendence/blob/master/ressources/ft_transcendence.pdf)
 
 <iframe width="560" height="315"
-src="https://youtu.be/-wzREvnItVo" 
-frameborder="0" 
-allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" 
-allowfullscreen></iframe>
+  src="https://youtu.be/-wzREvnItVo" 
+  frameborder="0" 
+  allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" 
+  allowfullscreen>
+</iframe>
 
 ## Presentation ft_transcendence
 
