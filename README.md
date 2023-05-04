@@ -2,8 +2,6 @@
 
 [Subject PDF](https://github.com/williamollio/ft_transcendence/blob/master/ressources/ft_transcendence.pdf)
 
-[![Alt text](https://github.com/williamollio/ft_transcendence/blob/master/ressources/Screenshot_2023-05-04%20at%2020.55.31.png)](https://www.youtube.com/watch?v=-wzREvnItVo)
-
 ## Presentation ft_transcendence
 
 The project aims to learn about web development and SPA. The goal of this web app is to play ping pong game with other users and to socialize with them.
