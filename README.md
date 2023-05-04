@@ -2,7 +2,7 @@
 
 [Subject PDF](https://github.com/williamollio/ft_transcendence/blob/master/ressources/ft_transcendence.pdf)
 
-[![Alt text](https://github.com/williamollio/ft_transcendence/blob/master/ressources/Screenshot_2023-05-04 at 20.55.31.png)](https://www.youtube.com/watch?v=-wzREvnItVo)
+[![Alt text](https://github.com/williamollio/ft_transcendence/blob/master/ressources/Screenshot_2023-05-04%20at%2020.55.31.png)](https://www.youtube.com/watch?v=-wzREvnItVo)
 
 ## Presentation ft_transcendence
 
