@@ -15,8 +15,7 @@ import React, {
   useState,
 } from "react";
 import { useTranslation } from "react-i18next";
-import { ChannelSocket } from "../../classes/ChannelSocket.class";
-import { GameSocket } from "../../classes/GameSocket.class";
+import { BigSocket } from "../../classes/BigSocket.class";
 import { ToastType } from "../../context/toast";
 import { TranscendanceContext } from "../../context/transcendance-context";
 import { TranscendanceStateActionType } from "../../context/transcendance-reducer";
@@ -28,15 +27,13 @@ import ChannelService from "../../services/channel.service";
 import { translationKeys } from "./constants";
 import { useNavigate } from "react-router-dom";
 import classes from "../../styles.module.scss";
-import { bgcolor } from "@mui/system";
 
 interface Props {
   blockedUser: Array<string>;
   refetchBlockedUsers: any;
   contextMenu: ChannelInfoContextMenu | null;
   setContextMenu: Dispatch<SetStateAction<ChannelInfoContextMenu | null>>;
-  channelSocket: ChannelSocket;
-  gameSocket: GameSocket;
+  bigSocket: BigSocket;
 }
 
 export default function UserContext(props: Props) {
@@ -45,8 +42,7 @@ export default function UserContext(props: Props) {
     refetchBlockedUsers,
     contextMenu,
     setContextMenu,
-    channelSocket,
-    gameSocket,
+    bigSocket,
   } = props;
   const { t } = useTranslation();
   const toast = useContext(TranscendanceContext);
@@ -58,7 +54,7 @@ export default function UserContext(props: Props) {
 
   useEffect(() => {
     if (contextMenu) {
-      if (contextMenu.user.id === channelSocket.user.id) {
+      if (contextMenu.user.id === bigSocket.user.id) {
         setSelf(true);
         setBlockStatus("Block");
       } else {
@@ -80,7 +76,7 @@ export default function UserContext(props: Props) {
 
   const handleDM = () => {
     if (contextMenu && contextMenu.user) {
-      channelSocket.createDm(contextMenu.user);
+      bigSocket.createDm(contextMenu.user);
     }
     handleContextClose();
   };
@@ -96,7 +92,7 @@ export default function UserContext(props: Props) {
 
   const handleInviteGame = (_event: React.MouseEvent<HTMLLIElement>) => {
     if (contextMenu && contextMenu.user && contextMenu.user.id) {
-      gameSocket.inviteToGame(
+      bigSocket.inviteToGame(
         checked ? GameMode.MAYHEM : GameMode.CLASSIC,
         contextMenu.user.id
       );
@@ -147,7 +143,7 @@ export default function UserContext(props: Props) {
       contextMenu.user &&
       contextMenu.user.id
     ) {
-      channelSocket.muteUser(contextMenu.channelId, contextMenu.user.id);
+      bigSocket.muteUser(contextMenu.channelId, contextMenu.user.id);
     }
     handleContextClose();
   };
@@ -159,7 +155,7 @@ export default function UserContext(props: Props) {
       contextMenu.user &&
       contextMenu.user.id
     ) {
-      channelSocket.banUser(contextMenu.channelId, contextMenu.user.id);
+      bigSocket.banUser(contextMenu.channelId, contextMenu.user.id);
     }
     handleContextClose();
   };
@@ -171,7 +167,7 @@ export default function UserContext(props: Props) {
       contextMenu.user &&
       contextMenu.user.id
     ) {
-      channelSocket.editRole(contextMenu.channelId, contextMenu.user.id);
+      bigSocket.editRole(contextMenu.channelId, contextMenu.user.id);
     }
     handleContextClose();
   };

@@ -10,7 +10,7 @@ import { useTranslation } from "react-i18next";
 import { translationKeys } from "../../views/Game/constants";
 import CustomTextField from "../shared/CustomTextField/CustomTextField";
 import { FieldValues, useForm } from "react-hook-form";
-import { GameSocket } from "../../classes/GameSocket.class";
+import { BigSocket } from "../../classes/BigSocket.class";
 import { GameMode } from "../../interfaces/chat.interface";
 import ChannelService from "../../services/channel.service";
 import React, { useContext, useState } from "react";
@@ -22,14 +22,14 @@ import { GameLoop } from "../../classes/GameLoop.class";
 import PauseNotification, { PauseState } from "./PauseNotification";
 
 interface Props {
-  gameSocket: GameSocket;
+  bigSocket: BigSocket;
   gameLoop: GameLoop;
   pauseContent: PauseState;
   setPauseContent: React.Dispatch<React.SetStateAction<PauseState | false>>;
 }
 
 export default function MainMenu(props: Props) {
-  const { gameSocket, gameLoop, pauseContent, setPauseContent } = props;
+  const { bigSocket, gameLoop, pauseContent, setPauseContent } = props;
   const { t } = useTranslation();
   const { handleSubmit, register } = useForm({
     mode: "onChange",
@@ -40,12 +40,12 @@ export default function MainMenu(props: Props) {
 
   const handleClassic = () => {
     gameLoop.gameConstants.playerSpeed = 7;
-    gameSocket.joinGame(GameMode.CLASSIC);
+    bigSocket.joinGame(GameMode.CLASSIC);
   };
 
   const handleMayhem = () => {
     gameLoop.gameConstants.playerSpeed = 12;
-    gameSocket.joinGame(GameMode.MAYHEM);
+    bigSocket.joinGame(GameMode.MAYHEM);
   };
 
   const handleQueue = () => {
@@ -57,7 +57,7 @@ export default function MainMenu(props: Props) {
   const handleInvite = (data: FieldValues) => {
     ChannelService.getUserByName(data.playerName).then((resolve) => {
       if (resolve.data)
-        gameSocket.inviteToGame(
+        bigSocket.inviteToGame(
           checked ? GameMode.MAYHEM : GameMode.CLASSIC,
           resolve.data.id
         );
@@ -76,7 +76,7 @@ export default function MainMenu(props: Props) {
 
   const handleSpectate = (data: FieldValues) => {
     ChannelService.getUserByName(data.playerName).then((resolve) => {
-      if (resolve.data) gameSocket.joinAsSpectator(resolve.data.id);
+      if (resolve.data) bigSocket.joinAsSpectator(resolve.data.id);
       else {
         toast.dispatchTranscendanceState({
           type: TranscendanceStateActionType.TOGGLE_TOAST,

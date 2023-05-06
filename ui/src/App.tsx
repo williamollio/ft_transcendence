@@ -15,20 +15,16 @@ import classes from "./styles.module.scss";
 import { useImageStore } from "./store/users-store";
 import { PrivateRoute } from "./components/Protection/PrivateRoute";
 import { Cookie, getIsAuthenticated, initAuthToken } from "./utils/auth-helper";
-import { UserSocket } from "./classes/UserSocket.class";
-import { ChannelSocket } from "./classes/ChannelSocket.class";
 import GameView from "./views/Game/GameView";
 import StatsView from "./views/Stats/StatsView";
-import { GameSocket } from "./classes/GameSocket.class";
 import ProfileView from "./views/Profile/ProfileView";
 import LeftDrawer from "./components/LeftDrawer/LeftDrawer";
 import Navbar from "./components/Navbar";
 import RightDrawer from "./components/RightDrawer/RightDrawer";
+import { BigSocket } from "./classes/BigSocket.class";
 
 export default function App() {
-  const [userSocket] = useState<UserSocket>(new UserSocket());
-  const [channelSocket] = useState<ChannelSocket>(new ChannelSocket());
-  const [gameSocket] = useState<GameSocket>(new GameSocket());
+  const [bigSocket] = useState<BigSocket>(new BigSocket());
 
   const [token, setToken] = useState<boolean>(false);
 
@@ -43,28 +39,18 @@ export default function App() {
       let gotToken = localStorage.getItem(Cookie.TOKEN);
       if (gotToken !== "") {
         gotToken = "Bearer " + gotToken;
-        if (userSocket.socket.connected === false) {
-          userSocket.socket.auth = { token: gotToken };
-          userSocket.socket.connect();
-          userSocket.logIn();
-        }
-        if (channelSocket.socket.connected === false) {
-          channelSocket.socket.auth = { token: gotToken };
-          channelSocket.initializeName(gotToken);
-          channelSocket.socket.connect();
-        }
-        if (gameSocket.socket.connected === false) {
-          gameSocket.socket.auth = { token: gotToken };
-          gameSocket.socket.connect();
+        if (bigSocket.socket.connected === false) {
+          bigSocket.socket.auth = { token: gotToken };
+          bigSocket.socket.connect();
+          bigSocket.initializeName(gotToken);
+          bigSocket.logIn();
         }
       }
     }
     return () => {
-      if (userSocket.socket.connected) userSocket.socket.disconnect();
-      if (channelSocket.socket.connected) channelSocket.socket.disconnect();
-      if (gameSocket.socket.connected) gameSocket.socket.disconnect();
+      if (bigSocket.socket.connected) bigSocket.socket.disconnect();
     };
-  }, [token, channelSocket, userSocket, gameSocket]);
+  }, [token, bigSocket]);
 
   // removes the object URL after the component unmounts to prevent memory leaks
   React.useEffect(() => {
@@ -120,18 +106,14 @@ export default function App() {
         sx={{ backgroundColor: classes.colorSecondary }}
       >
         <ThemeProvider theme={theme}>
-          <Navbar userSocket={userSocket} setToken={setToken} />
-          <LeftDrawer channelSocket={channelSocket} userSocket={userSocket} />
-          <RightDrawer
-            channelSocket={channelSocket}
-            userSocket={userSocket}
-            gameSocket={gameSocket}
-          />
+          <Navbar bigSocket={bigSocket} setToken={setToken} />
+          <LeftDrawer bigSocket={bigSocket} />
+          <RightDrawer bigSocket={bigSocket} />
           <Routes>
             <Route path="*" element={<AuthWrapper />} />
             <Route
               path={RoutePath.LOGIN}
-              element={<LoginView userSocket={userSocket} />}
+              element={<LoginView bigSocket={bigSocket} />}
             />
             <Route
               path={RoutePath.REDIRECT}
@@ -155,9 +137,7 @@ export default function App() {
               element={
                 <PrivateRoute
                   setToken={setToken}
-                  children={
-                    <GameView userSocket={userSocket} gameSocket={gameSocket} />
-                  }
+                  children={<GameView bigSocket={bigSocket} />}
                 ></PrivateRoute>
               }
             />

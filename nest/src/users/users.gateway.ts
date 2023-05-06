@@ -91,7 +91,7 @@ export class UserGateway {
   }
 
   // Game gateway
-  @SubscribeMessage('joinGame')
+  @SubscribeMessage('joinGameStatus')
   userInGame(@GetCurrentUserId() userId: string) {
     void this.usersService.updateConnectionStatus(userId, UserStatus.PLAYING);
     this.server.emit('statusUpdate', {
@@ -100,7 +100,7 @@ export class UserGateway {
     });
   }
 
-  @SubscribeMessage('leaveGame')
+  @SubscribeMessage('leaveGameStatus')
   gameEnded(@GetCurrentUserId() userId: string) {
     void this.usersService.updateConnectionStatus(userId, UserStatus.ONLINE);
     this.server.emit('statusUpdate', {

@@ -20,8 +20,7 @@ import { useTranslation } from "react-i18next";
 import { translationKeys } from "../constants";
 import { useDrawersStore } from "../../../store/drawers-store";
 import { useUserStore } from "../../../store/users-store";
-import { ChannelSocket } from "../../../classes/ChannelSocket.class";
-import { UserSocket } from "../../../classes/UserSocket.class";
+import { BigSocket } from "../../../classes/BigSocket.class";
 import { listenerWrapper } from "../../../services/initSocket.service";
 import { useNavigate } from "react-router-dom";
 
@@ -29,8 +28,7 @@ interface Props {
   userId: string;
   open: boolean;
   users: User[];
-  channelSocket: ChannelSocket;
-  userSocket: UserSocket;
+  bigSocket: BigSocket;
   showErrorToast: (error?: AxiosError) => void;
   showSuccessToast: (message: string) => void;
 }
@@ -41,8 +39,7 @@ export default function ListFriends(props: Props) {
     userId,
     open,
     users,
-    channelSocket,
-    userSocket,
+    bigSocket,
     showErrorToast,
     showSuccessToast,
   } = props;
@@ -103,12 +100,12 @@ export default function ListFriends(props: Props) {
 
   React.useEffect(() => {
     listenerWrapper(() => {
-      if (userSocket.socket.connected) {
+      if (bigSocket.socket.connected) {
         // receiving data from server
-        userSocket.socket.on("statusUpdate", statusUpdateListener);
+        bigSocket.socket.on("statusUpdate", statusUpdateListener);
         // sending request to server
         for (const user of users) {
-          userSocket.status(user.id);
+          bigSocket.status(user.id);
         }
         return true;
       }
@@ -116,14 +113,14 @@ export default function ListFriends(props: Props) {
     });
     return () => {
       listenerWrapper(() => {
-        if (userSocket.socket.connected) {
-          userSocket.socket.off("statusUpdate", statusUpdateListener);
+        if (bigSocket.socket.connected) {
+          bigSocket.socket.off("statusUpdate", statusUpdateListener);
           return true;
         }
         return false;
       });
     };
-  }, [userSocket, users]);
+  }, [bigSocket, users]);
 
   async function getProfilePicture(friendId: string): Promise<string> {
     const image = await fetchProfilePicture(friendId);
@@ -132,7 +129,7 @@ export default function ListFriends(props: Props) {
 
   function createDmChat(user: User) {
     setIsRightOpen(true);
-    channelSocket.createDm(user);
+    bigSocket.createDm(user);
   }
 
   async function deleteFriendship(friendId: string) {

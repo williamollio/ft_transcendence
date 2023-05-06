@@ -4,7 +4,7 @@ import { chatRoom } from "../../classes/chatRoom.class";
 import CloseIcon from "@mui/icons-material/Close";
 import CreateForm from "./CreateChannelForm";
 import JoinForm from "./JoinChannelForm";
-import { ChannelSocket } from "../../classes/ChannelSocket.class";
+import { BigSocket } from "../../classes/BigSocket.class";
 import {
   CRDialogValue,
   JoinDialogValue,
@@ -16,11 +16,11 @@ import ChannelService from "../../services/channel.service";
 interface Props {
   open: boolean;
   toggleOpen: any;
-  channelSocket: ChannelSocket;
+  bigSocket: BigSocket;
 }
 
 export default function AddChannelDialog(props: Props) {
-  const { open, toggleOpen, channelSocket } = props;
+  const { open, toggleOpen, bigSocket } = props;
   const { t } = useTranslation();
 
   const [formSelection, setFormSelection] = useState<number>(0);
@@ -74,12 +74,12 @@ export default function AddChannelDialog(props: Props) {
       if (dialogValue.key !== "") {
         if (dialogValue.access !== "PROTECTED" || dialogValue.password !== "") {
           if (dialogValue.access === "PROTECTED") {
-            channelSocket.createRoom(
+            bigSocket.createRoom(
               new chatRoom(undefined, dialogValue.key, dialogValue.access),
               dialogValue.password
             );
           } else {
-            channelSocket.createRoom(
+            bigSocket.createRoom(
               new chatRoom(undefined, dialogValue.key, dialogValue.access),
               undefined
             );
@@ -90,7 +90,7 @@ export default function AddChannelDialog(props: Props) {
       } else setAlertOpen(true);
     } else {
       ChannelService.getChannelByName(dialogJoinValue.name).then((resolve) => {
-        channelSocket.joinRoom(
+        bigSocket.joinRoom(
           resolve.id,
           dialogJoinValue.password !== "" ? dialogJoinValue.password : undefined
         );

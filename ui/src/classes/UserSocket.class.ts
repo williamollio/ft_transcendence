@@ -5,7 +5,7 @@ export class UserSocket {
   socket: Socket;
 
   constructor() {
-    this.socket = initSocket(`http://${window.location.hostname}:3333`, null);
+    this.socket = initSocket(`http://${window.location.hostname}:4444`, null);
   }
 
   logIn = () => {

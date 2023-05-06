@@ -8,7 +8,7 @@ export class GameSocket {
   spectatingPlayerId: string;
 
   constructor() {
-    this.socket = initSocket(`http://${window.location.hostname}:3333`, null);
+    this.socket = initSocket(`http://${window.location.hostname}:8888`, null);
     this.latestGame = null;
     this.spectatingPlayerId = "";
   }

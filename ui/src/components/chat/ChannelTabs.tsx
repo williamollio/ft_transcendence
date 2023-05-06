@@ -8,7 +8,7 @@ import {
 } from "react";
 import { chatRoom } from "../../classes/chatRoom.class";
 import AddIcon from "@mui/icons-material/Add";
-import { ChannelSocket } from "../../classes/ChannelSocket.class";
+import { BigSocket } from "../../classes/BigSocket.class";
 import { useQuery } from "@tanstack/react-query";
 import {
   channelUser,
@@ -28,7 +28,7 @@ interface Props {
   setContextMenu: Dispatch<SetStateAction<ContextMenu | null>>;
   contextMenu: ContextMenu | null;
   toggleOpen: Dispatch<SetStateAction<boolean>>;
-  channelSocket: ChannelSocket;
+  bigSocket: BigSocket;
   setNewChannel: (newChannel: chatRoom | boolean) => void;
   blockedUsers: Array<any>;
 }
@@ -39,7 +39,7 @@ export function ChannelTabs(props: Props) {
     setContextMenu,
     contextMenu,
     toggleOpen,
-    channelSocket,
+    bigSocket,
     setNewChannel,
     blockedUsers,
   } = props;
@@ -51,7 +51,7 @@ export function ChannelTabs(props: Props) {
   const theme = useTheme();
 
   const [channelList, setChannelList] = useState<chatRoom[]>(
-    channelSocket.channels
+    bigSocket.channels
   );
 
   const removeBlockedMessages = (messages: messagesDto[]) => {
@@ -65,7 +65,7 @@ export function ChannelTabs(props: Props) {
 
   const updateChannelList = () => {
     const newList: Array<chatRoom> = [];
-    channelSocket.channels.forEach((element) => {
+    bigSocket.channels.forEach((element) => {
       newList.push(element);
     });
     setChannelList(newList);
@@ -77,11 +77,11 @@ export function ChannelTabs(props: Props) {
     isError: joinedChannelsError,
     isFetching,
   } = useQuery(["joinedChannels"], ChannelService.fetchJoinedChannels, {
-    enabled: channelSocket.user.id !== "",
+    enabled: bigSocket.user.id !== "",
   });
 
   useEffect(() => {
-    if (channelSocket.channels.length === 0) {
+    if (bigSocket.channels.length === 0) {
       if (
         joinedChannels &&
         blockedUsers &&
@@ -91,7 +91,7 @@ export function ChannelTabs(props: Props) {
       ) {
         const newList = new Array<chatRoom>();
         if (joinedChannels.length === 0) {
-          channelSocket.channels = newList;
+          bigSocket.channels = newList;
           updateChannelList();
         }
         joinedChannels.forEach((element: DBChannelElement) => {
@@ -104,13 +104,13 @@ export function ChannelTabs(props: Props) {
               users: new Array<channelUser>(),
               messages: element.messages,
             });
-            channelSocket.channels = newList;
+            bigSocket.channels = newList;
             updateChannelList();
-            channelSocket.connectToRoom(element.id!);
+            bigSocket.connectToRoom(element.id!);
           } else {
             ChannelService.getUsersChannel(element.id).then((resolve) => {
               let dmName = resolve.data.find(
-                (user) => user.id !== channelSocket.user.id
+                (user) => user.id !== bigSocket.user.id
               )?.name;
               if (dmName) {
                 newList.push({
@@ -121,9 +121,9 @@ export function ChannelTabs(props: Props) {
                   messages: element.messages,
                 });
               }
-              channelSocket.channels = newList;
+              bigSocket.channels = newList;
               updateChannelList();
-              channelSocket.connectToRoom(element.id!);
+              bigSocket.connectToRoom(element.id!);
             });
           }
         });
@@ -145,17 +145,17 @@ export function ChannelTabs(props: Props) {
 
   useEffect(() => {
     if (data && data !== "" && !isLoading && !isError && !isRefetching) {
-      let index = channelSocket.channels.findIndex(
+      let index = bigSocket.channels.findIndex(
         (element) => element.id === data.id
       );
       if (index != -1) {
         const newList: Array<chatRoom> = [];
-        channelSocket.channels[index] = {
-          ...channelSocket.channels[index],
+        bigSocket.channels[index] = {
+          ...bigSocket.channels[index],
           key: data.name,
           access: data.type,
         };
-        channelSocket.channels.forEach((element) => {
+        bigSocket.channels.forEach((element) => {
           newList.push(element);
         });
         setChannelList(newList);
@@ -164,9 +164,9 @@ export function ChannelTabs(props: Props) {
           const newList: Array<chatRoom> = [];
           ChannelService.getUsersChannel(data.id).then((resolve) => {
             let userName = resolve.data.find(
-              (element) => element.id !== channelSocket.user.id
+              (element) => element.id !== bigSocket.user.id
             )?.name;
-            let channelIndex = channelSocket.channels.push(
+            let channelIndex = bigSocket.channels.push(
               new chatRoom(
                 data.id,
                 userName
@@ -175,22 +175,22 @@ export function ChannelTabs(props: Props) {
                 data.type
               )
             );
-            channelSocket.channels.forEach((element) => {
+            bigSocket.channels.forEach((element) => {
               newList.push(element);
             });
             setChannelList(newList);
-            setNewChannel(channelSocket.channels[channelIndex - 1]);
+            setNewChannel(bigSocket.channels[channelIndex - 1]);
           });
         } else {
           const newList: Array<chatRoom> = [];
-          let channelIndex = channelSocket.channels.push(
+          let channelIndex = bigSocket.channels.push(
             new chatRoom(data.id, data.name, data.type)
           );
-          channelSocket.channels.forEach((element) => {
+          bigSocket.channels.forEach((element) => {
             newList.push(element);
           });
           setChannelList(newList);
-          setNewChannel(channelSocket.channels[channelIndex - 1]);
+          setNewChannel(bigSocket.channels[channelIndex - 1]);
         }
       }
       setChannelQueryId(undefined);
@@ -202,7 +202,7 @@ export function ChannelTabs(props: Props) {
   };
 
   const roomJoinedListener = (data: { userId: string; channelId: string }) => {
-    if (data.userId === channelSocket.user.id) {
+    if (data.userId === bigSocket.user.id) {
       setChannelQueryId(data.channelId);
     }
   };
@@ -214,24 +214,24 @@ export function ChannelTabs(props: Props) {
 
   const roomLeftListener = (data: { userId: string; channelId: string }) => {
     if (
-      data.userId === channelSocket.user.id ||
-      channelSocket.channels.find((element) => element.id === data.channelId)
+      data.userId === bigSocket.user.id ||
+      bigSocket.channels.find((element) => element.id === data.channelId)
         ?.access === "DIRECTMESSAGE"
     ) {
-      let index = channelSocket.channels.findIndex(
+      let index = bigSocket.channels.findIndex(
         (element) => element.id === data.channelId
       );
       if (index != -1) {
-        channelSocket.channels.splice(index, 1);
-        if (channelSocket.channels.length > 0) {
+        bigSocket.channels.splice(index, 1);
+        if (bigSocket.channels.length > 0) {
           if (index == 0) {
-            setNewChannel(channelSocket.channels[index]);
+            setNewChannel(bigSocket.channels[index]);
           } else {
-            setNewChannel(channelSocket.channels[index - 1]);
+            setNewChannel(bigSocket.channels[index - 1]);
           }
         } else setNewChannel(false);
         const newList: Array<chatRoom> = [];
-        channelSocket.channels.forEach((element) => {
+        bigSocket.channels.forEach((element) => {
           newList.push(element);
         });
         setChannelList(newList);
@@ -241,28 +241,28 @@ export function ChannelTabs(props: Props) {
 
   useEffect(() => {
     listenerWrapper(() => {
-      if (channelSocket.socket.connected) {
-        channelSocket.registerListener("roomLeft", roomLeftListener);
-        channelSocket.registerListener("roomCreated", roomCreatedListener);
-        channelSocket.registerListener("roomJoined", roomJoinedListener);
-        channelSocket.registerListener("roomEdited", roomEditedListener);
+      if (bigSocket.socket.connected) {
+        bigSocket.registerListener("roomLeft", roomLeftListener);
+        bigSocket.registerListener("roomCreated", roomCreatedListener);
+        bigSocket.registerListener("roomJoined", roomJoinedListener);
+        bigSocket.registerListener("roomEdited", roomEditedListener);
         return true;
       }
       return false;
     });
     return () => {
       listenerWrapper(() => {
-        if (channelSocket.socket.connected) {
-          channelSocket.removeListener("roomLeft", roomLeftListener);
-          channelSocket.removeListener("roomCreated", roomCreatedListener);
-          channelSocket.removeListener("roomJoined", roomJoinedListener);
-          channelSocket.removeListener("roomEdited", roomEditedListener);
+        if (bigSocket.socket.connected) {
+          bigSocket.removeListener("roomLeft", roomLeftListener);
+          bigSocket.removeListener("roomCreated", roomCreatedListener);
+          bigSocket.removeListener("roomJoined", roomJoinedListener);
+          bigSocket.removeListener("roomEdited", roomEditedListener);
           return true;
         }
         return false;
       });
     };
-  }, [channelSocket.socket, channelSocket.socket.connected]);
+  }, [bigSocket.socket, bigSocket.socket.connected]);
 
   const handleRoomChange = (_event: SyntheticEvent, newValue: chatRoom) => {
     setNewChannel(newValue);

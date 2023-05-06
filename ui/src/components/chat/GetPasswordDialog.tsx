@@ -1,7 +1,7 @@
 import { Dialog, DialogContent, TextField } from "@mui/material";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ChannelSocket } from "../../classes/ChannelSocket.class";
+import { BigSocket } from "../../classes/BigSocket.class";
 import { chatRoom } from "../../classes/chatRoom.class";
 import { translationKeys } from "./constants";
 
@@ -9,12 +9,12 @@ interface Props {
   open: boolean;
   toggleOpen: any;
   channel: chatRoom | undefined;
-  channelSocket: ChannelSocket;
+  bigSocket: BigSocket;
   toggleChannelInfo: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export default function GetPasswordDialog(props: Props) {
-  const { open, toggleOpen, channel, channelSocket, toggleChannelInfo } = props;
+  const { open, toggleOpen, channel, bigSocket, toggleChannelInfo } = props;
   const { t } = useTranslation();
 
   const [input, setInput] = useState<string>("");
@@ -40,14 +40,14 @@ export default function GetPasswordDialog(props: Props) {
       if (channel && channel.access === "PROTECTED" && oldInput !== "") {
         if (input !== "") {
           //send request to change password
-          channelSocket.editRoom(channel, channel.access, oldInput, input);
+          bigSocket.editRoom(channel, channel.access, oldInput, input);
         } else {
           //send request to remove password
-          channelSocket.editRoom(channel, "PUBLIC", oldInput);
+          bigSocket.editRoom(channel, "PUBLIC", oldInput);
         }
       } else if (channel && channel.access !== "PROTECTED" && input !== "") {
         //send request with input to change access type to PROTECTED
-        channelSocket.editRoom(channel, "PROTECTED", undefined, input);
+        bigSocket.editRoom(channel, "PROTECTED", undefined, input);
       }
       handleClose();
     }

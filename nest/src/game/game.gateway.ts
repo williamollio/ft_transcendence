@@ -106,7 +106,9 @@ export class GameGateway {
     @GetCurrentUserId() id: string,
     @MessageBody('inviteGameId') inviteGameId?: string,
   ) {
-    if (!this.socketToId.has(client.id)) this.socketToId.set(client.id, id);
+    if (!this.socketToId.has(client.id)) {
+      this.socketToId.set(client.id, id);
+    }
     try {
       this.gameService.join(client, id, this.server, mode, inviteGameId);
     } catch (err) {

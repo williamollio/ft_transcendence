@@ -9,10 +9,8 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ChatIcon from "@mui/icons-material/Chat";
 import Chat from "../chat/Chat";
-import { ChannelSocket } from "../../classes/ChannelSocket.class";
-import { UserSocket } from "../../classes/UserSocket.class";
+import { BigSocket } from "../../classes/BigSocket.class";
 import { navbarHeight } from "../Navbar";
-import { GameSocket } from "../../classes/GameSocket.class";
 import { useDrawersStore } from "../../store/drawers-store";
 import { Tooltip } from "@mui/material";
 import { RoutePath } from "../../interfaces/router.interface";
@@ -56,13 +54,11 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 }));
 
 interface Props {
-  channelSocket: ChannelSocket;
-  userSocket: UserSocket;
-  gameSocket: GameSocket;
+  bigSocket: BigSocket;
 }
 
 export default function RightDrawer(props: Props) {
-  const { channelSocket, userSocket, gameSocket } = props;
+  const { bigSocket } = props;
   const theme = useTheme();
   const location = useLocation();
   const [open, setOpen] = useDrawersStore(
@@ -150,9 +146,7 @@ export default function RightDrawer(props: Props) {
               }}
             />
             <Chat
-              channelSocket={channelSocket}
-              userSocket={userSocket}
-              gameSocket={gameSocket}
+              bigSocket={bigSocket}
             />
           </Drawer>
         </Box>

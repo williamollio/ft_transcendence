@@ -19,7 +19,7 @@ import { useTranslation } from "react-i18next";
 import { translationKeys } from "../constants";
 import { useDrawersStore } from "../../../store/drawers-store";
 import { useUserStore } from "../../../store/users-store";
-import { UserSocket } from "../../../classes/UserSocket.class";
+import { BigSocket } from "../../../classes/BigSocket.class";
 import { listenerWrapper } from "../../../services/initSocket.service";
 import { useNavigate } from "react-router-dom";
 import { RoutePath } from "../../../interfaces/router.interface";
@@ -28,12 +28,12 @@ interface Props {
   userId: string;
   open: boolean;
   users: User[];
-  userSocket: UserSocket;
+  bigSocket: BigSocket;
   showErrorToast: (error?: AxiosError) => void;
   showSuccessToast: (message: string) => void;
 }
 export default function ListReceived(props: Props) {
-  const { userId, open, users, userSocket, showErrorToast, showSuccessToast } =
+  const { userId, open, users, bigSocket, showErrorToast, showSuccessToast } =
     props;
 
   const navigate = useNavigate();
@@ -88,12 +88,12 @@ export default function ListReceived(props: Props) {
 
   React.useEffect(() => {
     listenerWrapper(() => {
-      if (userSocket.socket.connected) {
+      if (bigSocket.socket.connected) {
         // receiving data from server
-        userSocket.socket.on("statusUpdate", statusUpdateListener);
+        bigSocket.socket.on("statusUpdate", statusUpdateListener);
         // sending request to server
         for (const user of users) {
-          userSocket.status(user.id);
+          bigSocket.status(user.id);
         }
         return true;
       }
@@ -101,14 +101,14 @@ export default function ListReceived(props: Props) {
     });
     return () => {
       listenerWrapper(() => {
-        if (userSocket.socket.connected) {
-          userSocket.socket.off("statusUpdate", statusUpdateListener);
+        if (bigSocket.socket.connected) {
+          bigSocket.socket.off("statusUpdate", statusUpdateListener);
           return true;
         }
         return false;
       });
     };
-  }, [userSocket, users]);
+  }, [bigSocket, users]);
 
   async function getProfilePicture(friendId: string): Promise<string> {
     const image = await fetchProfilePicture(friendId);

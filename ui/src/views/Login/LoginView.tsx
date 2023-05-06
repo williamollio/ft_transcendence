@@ -15,14 +15,14 @@ import usersService from "../../services/users.service";
 import { AxiosError } from "axios";
 import { ToastType } from "../../context/toast";
 import { TranscendanceStateActionType } from "../../context/transcendance-reducer";
-import { UserSocket } from "../../classes/UserSocket.class";
+import { BigSocket } from "../../classes/BigSocket.class";
 
 interface Props {
-  userSocket: UserSocket;
+  bigSocket: BigSocket;
 }
 
 export default function LoginView(props: Props): React.ReactElement {
-  const { userSocket } = props;
+  const { bigSocket } = props;
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { dispatchTranscendanceState } = React.useContext(TranscendanceContext);
@@ -36,7 +36,7 @@ export default function LoginView(props: Props): React.ReactElement {
     if (token !== null) {
       navigate(RoutePath.EDITPROFILE);
     }
-    if (userSocket.socket.connected) userSocket.logOut();
+    if (bigSocket.socket.connected) bigSocket.logOut();
     setIsLoading(false);
   }, []);
 
@@ -66,7 +66,7 @@ export default function LoginView(props: Props): React.ReactElement {
       showErrorToast(response.error);
       localStorage.removeItem(Cookie.TOKEN);
     } else {
-      if (userSocket.socket.connected) userSocket.logIn();
+      if (bigSocket.socket.connected) bigSocket.logIn();
       navigate(RoutePath.EDITPROFILE);
     }
   }
