@@ -21,9 +21,7 @@ import GetPasswordDialog from "./GetPasswordDialog";
 import { BigSocket } from "../../classes/BigSocket.class";
 import GetNameDialog from "./GetNameDialog";
 import { useQuery } from "@tanstack/react-query";
-import { UserSocket } from "../../classes/UserSocket.class";
 import ChannelService from "../../services/channel.service";
-import { GameSocket } from "../../classes/GameSocket.class";
 import { translationKeys } from "./constants";
 import { useTranslation } from "react-i18next";
 import { listenerWrapper } from "../../services/initSocket.service";
@@ -81,9 +79,9 @@ export default function ChannelInfoDialog(props: Props) {
   useEffect(() => {
     listenerWrapper(() => {
       if (bigSocket.socket.connected) {
-        bigSocket.registerListener("roomJoined", userJoinedListener);
-        bigSocket.registerListener("roomLeft", userLeftListener);
-        bigSocket.registerListener("roleUpdated", () => {
+        bigSocket.socket.on("roomJoined", userJoinedListener);
+        bigSocket.socket.on("roomLeft", userLeftListener);
+        bigSocket.socket.on("roleUpdated", () => {
           refetch();
         });
         return true;
@@ -93,9 +91,9 @@ export default function ChannelInfoDialog(props: Props) {
     return () => {
       listenerWrapper(() => {
         if (bigSocket.socket.connected) {
-          bigSocket.removeListener("roomJoined", userJoinedListener);
-          bigSocket.removeListener("roomLeft", userLeftListener);
-          bigSocket.removeListener("roleUpdated");
+          bigSocket.socket.off("roomJoined", userJoinedListener);
+          bigSocket.socket.off("roomLeft", userLeftListener);
+          bigSocket.socket.off("roleUpdated");
           return true;
         }
         return false;

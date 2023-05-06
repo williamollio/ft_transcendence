@@ -185,14 +185,6 @@ export class BigSocket {
     });
   };
 
-  registerListener = (event: string, call: (...args: any) => void) => {
-    this.socket.on(event, call);
-  };
-
-  removeListener = (event: string, call?: (...args: any) => void) => {
-    this.socket.off(event, call);
-  };
-
   logIn = () => {
     this.socket.emit("connectUser");
   };

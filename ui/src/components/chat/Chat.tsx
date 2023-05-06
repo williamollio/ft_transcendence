@@ -303,20 +303,20 @@ export default function Chat(props: Props) {
   useEffect(() => {
     listenerWrapper(() => {
       if (bigSocket.socket.connected) {
-        bigSocket.registerListener(
+        bigSocket.socket.on(
           "incomingMessage",
           incomingMessageListener
         );
-        bigSocket.registerListener("roomLeft", roomLeftListener);
-        bigSocket.registerListener("roomJoined", roomJoinedListener);
-        bigSocket.registerListener(
+        bigSocket.socket.on("roomLeft", roomLeftListener);
+        bigSocket.socket.on("roomJoined", roomJoinedListener);
+        bigSocket.socket.on(
           "inviteSucceeded",
           inviteSucceededListener
         );
-        bigSocket.registerListener("banSucceeded", banSuccessListener);
-        bigSocket.registerListener("muteSucceeded", muteSuccessListener);
+        bigSocket.socket.on("banSucceeded", banSuccessListener);
+        bigSocket.socket.on("muteSucceeded", muteSuccessListener);
         failEvents.forEach((element) => {
-          bigSocket.registerListener(element, (error) =>
+          bigSocket.socket.on(element, (error) =>
             failedListener(error, element)
           );
         });
@@ -328,20 +328,20 @@ export default function Chat(props: Props) {
     return () => {
       listenerWrapper(() => {
         if (bigSocket.socket.connected) {
-          bigSocket.removeListener("banSucceeded", banSuccessListener);
-          bigSocket.removeListener("muteSucceeded", muteSuccessListener);
-          bigSocket.removeListener(
+          bigSocket.socket.off("banSucceeded", banSuccessListener);
+          bigSocket.socket.off("muteSucceeded", muteSuccessListener);
+          bigSocket.socket.off(
             "incomingMessage",
             incomingMessageListener
           );
-          bigSocket.removeListener("roomLeft", roomLeftListener);
-          bigSocket.removeListener("roomJoined", roomJoinedListener);
-          bigSocket.removeListener(
+          bigSocket.socket.off("roomLeft", roomLeftListener);
+          bigSocket.socket.off("roomJoined", roomJoinedListener);
+          bigSocket.socket.off(
             "inviteSucceeded",
             inviteSucceededListener
           );
           failEvents.forEach((element) => {
-            bigSocket.removeListener(element, failedListener);
+            bigSocket.socket.off(element, failedListener);
           });
           bigSocket.socket.off("invitedToGame", invitedToGameListener);
           return true;

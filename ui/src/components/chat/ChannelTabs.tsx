@@ -21,7 +21,6 @@ import { translationKeys } from "./constants";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "@mui/material";
 import { listenerWrapper } from "../../services/initSocket.service";
-import { Message } from "@mui/icons-material";
 
 interface Props {
   currentRoom: chatRoom | boolean;
@@ -242,10 +241,10 @@ export function ChannelTabs(props: Props) {
   useEffect(() => {
     listenerWrapper(() => {
       if (bigSocket.socket.connected) {
-        bigSocket.registerListener("roomLeft", roomLeftListener);
-        bigSocket.registerListener("roomCreated", roomCreatedListener);
-        bigSocket.registerListener("roomJoined", roomJoinedListener);
-        bigSocket.registerListener("roomEdited", roomEditedListener);
+        bigSocket.socket.on("roomLeft", roomLeftListener);
+        bigSocket.socket.on("roomCreated", roomCreatedListener);
+        bigSocket.socket.on("roomJoined", roomJoinedListener);
+        bigSocket.socket.on("roomEdited", roomEditedListener);
         return true;
       }
       return false;
@@ -253,10 +252,10 @@ export function ChannelTabs(props: Props) {
     return () => {
       listenerWrapper(() => {
         if (bigSocket.socket.connected) {
-          bigSocket.removeListener("roomLeft", roomLeftListener);
-          bigSocket.removeListener("roomCreated", roomCreatedListener);
-          bigSocket.removeListener("roomJoined", roomJoinedListener);
-          bigSocket.removeListener("roomEdited", roomEditedListener);
+          bigSocket.socket.off("roomLeft", roomLeftListener);
+          bigSocket.socket.off("roomCreated", roomCreatedListener);
+          bigSocket.socket.off("roomJoined", roomJoinedListener);
+          bigSocket.socket.off("roomEdited", roomEditedListener);
           return true;
         }
         return false;
