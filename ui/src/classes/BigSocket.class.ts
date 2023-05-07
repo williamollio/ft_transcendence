@@ -197,8 +197,8 @@ export class BigSocket {
     this.socket.emit("leaveGameStatus");
   };
 
-  status = (userId: string) => {
-    this.socket.emit("status", { requestedUser: userId });
+  status = (userIdFull: string[], listType: string) => {
+    this.socket.emit("status", { requestedUsers: userIdFull, requestedList: listType });
   };
 
   logOut = () => {

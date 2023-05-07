@@ -93,15 +93,24 @@ export default function ListFriends(props: Props) {
     setUserStatus(newStatus);
   };
 
+  const statusUpdateFullListener = (
+    data: { userId: string; status: UserStatus }[]
+  ) => {
+    const newStatus: { [key: string]: UserStatus | UserStatus.OFFLINE } = {};
+    data.forEach((element) => {
+      newStatus[element.userId] = element.status;
+    });
+    setUserStatus(newStatus);
+  };
+
   React.useEffect(() => {
     listenerWrapper(() => {
       if (bigSocket.socket.connected) {
         // receiving data from server
         bigSocket.socket.on("statusUpdate", statusUpdateListener);
+        bigSocket.socket.on("statusUpdateFullFriends", statusUpdateFullListener);
         // sending request to server
-        for (const user of users) {
-          bigSocket.status(user.id);
-        }
+        bigSocket.status(users.map((element) => element.id), "Friends");
         return true;
       }
       return false;
@@ -110,6 +119,7 @@ export default function ListFriends(props: Props) {
       listenerWrapper(() => {
         if (bigSocket.socket.connected) {
           bigSocket.socket.off("statusUpdate", statusUpdateListener);
+          bigSocket.socket.off("statusUpdateFull", statusUpdateFullListener);
           return true;
         }
         return false;

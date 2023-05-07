@@ -52,16 +52,21 @@ export class UserGateway {
 
   @SubscribeMessage('status')
   async statusRequest(
-    @MessageBody('requestedUser') userId: string,
+    @MessageBody('requestedUsers') userIdFull: string[],
+    @MessageBody('requestedList') listType: string,
     @ConnectedSocket() clientSocket: Socket,
   ) {
-    const User = await this.prisma.user.findUnique({
-      where: { id: userId },
-      select: {
-        status: true,
-      },
-    });
-    clientSocket.emit('statusUpdate', { id: userId, status: User?.status });
+    const userStatuses: { userId: string; status: UserStatus }[] = [];
+    for (const userId of userIdFull) {
+      const User = await this.prisma.user.findUnique({
+        where: { id: userId },
+        select: {
+          status: true,
+        },
+      });
+      if (User) userStatuses.push({ userId: userId, status: User.status });
+    }
+    clientSocket.emit(`statusUpdateFull${listType}`, userStatuses);
   }
 
   @SubscribeMessage('connect')

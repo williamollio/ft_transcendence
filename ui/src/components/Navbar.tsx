@@ -76,11 +76,19 @@ export default function NavBar(props: Props): React.ReactElement {
     if (data.id === userId) setStatus(data.status);
   };
 
+  const statusUpdateFullListener = (
+    data: { userId: string; status: UserStatus }[]
+  ) => {
+    if (data.length === 1 && data[0].userId === userId)
+      setStatus(data[0].status);
+  };
+
   React.useEffect(() => {
     listenerWrapper(() => {
       if (bigSocket.socket.connected) {
         bigSocket.socket.on("statusUpdate", statusUpdateListener);
-        bigSocket.status(userId);
+        bigSocket.socket.on("statusUpdateFullSelf", statusUpdateFullListener);
+        bigSocket.status([userId], "Self");
         return true;
       }
       return false;
@@ -89,6 +97,7 @@ export default function NavBar(props: Props): React.ReactElement {
       listenerWrapper(() => {
         if (bigSocket.socket.connected) {
           bigSocket.socket.off("statusUpdate", statusUpdateListener);
+          bigSocket.socket.off("statusUpdateFull", statusUpdateFullListener);
           return true;
         }
         return false;
@@ -133,7 +142,10 @@ export default function NavBar(props: Props): React.ReactElement {
   return (
     <>
       {!hidden && (
-        <AppBar className={classes.menuBar} sx={{  zIndex: (theme) => theme.zIndex.modal + 3}}>
+        <AppBar
+          className={classes.menuBar}
+          sx={{ zIndex: (theme) => theme.zIndex.modal + 3 }}
+        >
           <Box
             className={classes.picture}
             sx={{

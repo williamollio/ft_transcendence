@@ -7,7 +7,7 @@ import {
   ListItemText,
   Tooltip,
 } from "@mui/material";
-import { User } from "../../../interfaces/user.interface";
+import { User, UserStatus } from "../../../interfaces/user.interface";
 import React from "react";
 import { fetchProfilePicture } from "../../../utils/picture-helper";
 import CheckIcon from "@mui/icons-material/Check";
@@ -40,6 +40,9 @@ export default function ListReceived(props: Props) {
   const { t } = useTranslation();
   const [profilePictures, setProfilePictures] = React.useState<{
     [key: string]: string;
+  }>({});
+  const [userStatus, setUserStatus] = React.useState<{
+    [key: string]: UserStatus | UserStatus.OFFLINE;
   }>({});
   const [usersState, setUsersState] = React.useState<User[] | undefined>(
     undefined
@@ -77,13 +80,20 @@ export default function ListReceived(props: Props) {
   }, [users]);
 
   const statusUpdateListener = (data: any) => {
-    const newList: User[] = new Array<User>();
-    users?.forEach((element) => newList.push(element));
-    const index = newList.findIndex((element) => element.id === data.id);
-    if (index !== -1) {
-      newList[index].status = data.status;
-    }
-    setUsersState(newList);
+    const newStatus: { [key: string]: UserStatus | UserStatus.OFFLINE } =
+      Object.assign({}, userStatus);
+    newStatus[data.id] = data.status;
+    setUserStatus(newStatus);
+  };
+
+  const statusUpdateFullListener = (
+    data: { userId: string; status: UserStatus }[]
+  ) => {
+    const newStatus: { [key: string]: UserStatus | UserStatus.OFFLINE } = {};
+    data.forEach((element) => {
+      newStatus[element.userId] = element.status;
+    });
+    setUserStatus(newStatus);
   };
 
   React.useEffect(() => {
@@ -91,10 +101,9 @@ export default function ListReceived(props: Props) {
       if (bigSocket.socket.connected) {
         // receiving data from server
         bigSocket.socket.on("statusUpdate", statusUpdateListener);
+        bigSocket.socket.on("statusUpdateFullReceived", statusUpdateFullListener);
         // sending request to server
-        for (const user of users) {
-          bigSocket.status(user.id);
-        }
+        bigSocket.status(users.map((element) => element.id), "Received");
         return true;
       }
       return false;
@@ -103,6 +112,7 @@ export default function ListReceived(props: Props) {
       listenerWrapper(() => {
         if (bigSocket.socket.connected) {
           bigSocket.socket.off("statusUpdate", statusUpdateListener);
+          bigSocket.socket.off("statusUpdateFull", statusUpdateFullListener);
           return true;
         }
         return false;
