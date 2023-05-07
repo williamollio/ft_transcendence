@@ -60,24 +60,19 @@ export default function ListReceived(props: Props) {
     ]
   );
 
-  React.useEffect(() => {
-    async function loadProfilePictures() {
-      const pictures: { [key: string]: string } = {};
-      for (const user of users) {
-        if (user.filename) {
-          const picture = await getProfilePicture(user.id);
-          pictures[user.id] = picture;
-        } else {
-          pictures[user.id] = "";
-        }
+  async function loadProfilePictures() {
+    const pictures: { [key: string]: string } = {};
+    for (const user of users) {
+      if (user.filename) {
+        const picture = await getProfilePicture(user.id);
+        pictures[user.id] = picture;
+      } else {
+        pictures[user.id] = "";
       }
-
-      setProfilePictures(pictures);
     }
-
-    loadProfilePictures();
+    setProfilePictures(pictures);
     setUsersState(users);
-  }, [users]);
+  }
 
   const statusUpdateListener = (data: any) => {
     const newStatus: { [key: string]: UserStatus | UserStatus.OFFLINE } =
@@ -99,11 +94,18 @@ export default function ListReceived(props: Props) {
   React.useEffect(() => {
     listenerWrapper(() => {
       if (bigSocket.socket.connected) {
-        // receiving data from server
+		loadProfilePictures();
+		// receiving data from server
         bigSocket.socket.on("statusUpdate", statusUpdateListener);
-        bigSocket.socket.on("statusUpdateFullReceived", statusUpdateFullListener);
+        bigSocket.socket.on(
+          "statusUpdateFullReceived",
+          statusUpdateFullListener
+        );
         // sending request to server
-        bigSocket.status(users.map((element) => element.id), "Received");
+        bigSocket.status(
+          users.map((element) => element.id),
+          "Received"
+        );
         return true;
       }
       return false;
