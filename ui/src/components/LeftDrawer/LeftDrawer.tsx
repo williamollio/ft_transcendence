@@ -28,8 +28,7 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import { useDrawersStore } from "../../store/drawers-store";
 import { navbarHeight } from "../Navbar";
-import { ChannelSocket } from "../../classes/ChannelSocket.class";
-import { UserSocket } from "../../classes/UserSocket.class";
+import { BigSocket } from "../../classes/BigSocket.class";
 import { RoutePath } from "../../interfaces/router.interface";
 import { useLocation } from "react-router-dom";
 
@@ -110,12 +109,11 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 }));
 
 interface Props {
-  channelSocket: ChannelSocket;
-  userSocket: UserSocket;
+  bigSocket: BigSocket;
 }
 
 export default function LeftDrawer(props: Props) {
-  const { channelSocket, userSocket } = props;
+  const { bigSocket } = props;
   const { t } = useTranslation();
   const theme = useTheme();
   const [friends, setFriends] = React.useState<User[]>([]);
@@ -296,8 +294,7 @@ export default function LeftDrawer(props: Props) {
               userId={userId}
               open={open}
               users={friends}
-              channelSocket={channelSocket}
-              userSocket={userSocket}
+              bigSocket={bigSocket}
               showErrorToast={showErrorToast}
               showSuccessToast={showSuccessToast}
             />
@@ -325,7 +322,7 @@ export default function LeftDrawer(props: Props) {
               userId={userId}
               open={open}
               users={requests}
-              userSocket={userSocket}
+              bigSocket={bigSocket}
               showErrorToast={showErrorToast}
               showSuccessToast={showSuccessToast}
             />
@@ -353,7 +350,7 @@ export default function LeftDrawer(props: Props) {
               userId={userId}
               open={open}
               users={requestsReceived}
-              userSocket={userSocket}
+              bigSocket={bigSocket}
               showErrorToast={showErrorToast}
               showSuccessToast={showSuccessToast}
             />

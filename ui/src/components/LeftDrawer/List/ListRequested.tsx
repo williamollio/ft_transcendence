@@ -7,7 +7,7 @@ import {
   ListItemText,
   Tooltip,
 } from "@mui/material";
-import { User } from "../../../interfaces/user.interface";
+import { User, UserStatus } from "../../../interfaces/user.interface";
 import React from "react";
 import { fetchProfilePicture } from "../../../utils/picture-helper";
 import CloseIcon from "@mui/icons-material/Close";
@@ -18,7 +18,7 @@ import { useTranslation } from "react-i18next";
 import { translationKeys } from "../constants";
 import { useDrawersStore } from "../../../store/drawers-store";
 import { useUserStore } from "../../../store/users-store";
-import { UserSocket } from "../../../classes/UserSocket.class";
+import { BigSocket } from "../../../classes/BigSocket.class";
 import { listenerWrapper } from "../../../services/initSocket.service";
 import { useNavigate } from "react-router-dom";
 
@@ -26,18 +26,21 @@ interface Props {
   userId: string;
   open: boolean;
   users: User[];
-  userSocket: UserSocket;
+  bigSocket: BigSocket;
   showErrorToast: (error?: AxiosError) => void;
   showSuccessToast: (message: string) => void;
 }
 export default function ListRequested(props: Props) {
-  const { userId, open, users, userSocket, showErrorToast, showSuccessToast } =
+  const { userId, open, users, bigSocket, showErrorToast, showSuccessToast } =
     props;
 
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [profilePictures, setProfilePictures] = React.useState<{
     [key: string]: string;
+  }>({});
+  const [userStatus, setUserStatus] = React.useState<{
+    [key: string]: UserStatus | UserStatus.OFFLINE;
   }>({});
   const [usersState, setUsersState] = React.useState<User[] | undefined>(
     undefined
@@ -75,38 +78,45 @@ export default function ListRequested(props: Props) {
   }, [users]);
 
   const statusUpdateListener = (data: any) => {
-    const newList: User[] = new Array<User>();
-    users?.forEach((element) => newList.push(element));
-    const index = newList.findIndex((element) => element.id === data.id);
-    if (index !== -1) {
-      newList[index].status = data.status;
-    }
-    setUsersState(newList);
+    const newStatus: { [key: string]: UserStatus | UserStatus.OFFLINE } =
+      Object.assign({}, userStatus);
+    newStatus[data.id] = data.status;
+    setUserStatus(newStatus);
+  };
+
+  const statusUpdateFullListener = (
+    data: { userId: string; status: UserStatus }[]
+  ) => {
+    const newStatus: { [key: string]: UserStatus | UserStatus.OFFLINE } = {};
+    data.forEach((element) => {
+      newStatus[element.userId] = element.status;
+    });
+    setUserStatus(newStatus);
   };
 
   React.useEffect(() => {
     listenerWrapper(() => {
-      if (userSocket.socket.connected) {
+      if (bigSocket.socket.connected) {
         // receiving data from server
-        userSocket.socket.on("statusUpdate", statusUpdateListener);
+        bigSocket.socket.on("statusUpdate", statusUpdateListener);
+        bigSocket.socket.on("statusUpdateFullRequested", statusUpdateFullListener);
         // sending request to server
-        for (const user of users) {
-          userSocket.status(user.id);
-        }
+        bigSocket.status(users.map((element) => element.id), "Requested");
         return true;
       }
       return false;
     });
     return () => {
       listenerWrapper(() => {
-        if (userSocket.socket.connected) {
-          userSocket.socket.off("statusUpdate", statusUpdateListener);
+        if (bigSocket.socket.connected) {
+          bigSocket.socket.off("statusUpdate", statusUpdateListener);
+          bigSocket.socket.off("statusUpdateFull", statusUpdateFullListener);
           return true;
         }
         return false;
       });
     };
-  }, [userSocket, users]);
+  }, [bigSocket, users]);
 
   async function getProfilePicture(friendId: string): Promise<string> {
     const image = await fetchProfilePicture(friendId);

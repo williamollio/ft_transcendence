@@ -23,15 +23,13 @@ import {
 import { accessTypes, chatRoom } from "../../classes/chatRoom.class";
 import AddChannelDialog from "./AddChannelDialog";
 import RoomContextMenu from "./RoomContextMenu";
-import { ChannelSocket } from "../../classes/ChannelSocket.class";
+import { BigSocket } from "../../classes/BigSocket.class";
 import { ChannelTabs } from "./ChannelTabs";
 import ChannelService from "../../services/channel.service";
 import { useNavigate } from "react-router-dom";
-import { UserSocket } from "../../classes/UserSocket.class";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { translationKeys } from "./constants";
-import { GameSocket } from "../../classes/GameSocket.class";
 import GetTextInputDialog from "./GetTextInputDialog";
 import { useTheme } from "@mui/material";
 import { TranscendanceContext } from "../../context/transcendance-context";
@@ -42,13 +40,11 @@ import { RoutePath } from "../../interfaces/router.interface";
 import UserContext from "./UserContext";
 
 interface Props {
-  channelSocket: ChannelSocket;
-  userSocket: UserSocket;
-  gameSocket: GameSocket;
+  bigSocket: BigSocket;
 }
 
 export default function Chat(props: Props) {
-  const { channelSocket, userSocket, gameSocket } = props;
+  const { bigSocket } = props;
   const theme = useTheme();
   const scrollRef = useRef<HTMLLIElement | null>(null);
   const { t } = useTranslation();
@@ -75,7 +71,7 @@ export default function Chat(props: Props) {
     isRefetching,
     refetch: refetchBlockedUsers,
   } = useQuery(["blocks"], ChannelService.fetchBlockedUsers, {
-    enabled: channelSocket.user.id !== "",
+    enabled: bigSocket.user.id !== "",
   });
 
   const handleSubmit = async (e: any) => {
@@ -87,14 +83,14 @@ export default function Chat(props: Props) {
         e.target.value.trim()
       ) {
         currentRoom.messages.push({
-          userId: channelSocket.user.id,
-          userName: channelSocket.user.name,
+          userId: bigSocket.user.id,
+          userName: bigSocket.user.name,
           content: e.target.value,
           channelId: currentRoom.id,
         });
-        channelSocket.messageRoom({
-          userId: channelSocket.user.id,
-          userName: channelSocket.user.name,
+        bigSocket.messageRoom({
+          userId: bigSocket.user.id,
+          userName: bigSocket.user.name,
           content: e.target.value,
           channelId: currentRoom.id,
         });
@@ -113,7 +109,7 @@ export default function Chat(props: Props) {
       setRoomInvite(data);
       toggleInvitePassword(true);
     } else {
-      channelSocket.joinRoom(data.id);
+      bigSocket.joinRoom(data.id);
       setRoomInvite({ id: "", type: "PRIVATE", name: "" });
     }
   };
@@ -159,18 +155,18 @@ export default function Chat(props: Props) {
   }) => {
     if (!isRefetching && !isLoading && !isError && blockedUsers) {
       if (!blockedUsers.some((element: string) => element === data.sender)) {
-        let index = channelSocket.channels.findIndex(
+        let index = bigSocket.channels.findIndex(
           (element) => element.id === data.messageInfo.channelId
         );
         if (index >= 0) {
-          channelSocket.channels[index].messages.push({
+          bigSocket.channels[index].messages.push({
             userId: data.messageInfo.userId,
             userName: data.messageInfo.userName,
             content: data.messageInfo.content,
             channelId: data.messageInfo.channelId,
           });
           updateMessages(
-            channelSocket.channels[index],
+            bigSocket.channels[index],
             data.messageInfo.channelId
           );
         }
@@ -179,38 +175,38 @@ export default function Chat(props: Props) {
   };
 
   const roomLeftListener = (data: { userId: string; channelId: string }) => {
-    if (data.userId !== channelSocket.user.id) {
-      let index = channelSocket.channels.findIndex(
+    if (data.userId !== bigSocket.user.id) {
+      let index = bigSocket.channels.findIndex(
         (element) => element.id === data.channelId
       );
       if (index >= 0) {
         ChannelService.getUserName(data.userId).then((res) => {
-          channelSocket.channels[index].messages.push({
+          bigSocket.channels[index].messages.push({
             userId: data.userId,
             userName: res.data.name,
             content: `${t(translationKeys.chatInfo.userLeft)}`,
             channelId: data.channelId,
           });
-          updateMessages(channelSocket.channels[index], data.channelId);
+          updateMessages(bigSocket.channels[index], data.channelId);
         });
       }
     }
   };
 
   const roomJoinedListener = (data: { userId: string; channelId: string }) => {
-    if (data.userId !== channelSocket.user.id) {
-      let index = channelSocket.channels.findIndex(
+    if (data.userId !== bigSocket.user.id) {
+      let index = bigSocket.channels.findIndex(
         (element) => element.id === data.channelId
       );
       if (index >= 0) {
         ChannelService.getUserName(data.userId).then((res) => {
-          channelSocket.channels[index].messages.push({
+          bigSocket.channels[index].messages.push({
             userId: data.userId,
             userName: res.data.name,
             content: `${t(translationKeys.chatInfo.userJoined)}`,
             channelId: data.channelId,
           });
-          updateMessages(channelSocket.channels[index], data.channelId);
+          updateMessages(bigSocket.channels[index], data.channelId);
         });
       }
     }
@@ -222,7 +218,7 @@ export default function Chat(props: Props) {
     type: accessTypes;
     invited: string;
   }) => {
-    if (data.invited === channelSocket.user.id) {
+    if (data.invited === bigSocket.user.id) {
       toast.dispatchTranscendanceState({
         type: TranscendanceStateActionType.TOGGLE_TOAST,
         toast: {
@@ -251,10 +247,10 @@ export default function Chat(props: Props) {
             ${data.game.mode === GameMode.CLASSIC ? "Classic" : "Mayhem"}`,
         autoClose: true,
         onAccept: () => {
-          gameSocket.joinGame(data.game.mode, data.initiatingUser.id);
+          bigSocket.joinGame(data.game.mode, data.initiatingUser.id);
           navigate(RoutePath.GAME);
         },
-        onRefuse: () => gameSocket.refuseInvite(data.initiatingUser.id),
+        onRefuse: () => bigSocket.refuseInvite(data.initiatingUser.id),
       },
     });
   };
@@ -263,11 +259,11 @@ export default function Chat(props: Props) {
     channelActionOnChannelId: string;
     channelActionTargetId: string;
   }) => {
-    if (result.channelActionTargetId === channelSocket.user.id) {
-      let bannedChannel = channelSocket.channels.find(
+    if (result.channelActionTargetId === bigSocket.user.id) {
+      let bannedChannel = bigSocket.channels.find(
         (element) => element.id === result.channelActionOnChannelId
       );
-      if (bannedChannel) channelSocket.deleteRoom(bannedChannel);
+      if (bannedChannel) bigSocket.deleteRoom(bannedChannel);
     }
   };
 
@@ -275,13 +271,13 @@ export default function Chat(props: Props) {
     channelActionOnChannelId: string;
     channelActionTargetId: string;
   }) => {
-    if (result.channelActionTargetId === channelSocket.user.id) {
-      const mutedChannel = channelSocket.channels.find(
+    if (result.channelActionTargetId === bigSocket.user.id) {
+      const mutedChannel = bigSocket.channels.find(
         (element) => element.id === result.channelActionOnChannelId
       );
       if (mutedChannel && mutedChannel.id) {
         mutedChannel.messages.push({
-          userId: channelSocket.user.id,
+          userId: bigSocket.user.id,
           userName: t(translationKeys.chatInfo.notice),
           content: t(translationKeys.chatInfo.muted),
           channelId: mutedChannel.id,
@@ -306,54 +302,54 @@ export default function Chat(props: Props) {
 
   useEffect(() => {
     listenerWrapper(() => {
-      if (channelSocket.socket.connected) {
-        channelSocket.registerListener(
+      if (bigSocket.socket.connected) {
+        bigSocket.socket.on(
           "incomingMessage",
           incomingMessageListener
         );
-        channelSocket.registerListener("roomLeft", roomLeftListener);
-        channelSocket.registerListener("roomJoined", roomJoinedListener);
-        channelSocket.registerListener(
+        bigSocket.socket.on("roomLeft", roomLeftListener);
+        bigSocket.socket.on("roomJoined", roomJoinedListener);
+        bigSocket.socket.on(
           "inviteSucceeded",
           inviteSucceededListener
         );
-        channelSocket.registerListener("banSucceeded", banSuccessListener);
-        channelSocket.registerListener("muteSucceeded", muteSuccessListener);
+        bigSocket.socket.on("banSucceeded", banSuccessListener);
+        bigSocket.socket.on("muteSucceeded", muteSuccessListener);
         failEvents.forEach((element) => {
-          channelSocket.registerListener(element, (error) =>
+          bigSocket.socket.on(element, (error) =>
             failedListener(error, element)
           );
         });
-        gameSocket.socket.on("invitedToGame", invitedToGameListener);
+        bigSocket.socket.on("invitedToGame", invitedToGameListener);
         return true;
       }
       return false;
     });
     return () => {
       listenerWrapper(() => {
-        if (channelSocket.socket.connected) {
-          channelSocket.removeListener("banSucceeded", banSuccessListener);
-          channelSocket.removeListener("muteSucceeded", muteSuccessListener);
-          channelSocket.removeListener(
+        if (bigSocket.socket.connected) {
+          bigSocket.socket.off("banSucceeded", banSuccessListener);
+          bigSocket.socket.off("muteSucceeded", muteSuccessListener);
+          bigSocket.socket.off(
             "incomingMessage",
             incomingMessageListener
           );
-          channelSocket.removeListener("roomLeft", roomLeftListener);
-          channelSocket.removeListener("roomJoined", roomJoinedListener);
-          channelSocket.removeListener(
+          bigSocket.socket.off("roomLeft", roomLeftListener);
+          bigSocket.socket.off("roomJoined", roomJoinedListener);
+          bigSocket.socket.off(
             "inviteSucceeded",
             inviteSucceededListener
           );
           failEvents.forEach((element) => {
-            channelSocket.removeListener(element, failedListener);
+            bigSocket.socket.off(element, failedListener);
           });
-          gameSocket.socket.off("invitedToGame", invitedToGameListener);
+          bigSocket.socket.off("invitedToGame", invitedToGameListener);
           return true;
         }
         return false;
       });
     };
-  }, [channelSocket, currentRoom, blockedUsers]);
+  }, [bigSocket, currentRoom, blockedUsers]);
 
   const listMessages = messages
     ? messages.map((messagesDto: messagesDto, index) => {
@@ -379,7 +375,7 @@ export default function Chat(props: Props) {
               >
                 <Typography fontSize={15} sx={{ whiteSpace: "pre-wrap" }}>
                   {"[" +
-                    (messagesDto.userId === channelSocket.user.id
+                    (messagesDto.userId === bigSocket.user.id
                       ? t(translationKeys.chatInfo.you)
                       : messagesDto.userName) +
                     "]: "}
@@ -426,14 +422,14 @@ export default function Chat(props: Props) {
           setContextMenu={setContextMenu}
           contextMenu={contextMenu}
           toggleOpen={toggleOpen}
-          channelSocket={channelSocket}
+          bigSocket={bigSocket}
           setNewChannel={setNewChannel}
           blockedUsers={blockedUsers}
         />
         <RoomContextMenu
           contextMenu={contextMenu}
           setContextMenu={setContextMenu}
-          channelSocket={channelSocket}
+          bigSocket={bigSocket}
         ></RoomContextMenu>
         <Divider></Divider>
         <Grid container height="100%">
@@ -455,7 +451,7 @@ export default function Chat(props: Props) {
           <AddChannelDialog
             open={open}
             toggleOpen={toggleOpen}
-            channelSocket={channelSocket}
+            bigSocket={bigSocket}
           ></AddChannelDialog>
 
           <Grid item alignSelf={"flex-end"}>
@@ -474,7 +470,7 @@ export default function Chat(props: Props) {
         open={invitePassword}
         toggleOpen={toggleInvitePassword}
         handleSubmit={(input: string) => {
-          channelSocket.joinRoom(roomInvite.id, input);
+          bigSocket.joinRoom(roomInvite.id, input);
           setRoomInvite({ id: "", type: "PRIVATE", name: "" });
         }}
         dialogContent={t(translationKeys.chatInfo.passwordReq)!}
@@ -486,8 +482,7 @@ export default function Chat(props: Props) {
         refetchBlockedUsers={refetchBlockedUsers}
         contextMenu={userContextMenu}
         setContextMenu={setUserContextMenu}
-        channelSocket={channelSocket}
-        gameSocket={gameSocket}
+        bigSocket={bigSocket}
       />
     </Paper>
   );

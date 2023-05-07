@@ -1,7 +1,7 @@
 import { Dialog, TextField } from "@mui/material";
-import { Dispatch, SetStateAction, useContext, useState } from "react";
+import { useContext, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ChannelSocket } from "../../classes/ChannelSocket.class";
+import { BigSocket } from "../../classes/BigSocket.class";
 import { chatRoom } from "../../classes/chatRoom.class";
 import ChannelService from "../../services/channel.service";
 import { translationKeys } from "./constants";
@@ -13,11 +13,11 @@ interface Props {
   open: boolean;
   toggleOpen: any;
   channel: chatRoom | undefined;
-  channelSocket: ChannelSocket;
+  bigSocket: BigSocket;
 }
 
 export default function GetIdDialog(props: Props) {
-  const { open, toggleOpen, channel, channelSocket } = props;
+  const { open, toggleOpen, channel, bigSocket } = props;
   const { t } = useTranslation();
   const toast = useContext(TranscendanceContext);
 
@@ -37,7 +37,7 @@ export default function GetIdDialog(props: Props) {
       ChannelService.getUserByName(input)
         .then((resolve) => {
           if (resolve.data)
-            channelSocket.inviteToChannel(channel, resolve.data.id);
+            bigSocket.inviteToChannel(channel, resolve.data.id);
           else {
             toast.dispatchTranscendanceState({
               type: TranscendanceStateActionType.TOGGLE_TOAST,

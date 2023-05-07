@@ -18,12 +18,10 @@ import React, { SyntheticEvent, useEffect, useState } from "react";
 import { channelUser, user } from "../../interfaces/chat.interface";
 import { chatRoom } from "../../classes/chatRoom.class";
 import GetPasswordDialog from "./GetPasswordDialog";
-import { ChannelSocket } from "../../classes/ChannelSocket.class";
+import { BigSocket } from "../../classes/BigSocket.class";
 import GetNameDialog from "./GetNameDialog";
 import { useQuery } from "@tanstack/react-query";
-import { UserSocket } from "../../classes/UserSocket.class";
 import ChannelService from "../../services/channel.service";
-import { GameSocket } from "../../classes/GameSocket.class";
 import { translationKeys } from "./constants";
 import { useTranslation } from "react-i18next";
 import { listenerWrapper } from "../../services/initSocket.service";
@@ -32,11 +30,11 @@ interface Props {
   channelInfoOpen: boolean;
   toggleChannelInfo: React.Dispatch<React.SetStateAction<boolean>>;
   channel: chatRoom | undefined;
-  channelSocket: ChannelSocket;
+  bigSocket: BigSocket;
 }
 
 export default function ChannelInfoDialog(props: Props) {
-  const { channelInfoOpen, toggleChannelInfo, channel, channelSocket } = props;
+  const { channelInfoOpen, toggleChannelInfo, channel, bigSocket } = props;
   const { t } = useTranslation();
 
   const [selected, setSelected] = useState<user | null>(null);
@@ -71,19 +69,19 @@ export default function ChannelInfoDialog(props: Props) {
   }, [data, isLoading, isError]);
 
   const userJoinedListener = (userId: string, _channelId: string) => {
-    if (userId !== channelSocket.user.id) refetch();
+    if (userId !== bigSocket.user.id) refetch();
   };
 
   const userLeftListener = (userId: string, _channelId: string) => {
-    if (userId !== channelSocket.user.id) refetch();
+    if (userId !== bigSocket.user.id) refetch();
   };
 
   useEffect(() => {
     listenerWrapper(() => {
-      if (channelSocket.socket.connected) {
-        channelSocket.registerListener("roomJoined", userJoinedListener);
-        channelSocket.registerListener("roomLeft", userLeftListener);
-        channelSocket.registerListener("roleUpdated", () => {
+      if (bigSocket.socket.connected) {
+        bigSocket.socket.on("roomJoined", userJoinedListener);
+        bigSocket.socket.on("roomLeft", userLeftListener);
+        bigSocket.socket.on("roleUpdated", () => {
           refetch();
         });
         return true;
@@ -92,16 +90,16 @@ export default function ChannelInfoDialog(props: Props) {
     });
     return () => {
       listenerWrapper(() => {
-        if (channelSocket.socket.connected) {
-          channelSocket.removeListener("roomJoined", userJoinedListener);
-          channelSocket.removeListener("roomLeft", userLeftListener);
-          channelSocket.removeListener("roleUpdated");
+        if (bigSocket.socket.connected) {
+          bigSocket.socket.off("roomJoined", userJoinedListener);
+          bigSocket.socket.off("roomLeft", userLeftListener);
+          bigSocket.socket.off("roleUpdated");
           return true;
         }
         return false;
       });
     };
-  }, [channelSocket.socket, channelSocket.socket.connected]);
+  }, [bigSocket.socket, bigSocket.socket.connected]);
 
   const handleClose = () => {
     toggleChannelInfo(false);
@@ -215,14 +213,14 @@ export default function ChannelInfoDialog(props: Props) {
         open={openName}
         toggleOpen={closeNameDialog}
         channel={channel}
-        channelSocket={channelSocket}
+        bigSocket={bigSocket}
         toggleChannelInfo={toggleChannelInfo}
       ></GetNameDialog>
       <GetPasswordDialog
         open={openPassword}
         toggleOpen={closePasswordDialog}
         channel={channel}
-        channelSocket={channelSocket}
+        bigSocket={bigSocket}
         toggleChannelInfo={toggleChannelInfo}
       ></GetPasswordDialog>
     </Dialog>

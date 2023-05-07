@@ -1,32 +1,29 @@
 import React from "react";
 import { GameMode } from "../interfaces/chat.interface";
 import { GameConstants, scoreInfo } from "../interfaces/game.interface";
-import { GameSocket } from "./GameSocket.class";
+import { BigSocket } from "./BigSocket.class";
 import { positionalData } from "./positionalData.class";
-import { UserSocket } from "./UserSocket.class";
 
 export class GameLoop {
   interval: NodeJS.Timer | null;
   positionalData: positionalData;
   keyPressed: Array<string>;
-  gameSocket: GameSocket;
-  userSocket: UserSocket;
+  bigSocket: BigSocket;
   activePlayer: number;
   gameMode: GameMode;
   scoreInfo: scoreInfo;
   gameConstants: GameConstants;
 
   constructor(
-    gameSocket: GameSocket,
-    userSocket: UserSocket,
+    bigSocket: BigSocket,
     constants: GameConstants
   ) {
     this.interval = null;
     this.gameConstants = constants;
     this.positionalData = new positionalData(constants);
     this.keyPressed = [];
-    this.gameSocket = gameSocket;
-    this.userSocket = userSocket;
+    this.bigSocket = bigSocket;
+    this.bigSocket = bigSocket;
     this.activePlayer = 0;
     this.gameMode = GameMode.CLASSIC;
     this.scoreInfo = {
@@ -90,7 +87,7 @@ export class GameLoop {
 
   updateGame = () => {
     this.handleMovement();
-    this.gameSocket.PP(
+    this.bigSocket.PP(
       this.activePlayer === 1
         ? this.positionalData.playerLeftYOffset
         : this.positionalData.playerRightYOffset
@@ -100,13 +97,13 @@ export class GameLoop {
   startLoop = async (
     togglePause: React.Dispatch<React.SetStateAction<boolean>>
   ) => {
-    this.userSocket.joinGame();
+    this.bigSocket.joinGameStatus();
     togglePause(false);
     if (!this.interval) this.interval = setInterval(this.updateGame, 30);
   };
 
   stopLoop = (togglePause: React.Dispatch<React.SetStateAction<boolean>>) => {
-    this.userSocket.leaveGame();
+    this.bigSocket.leaveGameStatus();
     togglePause(true);
     if (this.interval !== null) {
       clearInterval(this.interval);

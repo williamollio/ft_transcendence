@@ -2,17 +2,15 @@ import React, { useState } from "react";
 import { GameLoop } from "../../classes/GameLoop.class";
 import GameBoard from "./GameBoard";
 import ScoreDisplay from "./ScoreDisplay";
-import { GameSocket } from "../../classes/GameSocket.class";
+import { BigSocket } from "../../classes/BigSocket.class";
 import { GameConstants, scoreInfo } from "../../interfaces/game.interface";
-import { UserSocket } from "../../classes/UserSocket.class";
 
 interface Props {
-  gameSocket: GameSocket;
-  userSocket: UserSocket;
+  bigSocket: BigSocket;
 }
 
 export default function Game(props: Props) {
-  const { gameSocket, userSocket } = props;
+  const { bigSocket } = props;
 
   const gameConstants: GameConstants = {
     boardHeight: 450,
@@ -25,7 +23,7 @@ export default function Game(props: Props) {
   };
 
   const [gameLoop] = useState<GameLoop>(
-    new GameLoop(gameSocket, userSocket, gameConstants)
+    new GameLoop(bigSocket, gameConstants)
   );
   const [scoreInfo, setScoreInfo] = useState<scoreInfo>({
     p1s: 0,
@@ -40,7 +38,7 @@ export default function Game(props: Props) {
     <>
       <GameBoard
         gameLoop={gameLoop}
-        gameSocket={gameSocket}
+        bigSocket={bigSocket}
         setScoreInfo={setScoreInfo}
         gameConstants={gameConstants}
       />

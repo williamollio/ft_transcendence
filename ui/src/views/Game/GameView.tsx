@@ -2,7 +2,7 @@ import React from "react";
 import { Button, Grid, Typography } from "@mui/material";
 import { translationKeys } from "./constants";
 import { useTranslation } from "react-i18next";
-import { UserSocket } from "../../classes/UserSocket.class";
+import { BigSocket } from "../../classes/BigSocket.class";
 import {
   Background,
   ProfileCard,
@@ -10,21 +10,19 @@ import {
   TitleWrapper,
   ContentWrapper,
 } from "../../styles/MuiStyles";
-import { GameSocket } from "../../classes/GameSocket.class";
 import classes from "../../styles.module.scss";
 import Game from "../../components/game/Game";
 
 interface Props {
-  gameSocket: GameSocket;
-  userSocket: UserSocket;
+  bigSocket: BigSocket;
 }
 
 export default function GameView(props: Props): React.ReactElement {
-  const { gameSocket, userSocket } = props;
+  const { bigSocket } = props;
   const { t } = useTranslation();
 
   const handleLeave = () => {
-    gameSocket.leave();
+    bigSocket.leave();
   };
 
   return (
@@ -45,7 +43,7 @@ export default function GameView(props: Props): React.ReactElement {
             <ContentWrapper>
               <Grid container justifyContent="center">
                 <Grid item>
-                  <Game gameSocket={gameSocket} userSocket={userSocket} />
+                  <Game bigSocket={bigSocket} />
                 </Grid>
                 <Grid item>
                   <Button variant="contained" onClick={handleLeave}>

@@ -14,19 +14,19 @@ import { fetchProfilePicture } from "../utils/picture-helper";
 import { useDrawersStore } from "../store/drawers-store";
 import { useTheme } from "@mui/material";
 import { UserStatus } from "../interfaces/user.interface";
-import { UserSocket } from "../classes/UserSocket.class";
+import { BigSocket } from "../classes/BigSocket.class";
 import { listenerWrapper } from "../services/initSocket.service";
 import { RoutePath } from "../interfaces/router.interface";
 
 export const navbarHeight = "4rem";
 
 interface Props {
-  userSocket: UserSocket;
+  bigSocket: BigSocket;
   setToken: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export default function NavBar(props: Props): React.ReactElement {
-  const { userSocket, setToken } = props;
+  const { bigSocket, setToken } = props;
   const theme = useTheme();
   const state = useLocation().state;
   const navigate = useNavigate();
@@ -76,25 +76,34 @@ export default function NavBar(props: Props): React.ReactElement {
     if (data.id === userId) setStatus(data.status);
   };
 
+  const statusUpdateFullListener = (
+    data: { userId: string; status: UserStatus }[]
+  ) => {
+    if (data.length === 1 && data[0].userId === userId)
+      setStatus(data[0].status);
+  };
+
   React.useEffect(() => {
     listenerWrapper(() => {
-      if (userSocket.socket.connected) {
-        userSocket.socket.on("statusUpdate", statusUpdateListener);
-        userSocket.status(userId);
+      if (bigSocket.socket.connected) {
+        bigSocket.socket.on("statusUpdate", statusUpdateListener);
+        bigSocket.socket.on("statusUpdateFullSelf", statusUpdateFullListener);
+        bigSocket.status([userId], "Self");
         return true;
       }
       return false;
     });
     return () => {
       listenerWrapper(() => {
-        if (userSocket.socket.connected) {
-          userSocket.socket.off("statusUpdate", statusUpdateListener);
+        if (bigSocket.socket.connected) {
+          bigSocket.socket.off("statusUpdate", statusUpdateListener);
+          bigSocket.socket.off("statusUpdateFull", statusUpdateFullListener);
           return true;
         }
         return false;
       });
     };
-  }, [userSocket, userId, location.pathname]);
+  }, [bigSocket, userId, location.pathname]);
 
   async function wrapperFetchProfilePicture(userId: string) {
     const pictureFetched = await fetchProfilePicture(userId);
@@ -133,7 +142,10 @@ export default function NavBar(props: Props): React.ReactElement {
   return (
     <>
       {!hidden && (
-        <AppBar className={classes.menuBar} sx={{  zIndex: (theme) => theme.zIndex.modal + 3}}>
+        <AppBar
+          className={classes.menuBar}
+          sx={{ zIndex: (theme) => theme.zIndex.modal + 3 }}
+        >
           <Box
             className={classes.picture}
             sx={{

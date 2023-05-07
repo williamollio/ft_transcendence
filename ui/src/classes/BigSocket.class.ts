@@ -1,24 +1,69 @@
 import { Socket } from "socket.io-client";
 import { initSocket } from "../services/initSocket.service";
 import { accessTypes, chatRoom } from "./chatRoom.class";
-import { messagesDto, user } from "../interfaces/chat.interface";
+import { GameMode, messagesDto, user } from "../interfaces/chat.interface";
 import { getTokenData } from "../utils/auth-helper";
 import UserService from "../services/users.service";
 import ChannelService from "../services/channel.service";
-import { User } from "../interfaces/user.interface";
 
-export class ChannelSocket {
+export class BigSocket {
   socket: Socket;
   user: user;
   channels: Array<chatRoom>;
   error: any;
+  latestGame: "PLAY" | "WATCH" | null;
+  spectatingPlayerId: string;
 
   constructor() {
     this.socket = initSocket(`http://${window.location.hostname}:3333`, null);
+    this.latestGame = null;
+    this.spectatingPlayerId = "";
     this.user = { id: "", name: "" };
     this.error = false;
     this.channels = new Array<chatRoom>();
   }
+
+  PP = (newPosition: number) => {
+    this.socket.volatile.emit("PP", newPosition + 50);
+  };
+
+  leave = () => {
+    if (this.latestGame === "PLAY") this.leaveGame();
+    else if (this.latestGame === "WATCH") this.leaveAsSpectator();
+  };
+
+  leaveGame = () => {
+    this.socket.emit("leaveGame");
+  };
+
+  rejoin = () => {
+    this.socket.emit("reJoin");
+  };
+
+  refuseInvite = (challengerId: string) => {
+    this.socket.emit("refuseInvite", challengerId);
+  };
+
+  inviteToGame = (mode: GameMode, opponentId: string) => {
+    this.socket.emit("createInvitationGame", {
+      mode: mode,
+      opponent: opponentId,
+    });
+  };
+
+  joinGame = (mode: GameMode, inviteGameId?: string) => {
+    this.socket.emit("joinGame", { mode: mode, inviteGameId: inviteGameId });
+  };
+
+  joinAsSpectator = (playerId: string) => {
+    this.spectatingPlayerId = playerId;
+    this.socket.emit("watchGame", { playerId: playerId });
+  };
+
+  leaveAsSpectator = () => {
+    this.socket.emit("leaveWatch", { playerId: this.spectatingPlayerId });
+    this.spectatingPlayerId = "";
+  };
 
   initializeName(token: string | null) {
     if (token) {
@@ -140,11 +185,23 @@ export class ChannelSocket {
     });
   };
 
-  registerListener = (event: string, call: (...args: any) => void) => {
-    this.socket.on(event, call);
+  logIn = () => {
+    this.socket.emit("connectUser");
   };
 
-  removeListener = (event: string, call?: (...args: any) => void) => {
-    this.socket.off(event, call);
+  joinGameStatus = () => {
+    this.socket.emit("joinGameStatus");
+  };
+
+  leaveGameStatus = () => {
+    this.socket.emit("leaveGameStatus");
+  };
+
+  status = (userIdFull: string[], listType: string) => {
+    this.socket.emit("status", { requestedUsers: userIdFull, requestedList: listType });
+  };
+
+  logOut = () => {
+    this.socket.disconnect();
   };
 }

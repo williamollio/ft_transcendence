@@ -1,10 +1,8 @@
 import { Menu, MenuItem } from "@mui/material";
-import { Dispatch, SetStateAction, useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ChannelSocket } from "../../classes/ChannelSocket.class";
+import { BigSocket } from "../../classes/BigSocket.class";
 import { chatRoom } from "../../classes/chatRoom.class";
-import { GameSocket } from "../../classes/GameSocket.class";
-import { UserSocket } from "../../classes/UserSocket.class";
 import { translationKeys } from "./constants";
 import ChannelInfoDialog from "./ChannelInfoDialog";
 import GetIdDialog from "./GetIdDialog";
@@ -12,11 +10,11 @@ import GetIdDialog from "./GetIdDialog";
 interface Props {
   contextMenu: { mouseX: number; mouseY: number; channel: chatRoom } | null;
   setContextMenu: any;
-  channelSocket: ChannelSocket;
+  bigSocket: BigSocket;
 }
 
 export default function RoomContextMenu(props: Props) {
-  const { contextMenu, setContextMenu, channelSocket } = props;
+  const { contextMenu, setContextMenu, bigSocket } = props;
   const { t } = useTranslation();
 
   const [channelInfoOpen, toggleChannelInfo] = useState(false);
@@ -30,11 +28,11 @@ export default function RoomContextMenu(props: Props) {
 
   const removeRoom = () => {
     if (contextMenu) {
-      let index = channelSocket.channels.findIndex(
+      let index = bigSocket.channels.findIndex(
         (element: chatRoom) => element.id === contextMenu.channel.id
       );
       if (index >= 0) {
-        channelSocket.deleteRoom(contextMenu.channel);
+        bigSocket.deleteRoom(contextMenu.channel);
       }
     }
     handleContextClose();
@@ -83,10 +81,10 @@ export default function RoomContextMenu(props: Props) {
         channelInfoOpen={channelInfoOpen}
         toggleChannelInfo={toggleChannelInfo}
         channel={contextChannel}
-        channelSocket={channelSocket}
+        bigSocket={bigSocket}
       ></ChannelInfoDialog>
       <GetIdDialog
-        channelSocket={channelSocket}
+        bigSocket={bigSocket}
         open={openId}
         toggleOpen={toggleOpenId}
         channel={contextChannel}

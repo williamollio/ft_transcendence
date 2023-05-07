@@ -1,7 +1,7 @@
 import { Dialog, DialogContent, TextField } from "@mui/material";
 import React, { useContext, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ChannelSocket } from "../../classes/ChannelSocket.class";
+import { BigSocket } from "../../classes/BigSocket.class";
 import { chatRoom } from "../../classes/chatRoom.class";
 import { translationKeys } from "./constants";
 import { TranscendanceContext } from "../../context/transcendance-context";
@@ -12,12 +12,12 @@ interface Props {
   open: boolean;
   toggleOpen: any;
   channel: chatRoom | undefined;
-  channelSocket: ChannelSocket;
+  bigSocket: BigSocket;
   toggleChannelInfo: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export default function GetNameDialog(props: Props) {
-  const { open, toggleOpen, channel, channelSocket, toggleChannelInfo } = props;
+  const { open, toggleOpen, channel, bigSocket, toggleChannelInfo } = props;
   const { t } = useTranslation();
 
   const [input, setInput] = useState<string>("");
@@ -48,7 +48,7 @@ export default function GetNameDialog(props: Props) {
           (channel.access === "PROTECTED" && input !== ""))
       ) {
         if (nameInput !== "") {
-          channelSocket.editRoom(
+          bigSocket.editRoom(
             channel,
             channel.access,
             channel.access === "PROTECTED" ? input : undefined,

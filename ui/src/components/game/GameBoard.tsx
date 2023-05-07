@@ -8,7 +8,7 @@ import React, {
 } from "react";
 import { useTranslation } from "react-i18next";
 import { GameLoop } from "../../classes/GameLoop.class";
-import { GameSocket } from "../../classes/GameSocket.class";
+import { BigSocket } from "../../classes/BigSocket.class";
 import { ToastType } from "../../context/toast";
 import { TranscendanceContext } from "../../context/transcendance-context";
 import { TranscendanceStateActionType } from "../../context/transcendance-reducer";
@@ -31,13 +31,13 @@ import MainMenu from "./MainMenu";
 
 interface Props {
   gameLoop: GameLoop;
-  gameSocket: GameSocket;
+  bigSocket: BigSocket;
   setScoreInfo: React.Dispatch<SetStateAction<scoreInfo>>;
   gameConstants: GameConstants;
 }
 
 export default function GameBoard(props: Props) {
-  const { gameLoop, gameSocket, setScoreInfo, gameConstants } = props;
+  const { gameLoop, bigSocket, setScoreInfo, gameConstants } = props;
   const { t } = useTranslation();
   const toast = useContext(TranscendanceContext);
 
@@ -75,10 +75,10 @@ export default function GameBoard(props: Props) {
   };
 
   const gameFinishListener = (data: any) => {
-    gameSocket.latestGame = null;
+    bigSocket.latestGame = null;
     const thisPlayer =
       gameLoop.activePlayer === 0
-        ? gameSocket.spectatingPlayerId
+        ? bigSocket.spectatingPlayerId
         : gameLoop.activePlayer === 1
         ? gameLoop.scoreInfo.p1Id
         : gameLoop.scoreInfo.p2Id;
@@ -128,8 +128,8 @@ export default function GameBoard(props: Props) {
   };
 
   const gameJoinedListener = (data: any) => {
-    if (data.playerNumber === 0) gameSocket.latestGame = "WATCH";
-    else gameSocket.latestGame = "PLAY";
+    if (data.playerNumber === 0) bigSocket.latestGame = "WATCH";
+    else bigSocket.latestGame = "PLAY";
     gameLoop.activePlayer = data.playerNumber;
   };
 
@@ -162,7 +162,7 @@ export default function GameBoard(props: Props) {
 
   const tryRejoinListener = (data: any) => {
     if (data) {
-      gameSocket.joinGame(data.mode);
+      bigSocket.joinGame(data.mode);
       gameLoop.positionalData = new positionalData(gameConstants, {
         ...gamePositions,
         playerLeftYOffset: data.pos.p1y - gameConstants.paddleSize / 2,
@@ -177,7 +177,7 @@ export default function GameBoard(props: Props) {
 
   const leftWatchListener = () => {
     resetGame();
-    gameSocket.latestGame = null;
+    bigSocket.latestGame = null;
   };
 
   const leftGameListener = () => {
@@ -200,19 +200,19 @@ export default function GameBoard(props: Props) {
     document.addEventListener("keydown", playerMoveHandler);
     document.addEventListener("keyup", playerStopHandler);
     listenerWrapper(() => {
-      if (gameSocket.socket.connected) {
+      if (bigSocket.socket.connected) {
         failedEvents.forEach((event) =>
-          gameSocket.socket.on(event, failedListener)
+          bigSocket.socket.on(event, failedListener)
         );
-        gameSocket.socket.on("leftGame", leftGameListener);
-        gameSocket.socket.on("tryRejoin", tryRejoinListener);
-        gameSocket.socket.on("matchFinished", gameFinishListener);
-        gameSocket.socket.on("gameStarting", gameStartingListener);
-        gameSocket.socket.on("gameJoined", gameJoinedListener);
-        gameSocket.socket.on("gameStatus", mutateGameStatusListener);
-        gameSocket.socket.on("GI", giListener);
-        gameSocket.socket.on("leftWatch", leftWatchListener);
-        gameSocket.rejoin();
+        bigSocket.socket.on("leftGame", leftGameListener);
+        bigSocket.socket.on("tryRejoin", tryRejoinListener);
+        bigSocket.socket.on("matchFinished", gameFinishListener);
+        bigSocket.socket.on("gameStarting", gameStartingListener);
+        bigSocket.socket.on("gameJoined", gameJoinedListener);
+        bigSocket.socket.on("gameStatus", mutateGameStatusListener);
+        bigSocket.socket.on("GI", giListener);
+        bigSocket.socket.on("leftWatch", leftWatchListener);
+        bigSocket.rejoin();
         return true;
       }
       return false;
@@ -221,25 +221,25 @@ export default function GameBoard(props: Props) {
       document.removeEventListener("keydown", playerMoveHandler);
       document.removeEventListener("keyup", playerStopHandler);
       listenerWrapper(() => {
-        if (gameSocket.socket.connected) {
+        if (bigSocket.socket.connected) {
           failedEvents.forEach((event) =>
-            gameSocket.socket.off(event, failedListener)
+            bigSocket.socket.off(event, failedListener)
           );
-          gameSocket.socket.off("leftGame", leftGameListener);
-          gameSocket.socket.off("tryRejoin", tryRejoinListener);
-          gameSocket.socket.off("matchFinished", gameFinishListener);
-          gameSocket.socket.off("gameStarting", gameStartingListener);
-          gameSocket.socket.off("gameJoined", gameJoinedListener);
-          gameSocket.socket.off("gameStatus", mutateGameStatusListener);
-          gameSocket.socket.off("GI", giListener);
-          gameSocket.socket.off("leftWatch", leftWatchListener);
+          bigSocket.socket.off("leftGame", leftGameListener);
+          bigSocket.socket.off("tryRejoin", tryRejoinListener);
+          bigSocket.socket.off("matchFinished", gameFinishListener);
+          bigSocket.socket.off("gameStarting", gameStartingListener);
+          bigSocket.socket.off("gameJoined", gameJoinedListener);
+          bigSocket.socket.off("gameStatus", mutateGameStatusListener);
+          bigSocket.socket.off("GI", giListener);
+          bigSocket.socket.off("leftWatch", leftWatchListener);
           return true;
         }
         return false;
       });
       if (gameLoop.interval) gameLoop.stopLoop(togglePause);
     };
-  }, [gameSocket]);
+  }, [bigSocket]);
 
   return (
     <>
@@ -256,7 +256,7 @@ export default function GameBoard(props: Props) {
           <>
             {pauseContent !== false ? (
               <MainMenu
-                gameSocket={gameSocket}
+                bigSocket={bigSocket}
                 gameLoop={gameLoop}
                 pauseContent={pauseContent}
                 setPauseContent={setPauseContent}
