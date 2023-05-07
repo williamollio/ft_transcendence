@@ -23,6 +23,7 @@ import { useUserStore } from "../../../store/users-store";
 import { BigSocket } from "../../../classes/BigSocket.class";
 import { listenerWrapper } from "../../../services/initSocket.service";
 import { useNavigate } from "react-router-dom";
+import { UserStatus } from "../../../interfaces/user.interface";
 
 interface Props {
   userId: string;
@@ -35,18 +36,15 @@ interface Props {
 export default function ListFriends(props: Props) {
   const theme = useTheme();
   const { t } = useTranslation();
-  const {
-    userId,
-    open,
-    users,
-    bigSocket,
-    showErrorToast,
-    showSuccessToast,
-  } = props;
+  const { userId, open, users, bigSocket, showErrorToast, showSuccessToast } =
+    props;
 
   const navigate = useNavigate();
   const [profilePictures, setProfilePictures] = React.useState<{
     [key: string]: string;
+  }>({});
+  const [userStatus, setUserStatus] = React.useState<{
+    [key: string]: UserStatus | UserStatus.OFFLINE;
   }>({});
   const [usersState, setUsersState] = React.useState<User[] | undefined>(
     undefined
@@ -89,13 +87,10 @@ export default function ListFriends(props: Props) {
   }
 
   const statusUpdateListener = (data: any) => {
-    const newList: User[] = new Array<User>();
-    users?.forEach((element) => newList.push(element));
-    const index = newList.findIndex((element) => element.id === data.id);
-    if (index !== -1) {
-      newList[index].status = data.status;
-    }
-    setUsersState(newList);
+    const newStatus: { [key: string]: UserStatus | UserStatus.OFFLINE } =
+      Object.assign({}, userStatus);
+    newStatus[data.id] = data.status;
+    setUserStatus(newStatus);
   };
 
   React.useEffect(() => {
@@ -177,7 +172,7 @@ export default function ListFriends(props: Props) {
                     horizontal: "right",
                   }}
                   variant="dot"
-                  status={user.status}
+                  status={userStatus[user.id]}
                 >
                   <Avatar key={user.id} src={profilePictures[user.id]} />
                 </StyledAvatarBadge>
