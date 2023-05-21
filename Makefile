@@ -28,8 +28,6 @@ down :
 fclean :
 	docker system prune -af --volumes
 	docker network prune -f
-	rm -Rf nest/node_modules
-	rm -Rf ui/node_modules
 
 ps :
 	docker compose ps
