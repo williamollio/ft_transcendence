@@ -51,11 +51,9 @@ services:
     container_name: reverse_proxy
     ports:
       - 80:80
-      - 443:443
     volumes:
       - ./ui/:/usr/share/nginx/html
       - ./reverse_proxy/conf/:/etc/nginx/conf.d
-      - ./reverse_proxy/certs/:/etc/certs/
     networks:
       - ft_transcendance
 
