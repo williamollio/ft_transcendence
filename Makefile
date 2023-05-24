@@ -1,36 +1,36 @@
 uibuild :
-	sudo docker compose build ui --no-cache
+	sudo docker-compose build ui --no-cache
 
 uiup :
-	sudo docker compose up ui
+	sudo docker-compose up ui
 
 uiclean:
 	sudo docker image rm ft_transcendance_ui
 
 nestbuild :
-	sudo docker compose build nest --no-cache
+	sudo docker-compose build nest --no-cache
 
 nestup :
-	sudo docker compose up nest
+	sudo docker-compose up nest
 
 nestclean:
 	sudo docker image rm ft_transcendance_nest
 
 build :
-	sudo docker compose build
+	sudo docker-compose build
 
 up :
-	sudo docker compose up --build
+	sudo docker-compose up --build
 
 down :
-	sudo docker compose down
+	sudo docker-compose down
 
 fclean :
 	sudo docker system prune -af --volumes
 	sudo docker network prune -f
 
 ps :
-	sudo docker compose ps
+	sudo docker-compose ps
 
 info :
 	sudo docker system df
