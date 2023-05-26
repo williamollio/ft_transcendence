@@ -45,6 +45,8 @@ services:
     restart: always
     networks:
       - ft_transcendance
+    depends_on:
+      - nest
 
   nginx:
     build: ./reverse_proxy/
