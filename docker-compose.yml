@@ -56,6 +56,8 @@ services:
       - ./reverse_proxy/conf/:/etc/nginx/conf.d
     networks:
       - ft_transcendance
+    depends_on:
+      - ui
 
 networks:
   ft_transcendance:
