@@ -5,7 +5,7 @@ uiup :
 	sudo docker-compose up ui
 
 uiclean:
-	sudo docker image rm ft_transcendance_ui
+	sudo docker image rm ft_transcendence_ui
 
 nestbuild :
 	sudo docker-compose build nest --no-cache
@@ -14,7 +14,7 @@ nestup :
 	sudo docker-compose up nest
 
 nestclean:
-	sudo docker image rm ft_transcendance_nest
+	sudo docker image rm ft_transcendence_nest
 
 build :
 	sudo docker-compose build
