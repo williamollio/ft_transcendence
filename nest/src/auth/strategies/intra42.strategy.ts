@@ -12,7 +12,7 @@ export class Intra42Strategy extends PassportStrategy(Strategy, 'intra42') {
     super({
       clientID: process.env.CLIENT_ID,
       clientSecret: process.env.CLIENT_SECRET,
-      callbackURL: `${process.env.DOMAIN}:8080/auth/intra42/callback`,
+      callbackURL: `${process.env.DOMAIN}/auth/intra42/callback`,
       scopes: [],
     });
   }
