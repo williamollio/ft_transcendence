@@ -71,6 +71,7 @@ export default function App() {
   };
 
   const RedirectWrapper = () => {
+    console.log("redirect react");
     initAuthToken();
     return <Navigate to={RoutePath.EDITPROFILE} />;
   };
