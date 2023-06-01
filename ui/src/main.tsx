@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
-import { HashRouter } from "react-router-dom";
+import { BrowserRouter } from "react-router-dom";
 import { TranscendanceProvider } from "./context/transcendance-context";
 import { initReacti18n } from "./i18n/i18n";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -18,12 +18,12 @@ const root = ReactDOM.createRoot(
 );
 root.render(
   <React.StrictMode>
-    <HashRouter>
+    <BrowserRouter basename="/ft_transcendence">
       <TranscendanceProvider>
         <QueryClientProvider client={queryClient}>
           <App />
         </QueryClientProvider>
       </TranscendanceProvider>
-    </HashRouter>
+    </BrowserRouter>
   </React.StrictMode>
 );
