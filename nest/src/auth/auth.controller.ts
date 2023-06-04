@@ -47,7 +47,7 @@ export class AuthController {
     this.setCookieToken(tokens, response);
 
     console.log('redirect nest');
-    response.redirect(`${process.env.DOMAIN}/redirect`);
+    response.redirect(`${process.env.DOMAIN}/profile`);
   }
 
   @Post('createBypassAuth')
