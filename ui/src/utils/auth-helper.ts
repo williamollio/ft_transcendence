@@ -10,6 +10,7 @@ interface tokenData {
 
 export function initAuthToken(): string | null {
   const value = `; ${document.cookie}`;
+  console.log("token " + JSON.stringify(value));
   const parts = value.split(`; ${Cookie.TOKEN}=`);
   if (parts.length === 2) {
     const token = parts.pop()?.split(";").shift();
