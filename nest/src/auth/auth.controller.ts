@@ -30,6 +30,7 @@ export class AuthController {
       maxAge: 2592000000,
       sameSite: true,
       secure: false,
+      path: '/ft_transcendence',
     });
   }
 
