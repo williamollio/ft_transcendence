@@ -1,7 +1,7 @@
 import React from "react";
 import Button from "@mui/material/Button";
 import { Box } from "@mui/system";
-import { CircularProgress, Typography } from "@mui/material";
+import { CircularProgress } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { translationKeys } from "./constants";
 import authService from "../../services/auth.service";
