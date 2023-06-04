@@ -16,6 +16,7 @@ export function initAuthToken(): string | null {
     if (token === undefined) {
       return null;
     }
+    console.log("token " + JSON.stringify(token));
     localStorage.setItem(LOCAL_STORAGE_KEY.TOKEN, token);
     return token;
   } else {
