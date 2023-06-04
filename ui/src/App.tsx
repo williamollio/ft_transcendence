@@ -62,6 +62,7 @@ export default function App() {
   }, [imageUrl]);
 
   const AuthWrapper = (): ReactElement => {
+    console.log(window.location.pathname);
     const isAuthenticated = getIsAuthenticated();
     return isAuthenticated ? (
       <Navigate to={RoutePath.PROFILE} replace />
