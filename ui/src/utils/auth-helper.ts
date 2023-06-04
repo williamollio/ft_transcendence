@@ -10,14 +10,12 @@ interface tokenData {
 
 export function initAuthToken(): string | null {
   const value = `; ${document.cookie}`;
-  console.log("token " + JSON.stringify(value));
   const parts = value.split(`; ${Cookie.TOKEN}=`);
   if (parts.length === 2) {
     const token = parts.pop()?.split(";").shift();
     if (token === undefined) {
       return null;
     }
-    console.log("token " + JSON.stringify(token));
     localStorage.setItem(LOCAL_STORAGE_KEY.TOKEN, token);
     return token;
   } else {
