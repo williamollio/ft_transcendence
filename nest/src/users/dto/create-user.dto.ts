@@ -6,6 +6,4 @@ export class CreateUserDto {
 
   @ApiProperty({ required: true })
   intraId: string;
-
-  // maybe add also a picture here
 }
