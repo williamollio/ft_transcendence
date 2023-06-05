@@ -36,6 +36,7 @@ enum acknoledgementStatus {
   cors: {
     origin: '*',
   },
+  path: '/ft_transcendence/api',
   parser: msgpack,
 })
 @UseGuards(JwtGuard)
