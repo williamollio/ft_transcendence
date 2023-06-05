@@ -21,6 +21,7 @@ import { PrismaService } from '../prisma/prisma.service';
   cors: {
     origin: '*',
   },
+  path: '/ft_transcendence/api',
   parser: msgpack,
 })
 // add some guards here

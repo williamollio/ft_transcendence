@@ -1,4 +1,5 @@
 export function getBaseUrl(): string {
   const currentHostName = window.location.hostname;
-  return `https://${currentHostName}/ft_transcendence/api/`;
+  const protocol = window.location.protocol
+  return `${protocol}://${currentHostName}/ft_transcendence/api/`;
 }
