@@ -19,7 +19,6 @@ import { JwtUser } from 'src/users/interface/jwt-user.interface';
   cors: {
     origin: '*',
   },
-  path: '/ft_transcendence/api',
   parser: msgpack,
 })
 @UseGuards(JwtGuard)
