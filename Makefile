@@ -7,6 +7,9 @@ uiup :
 uiclean:
 	sudo docker image rm ft_transcendence_ui
 
+nginxup :
+	sudo docker-compose up nginx
+
 nestbuild :
 	sudo docker-compose build nest --no-cache
 
