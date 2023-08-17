@@ -13,7 +13,7 @@ services:
       - POSTGRES_PASSWORD=password
     restart: always
     networks:
-      - ft_transcendance
+      - ft_transcendence
 
   nest:
     build:
@@ -30,7 +30,7 @@ services:
       - postgres
     restart: always
     networks:
-      - ft_transcendance
+      - ft_transcendence
 
   ui:
     build:
@@ -44,7 +44,7 @@ services:
       - "3000:3000"
     restart: always
     networks:
-      - ft_transcendance
+      - ft_transcendence
     depends_on:
       - nest
 
@@ -57,14 +57,16 @@ services:
       - ./ui/:/usr/share/nginx/html
       - ./reverse_proxy/conf/:/etc/nginx/conf.d
     networks:
-      - ft_transcendance
+      - ft_transcendence
     depends_on:
       - ui
 
 networks:
-  ft_transcendance:
-    name: ft_transcendance
+  ft_transcendence:
+    name: ft_transcendence
     driver: bridge
+    driver_opts:
+      com.docker.network.bridge.host_binding_ipv4: "127.0.0.1"
 
 volumes:
   postgres:
