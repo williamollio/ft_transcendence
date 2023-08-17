@@ -18,7 +18,7 @@ const root = ReactDOM.createRoot(
 );
 root.render(
   <React.StrictMode>
-    <BrowserRouter basename="/ft_transcendence">
+    <BrowserRouter>
       <TranscendanceProvider>
         <QueryClientProvider client={queryClient}>
           <App />
