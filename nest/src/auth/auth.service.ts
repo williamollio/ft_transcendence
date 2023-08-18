@@ -25,7 +25,7 @@ export class AuthService {
   private async generateTokens(payload: JwtUser) {
     return await this.jwtService.signAsync(payload, {
       secret: process.env.JWT_SECRET,
-      expiresIn: '7d',
+      expiresIn: '1h',
     });
   }
 
