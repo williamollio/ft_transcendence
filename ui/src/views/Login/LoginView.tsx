@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { RoutePath } from "../../interfaces/router.interface";
 import { Cookie } from "../../utils/auth-helper";
 import { BigSocket } from "../../classes/BigSocket.class";
+import Banner from "../../components/Login/Banner";
 
 interface Props {
   bigSocket: BigSocket;
@@ -49,6 +50,7 @@ export default function LoginView(props: Props): React.ReactElement {
             gap: "3rem",
           }}
         >
+          <Banner />
           <Box
             sx={{
               display: "flex",
