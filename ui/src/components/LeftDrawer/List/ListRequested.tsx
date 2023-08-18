@@ -58,24 +58,19 @@ export default function ListRequested(props: Props) {
     ]
   );
 
-  React.useEffect(() => {
-    async function loadProfilePictures() {
-      const pictures: { [key: string]: string } = {};
-      for (const user of users) {
-        if (user.filename) {
-          const picture = await getProfilePicture(user.id);
-          pictures[user.id] = picture;
-        } else {
-          pictures[user.id] = "";
-        }
+  async function loadProfilePictures() {
+    const pictures: { [key: string]: string } = {};
+    for (const user of users) {
+      if (user.filename) {
+        const picture = await getProfilePicture(user.id);
+        pictures[user.id] = picture;
+      } else {
+        pictures[user.id] = "";
       }
-
-      setProfilePictures(pictures);
     }
-
-    loadProfilePictures();
+    setProfilePictures(pictures);
     setUsersState(users);
-  }, [users]);
+  }
 
   const statusUpdateListener = (data: any) => {
     const newStatus: { [key: string]: UserStatus | UserStatus.OFFLINE } =
@@ -97,6 +92,7 @@ export default function ListRequested(props: Props) {
   React.useEffect(() => {
     listenerWrapper(() => {
       if (bigSocket.socket.connected) {
+		loadProfilePictures();
         // receiving data from server
         bigSocket.socket.on("statusUpdate", statusUpdateListener);
         bigSocket.socket.on("statusUpdateFullRequested", statusUpdateFullListener);

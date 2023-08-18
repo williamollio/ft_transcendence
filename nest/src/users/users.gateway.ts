@@ -15,6 +15,7 @@ import { UsersService } from './users.service';
 import * as msgpack from 'socket.io-msgpack-parser';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
 import { PrismaService } from '../prisma/prisma.service';
+import { SchedulerRegistry } from '@nestjs/schedule';
 
 // add some cors sanitazation here
 @WebSocketGateway(3333, {
@@ -31,6 +32,7 @@ export class UserGateway {
   constructor(
     private readonly usersService: UsersService, // private readonly socketToIdService: SocketToUserIdStorage,
     private prisma: PrismaService,
+    private schedulerRegistry: SchedulerRegistry,
   ) {}
 
   @SubscribeMessage('connectUser')
@@ -39,10 +41,15 @@ export class UserGateway {
       String(userId),
       UserStatus.ONLINE,
     );
-    this.server.emit('statusUpdate', {
-      id: userId,
-      status: UserStatus.ONLINE,
-    });
+    if (this.schedulerRegistry.doesExist('timeout', userId)) {
+      clearTimeout(this.schedulerRegistry.getTimeout(userId));
+      this.schedulerRegistry.deleteTimeout(userId);
+    } else {
+      this.server.emit('statusUpdate', {
+        id: userId,
+        status: UserStatus.ONLINE,
+      });
+    }
   }
 
   @SubscribeMessage('disconnectUser')
@@ -88,10 +95,14 @@ export class UserGateway {
       void this.usersService.updateConnectionStatus(userId, UserStatus.OFFLINE);
       // this.socketToIdService.delete(clientSocket.id);
       socketToUserId.delete(clientSocket.id);
-      this.server.emit('statusUpdate', {
-        id: userId,
-        status: UserStatus.OFFLINE,
-      });
+      const timeout = setTimeout(() => {
+        this.server.emit('statusUpdate', {
+          id: userId,
+          status: UserStatus.OFFLINE,
+        });
+		this.schedulerRegistry.deleteTimeout(userId);
+      }, 3000);
+      this.schedulerRegistry.addTimeout(userId, timeout);
     }
   }
 

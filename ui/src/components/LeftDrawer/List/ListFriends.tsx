@@ -6,6 +6,8 @@ import {
   Avatar,
   ListItemText,
   Tooltip,
+  Skeleton,
+  Grid,
 } from "@mui/material";
 import ChatIcon from "@mui/icons-material/Chat";
 import { User } from "../../../interfaces/user.interface";
@@ -24,6 +26,7 @@ import { BigSocket } from "../../../classes/BigSocket.class";
 import { listenerWrapper } from "../../../services/initSocket.service";
 import { useNavigate } from "react-router-dom";
 import { UserStatus } from "../../../interfaces/user.interface";
+import { user } from "../../../interfaces/chat.interface";
 
 interface Props {
   userId: string;
@@ -68,10 +71,6 @@ export default function ListFriends(props: Props) {
     ]
   );
 
-  React.useEffect(() => {
-    loadProfilePictures();
-  }, [users]);
-
   async function loadProfilePictures() {
     const pictures: { [key: string]: string } = {};
     for (const user of users) {
@@ -108,9 +107,16 @@ export default function ListFriends(props: Props) {
       if (bigSocket.socket.connected) {
         // receiving data from server
         bigSocket.socket.on("statusUpdate", statusUpdateListener);
-        bigSocket.socket.on("statusUpdateFullFriends", statusUpdateFullListener);
+        bigSocket.socket.on(
+          "statusUpdateFullFriends",
+          statusUpdateFullListener
+        );
         // sending request to server
-        bigSocket.status(users.map((element) => element.id), "Friends");
+        bigSocket.status(
+          users.map((element) => element.id),
+          "Friends"
+        );
+        loadProfilePictures();
         return true;
       }
       return false;
