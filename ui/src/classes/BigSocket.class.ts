@@ -15,7 +15,7 @@ export class BigSocket {
   spectatingPlayerId: string;
 
   constructor() {
-    this.socket = initSocket(`https://ft-transcendence.met-it.io`, null);
+    this.socket = initSocket(`${window.location.hostname}`, null);
     this.latestGame = null;
     this.spectatingPlayerId = "";
     this.user = { id: "", name: "" };
