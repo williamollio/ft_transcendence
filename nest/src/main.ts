@@ -20,7 +20,6 @@ async function bootstrap() {
     origin: '*',
   });
   app.use(cookieParser());
-  app.setGlobalPrefix('api');
   await app.listen(8080);
 }
 bootstrap();
