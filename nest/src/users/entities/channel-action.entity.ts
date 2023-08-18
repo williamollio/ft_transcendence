@@ -1,34 +1,34 @@
-import { ChannelAction, ChannelActionType } from '@prisma/client';
+import { ChannelActionType } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
 import { UserEntity } from './user.entity';
 import { ChannelEntity } from './channel.entity';
 
 // @Injectable()
 export class ChannelActionEntity {
-    @ApiProperty()
-    channelActionTargetId: string;
+  @ApiProperty()
+  channelActionTargetId: string;
 
-    @ApiProperty()
-    channelActionTarget: UserEntity;
+  @ApiProperty()
+  channelActionTarget: UserEntity;
 
-    @ApiProperty()
-    channelActionOnChannelId: string;
+  @ApiProperty()
+  channelActionOnChannelId: string;
 
-    @ApiProperty()
-    channelActionOnChannel: ChannelEntity;
+  @ApiProperty()
+  channelActionOnChannel: ChannelEntity;
 
-    @ApiProperty()
-    channelActionRequesterId: string;
+  @ApiProperty()
+  channelActionRequesterId: string;
 
-    @ApiProperty()
-    channelActionRequester: UserEntity;
+  @ApiProperty()
+  channelActionRequester: UserEntity;
 
-    @ApiProperty()
-    type: ChannelActionType;
+  @ApiProperty()
+  type: ChannelActionType;
 
-    @ApiProperty()
-    createdAt: Date;
+  @ApiProperty()
+  createdAt: Date;
 
-    @ApiProperty()
-    updatedAt: Date;
+  @ApiProperty()
+  updatedAt: Date;
 }

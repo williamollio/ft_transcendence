@@ -9,11 +9,11 @@ services:
     ports:
       - "5432:5432"
     environment:
-      - POSTGRES_USER=admin
-      - POSTGRES_PASSWORD=password
+      POSTGRES_USER: "${POSTGRES_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
     restart: always
     networks:
-      - ft_transcendance
+      - ft_transcendence
 
   nest:
     build:
@@ -30,7 +30,7 @@ services:
       - postgres
     restart: always
     networks:
-      - ft_transcendance
+      - ft_transcendence
 
   ui:
     build:
@@ -44,25 +44,29 @@ services:
       - "3000:3000"
     restart: always
     networks:
-      - ft_transcendance
+      - ft_transcendence
+    depends_on:
+      - nest
 
   nginx:
     build: ./reverse_proxy/
     container_name: reverse_proxy
     ports:
-      - 80:80
-      - 443:443
+      - 8000:8000
     volumes:
       - ./ui/:/usr/share/nginx/html
       - ./reverse_proxy/conf/:/etc/nginx/conf.d
-      - ./reverse_proxy/certs/:/etc/certs/
     networks:
-      - ft_transcendance
+      - ft_transcendence
+    depends_on:
+      - ui
 
 networks:
-  ft_transcendance:
-    name: ft_transcendance
+  ft_transcendence:
+    name: ft_transcendence
     driver: bridge
+    driver_opts:
+      com.docker.network.bridge.host_binding_ipv4: "127.0.0.1"
 
 volumes:
   postgres:

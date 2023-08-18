@@ -1,4 +1,4 @@
-import { Channel, ChannelType } from '@prisma/client';
+import { ChannelType } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
 import { MessageEntity } from './message.entity';
 import { ChannelUserEntity } from './channel-user.entity';
@@ -7,33 +7,33 @@ import { UserEntity } from './user.entity';
 
 // @Injectable()
 export class ChannelEntity {
-    @ApiProperty()
-    id: string;
+  @ApiProperty()
+  id: string;
 
-    @ApiProperty()
-    name: string;
+  @ApiProperty()
+  name: string;
 
-    @ApiProperty()
-    type: ChannelType;
+  @ApiProperty()
+  type: ChannelType;
 
-    @ApiProperty()
-    passwordHash: string;
+  @ApiProperty()
+  passwordHash: string;
 
-    @ApiProperty()
-    createdAt: Date;
+  @ApiProperty()
+  createdAt: Date;
 
-    @ApiProperty()
-    updatedAt: Date;
+  @ApiProperty()
+  updatedAt: Date;
 
-    @ApiProperty()
-    messages: MessageEntity[];
+  @ApiProperty()
+  messages: MessageEntity[];
 
-    @ApiProperty()
-    users: ChannelUserEntity[];
+  @ApiProperty()
+  users: ChannelUserEntity[];
 
-    @ApiProperty()
-    channelActionOnChannel: ChannelActionEntity[];
+  @ApiProperty()
+  channelActionOnChannel: ChannelActionEntity[];
 
-    @ApiProperty()
-    invitees: UserEntity[];
+  @ApiProperty()
+  invitees: UserEntity[];
 }

@@ -16,7 +16,7 @@ export class PrismaService extends PrismaClient {
 
   // ensure the application shuts down gracefully
   async enableShutdownHooks(app: INestApplication) {
-    this.$on('beforeExit', async () => {
+    process.on('beforeExit', async () => {
       await app.close();
     });
   }

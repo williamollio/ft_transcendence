@@ -15,7 +15,7 @@ export class BigSocket {
   spectatingPlayerId: string;
 
   constructor() {
-    this.socket = initSocket(`http://${window.location.hostname}:3333`, null);
+    this.socket = initSocket(`${window.location.hostname}`, null);
     this.latestGame = null;
     this.spectatingPlayerId = "";
     this.user = { id: "", name: "" };

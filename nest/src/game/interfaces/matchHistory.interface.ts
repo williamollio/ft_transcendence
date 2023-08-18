@@ -1,13 +1,11 @@
-import { GameMode } from "../entities/game.entity";
-
 export interface MatchHistory {
-    id: string;
-    imageCurrentUser: string | null;
-    currentUserId: string;
-    imageOpponent: string | null;
-    opponentId: string;
-    //score: string;
-    p1Score: number;
-    p2Score: number;
-    matchWon: boolean;
-  }
+  id: string;
+  imageCurrentUser: string | null;
+  currentUserId: string;
+  imageOpponent: string | null;
+  opponentId: string;
+  //score: string;
+  p1Score: number;
+  p2Score: number;
+  matchWon: boolean;
+}

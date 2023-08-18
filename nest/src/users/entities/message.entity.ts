@@ -4,27 +4,27 @@ import { ChannelEntity } from './channel.entity';
 
 // @Injectable()
 export class MessageEntity {
-    @ApiProperty()
-    id: string;
+  @ApiProperty()
+  id: string;
 
-    @ApiProperty()
-    content: string;
+  @ApiProperty()
+  content: string;
 
-    @ApiProperty()
-    createdAt: Date;
+  @ApiProperty()
+  createdAt: Date;
 
-    @ApiProperty()
-    updatedAt: Date;
+  @ApiProperty()
+  updatedAt: Date;
 
-    @ApiProperty()
-    senderId: string;
+  @ApiProperty()
+  senderId: string;
 
-    @ApiProperty()
-    channelId: string;
+  @ApiProperty()
+  channelId: string;
 
-    @ApiProperty()
-    sender: UserEntity;
+  @ApiProperty()
+  sender: UserEntity;
 
-    @ApiProperty()
-    channel: ChannelEntity;
+  @ApiProperty()
+  channel: ChannelEntity;
 }
