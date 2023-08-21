@@ -15,7 +15,7 @@ The project aims to learn about web development and SPA. The goal of this web ap
 ### Environment variables ft_transcendence
 
 Set your passwords and credentials in a `.env` file which has to be located in the `nest` folder.
-Use [env.example](https://github.com/williamollio/ft_transcendence/blob/master/nest/env.example) as an example. Search globally for "127.0.0.1" in the project and replace it by your ip address.
+Use [env.example](https://github.com/williamollio/ft_transcendence/blob/master/nest/env.example) and [env.example](https://github.com/williamollio/ft_transcendence/blob/master/env.example) as an examples.
 
 ### UI
 
