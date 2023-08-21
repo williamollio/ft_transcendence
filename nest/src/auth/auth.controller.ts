@@ -19,6 +19,7 @@ import { JwtGuard } from './guards/jwt.guard';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { FullAuthGuard } from './guards/full-auth.guard';
 import { Response } from 'express';
+import { GoogleGuard } from './guards/google.guard';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -31,6 +32,21 @@ export class AuthController {
       sameSite: false,
       secure: false,
     });
+  }
+
+  @Get('google')
+  @UseGuards(GoogleGuard)
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  async authGoogle() {}
+
+  @Get('google/callback')
+  @UseGuards(GoogleGuard)
+  async googleAuthCallback(@Req() req: any, @Res() response: any) {
+    const tokens = await this.authService.signIn(req.user as Intra42User);
+
+    this.setCookieToken(tokens, response);
+
+    response.redirect(`${process.env.DOMAIN_IP}:3000/redirect`);
   }
 
   @Get('intra42')

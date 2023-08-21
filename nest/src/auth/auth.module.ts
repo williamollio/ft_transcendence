@@ -7,6 +7,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { Intra42Strategy } from './strategies/intra42.strategy';
 import * as process from 'process';
 import { FullAuthStrategy } from './strategies/full-auth-strategy';
+import { GoogleStrategy } from './strategies/google.strategy';
 
 @Module({
   imports: [
@@ -17,6 +18,12 @@ import { FullAuthStrategy } from './strategies/full-auth-strategy';
     UsersModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, Intra42Strategy, FullAuthStrategy],
+  providers: [
+    AuthService,
+    JwtStrategy,
+    Intra42Strategy,
+    FullAuthStrategy,
+    GoogleStrategy,
+  ],
 })
 export class AuthModule {}
