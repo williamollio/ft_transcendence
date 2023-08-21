@@ -12,7 +12,7 @@ import { FullAuthStrategy } from './strategies/full-auth-strategy';
   imports: [
     JwtModule.register({
       secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: '1d' },
+      signOptions: { expiresIn: '1h' },
     }),
     UsersModule,
   ],
