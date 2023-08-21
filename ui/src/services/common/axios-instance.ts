@@ -1,12 +1,12 @@
 import { Cookie } from "../../utils/auth-helper";
 import axios from "axios";
-import { getBaseUrl } from "../../utils/url-helper";
+import { getBaseUrlServer } from "../../utils/url-helper";
 import { eraseCookie } from "../../utils/auth-helper";
 import { useNavigate } from "react-router-dom";
 import { RoutePath } from "../../interfaces/router.interface";
 
 export const axiosInstance = axios.create({
-  baseURL: `${getBaseUrl()}`,
+  baseURL: `${getBaseUrlServer()}`,
 });
 
 axiosInstance.interceptors.request.use((config) => {

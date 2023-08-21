@@ -5,6 +5,7 @@ import { GameMode, messagesDto, user } from "../interfaces/chat.interface";
 import { getTokenData } from "../utils/auth-helper";
 import UserService from "../services/users.service";
 import ChannelService from "../services/channel.service";
+import { getBaseUrl } from "../utils/url-helper";
 
 export class BigSocket {
   socket: Socket;
@@ -15,7 +16,7 @@ export class BigSocket {
   spectatingPlayerId: string;
 
   constructor() {
-    this.socket = initSocket(`${window.location.hostname}`, null);
+    this.socket = initSocket(`${getBaseUrl()}`, null);
     this.latestGame = null;
     this.spectatingPlayerId = "";
     this.user = { id: "", name: "" };
@@ -198,7 +199,10 @@ export class BigSocket {
   };
 
   status = (userIdFull: string[], listType: string) => {
-    this.socket.emit("status", { requestedUsers: userIdFull, requestedList: listType });
+    this.socket.emit("status", {
+      requestedUsers: userIdFull,
+      requestedList: listType,
+    });
   };
 
   logOut = () => {

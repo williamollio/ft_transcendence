@@ -1,4 +1,4 @@
-import { getBaseUrl } from "../utils/url-helper";
+import { getBaseUrlServer } from "../utils/url-helper";
 import { axiosInstance } from "./common/axios-instance";
 import { resolve, Response } from "./common/resolve";
 import { AxiosResponse } from "axios";
@@ -7,7 +7,7 @@ const PATH = "auth";
 
 class AuthService {
   getAuthURI(): string {
-    return `${getBaseUrl()}auth/intra42`;
+    return `${getBaseUrlServer()}auth/intra42`;
   }
 
   async sendSecondFactor(code: string[]): Promise<Response<void>> {
@@ -18,7 +18,7 @@ class AuthService {
       .join("");
     return resolve<void>(
       axiosInstance
-        .post(`${getBaseUrl()}auth/2fa/validate`, { code: newString })
+        .post(`${getBaseUrlServer()}auth/2fa/validate`, { code: newString })
         .then((res: AxiosResponse) => res.data)
     );
   }
