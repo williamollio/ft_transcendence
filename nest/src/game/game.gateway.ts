@@ -17,7 +17,7 @@ import { JwtUser } from 'src/users/interface/user.interface';
 
 @WebSocketGateway(3333, {
   cors: {
-    origin: '*',
+    origin: process.env.DOMAIN,
   },
   parser: msgpack,
 })

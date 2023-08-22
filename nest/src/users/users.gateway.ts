@@ -20,7 +20,7 @@ import { SchedulerRegistry } from '@nestjs/schedule';
 // add some cors sanitazation here
 @WebSocketGateway(3333, {
   cors: {
-    origin: '*',
+    origin: process.env.DOMAIN,
   },
   parser: msgpack,
 })
@@ -100,7 +100,7 @@ export class UserGateway {
           id: userId,
           status: UserStatus.OFFLINE,
         });
-		this.schedulerRegistry.deleteTimeout(userId);
+        this.schedulerRegistry.deleteTimeout(userId);
       }, 3000);
       this.schedulerRegistry.addTimeout(userId, timeout);
     }
