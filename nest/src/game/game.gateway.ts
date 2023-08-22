@@ -13,7 +13,7 @@ import { GameMode } from './entities/game.entity';
 import * as msgpack from 'socket.io-msgpack-parser';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
 import { gameSocketToUserId } from './socketToUserIdStorage.service';
-import { JwtUser } from 'src/users/interface/jwt-user.interface';
+import { JwtUser } from 'src/users/interface/user.interface';
 
 @WebSocketGateway(3333, {
   cors: {

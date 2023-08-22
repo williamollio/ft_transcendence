@@ -24,7 +24,7 @@ import { socketToChannelId } from 'src/channel/socketToChannelIdStorage.service'
 import { ModerateChannelDto } from './dto/moderateChannelUser.dto';
 import * as msgpack from 'socket.io-msgpack-parser';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
-import { JwtUser } from 'src/users/interface/jwt-user.interface';
+import { JwtUser } from 'src/users/interface/user.interface';
 import { UsersService } from 'src/users/users.service';
 
 enum acknoledgementStatus {
