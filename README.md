@@ -29,7 +29,7 @@ https://user-images.githubusercontent.com/61702477/236315470-dfff8132-8acf-4ffe-
 ### Environment variables ft_transcendence
 
 Set your passwords and credentials in a `.env` file which has to be located in the `nest` folder.
-Use [env.example](https://github.com/williamollio/ft_transcendence/blob/master/nest/env.example) and [env.example](https://github.com/williamollio/ft_transcendence/blob/master/env.example) as an examples.
+Use [./nest/env.example](https://github.com/williamollio/ft_transcendence/blob/master/nest/env.example), [./env.example](https://github.com/williamollio/ft_transcendence/blob/master/env.example) and [./ui/env.example](https://github.com/williamollio/ft_transcendence/blob/master/ui/env.example) as an examples.
 
 ### UI
 
