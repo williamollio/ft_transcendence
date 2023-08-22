@@ -38,9 +38,7 @@ export class AuthController {
   @Get('google/callback')
   @UseGuards(GoogleGuard)
   async googleAuthCallback(@Req() req: any, @Res() response: any) {
-    console.log('here1');
     const tokens = await this.authService.signIn(req.user as OAuthUser);
-    console.log('here2');
 
     this.setCookieToken(tokens, response);
 
