@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import * as process from 'process';
 import { Strategy, VerifyCallback } from 'passport-google-oauth20';
-import { Intra42User } from '../../users/interface/user.interface';
+import { OAuthUser } from '../../users/interface/user.interface';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
@@ -23,7 +23,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   ): Promise<any> {
     const { id, name, emails } = profile;
 
-    const user: Intra42User = {
+    const user: OAuthUser = {
       provider: 'google',
       providerId: id,
       email: emails[0].value,

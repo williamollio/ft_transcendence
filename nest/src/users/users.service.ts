@@ -3,7 +3,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { User, UserStatus, Match } from '@prisma/client';
-import { Intra42User } from './interface/user.interface';
+import { OAuthUser } from './interface/user.interface';
 import { Response } from 'express';
 import { MatchHistory } from 'src/game/interfaces/matchHistory.interface';
 import { Stat } from 'src/game/interfaces/stats.interface';
@@ -45,7 +45,7 @@ export class UsersService {
     }
   }
 
-  public async createFromIntra(dto: Intra42User): Promise<User> {
+  public async createFromIntra(dto: OAuthUser): Promise<User> {
     try {
       return await this.prisma.user.create({
         data: {

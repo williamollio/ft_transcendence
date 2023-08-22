@@ -8,7 +8,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import { JwtUser } from '../users/interface/user.interface';
-import { Intra42User } from '../users/interface/user.interface';
+import { OAuthUser } from '../users/interface/user.interface';
 import * as process from 'process';
 import { authenticator } from 'otplib';
 import { toDataURL } from 'qrcode';
@@ -28,7 +28,7 @@ export class AuthService {
     });
   }
 
-  async signIn(user: Intra42User) {
+  async signIn(user: OAuthUser) {
     if (user == null) throw new BadRequestException('Unauthenticated');
 
     let foundUser = await this.userService.findByIntraId(user.providerId);
@@ -52,7 +52,7 @@ export class AuthService {
     return tokens;
   }
 
-  async registerUser(user: Intra42User) {
+  async registerUser(user: OAuthUser) {
     try {
       return await this.userService.createFromIntra(user);
     } catch (e) {

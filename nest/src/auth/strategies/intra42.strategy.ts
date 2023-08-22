@@ -4,7 +4,7 @@ import { PassportStrategy } from '@nestjs/passport';
 // @ts-ignore
 import { Strategy } from 'passport-42';
 import * as process from 'process';
-import { Intra42User } from '../../users/interface/user.interface';
+import { OAuthUser } from '../../users/interface/user.interface';
 
 @Injectable()
 export class Intra42Strategy extends PassportStrategy(Strategy, 'intra42') {
@@ -25,7 +25,7 @@ export class Intra42Strategy extends PassportStrategy(Strategy, 'intra42') {
   ): Promise<any> {
     const { id, name, emails } = profile;
 
-    const user: Intra42User = {
+    const user: OAuthUser = {
       provider: 'intra42',
       providerId: id,
       email: emails[0].value,

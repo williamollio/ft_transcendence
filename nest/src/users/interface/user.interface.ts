@@ -1,4 +1,4 @@
-export interface Intra42User {
+export interface OAuthUser {
   providerId: string;
   email: string;
   name: string;

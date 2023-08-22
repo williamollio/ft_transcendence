@@ -11,7 +11,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { IntraGuard } from './guards/intra.guard';
 import * as process from 'process';
-import { Intra42User } from '../users/interface/user.interface';
+import { OAuthUser } from '../users/interface/user.interface';
 import { JwtGuard } from './guards/jwt.guard';
 import { FullAuthGuard } from './guards/full-auth.guard';
 import { Response } from 'express';
@@ -38,7 +38,7 @@ export class AuthController {
   @Get('google/callback')
   @UseGuards(GoogleGuard)
   async googleAuthCallback(@Req() req: any, @Res() response: any) {
-    const tokens = await this.authService.signIn(req.user as Intra42User);
+    const tokens = await this.authService.signIn(req.user as OAuthUser);
 
     this.setCookieToken(tokens, response);
 
@@ -53,7 +53,7 @@ export class AuthController {
   @Get('intra42/callback')
   @UseGuards(IntraGuard)
   async intraAuthCallback(@Req() req: any, @Res() response: any) {
-    const tokens = await this.authService.signIn(req.user as Intra42User);
+    const tokens = await this.authService.signIn(req.user as OAuthUser);
 
     this.setCookieToken(tokens, response);
 
