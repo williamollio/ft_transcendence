@@ -3,11 +3,10 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { User, UserStatus, Match } from '@prisma/client';
-import { Intra42User } from './interface/intra42-user.interface';
+import { Intra42User } from './interface/user.interface';
 import { Response } from 'express';
 import { MatchHistory } from 'src/game/interfaces/matchHistory.interface';
 import { Stat } from 'src/game/interfaces/stats.interface';
-import { GameService } from 'src/game/game.service';
 
 // have to update this file and user response to display error
 

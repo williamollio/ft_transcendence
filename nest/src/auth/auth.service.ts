@@ -7,8 +7,8 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
-import { JwtUser } from '../users/interface/jwt-user.interface';
-import { Intra42User } from '../users/interface/intra42-user.interface';
+import { JwtUser } from '../users/interface/user.interface';
+import { Intra42User } from '../users/interface/user.interface';
 import * as process from 'process';
 import { authenticator } from 'otplib';
 import { toDataURL } from 'qrcode';

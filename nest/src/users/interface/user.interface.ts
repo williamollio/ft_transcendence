@@ -4,3 +4,8 @@ export interface Intra42User {
   name: string;
   provider: string;
 }
+
+export interface JwtUser {
+  id: string;
+  intraId: string;
+}

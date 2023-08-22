@@ -4,7 +4,7 @@ import { PassportStrategy } from '@nestjs/passport';
 // @ts-ignore
 import { Strategy } from 'passport-42';
 import * as process from 'process';
-import { Intra42User } from '../../users/interface/intra42-user.interface';
+import { Intra42User } from '../../users/interface/user.interface';
 
 @Injectable()
 export class Intra42Strategy extends PassportStrategy(Strategy, 'intra42') {

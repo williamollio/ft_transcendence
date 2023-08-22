@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import * as process from 'process';
 import { Strategy, VerifyCallback } from 'passport-google-oauth20';
-import { Intra42User } from '../../users/interface/intra42-user.interface';
+import { Intra42User } from '../../users/interface/user.interface';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {

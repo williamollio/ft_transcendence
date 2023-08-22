@@ -11,7 +11,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { IntraGuard } from './guards/intra.guard';
 import * as process from 'process';
-import { Intra42User } from '../users/interface/intra42-user.interface';
+import { Intra42User } from '../users/interface/user.interface';
 import { JwtGuard } from './guards/jwt.guard';
 import { FullAuthGuard } from './guards/full-auth.guard';
 import { Response } from 'express';
@@ -42,7 +42,7 @@ export class AuthController {
 
     this.setCookieToken(tokens, response);
 
-    response.redirect(`${process.env.DOMAIN_IP}:3000/redirect`);
+    response.redirect(`${process.env.DOMAIN_IP}/profile`);
   }
 
   @Get('intra42')
