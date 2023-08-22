@@ -1,13 +1,10 @@
 import {
-  Body,
   Controller,
   Get,
   HttpStatus,
-  Param,
   Post,
   Req,
   Res,
-  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
@@ -16,7 +13,6 @@ import { IntraGuard } from './guards/intra.guard';
 import * as process from 'process';
 import { Intra42User } from '../users/interface/intra42-user.interface';
 import { JwtGuard } from './guards/jwt.guard';
-import { CreateUserDto } from '../users/dto/create-user.dto';
 import { FullAuthGuard } from './guards/full-auth.guard';
 import { Response } from 'express';
 import { GoogleGuard } from './guards/google.guard';
@@ -62,20 +58,6 @@ export class AuthController {
     this.setCookieToken(tokens, response);
 
     response.redirect(`${process.env.DOMAIN}/profile`);
-  }
-
-  @Post('createBypassAuth')
-  async bypassCreateAuthUser(@Body() createUserDto: CreateUserDto) {
-    return await this.authService.bypassAuth(createUserDto);
-  }
-
-  @Get('bypassAuth/:intraId')
-  async bypassGetAuthUser(@Param('intraId') intraId: string) {
-    try {
-      return await this.authService.bypassAuth({ name: '', intraId });
-    } catch (e) {
-      throw new UnauthorizedException('No such user!');
-    }
   }
 
   @Get('logout')

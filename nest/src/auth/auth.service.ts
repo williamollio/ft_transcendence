@@ -10,7 +10,6 @@ import { UsersService } from '../users/users.service';
 import { JwtUser } from '../users/interface/jwt-user.interface';
 import { Intra42User } from '../users/interface/intra42-user.interface';
 import * as process from 'process';
-import { CreateUserDto } from '../users/dto/create-user.dto';
 import { authenticator } from 'otplib';
 import { toDataURL } from 'qrcode';
 import { Response } from 'express';
@@ -35,22 +34,6 @@ export class AuthService {
     let foundUser = await this.userService.findByIntraId(user.providerId);
     if (foundUser == null) {
       foundUser = await this.registerUser(user);
-    }
-    return await this.coreSignIn({
-      id: foundUser.id,
-      intraId: foundUser.intraId,
-    });
-  }
-
-  async bypassAuth(createUserDto: CreateUserDto) {
-    let foundUser = await this.userService.findByIntraId(createUserDto.intraId);
-    if (foundUser == null) {
-      if (createUserDto.name === '') {
-        throw new InternalServerErrorException(
-          'Name of user to be created cannot be empty!',
-        );
-      }
-      foundUser = await this.userService.create(createUserDto);
     }
     return await this.coreSignIn({
       id: foundUser.id,
