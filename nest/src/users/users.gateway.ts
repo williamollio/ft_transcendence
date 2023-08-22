@@ -21,6 +21,7 @@ import { SchedulerRegistry } from '@nestjs/schedule';
 @WebSocketGateway(3333, {
   cors: {
     origin: process.env.DOMAIN,
+    credentials: true,
   },
   parser: msgpack,
 })
