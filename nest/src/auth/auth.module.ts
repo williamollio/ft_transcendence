@@ -8,6 +8,7 @@ import { Intra42Strategy } from './strategies/intra42.strategy';
 import * as process from 'process';
 import { FullAuthStrategy } from './strategies/full-auth-strategy';
 import { GoogleStrategy } from './strategies/google.strategy';
+import { PassportModule } from '@nestjs/passport';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { GoogleStrategy } from './strategies/google.strategy';
       signOptions: { expiresIn: '1h' },
     }),
     UsersModule,
+    PassportModule.register({ session: false }),
   ],
   controllers: [AuthController],
   providers: [
