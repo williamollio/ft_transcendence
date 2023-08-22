@@ -28,6 +28,7 @@
     "protobufjs": "^7.2.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-google-button": "^0.7.2",
     "react-hook-form": "^7.42.1",
     "react-i18next": "^12.1.1",
     "react-router-dom": "^6.4.3",

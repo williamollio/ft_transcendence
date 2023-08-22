@@ -1,7 +1,7 @@
 import React from "react";
 import Button from "@mui/material/Button";
 import { Box } from "@mui/system";
-import { CircularProgress } from "@mui/material";
+import { CircularProgress, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { translationKeys } from "./constants";
 import authService from "../../services/auth.service";
@@ -10,6 +10,7 @@ import { RoutePath } from "../../interfaces/router.interface";
 import { Cookie } from "../../utils/auth-helper";
 import { BigSocket } from "../../classes/BigSocket.class";
 import Banner from "../../components/Login/Banner";
+import GoogleButton from "react-google-button";
 
 interface Props {
   bigSocket: BigSocket;
@@ -31,7 +32,11 @@ export default function LoginView(props: Props): React.ReactElement {
   }, []);
 
   const handleLogin42 = () => {
-    window.open(authService.getAuthURI(), "_self");
+    window.open(authService.getAuth42URI(), "_self");
+  };
+
+  const handleLoginGoogle = () => {
+    window.open(authService.getAuthGoogleURI(), "_self");
   };
 
   return (
@@ -67,6 +72,24 @@ export default function LoginView(props: Props): React.ReactElement {
             >
               {t(translationKeys.buttons.login42)}
             </Button>
+          </Box>
+          <Typography fontWeight="bold" fontSize={12}>
+            {t(translationKeys.or)}
+          </Typography>
+          <Box
+            sx={{
+              display: "flex",
+              width: "22rem",
+              alignItems: "center",
+              justifyContent: "center",
+              flexDirection: "column",
+            }}
+          >
+            <GoogleButton
+              onClick={() => {
+                handleLoginGoogle();
+              }}
+            />
           </Box>
         </Box>
       )}

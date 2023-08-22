@@ -6,8 +6,12 @@ import { AxiosResponse } from "axios";
 const PATH = "auth";
 
 class AuthService {
-  getAuthURI(): string {
+  getAuth42URI(): string {
     return `${getBaseUrlServer()}auth/intra42`;
+  }
+
+  getAuthGoogleURI(): string {
+    return `${getBaseUrlServer()}auth/google`;
   }
 
   async sendSecondFactor(code: string[]): Promise<Response<void>> {
