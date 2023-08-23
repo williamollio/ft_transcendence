@@ -5,6 +5,8 @@ import { User } from "../../interfaces/user.interface";
 import { AuthCheck } from "./AuthCheck";
 import { Box, CircularProgress } from "@mui/material";
 import { RoutePath } from "../../interfaces/router.interface";
+import { eraseCookie } from "../../utils/auth-helper";
+import { useNavigate } from "react-router-dom";
 
 export const PrivateRoute: FC<{
   children: React.ReactElement;
@@ -21,6 +23,7 @@ export const PrivateRoute: FC<{
     React.useState<boolean>(false);
   const [isUserDataLoaded, setIsUserDataLoaded] =
     React.useState<boolean>(false);
+  const navigate = useNavigate();
 
   React.useEffect(() => {
     let token;
@@ -52,7 +55,13 @@ export const PrivateRoute: FC<{
 
   async function fetchCurrentUser(userId: string) {
     const responseUser = await usersService.getUser(userId);
-    if (!responseUser) {
+    if (responseUser === null || responseUser.data === null) {
+      const token = localStorage.getItem(Cookie.TOKEN);
+      if (token) {
+        localStorage.removeItem(Cookie.TOKEN);
+        eraseCookie(Cookie.TOKEN);
+      }
+      navigate(RoutePath.LOGIN);
       return null;
     }
     setUser(responseUser.data);
