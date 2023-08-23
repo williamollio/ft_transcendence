@@ -11,6 +11,7 @@ import { Cookie } from "../../utils/auth-helper";
 import { BigSocket } from "../../classes/BigSocket.class";
 import Banner from "../../components/Login/Banner";
 import GoogleButton from "react-google-button";
+import BannerBlock from "../../components/Login/BannerBlock";
 
 interface Props {
   bigSocket: BigSocket;
@@ -21,6 +22,12 @@ export default function LoginView(props: Props): React.ReactElement {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
+  const [isDesktop, setDesktop] = React.useState(window.innerWidth > 1200);
+
+  React.useEffect(() => {
+    window.addEventListener("resize", updateMedia);
+    return () => window.removeEventListener("resize", updateMedia);
+  });
 
   React.useEffect(() => {
     const token = localStorage.getItem(Cookie.TOKEN);
@@ -30,6 +37,10 @@ export default function LoginView(props: Props): React.ReactElement {
     if (bigSocket.socket.connected) bigSocket.logOut();
     setIsLoading(false);
   }, []);
+
+  const updateMedia = () => {
+    setDesktop(window.innerWidth > 1200);
+  };
 
   const handleLogin42 = () => {
     window.open(authService.getAuth42URI(), "_self");
@@ -55,7 +66,7 @@ export default function LoginView(props: Props): React.ReactElement {
             gap: "3rem",
           }}
         >
-          <Banner />
+          {isDesktop ? <Banner /> : <BannerBlock />}
           <Box
             sx={{
               display: "flex",

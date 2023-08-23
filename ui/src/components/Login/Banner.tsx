@@ -25,7 +25,6 @@ const Banner = () => {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              padding: "1rem",
               zIndex: 4,
             }}
           >
@@ -44,18 +43,16 @@ const Banner = () => {
               <Box>
                 <Typography variant="body1">
                   This application was created for educational purposes only and
-                  is not intended for :
+                  is NOT supposed to be :
                 </Typography>
                 <Box sx={{ display: "flex", justifyContent: "center" }}>
                   <Typography variant="body1">
-                    - Production use
+                    - Production-ready
                     <br />
-                    - Security
+                    - Fully secured
                     <br />
-                    - Bug-free operation
-                    <br />
-                    - Responsiveness
-                    <br />- Aesthetic design
+                    - Fully responsive
+                    <br />- Well designed
                   </Typography>
                 </Box>
               </Box>
@@ -78,7 +75,8 @@ const Banner = () => {
                     >
                       maintainer
                     </span>
-                  </a>.
+                  </a>
+                  .
                 </Typography>
               </Box>
               <Typography variant="body2">
@@ -93,7 +91,8 @@ const Banner = () => {
                   >
                     link
                   </span>
-                </a>.
+                </a>
+                .
               </Typography>
 
               <Box
