@@ -24,7 +24,7 @@ export class AuthController {
 
   private setCookieToken(token: string, res: any) {
     res.cookie('access_token', token, {
-      maxAge: 120000,
+      maxAge: 21600000,
       sameSite: false,
       secure: true,
     });
