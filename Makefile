@@ -25,6 +25,9 @@ build :
 up :
 	sudo docker compose up --build
 
+staging :
+	sudo docker compose -f docker-compose.staging.yml up --build
+
 down :
 	sudo docker compose down
 
