@@ -52,6 +52,9 @@ export const PrivateRoute: FC<{
 
   async function fetchCurrentUser(userId: string) {
     const responseUser = await usersService.getUser(userId);
+    if (!responseUser) {
+      return null;
+    }
     setUser(responseUser.data);
     setSecondFactorLogged(responseUser.data.secondFactorLogged);
     setSecondFactorEnabled(responseUser.data.secondFactorEnabled);

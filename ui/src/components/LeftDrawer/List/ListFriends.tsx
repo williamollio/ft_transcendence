@@ -6,8 +6,6 @@ import {
   Avatar,
   ListItemText,
   Tooltip,
-  Skeleton,
-  Grid,
 } from "@mui/material";
 import ChatIcon from "@mui/icons-material/Chat";
 import { User } from "../../../interfaces/user.interface";
@@ -26,7 +24,6 @@ import { BigSocket } from "../../../classes/BigSocket.class";
 import { listenerWrapper } from "../../../services/initSocket.service";
 import { useNavigate } from "react-router-dom";
 import { UserStatus } from "../../../interfaces/user.interface";
-import { user } from "../../../interfaces/chat.interface";
 
 interface Props {
   userId: string;
